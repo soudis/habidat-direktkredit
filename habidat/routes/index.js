@@ -8,6 +8,19 @@ var util = require('util');
 var url = require('url');
 var utils = require('../utils');
 var fs = require('fs');
+var numeral = require('numeral');
+
+numeral.language('de', {
+    delimiters: {
+        thousands: '.',
+        decimal: ','
+    },
+    currency: {
+        symbol: '€'
+    }
+});
+
+numeral.language('de');
 
 function redirectReload(redirectUrl) {
   var u = url.parse(redirectUrl, true, false);
@@ -76,6 +89,89 @@ router.get('/files', isLoggedIn, function(req, res) {
      dk_files : dk_files, balance_files:balance_files, title: "Dateien" // get the user out of session and pass to template
  });
 });
+
+
+router.post('/accountnotification', isLoggedIn, function(req, res) {
+	
+	models.user.find({
+		where: {
+			id: req.user.id
+		}, 
+		include:{ 
+			model: models.contract, 
+			as: 'contracts', 
+			include : { 
+				model: models.transaction, 
+				as: 'transactions'
+			}
+		}
+	}).then(function(user) {
+		var transactionList = user.getTransactionList(req.body.year);
+		
+		transactionList.sort(function(a,b) {
+			if (a.contract_id > b.contract_id)
+				return 1;
+			else if (b.contract_id > a.contract_id)
+				return -1;
+			else {	
+				if (a.date.diff(b.date) > 0)
+					return 1;
+				else if(b.date.diff(a.date) > 0)
+					return -1;
+				else 
+					return 0;
+			}
+		});
+		
+		var interestTotal = 0;
+		transactionList.forEach(function(transaction){
+			if (transaction.type.startsWith("Zinsertrag")) {
+				interestTotal = interestTotal + transaction.amount;
+			}
+			transaction.date = transaction.date.format("DD.MM.YYYY");
+			transaction.amount = numeral(transaction.amount).format("0,0.00 $");
+			transaction.interest_rate = numeral(transaction.interest_rate/100).format("0.00 %");
+
+		});
+		
+		var data = {
+				"id": user.id,
+				"first_name": user.first_name,
+				"last_name": user.last_name,
+				"street" :user.street,
+				"zip": user.zip,
+				"place": user.place,
+				"year": req.body.year,
+				"current_date": moment().format("DD.MM.YYYY"),
+				"transactionList": transactionList,
+				"interestTotal": numeral(interestTotal).format("0,0.00 $")};
+		var filename =  "Kontomitteilung " + user.id + " " + req.body.year;
+		utils.generateDocx("account_notification", filename, data);
+		utils.convertToPdf(filename, function(err) {
+			var file;
+			if (!err) {
+				file = fs.readFileSync("./tmp/"+ filename +".pdf", 'binary');
+
+				res.setHeader('Content-Length', file.length);
+				res.setHeader('Content-Type', 'application/pdf');
+				res.setHeader('Content-Disposition', 'inline; filename=' + filename + '.pdf');
+				res.write(file, 'binary');
+				res.end();			
+			} else {
+				console.log("Error generating PDF: ", err)
+				file = fs.readFileSync("./tmp/"+ filename +".docx", 'binary');
+
+				res.setHeader('Content-Length', file.length);
+				res.setHeader('Content-Type', 'application/msword');
+				res.setHeader('Content-Disposition', 'inline; filename=' + filename + '.docx');
+				res.write(file, 'binary');
+				res.end();
+			}
+		});
+	});
+});
+	
+
 
 router.get('/admin', isLoggedInAdmin, function(req, res) {
 	res.redirect('/user/list');

@@ -22,6 +22,8 @@
     "sequelize": "^3.15.1",
     "sprintf": "^0.1.5",
     "docxtemplater": "^1.2.1",
-    "json2csv" : "^2.0.12"
+    "json2csv" : "^2.0.12",
+    "numeral" : "^1.5.2",
+    "cloudconvert" : "^1.1.1"
   }
 }

@@ -2,6 +2,7 @@ var DocxGen = require('docxtemplater');
 var JSZipUtils = require('jszip');
 var fs = require('fs');
 var moment = require('moment');
+var cloudconvert = new (require('cloudconvert'))('oqxW0tKE_7gykv8GDULnAcRTv50QTqMtIPbFBtVzgQFUQe2VridmQ7czMIGtccFwO0ZvsyMNV-6IB4qXxWSo_g');
 
 var json2csv = require('json2csv');
 
@@ -16,6 +17,23 @@ exports.generateDocx = function(templateFile, outputFile, data){
         var out=doc.getZip().generate({type:"nodebuffer"});
         fs.writeFileSync("./tmp/"+ outputFile +".docx", out);
         console.log("done");
+};
+
+exports.convertToPdf = function(file, callback){
+	
+	fs.createReadStream("./tmp/" + file + ".docx")
+	.pipe(cloudconvert.convert({
+	    inputformat: 'docx',
+	    outputformat: 'pdf'
+	 }))
+	.pipe(fs.createWriteStream("./tmp/" + file + ".pdf")
+	.on('finish', function() {
+	    callback(null);
+	})
+	.on('error', function(err) {
+		callback(err);
+	}));
+
 };
 
 exports.generateTransactionList = function(transactionList, outputFile){
