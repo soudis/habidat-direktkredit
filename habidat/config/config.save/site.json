@@ -1,0 +1,12 @@
+{
+  "projectname" : "Willy*Fred",
+  "email" : "willy-fred@servus.at",
+  "logo" : "/public/images/logo.gif",
+  "http": "true",
+  "https": "false",
+  "sslcert": "config/certificate.pem",
+  "sslkey": "config/key.pem",
+  "porthttps": 810,
+  "porthttp": 8080,
+  "reverseproxy": "true"
+}

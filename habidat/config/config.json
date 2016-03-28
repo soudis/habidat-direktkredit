@@ -1,0 +1,9 @@
+{
+  "database": {
+	"username": "root",
+	"password": null,
+	"database": "crowdinfest",
+	"host": "127.0.0.1",
+	"dialect": "mysql"
+  }
+}
