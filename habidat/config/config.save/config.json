@@ -1,9 +1,0 @@
-{
-  "database": {
-	"username": "wffinstatus",
-	"password": AhguXeis6phah5ph,
-	"database": "wffinstatus",
-	"host": "127.0.0.1",
-	"dialect": "mysql"
-  }
-}
