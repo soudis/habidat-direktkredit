@@ -4,8 +4,13 @@ block content
     +nav_item( "/user/list" ) DK Liste
     +nav_item_dropdown( "#" )(label="Auswertungen")
      +nav_item( "/statistics/downloads" ) Downloads
+     +nav_item( "/statistics/numbers" ) Zahlen, Daten, Fakten
     +nav_item( "/admin/communication" ) Kommunikation
     +nav_item( "/procrastinate") #[span.glyphicon.glyphicon-time]
     +nav_item( "/admin-logout" ) Abmelden
+  if message && message != ""
+    .row
+      .alert.alert-danger= message
+    
   block admin-content
  

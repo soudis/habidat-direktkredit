@@ -18,16 +18,30 @@ module.exports = function(sequelize, DataTypes) {
       }
     },
     type: {
-      type: DataTypes.ENUM('INITIAL','DEPOSIT','WITHDRAWAL','TERMINATION'),
-      allowNull: true
+      type: DataTypes.TEXT,
+      allowNull: false
     },
     transaction_date: {
       type: DataTypes.DATE,
-      allowNull: true
+      allowNull: false
     },
     amount: {
       type: DataTypes.DECIMAL,
-      allowNull: true
+      allowNull: false,
+      validate: {
+    	  isValid: function(value) {
+    		  console.log("value " + this.type);
+    		  if (this.type === 'withdrawal' || this.type === 'termination'){
+    			  if (value >= 0) {
+    				  throw new Error("Rückzahlungen müssen negativ sein");
+    			  }
+    		  } else {
+    			  if (value <= 0) {
+    				  throw new Error("Einzahlungen müssen positiv sein");
+    			  }
+    		  }
+    	  }
+      }
     }
   }, {
     tableName: 'transaction',

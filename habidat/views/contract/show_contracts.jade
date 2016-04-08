@@ -51,4 +51,4 @@ each contract in user.contracts
             .col-md-3 #{transaction.getTypeText()}
             .col-md-4.text-right #{sprintf('%.2f', transaction.amount )} EUR #[a.btn.btn-default.btn-sm(href='/transaction/edit/'+transaction.id) #[span.glyphicon.glyphicon-pencil]] #[a.btn.btn-default.btn-sm(href='/transaction/delete/'+transaction.id) #[span.glyphicon.glyphicon-trash]]
       if (addTransaction && contract.id == addTransaction.contract_id)
-        +transaction_input('/transaction/add', user, contract, null)    
+        +transaction_input('/transaction/add', user, contract, addTransaction)    

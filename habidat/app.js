@@ -1,4 +1,5 @@
 var express = require('express');
+var router = express.Router();
 var path = require('path');
 var favicon = require('serve-favicon');
 var logger = require('morgan');
@@ -18,13 +19,10 @@ var privateKey  = fs.readFileSync(site.sslkey, 'utf8');
 var certificate = fs.readFileSync(site.sslcert, 'utf8');
 var credentials = {key: privateKey, cert: certificate};
 
-
 var models  = require('./models');
 
 require('./config/passport')(passport); 
 
-var routes = require('./routes/index');
-var users = require('./routes/users');
 var session      = require('express-session');
 
 var app = express();
@@ -55,10 +53,15 @@ app.use('/public', express.static(__dirname + '/public/',  { maxAge: oneDay }));
 app.use(session({ secret: 'ilovescotchscotchyscotchscotch' })); // session secret
 app.use(passport.initialize());
 app.use(passport.session()); // persistent login sessions
-app.use(flash()); 
 
-app.use('/', routes);
-app.use('/users', users);
+require('./routes/contract')(app);
+require('./routes/normaluser')(app);
+require('./routes/other')(app);
+require('./routes/procrastinate')(app);
+require('./routes/root')(app);
+require('./routes/statistics')(app);
+require('./routes/transaction')(app);
+require('./routes/user')(app);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
@@ -80,9 +83,6 @@ if (app.get('env') === 'development') {
     });
   });
 }
-
-
-
 
 module.exports = app;
 

@@ -1,0 +1,49 @@
+extends ../admin/layout
+
+block admin-content
+  .jumbotron
+    h2 Zahlen, Daten, Fakten
+    p Auswertungen für Hobby-Nummerolog*innen und Zahlennerds 
+  .row
+    .col-md-6
+      .panel.panel-info
+        .panel-heading
+          h3.panel-title Alle Kredite
+        .row
+          .col-md2 Anzahl
+          .col-md4= numbers.total.count
+        .row
+          .col-md2 Gesamtwert
+          .col-md4= numbers.total.amount
+        .row 
+          .col-md2 Durchschnittswert
+          .col-md4= numbers.total.avgAmount
+        .row
+          .col-md2 Medianwert
+          .col-md4= numbers.total.medianAmount
+        .row
+          .col-md2 Durchschnittszinssatz
+          .col-md4= numbers.total.avgInterestRate
+        .row
+          .col-md2 Durchschnittslaufzeit
+          .col-md4= numbers.total.avgPeriod
+    .col-md6
+      .panel.panel-info
+        .panel-heading
+          h3.panel-title Laufende Kredite
+        .row
+          .col-md2 Anzahl
+          .col-md4= numbers.total.countRunning
+        .row
+          .col-md2 Gesamtwert
+          .col-md4= numbers.total.amountRunning
+      .panel.panel-info
+        .panel-heading
+          h3.panel-title Gekündigte Kredite
+        .row
+          .col-md2 Anzahl
+          .col-md4= numbers.total.countCancelled
+        .row
+          .col-md2 Gesamtwert
+          .col-md4= numbers.total.amountCancelled
+ 

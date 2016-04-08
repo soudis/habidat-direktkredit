@@ -66,6 +66,60 @@ module.exports = function(sequelize, DataTypes) {
     classMethods: {
     	associate: function(db) {
     		db['user'].hasMany(db['contract'], {as: 'contracts', foreignKey: 'user_id'});
+    	},
+    	findByIdFetchFull: function(models, id, callback) {
+    		this.find({
+    			where: {
+    				id: id
+    			}, 
+    			include:{ 
+    				model: models.contract, 
+    				as: 'contracts', 
+    				include : { 
+    					model: models.transaction, 
+    					as: 'transactions'
+    				}
+    			},
+    			order:[[{ 
+    				model: models.contract, 
+    				as: 'contracts'}, 
+    				'sign_date'],[{
+    	            model: models.contract, 
+    				as: 'contracts'					
+    				},{
+    			    model: models.transaction, 
+    				as: 'transactions'
+    				}, 
+    				'transaction_date']]
+    		}).then(function(user) {
+    			  callback(user);
+    		});
+    	},
+    	findFetchFull : function(models, whereClause, callback) {
+    		models.user.findAll({  	      
+  			  where: whereClause,
+  			  include:{ 
+  					model: models.contract, 
+  					as: 'contracts', 
+  					include : { 
+  						model: models.transaction, 
+  						as: 'transactions'
+  					}
+  				},
+  				order:[['last_name'], ['first_name'],[{ 
+  					model: models.contract, 
+  					as: 'contracts'}, 
+  					'sign_date'],[{
+  	              model: models.contract, 
+  					as: 'contracts'					
+  					},{
+  				    model: models.transaction, 
+  					as: 'transactions'
+  					}, 
+  					'transaction_date']]
+  			}).then(function(users){
+  				callback(users);
+  			});
     	}
 	},
   	instanceMethods: {
