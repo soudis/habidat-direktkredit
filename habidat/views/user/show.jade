@@ -1,6 +1,10 @@
 extends ../admin/layout
+
+include ../file/show
+
 block admin-content
   include ./show_user.jade 
+  +files_show(user.files, 'user', user.id, addFile)  
   include ../contract/show_contracts.jade 
 
               

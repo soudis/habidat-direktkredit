@@ -11,7 +11,11 @@ var Sequelize = require('sequelize');
 var https = require('https');
 var http = require('http');
 var fs = require('fs');
+var multer = require('multer');
 
+
+var migrate = require('./models/migration');
+migrate.up();
 
 var site    = require('./config/site.json');
 
@@ -20,6 +24,8 @@ var certificate = fs.readFileSync(site.sslcert, 'utf8');
 var credentials = {key: privateKey, cert: certificate};
 
 var models  = require('./models');
+
+
 
 require('./config/passport')(passport); 
 
@@ -45,6 +51,7 @@ app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
+app.use(multer({dest:'./upload/'}).single('file'));
 
 var oneDay = 86400000;
 
@@ -62,6 +69,7 @@ require('./routes/root')(app);
 require('./routes/statistics')(app);
 require('./routes/transaction')(app);
 require('./routes/user')(app);
+require('./routes/file')(app);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

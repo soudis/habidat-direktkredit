@@ -24,6 +24,7 @@
     "docxtemplater": "^1.2.1",
     "json2csv" : "^2.0.12",
     "numeral" : "^1.5.2",
-    "cloudconvert" : "^1.1.1"
+    "cloudconvert" : "^1.1.1",
+    "multer" : "^1.1.0"
   }
 }

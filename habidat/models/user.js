@@ -65,21 +65,34 @@ module.exports = function(sequelize, DataTypes) {
     freezeTableName: true,
     classMethods: {
     	associate: function(db) {
-    		db['user'].hasMany(db['contract'], {as: 'contracts', foreignKey: 'user_id'});
+    		db.user.hasMany(db.contract, {
+    			as: 'contracts', 
+    			foreignKey: 'user_id'});
+    		
+    		db.user.hasMany(db.file, {
+    			as: 'files',
+    			foreignKey: 'ref_id',
+    			scope: {
+    				ref_table: 'user'
+    			}
+    		});
     	},
     	findByIdFetchFull: function(models, id, callback) {
     		this.find({
     			where: {
     				id: id
     			}, 
-    			include:{ 
+    			include:[{ 
     				model: models.contract, 
     				as: 'contracts', 
     				include : { 
     					model: models.transaction, 
     					as: 'transactions'
+    				}},{
+    				model: models.file,
+    				as: 'files',
     				}
-    			},
+    			],
     			order:[[{ 
     				model: models.contract, 
     				as: 'contracts'}, 
