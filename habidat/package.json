@@ -25,6 +25,8 @@
     "json2csv" : "^2.0.12",
     "numeral" : "^1.5.2",
     "cloudconvert" : "^1.1.1",
-    "multer" : "^1.1.0"
+    "multer" : "^1.1.0",
+    "nchart" : "^1.0.1",
+    "canvas" :"^1.3.12"
   }
 }

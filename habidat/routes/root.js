@@ -9,12 +9,12 @@ module.exports = function(app){
 
 	/* Welcome Site */
 	router.get('/', function(req, res, next) {
-	  res.render('index', { title: 'habiDAT' } );
+	  res.render('index', { title: 'habiDAT', message: req.flash('loginMessage') } );
 	});
 
 	/* Admin Logon page */
 	router.get('/admin-logon', function(req, res, next) {
-	  res.render('admin/admin-logon', { title: 'habiDAT Login' });
+	  res.render('admin/admin-logon', { title: 'habiDAT Login', message: req.flash('loginMessage') });
 	});
 	
 	router.get('/admin', security.isLoggedInAdmin, function(req, res) {

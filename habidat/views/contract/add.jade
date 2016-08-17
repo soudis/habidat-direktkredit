@@ -13,10 +13,10 @@ block admin-content
           input.form-control(type="number" step="0.01" name="amount")
         label.control-label.col-md-1 Zinssatz
         .col-md-2
-          input.form-control(type="number" step="0.01" min="0" max="10" name="interest_rate") 
+          input.form-control(type="number" step="0.001" min="0" max="10" name="interest_rate") 
         label.control-label.col-md-1 Laufzeit
         .col-md-2
-          input.form-control(type="text" name="period")
+          input.form-control(type="number" name="period" step="0.01" min="0" max="100")
       .form-group 
         label.control-label.col-md-2 Vertragsdatum
         .col-md-4

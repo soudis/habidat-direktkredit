@@ -9,3 +9,5 @@
     .draw();
     $('[data-toggle="tooltip"]').tooltip(); 
   });
+  
+  

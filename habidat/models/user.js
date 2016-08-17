@@ -59,7 +59,11 @@ module.exports = function(sequelize, DataTypes) {
     BIC: {
       type: DataTypes.STRING,
       allowNull: true
-    }
+    },
+    relationship: {
+        type: DataTypes.STRING,
+        allowNull: true
+      }
   }, {
     tableName: 'user',
     freezeTableName: true,
@@ -133,9 +137,36 @@ module.exports = function(sequelize, DataTypes) {
   			}).then(function(users){
   				callback(users);
   			});
+    	},
+    	aboutToExpire: function(models, whereClause, daysToExpire, callback ){
+    		var expires = false;
+    		var usersExpired = [];
+    		models.user.findFetchFull(models, whereClause, function(users){
+    			users.forEach(function(user){
+    				user.contracts.forEach(function(contract){
+    					if (!contract.isTerminated() && moment(contract.sign_date).add( daysToExpire + contract.period*365, 'days').diff(moment()) <= 0) {
+    						expires = true;
+    					}
+    				});
+    				if (expires === true) {
+    					usersExpired.push(user);
+    				}
+    				expires = false;
+    			});
+    			callback(usersExpired);
+    		});
     	}
 	},
   	instanceMethods: {
+  		isActive: function() {
+  			var active;
+  			this.contracts.forEach(function(contract){
+  				if (!contract.isTerminated()) {
+  					active = true;
+  				}
+  			});
+  			return active;
+  		},
   		isAdmin: function() {
   			if (this.administrator) {
   				return true;

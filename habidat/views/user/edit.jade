@@ -34,5 +34,17 @@ block admin-content
           label.control-label.col-md-2 BIC
           .col-md-4
             input.form-control(type="text" name="BIC" value=user.BIC)
+        .form-group
+          label.control-label.col-md-2 Beziehung zum Projekt
+          .col-md-4
+            select.form-control(name="relationship")
+              option(selected=user && user.relationship == 'Unbekannt' value='Unbekannt') Unbekannt
+              option(selected=user && user.relationship == 'Bewohner_innen' value='Bewohner_innen') Bewohner_innen
+              option(selected=user && user.relationship == 'Nutzer_innen' value='Nutzer_innen') Nutzer_innen
+              option(selected=user && user.relationship == 'Verwandte' value='Verwandte') Verwandte
+              option(selected=user && user.relationship == 'Freund_innen' value='Freund_innen') Freund_innen
+              option(selected=user && user.relationship == 'Bekannte' value='Bekannte') Bekannte
+              option(selected=user && user.relationship == 'MHS' value='MHS') Mietshäusersyndikat
+              option(selected=user && user.relationship == 'habiTAT' value='habiTAT') habiTAT            
         .text-right
           button(type='submit' class='btn btn-primary') Speichern

@@ -6,10 +6,19 @@ var url = require('url');
 
 module.exports = function(app){
 
+	router.get('/user/list/:mode', security.isLoggedInAdmin, function(req, res) {
+		if (req.params.mode === 'expire') {
+			models.user.aboutToExpire(models, ['administrator <> 1'], 90, function(users) {
+				res.render('user/list', {users: users, title: 'Direktkreditgeber*innen Liste'});
+			});
+		}
+	});
+	
 	router.get('/user/list', security.isLoggedInAdmin, function(req, res) {
 		models.user.findFetchFull(models, ['administrator <> 1'], function(users) {
 			res.render('user/list', {users: users, title: 'Direktkreditgeber*innen Liste'});
 		});
+
 	});
 
 	router.get('/user/add', security.isLoggedInAdmin, function(req, res, next) {
@@ -48,7 +57,8 @@ module.exports = function(app){
 			IBAN: req.body.IBAN,
 			BIC: req.body.BIC,
 	        logon_id: Math.abs(Math.random() * 100000000),
-	        password: password
+	        password: password,
+	        relationship: req.body.relationship
 			
 		}).then(function(user) {
 			res.redirect('/user/show/' + user.id);
@@ -65,7 +75,8 @@ module.exports = function(app){
 			telno: req.body.telno,
 			email: req.body.email,
 			IBAN: req.body.IBAN,
-			BIC: req.body.BIC	
+			BIC: req.body.BIC,
+			relationship: req.body.relationship
 		}, {where:{id:req.body.id}}).then(function(user) {
 			res.redirect('/user/show/' + req.body.id);
 		});	

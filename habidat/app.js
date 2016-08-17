@@ -27,7 +27,7 @@ var models  = require('./models');
 
 
 
-require('./config/passport')(passport); 
+require('./utils/security/passport')(passport); 
 
 var session      = require('express-session');
 
@@ -45,13 +45,14 @@ if (site.reverseproxy === 'true') {
 	app.enable('trust proxy');
 }
 
-// uncomment after placing your favicon in /public
-//app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
-app.use(logger('dev'));
+// setup the logger
+app.use(logger('common'));
+
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(multer({dest:'./upload/'}).single('file'));
+app.use(flash());
 
 var oneDay = 86400000;
 
@@ -70,6 +71,7 @@ require('./routes/statistics')(app);
 require('./routes/transaction')(app);
 require('./routes/user')(app);
 require('./routes/file')(app);
+require('./routes/communication')(app);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

@@ -1,6 +1,45 @@
 var models  = require('../../models');
 var moment = require("moment");
 
+var chartColors = [
+	"#a6cee3",
+	"#1f78b4",
+	"#b2df8a",
+	"#33a02c",
+	"#fb9a99",
+	"#e31a1c",
+	"#fdbf6f",
+	"#ff7f00",
+	"#cab2d6",
+	"#6a3d9a",
+	"#ffff99",
+	"#b15928"
+];
+	
+var generatePieChart = function(data, callback) {
+	var chartData = [];
+	var index = 0;
+	for(var label in data)
+	{
+		var value = data[label];
+
+		chartData.push({value: value, color: chartColors[index], label:label});
+		index++;
+
+	}
+	
+	var Canvas = require('canvas')
+	  , canvas = new Canvas(800, 800)
+	  , ctx = canvas.getContext('2d')
+	  , Chart = require('nchart')
+	  , fs = require('fs');
+	
+	new Chart(ctx).Pie(
+		    chartData
+		);
+	callback(canvas.toBuffer().toString('base64'));
+};
+
 exports.getNumbers = function(callback){
 
 	var contractHelper = [];
@@ -37,7 +76,9 @@ exports.getNumbers = function(callback){
 				amountCancelled : 0,
 				countNew : 0,
 				countCancelled : 0
-			}
+			},
+			byRelationship: {},
+			charts:{}
 
 
 	};
@@ -116,6 +157,12 @@ exports.getNumbers = function(callback){
 						numbers.total.countRunning ++;
 						numbers.total.interestToDate += interest;
 					}
+					
+					if(numbers.byRelationship[user.relationhip]) {
+						numbers.byRelationship[user.relationship] += contract.amount;
+					} else {
+						numbers.byRelationship[user.relationship] = contract.amount;
+					}
 
 					contractHelper.push ({
 						interestRate : contract.interest_rate,
@@ -165,9 +212,14 @@ exports.getNumbers = function(callback){
 		
 		numbers.total.avgAmount = numbers.total.amount / numbers.total.count;
 		numbers.total.avgPeriod = numbers.total.avgPeriod / numbers.total.amount;
+		
+/*		generatePieChart(numbers.byRelationship, function(chart) {
+			numbers.charts.byRelationship = chart;
+		});*/
 
 		console.log("test2" + numbers.total.amount);
 		callback(numbers);
 	});
 
 };
+

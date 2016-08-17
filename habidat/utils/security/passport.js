@@ -1,14 +1,20 @@
 // config/passport.js
 
 var Sequelize = require("sequelize");
-var models  = require('../models');
+var models  = require('../../models');
+var moment = require('moment');
+var fs = require('fs');
+
+var log_file = fs.createWriteStream(__dirname + '/../../log/access.log', {flags : 'a'});
 
 // load all the things we need
 var LocalStrategy   = require('passport-local').Strategy;
 
 
 function logAuthFailed(req, userid) {
-	console.log('AUTH-FAIL: URL: ' + req.url + ', Authentification failure for ' + userid + ' from ' + req.ip);
+	var ip = req.header('x-forwarded-for') || req.connection.remoteAddress;
+	log_file.write(moment().format('YYYY-MM-DD HH:mm:SS') + ' AUTH-FAIL: URL: ' + req.url + ', USER: ' + userid + ', CLIENT IP: ' + ip + '\n');
+	console.log(moment().format('YYYY-MM-DD HH:mm:SS') + ' AUTH-FAIL: URL: ' + req.url + ', USER: ' + userid + ', CLIENT IP: ' + ip);
 }
 // expose this function to our app using module.exports
 module.exports = function(passport) {

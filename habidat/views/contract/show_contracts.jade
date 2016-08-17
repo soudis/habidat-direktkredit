@@ -24,7 +24,7 @@ each contract in user.contracts
         .col-md-8 nicht gekündigt
     .row
       .col-md-4 Zinssatz:
-      .col-md-8 #{sprintf('%.2f', contract.interest_rate )}%
+      .col-md-8 #{sprintf('%.3f', contract.interest_rate )}%
     .row 
       .col-md-4 Zinsertrag (bis heute):
       .col-md-8 #{sprintf('%.2f', interest.now)} EUR
@@ -34,6 +34,9 @@ each contract in user.contracts
     .row 
       .col-md-4 Status:
       .col-md-8 #{contract.getStatusText()} 
+    .row 
+      .col-md-4 Laufzeit:
+      .col-md-8 #{sprintf('%.2f', contract.period)} Jahre
     .row 
       .col-md-4 Notizen:
       .col-md-8= contract.notes
