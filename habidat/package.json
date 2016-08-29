@@ -27,6 +27,7 @@
     "cloudconvert" : "^1.1.1",
     "multer" : "^1.1.0",
     "nchart" : "^1.0.1",
-    "canvas" :"^1.3.12"
+    "canvas" :"^1.3.12",
+    "validator" : "^4.0.4"
   }
 }

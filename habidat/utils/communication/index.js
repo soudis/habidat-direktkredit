@@ -1,6 +1,6 @@
 var models  = require('../../models');
 var moment = require("moment");
-
+var validator = require("validator");
 
 exports.getEmails = function(mode, callback){
 
@@ -10,7 +10,7 @@ exports.getEmails = function(mode, callback){
 	models.user.findFetchFull(models, whereClause, function(users){
 		users.forEach(function(user){
 			var add;
-			if (user.email && (mode == 'all' || user.isActive())) {
+			if (user.email && validator.isEmail(user.email) && (mode === 'all' || user.isActive())) {
 				usersString += user.email + ',';
 			} 
 		});
