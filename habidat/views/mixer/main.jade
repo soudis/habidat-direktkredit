@@ -1,0 +1,26 @@
+extends ../admin/layout
+
+block admin-content
+  .jumbotron
+    h2 Bewohner*innenmixer
+    p Der Bewohner*innenmixer berechnet die ideale Zuweisung der Bewohner*innen zu den Wohnungen nach magischen fremdbestimmten Kriterien. Einfach die Bewohner*innen und Wohnungen eintragen und die Blackbox rattern lassen. 
+  .row
+    a.btn.btn-default.btn-sm(href='/mixer/add_config') #[span.glyphicon.glyphicon-plus]
+    table.table.table-striped
+      thead
+        tr
+          th.col-md-6.text-center Name
+          th.col-md-6.text-center Berechnungsmodus
+      tbody
+        each configuration in configurations
+          tr
+            td= configuration.name 
+            td= configuration.calculation_mode
+            td.fit
+                a.btn.btn-default.btn-sm(href='/mixer/show/'+configuration.id) #[span.glyphicon.glyphicon-search]
+                a.btn.btn-default.btn-sm(href='/mixer/edit_config/'+configuration.id) #[span.glyphicon.glyphicon-pencil]
+                a.btn.btn-default.btn-sm(href='/mixer/delete_config/'+configuration.id) #[span.glyphicon.glyphicon-trash]
+              
+  
+              
+            

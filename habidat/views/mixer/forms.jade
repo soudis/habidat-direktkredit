@@ -1,0 +1,101 @@
+mixin config_form(configuration, action)
+  .row
+    form.form-horizontal(action=action method="post" role="form")
+      if configuration
+        input(type="hidden" name="id" value=configuration.id)
+      legend Konfiguration bearbeiten / hinzufügen
+      .form-group
+        label.control-label.col-md-2 Name
+        .col-md-4
+          if configuration
+            input.form-control(type="text" name="name" value=configuration.name)
+          else
+            input.form-control(type="text" name="name")
+        label.control-label.col-md-2 Berechnungsmodus
+        .col-md-4
+          select.form-control(name="calculation_mode")
+            option(selected=configuration && configuration.calculation_mode == "WBHOOE" value="WBHOOE") Wohnbeihilfe OÖ           
+      .text-right
+        button(type='submit' class='btn btn-primary') Speichern
+        
+        
+mixin habitant_form(configuration, habitant, action)
+    form.form-horizontal(action=action method="post" role="form")
+      if habitant
+        input(type="hidden" name="id" value=habitant.id)
+      else
+        input(type="hidden" name="id")        
+      input(type="hidden" name="configuration_id" value=configuration_id)
+      legend Bewohner*in bearbeiten
+      .form-group
+        label.control-label.col-md-2 Name
+        .col-md-3
+          if habitant
+            input.form-control(type="text" name="name" value=habitant.name)
+          else
+            input.form-control(type="text" name="name")
+      .form-group
+        label.control-label.col-md-2 Geburtsdatum
+        .col-md-3
+          .input-group.date.datepicker(data-provide="datepicker" data-date-format="dd.mm.yyyy" data-date-language="de")
+            if habitant && habitant.birth_date
+              input.form-control(type="text" name="birth_date" value=moment(habitant.birth_date).format('DD.MM.YYYY'))
+            else 
+              input.form-control(type="text" name="birth_date")
+            span.input-group-addon
+              span.glyphicon.glyphicon-calendar
+      .form-group
+        label.control-label.col-md-2 Einkommen
+        .col-md-3
+          if habitant
+            input.form-control(type="number" step="1" min="0" max="100000" name="income" value=habitant.income)
+          else
+            input.form-control(type="number" step="1" min="0" max="100000" name="income") 
+      .form-group
+        label.control-label.col-md-2 Fixierte Wohnung
+        .col-md-3
+          select.form-control(name="fixed_to_flat")
+            each flat in flats
+              option(value="")
+              option(selected=habitant && habitant.fixed_to_flat == flat.id value=flat.id)= flat.name           
+      .text-right
+        button(type='submit' class='btn btn-primary') Speichern
+        
+mixin flat_form(configuration_id, flat, action)
+    form.form-horizontal(action=action method="post" role="form")
+      if flat
+        input(type="hidden" name="id" value=flat.id)
+      else
+        input(type="hidden" name="id")        
+      input(type="hidden" name="configuration_id" value=configuration_id)
+      legend Wohnung bearbeiten
+      .form-group
+        label.control-label.col-md-2 Name
+        .col-md-3
+          if flat
+            input.form-control(type="text" name="name" value=flat.name)
+          else
+            input.form-control(type="text" name="name")
+      .form-group
+        label.control-label.col-md-2 Größe
+        .col-md-3
+          if flat
+            input.form-control(type="number" step="0.01" min="0" max="10000" name="size" value=flat.size)
+          else
+            input.form-control(type="number" step="0.01" min="0" max="10000" name="size") 
+      .form-group
+        label.control-label.col-md-2 Min. Bewohner*innen
+        .col-md-3
+          if flat
+            input.form-control(type="number" step="1" min="0" max="100" name="min_habitant" value=flat.min_habitant)
+          else
+            input.form-control(type="number" step="1" min="0" max="100" name="min_habitant")    
+      .form-group
+        label.control-label.col-md-2 Max. Bewohner*innen
+        .col-md-3
+          if flat
+            input.form-control(type="number" step="1" min="0" max="100" name="max_habitant" value=flat.max_habitant)
+          else
+            input.form-control(type="number" step="1" min="0" max="100" name="max_habitant")                        
+      .text-right
+        button(type='submit' class='btn btn-primary') Speichern
