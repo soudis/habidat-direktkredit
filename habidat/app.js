@@ -72,6 +72,7 @@ require('./routes/transaction')(app);
 require('./routes/user')(app);
 require('./routes/file')(app);
 require('./routes/communication')(app);
+require('./routes/mixer')(app);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
