@@ -13,35 +13,53 @@ block admin-content
         .col-md-7.h4= numbers.total.count
       .row
         .col-md-5.h4 Gesamtwert
-        .col-md-7.h4= numbers.total.amount
+        .col-md-7.h4 #{sprintf('%.2f', numbers.total.amount )} EUR
       .row 
         .col-md-5.h4 Durchschnittswert
-        .col-md-7.h4= numbers.total.avgAmount
+        .col-md-7.h4 #{sprintf('%.2f', numbers.total.avgAmount )} EUR 
       .row
         .col-md-5.h4 Medianwert
-        .col-md-7.h4= numbers.total.medianAmount
+        .col-md-7.h4  #{sprintf('%.2f', numbers.total.medianAmount )} EUR 
       .row
         .col-md-5.h4 Durchschnittszinssatz
-        .col-md-7.h4= numbers.total.avgInterestRate
+        .col-md-7.h4 #{sprintf('%.4f', numbers.total.avgInterestRate )} %
       .row
         .col-md-5.h4 Durchschnittslaufzeit
-        .col-md-7.h4= numbers.total.avgPeriod
+        .col-md-7.h4 #{sprintf('%.3f', numbers.total.avgPeriod )} Jahre
     .col-md-6
       .row
         h3 Laufende Kredite
       .row
         .col-md-5.h4 Anzahl
-        .col-md-7.h4= numbers.total.countRunning
+        .col-md-7.h4= numbers.running.count
       .row
         .col-md-5.h4 Gesamtwert
-        .col-md-7.h4= numbers.total.amountRunning
+        .col-md-7.h4 #{sprintf('%.2f', numbers.running.amount )} EUR
+      .row 
+        .col-md-5.h4 Durchschnittswert
+        .col-md-7.h4 #{sprintf('%.2f', numbers.running.avgAmount )} EUR 
+      .row
+        .col-md-5.h4 Durchschnittszinssatz
+        .col-md-7.h4 #{sprintf('%.4f', numbers.running.avgInterestRate )} %
+      .row
+        .col-md-5.h4 Durchschnittslaufzeit
+        .col-md-7.h4 #{sprintf('%.3f', numbers.running.avgPeriod )} Jahre
       .row
         h3 Gekündigte Kredite
       .row
         .col-md-5.h4 Anzahl
-        .col-md-7.h4= numbers.total.countCancelled
+        .col-md-7.h4= numbers.cancelled.count
       .row
         .col-md-5.h4 Gesamtwert
-        .col-md-7.h4= numbers.total.amountCancelled
+        .col-md-7.h4 #{sprintf('%.2f', numbers.cancelled.amount )} EUR
+      .row 
+        .col-md-5.h4 Durchschnittswert
+        .col-md-7.h4 #{sprintf('%.2f', numbers.cancelled.avgAmount )} EUR 
+      .row
+        .col-md-5.h4 Durchschnittszinssatz
+        .col-md-7.h4 #{sprintf('%.4f', numbers.cancelled.avgInterestRate )} %
+      .row
+        .col-md-5.h4 Durchschnittslaufzeit
+        .col-md-7.h4 #{sprintf('%.3f', numbers.cancelled.avgPeriod )} Jahre
     .row
       img(width="600" src="data:image/png;base64,"+numbers.charts.byRelationship)

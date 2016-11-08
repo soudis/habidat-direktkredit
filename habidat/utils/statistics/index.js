@@ -47,14 +47,10 @@ exports.getNumbers = function(callback){
 	var numbers = {
 			total : {
 				amount : 0,
-				amountRunning : 0,
-				amountCancelled : 0,
 				avgAmount : 0,
 				medianAmount: 0,
 
 				count : 0,
-				countRunning : 0,
-				countCancelled : 0,
 
 				interestToDate : 0,
 				interestPaid : 0,
@@ -62,7 +58,24 @@ exports.getNumbers = function(callback){
 				medianInterestRate : 0,
 				
 				avgPeriod : 0,
+				avgPeriodAmount: 0,
 				medianPeriod : 0
+			},
+			running : {
+				amount :0,
+				avgAmount : 0,
+				count :0,
+				avgInterestRate :0,
+				avgPeriod :0,
+				avgPeriodAmount: 0
+			},
+			cancelled : {
+				amount :0,
+				avgAmount : 0,
+				count :0,
+				avgInterestRate :0,
+				avgPeriod : 0,
+				avgPeriodAmount: 0
 			},
 			lastMonth : {
 				amountNew : 0,
@@ -146,15 +159,28 @@ exports.getNumbers = function(callback){
 					numbers.total.amount += deposits;
 					numbers.total.avgInterestRate += contract.amount * contract.interest_rate;
 					numbers.total.count ++;
-					numbers.total.avgPeriod += contract.period * contract.amount;
+					if (contract.period > 0) {
+						numbers.total.avgPeriod += contract.period * contract.amount;
+						numbers.total.avgPeriodAmount += contract.amount;
+					}
 					if (contract.isTerminated(now)) {
-						numbers.total.amountCancelled += deposits;
-						numbers.total.countCancelled ++;
+						numbers.cancelled.count ++;
+						numbers.cancelled.amount += deposits;
+						if (contract.period > 0) {
+							numbers.cancelled.avgPeriod += contract.period * contract.amount;
+							numbers.cancelled.avgPeriodAmount += contract.amount;
+						}
+						numbers.cancelled.avgInterestRate  += contract.amount * contract.interest_rate;
 						numbers.total.interestPaid -= deposits + withdrawals;
 						numbers.total.interestToDate -= deposits + withdrawals;
 					} else {
-						numbers.total.amountRunning += deposits;
-						numbers.total.countRunning ++;
+						numbers.running.count ++;
+						numbers.running.amount += deposits;
+						if (contract.period > 0) {
+							numbers.running.avgPeriod += contract.period * contract.amount;
+							numbers.running.avgPeriodAmount += contract.amount;
+						}
+						numbers.running.avgInterestRate  += contract.amount * contract.interest_rate;
 						numbers.total.interestToDate += interest;
 					}
 					
@@ -176,6 +202,8 @@ exports.getNumbers = function(callback){
 			});
 
 		numbers.total.avgInterestRate = numbers.total.avgInterestRate / numbers.total.amount;
+		numbers.running.avgInterestRate = numbers.running.avgInterestRate / numbers.running.amount;
+		numbers.cancelled.avgInterestRate = numbers.cancelled.avgInterestRate / numbers.cancelled.amount;
 
 		contractHelper.sort(function(a,b) {
 			if (a.interestRate > b.interestRate)
@@ -211,7 +239,11 @@ exports.getNumbers = function(callback){
 		numbers.total.medianPeriod = contractHelper[Math.ceil(numbers.total.count/2)].period;
 		
 		numbers.total.avgAmount = numbers.total.amount / numbers.total.count;
-		numbers.total.avgPeriod = numbers.total.avgPeriod / numbers.total.amount;
+		numbers.total.avgPeriod = numbers.total.avgPeriod / numbers.total.avgPeriodAmount;
+		numbers.cancelled.avgAmount = numbers.cancelled.amount / numbers.cancelled.count;
+		numbers.cancelled.avgPeriod = numbers.cancelled.avgPeriod / numbers.cancelled.avgPeriodAmount;
+		numbers.running.avgAmount = numbers.running.amount / numbers.running.count;
+		numbers.running.avgPeriod = numbers.running.avgPeriod / numbers.running.avgPeriodAmount;
 		
 /*		generatePieChart(numbers.byRelationship, function(chart) {
 			numbers.charts.byRelationship = chart;
