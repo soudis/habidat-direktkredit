@@ -1,0 +1,15 @@
+extends layout
+
+block content
+  +nav(site.projectname, "dropdown_menu", site.logo) 
+    +nav_item("/") Einloggen
+
+  .jumbotron
+    h2= site.projectname + " @ habiDAT"
+    p Willkommen beim habiDAT. Bitte melde dich mit deinen Zugangsdaten an. Die Daten wurden dir nach Vertragsabschluss per Post zugesandt. Falls du die Zugangsdaten nicht bekommen hast oder verloren hast, dann melde dich bitte unter #[a(href='mailto:#{site.email}') #{site.email}] 
+  
+  if message && message.length > 0
+    div(class="alert alert-danger") 
+      p.message= message
+
+  +logon_form("logon")

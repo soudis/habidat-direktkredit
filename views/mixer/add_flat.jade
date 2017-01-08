@@ -1,0 +1,6 @@
+extends ../admin/layout
+
+include ./forms.jade  
+
+block admin-content
+  +flat_form(configuration_id, flat, "/mixer/add_flat")
