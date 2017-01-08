@@ -1,8 +1,0 @@
-docs
-test
-.editorconfig
-.env
-.travis.yml
-.gitignore
-build-docs.sh
-README.md
