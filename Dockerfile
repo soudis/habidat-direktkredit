@@ -9,5 +9,6 @@ RUN npm install pm2 -g
 
 VOLUME config
 VOLUME public/files
+VOLUME templates
 
 CMD pm2 start app.js -n habidat
