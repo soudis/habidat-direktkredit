@@ -9,4 +9,4 @@ VOLUME config
 VOLUME public/files
 VOLUME templates
 
-CMD pm2 start app.js -n habidat
+CMD pm2-docker start app.js 
