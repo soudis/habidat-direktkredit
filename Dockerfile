@@ -5,8 +5,8 @@ WORKDIR /habidat
 RUN npm install
 RUN npm install pm2 -g
 
-VOLUME config
-VOLUME public/files
-VOLUME templates
+VOLUME /habidat/config
+VOLUME /habidat/public/files
+VOLUME /habidat/templates
 
 CMD pm2-docker start app.js 
