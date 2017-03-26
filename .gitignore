@@ -9,6 +9,7 @@ tmp
 upload
 templates
 public/files
+public/images
 
 # Compiled source #
 ###################
