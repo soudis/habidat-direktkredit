@@ -1,0 +1,30 @@
+{ 
+	"willy-fred": {
+		"projectname": "Willy*Fred",
+		"logo": "/public/images/willy-fred.gif",
+	    "email" : "willy-fred@servus.at",
+	    "files" : "/public/files/willy-fred",
+	    "templates": "/templates/willy-fred/docx",
+	    "usersuffix": "willyfred",
+	    "db": {
+	    	"username": "dk_willy_fred",
+			"password": "test",
+			"database": "dk_willy_fred"
+	    }
+	},
+	"autonome-wohnfabrik": {
+		"projectname": "Autonome Wohnfabrik",
+		"logo": "/public/images/wohnfabrik.png",
+	    "email" : "wohnfabrik@systemli.org",
+	    "files" : "/public/files/autonome-wohnfabrik",
+	    "templates": "/templates/autonome-wohnfabrik/docx",
+	    "usersuffix": "wohnfabrik",
+	    "db": {
+	    	"username": "dk_autonome_wohnfabrik",
+			"password": "test",
+			"database": "dk_autonome_wohnfabrik"
+	    }
+	}
+
+
+}
