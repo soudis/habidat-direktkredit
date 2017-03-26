@@ -1,4 +1,3 @@
-var models  = require('../models');
 var security = require('../utils/security');
 var moment = require("moment");
 var router = require('express').Router();
@@ -9,6 +8,7 @@ module.exports = function(app){
 
 	/* GET home page. */
 	router.get('/transaction/edit/:id', security.isLoggedInAdmin, function(req, res, next) {
+		var models  = require('../models')(req.session.project);
 		models.transaction.find({
 			where : {
 				id: req.params.id
@@ -28,6 +28,7 @@ module.exports = function(app){
 
 	/* GET home page. */
 	router.get('/transaction/add/:id', security.isLoggedInAdmin, function(req, res, next) {
+		var models  = require('../models')(req.session.project);
 			models.contract.find({
 				where:{
 					id: req.params.id
@@ -41,6 +42,7 @@ module.exports = function(app){
 	});
 
 	router.post('/transaction/add', security.isLoggedInAdmin, function(req, res) {
+		var models  = require('../models')(req.session.project);
 		models.transaction.create({
 			transaction_date: moment(req.body.transaction_date, 'DD.MM.YYYY')+1000*60*60*24,
 			amount: req.body.amount,
@@ -56,6 +58,7 @@ module.exports = function(app){
 	});
 	
 	router.post('/transaction/edit', security.isLoggedInAdmin, function(req, res) {
+		var models  = require('../models')(req.session.project);
 		models.transaction.update({
 			transaction_date: moment(req.body.transaction_date, 'DD.MM.YYYY')+1000*60*60*24,
 			amount: req.body.amount,
@@ -72,6 +75,7 @@ module.exports = function(app){
 
 	router.get('/transaction/delete/:id', security.isLoggedInAdmin, function(req, res) {
 		
+		var models  = require('../models')(req.session.project);
 		models.transaction.find({
 			where: {
 				id: req.params.id

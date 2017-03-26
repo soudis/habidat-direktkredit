@@ -1,4 +1,3 @@
-var models  = require('../models');
 var security = require('../utils/security');
 var moment = require("moment");
 var statistics = require('../utils/statistics');
@@ -12,7 +11,8 @@ module.exports = function(app){
 	});
 
 	router.get('/statistics/numbers', security.isLoggedInAdmin, function(req, res) {
-		statistics.getNumbers(function(numbers) {
+		var models  = require('../models')(req.session.project);		
+		statistics.getNumbers(models, function(numbers) {
 			console.log("test: " + numbers.amount);
 			res.render('statistics/numbers', { title: 'Zahlen, Daten, Fakten', "numbers": numbers});
 		});
@@ -20,7 +20,7 @@ module.exports = function(app){
 	});
 	
 	router.post('/statistics/transactionList', security.isLoggedInAdmin, function(req, res) {
-		
+		var models  = require('../models')(req.session.project);		
 		models.user.all({
 			  include:{ 
 					model: models.contract, 

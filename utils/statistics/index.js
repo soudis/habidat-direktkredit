@@ -1,4 +1,3 @@
-var models  = require('../../models');
 var moment = require("moment");
 
 var chartColors = [
@@ -40,7 +39,7 @@ var generatePieChart = function(data, callback) {
 	callback(canvas.toBuffer().toString('base64'));
 };
 
-exports.getNumbers = function(callback){
+exports.getNumbers = function(models, callback){
 
 	var contractHelper = [];
 

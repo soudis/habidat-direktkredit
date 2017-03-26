@@ -1,6 +1,6 @@
 extends layout
 block content
-  +nav(site.projectname, "dropdown_menu", site.logo)
+  +nav(project.projectname, "dropdown_menu", project.logo)
     +nav_item( "profile" ) Finanzstatus
     +nav_item( "files" ) Dateien
     +nav_item( "/procrastinate") #[span.glyphicon.glyphicon-time]    
@@ -8,7 +8,7 @@ block content
      
   .jumbotron
     h2= "Finanzstatus für " + user.first_name + ' ' + user.last_name
-    p Hier siehst du deinen aktuellen Finanzstatus und deine Stammdaten. Falls die Daten nicht stimmen, melde dich bitte unter #[a(href='mailto:#{site.email}') #{site.email}]
+    p Hier siehst du deinen aktuellen Finanzstatus und deine Stammdaten. Falls die Daten nicht stimmen, melde dich bitte unter #[a(href='mailto:#{project.email}') #{project.email}]
   
   .row
     h3 Stammdaten

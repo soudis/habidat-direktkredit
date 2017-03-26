@@ -1,11 +1,12 @@
 extends ../layout
 
 block content
-  +nav(site.projectname, "dropdown_menu", site.logo) 
+  +nav(project.projectname, "dropdown_menu", project.logo) 
+    +nav_item('/project') Projekt auswählen  
     +nav_item("/admin-logon") Einloggen
 
   .jumbotron
-    h2= site.projectname + " @ habiDAT"
+    h2= project.projectname + " @ habiDAT"
     p Willkommen im Adminbereich von habiDAT. Bitte melde dich mit einem Administratorlogin an. 
   
   if message && message.length > 0

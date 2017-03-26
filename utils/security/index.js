@@ -1,4 +1,3 @@
-var models  = require('../../models');
 var moment = require("moment");
 var url = require('url');
 

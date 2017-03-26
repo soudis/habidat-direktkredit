@@ -9,7 +9,7 @@ module.exports = function(app){
 	});
 	
 	router.post('/communication/email', security.isLoggedInAdmin, function(req, res) {
-		communication.getEmails(req.body.mode, function(emails) {
+		communication.getEmails(req.body.mode, req.session.project, function(emails) {
 			res.setHeader('Content-Length', emails.length);
 			res.setHeader('Content-Type', 'text/text');
 			res.setHeader('Content-Disposition', 'inline; filename=emailaddresses.txt');

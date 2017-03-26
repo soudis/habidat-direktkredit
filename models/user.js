@@ -304,7 +304,7 @@ module.exports = function(sequelize, DataTypes) {
   		afterCreate: function(user, options) {
   		  var id = user.id + 10000;
   		  return user.update({
-  		    logon_id: id + "_willyfred" 
+  		    logon_id: id + "_" + global.project.usersuffix
   		  }, {
   		    where: {
   		      id: user.id

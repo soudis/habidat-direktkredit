@@ -1,4 +1,3 @@
-var models  = require('../models');
 var security = require('../utils/security');
 var moment = require("moment");
 var utils = require('../utils');
@@ -6,6 +5,7 @@ var fs = require('fs');
 var numeral = require('numeral');
 var format = require('../utils/format');
 var router = require('express').Router();
+var projects = require('../config/projects.json');
 
 module.exports = function(app){
 
@@ -15,6 +15,7 @@ module.exports = function(app){
 // we will want this protected so you have to be logged in to visit
 // we will use route middleware to verify this (the isLoggedIn function)
 router.get('/profile', security.isLoggedIn, function(req, res) {
+	var models  = require('../models')(req.session.project);
 	models.user.findByIdFetchFull(models, req.user.id,function(user){
 		res.render('profile', {
 			user : user, // get the user out of session and pass to template
@@ -25,7 +26,7 @@ router.get('/profile', security.isLoggedIn, function(req, res) {
 
 router.get('/files', security.isLoggedIn, function(req, res) {
     var dk_files = [];
-    var dir = "public/files/dk";
+    var dir = __dirname + "/.." + projects[req.session.project].files + "/dk";
     var name;
     var files = fs.readdirSync(dir);
     for (var i in files){
@@ -36,7 +37,7 @@ router.get('/files', security.isLoggedIn, function(req, res) {
     }
     
     var balance_files = [];
-    dir = "public/files/balance";
+    dir = __dirname + "/.." + projects[req.session.project].files + "/balance";
     files = fs.readdirSync(dir);
     for (i in files){
         name = dir + '/' + files[i];
@@ -51,7 +52,7 @@ router.get('/files', security.isLoggedIn, function(req, res) {
 
 
 router.post('/accountnotification', security.isLoggedIn, function(req, res) {
-	
+	var models  = require('../models')(req.session.project);	
 	models.user.findByIdFetchFull(models, req.user.id,function(user){
 		var transactionList = user.getTransactionList(req.body.year);
 		
@@ -84,7 +85,7 @@ router.post('/accountnotification', security.isLoggedIn, function(req, res) {
 		var data = {
 				"id": user.id,
 				"first_name": user.first_name?user.first_name:"",
-				"last_name": user.last_name?user.first_name:"",
+				"last_name": user.last_name?user.last_name:"",
 				"street" :user.street,
 				"zip": user.zip,
 				"place": user.place,
@@ -93,7 +94,7 @@ router.post('/accountnotification', security.isLoggedIn, function(req, res) {
 				"transactionList": transactionList,
 				"interestTotal": format.formatMoney(interestTotal)};
 		var filename =  "Kontomitteilung " + user.id + " " + req.body.year;
-		utils.generateDocx("account_notification", filename, data);
+		utils.generateDocx("account_notification", filename, data, req.session.project);
 		utils.convertToPdf(filename, function(err) {
 			var file;
 			if (!err) {

@@ -63,36 +63,32 @@ module.exports = function(sequelize, DataTypes) {
     instanceMethods: {
   		calculateInterest: function() {
   			var interest = {"now": 0.00, "last_year": 0.00};
-  			var interest_rate = this.interest_rate;
-  			var last_year = moment().subtract(1, "years").endOf("year");
+  			var last_year_end = moment().startOf("year");
+        var last_year_begin = moment().subtract(1, "years").startOf("year");
+        var now = moment();
+
   			var contract = this;
-  			interest.last_year_no = last_year.year();
+  			interest.last_year_no = last_year_begin.year();
   			
-  			var terminatedLastYear = contract.isTerminated(last_year);
+  			var terminatedLastYear = contract.isTerminated(last_year_end);
   			
-  			if (contract.isTerminated(moment())) {
+  			if (contract.isTerminated(now)) {
   				this.transactions.forEach(function(transaction) {
   					interest.now += transaction.amount;
   					if (terminatedLastYear) {
   						interest.last_year += transaction.amount;
-  					} else if (transaction.amount > 0 && last_year.diff(transaction.transaction_date, 'days') > 0)  {
-  					  interest.last_year += transaction.amount * Math.pow (1+(interest_rate/100), last_year.diff(transaction.transaction_date, 'days') / 365) - transaction.amount;
-  					  if (last_year.subtract(1, "years").diff(transaction.transaction_date, 'days') > 0) {
-  	  					  interest.last_year -= transaction.amount * Math.pow (1+(interest_rate/100), last_year.subtract(1, "years").diff(transaction.transaction_date, 'days') / 365) - transaction.amount;  						  
-  					  }
+  					} else if (last_year_end.diff(transaction.transaction_date, 'days') > 0)  {
+  					  interest.last_year += transaction.interestToDate(contract.interest_rate, last_year_end);
+              interest.last_year -= transaction.interestToDate(contract.interest_rate, last_year_begin);
   					}
   				});  	
   				interest.now = Math.abs(interest.now);
   				interest.last_year = Math.abs(interest.last_year);
   			} else {
   				this.transactions.forEach(function(transaction) {
-  					interest.now += transaction.amount * Math.pow (1+(interest_rate/100), moment(Date.now()).diff(transaction.transaction_date, 'days') / 365) - transaction.amount;
-  					if (last_year.diff(transaction.transaction_date, 'days') > 0) {
-					  interest.last_year += transaction.amount * Math.pow (1+(interest_rate/100), last_year.diff(transaction.transaction_date, 'days') / 365) - transaction.amount;
-  					  if (last_year.subtract(1, "years").diff(transaction.transaction_date, 'days') > 0) {
-  	  					  interest.last_year -= transaction.amount * Math.pow (1+(interest_rate/100), last_year.subtract(1, "years").diff(transaction.transaction_date, 'days') / 365) - transaction.amount;  						  
-  					  }
-  					}
+  					interest.now += transaction.interestToDate(contract.interest_rate, now);
+            interest.last_year += transaction.interestToDate(contract.interest_rate, last_year_end);
+            interest.last_year -= transaction.interestToDate(contract.interest_rate, last_year_begin);
   				});
   				interest.now = Math.ceil(interest.now*100) / 100;
   			}

@@ -1,4 +1,3 @@
-var models  = require('../../models');
 var moment = require("moment");
 var validator = require("validator");
 

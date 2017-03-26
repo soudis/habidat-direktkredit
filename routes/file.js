@@ -1,4 +1,3 @@
-var models  = require('../models');
 var security = require('../utils/security');
 var router = require('express').Router();
 var fs = require('fs');
@@ -7,6 +6,7 @@ module.exports = function(app){
 
 
 	router.get('/file/add/:type/:id', security.isLoggedInAdmin, function(req, res, next) {
+		var models  = require('../models')(req.session.project);
 		if (req.params.type === 'user') {
 			models.user.findByIdFetchFull(models, req.params.id, function(user) {
 				res.render('user/show', { user:user, addFile:req.params.type, title: 'Dateiupload' });
@@ -15,6 +15,7 @@ module.exports = function(app){
 	});
 	
 	router.get('/file/get/:id', security.isLoggedInAdmin, function(req, res, next) {
+		var models  = require('../models')(req.session.project);
 		models.file.findById(req.params.id).then(function(file) {
 			var fileData = fs.readFileSync(file.path, 'binary');
 
@@ -28,6 +29,7 @@ module.exports = function(app){
 	
 	router.get('/file/delete/:id', security.isLoggedInAdmin, function(req, res, next) {
 		
+		var models  = require('../models')(req.session.project);
 		models.file.findById(req.params.id).then(function(file) {
 			if (file.ref_table === 'user') {
 				fs.unlinkSync(file.path);  
@@ -40,6 +42,7 @@ module.exports = function(app){
 	
 	router.post('/file/add', security.isLoggedInAdmin, function(req, res) {
 		console.log(req.file);
+		var models  = require('../models')(req.session.project);
 		if (req.body.type === 'user') {
 			
 			models.file.create({

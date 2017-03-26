@@ -1,4 +1,3 @@
-var models  = require('../models');
 var security = require('../utils/security');
 var moment = require("moment");
 var router = require('express').Router();
@@ -7,6 +6,7 @@ var url = require('url');
 module.exports = function(app){
 
 	router.get('/user/list/:mode', security.isLoggedInAdmin, function(req, res) {
+		var models  = require('../models')(req.session.project);
 		if (req.params.mode === 'expire') {
 			models.user.aboutToExpire(models, ['administrator <> 1'], 90, function(users) {
 				res.render('user/list', {users: users, title: 'Direktkreditgeber*innen Liste'});
@@ -15,6 +15,7 @@ module.exports = function(app){
 	});
 	
 	router.get('/user/list', security.isLoggedInAdmin, function(req, res) {
+		var models  = require('../models')(req.session.project);
 		models.user.findFetchFull(models, ['administrator <> 1'], function(users) {
 			res.render('user/list', {users: users, title: 'Direktkreditgeber*innen Liste'});
 		});
@@ -26,12 +27,14 @@ module.exports = function(app){
 	});
 
 	router.get('/user/edit/:id', security.isLoggedInAdmin, function(req, res, next) {
+		var models  = require('../models')(req.session.project);
 		models.user.findByIdFetchFull(models, req.params.id, function(user) {
 			  res.render('user/edit', { user:user, title: 'Direktkreditgeber*in Bearbeiten'});
 		});	
 	});
 
 	router.get('/user/show/:id', security.isLoggedInAdmin, function(req, res, next) {
+		var models  = require('../models')(req.session.project);
 		models.user.findByIdFetchFull(models, req.params.id, function(user) {
 			  res.render('user/show', { user:user, title: 'Direktkreditgeber*in' });
 		});	
@@ -39,6 +42,7 @@ module.exports = function(app){
 
 	router.post('/user/add', security.isLoggedInAdmin, function(req, res) {
 		
+		var models  = require('../models')(req.session.project);
 		var length = 8,
 	    charset = "!#+?-_abcdefghijklnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789",
 	    password = "";
@@ -66,6 +70,7 @@ module.exports = function(app){
 	});
 
 	router.post('/user/edit', security.isLoggedInAdmin, function(req, res) {
+		var models  = require('../models')(req.session.project);
 		models.user.update({
 			first_name: req.body.first_name,
 			last_name: req.body.last_name,

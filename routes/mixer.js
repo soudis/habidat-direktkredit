@@ -1,12 +1,12 @@
 var security = require('../utils/security');
 var mixer = require('../utils/mixer');
 var router = require('express').Router();
-var models  = require('../models');
 var moment = require('moment');
 
 module.exports = function(app){
 	
 	router.get('/mixer/main', security.isLoggedInAdmin, function(req, res) {
+		var models  = require('../models')(req.session.project);
 		models.mixer_config.findAll().then(function(configurations){
 			res.render('mixer/main', {configurations:configurations, title: 'Bewohner*innenmixer'});
 		});
@@ -18,6 +18,7 @@ module.exports = function(app){
 	});
 
 	router.get('/mixer/mix/:id', security.isLoggedInAdmin, function(req, res) {
+		var models  = require('../models')(req.session.project);
 		models.mixer_config.find({
 			where : {
 				id: req.params.id
@@ -43,6 +44,7 @@ module.exports = function(app){
     });
 	
 	router.get('/mixer/show/:id', security.isLoggedInAdmin, function(req, res) {
+		var models  = require('../models')(req.session.project);
 		models.mixer_config.find({
 			where : {
 				id: req.params.id
@@ -61,6 +63,7 @@ module.exports = function(app){
 	
 	/* Add habitant */
 	router.get('/mixer/add_habitant/:id', security.isLoggedInAdmin, function(req, res, next) {
+		var models  = require('../models')(req.session.project);
 		models.mixer_config.find({
 			where : {
 				id: req.params.id
@@ -74,6 +77,7 @@ module.exports = function(app){
 
 	/* Edit habitant */
 	router.get('/mixer/edit_habitant/:id', security.isLoggedInAdmin, function(req, res, next) {
+		var models  = require('../models')(req.session.project);
 		models.habitant.find({
 			where : {
 				id: req.params.id
@@ -88,6 +92,7 @@ module.exports = function(app){
 	/* Delete habitant */
 	router.get('/mixer/delete_habitant/:id', security.isLoggedInAdmin, function(req, res) {
 		
+		var models  = require('../models')(req.session.project);
 		models.habitant.find({
 			where: {
 				id: req.params.id
@@ -102,6 +107,7 @@ module.exports = function(app){
 		if (req.body.fixed_to_flat === "") {
 			req.body.fixed_to_flat = null;
 		}
+		var models  = require('../models')(req.session.project);
 		models.habitant.create({
 			name: req.body.name,
 			birth_date: moment(req.body.birth_date, 'DD.MM.YYYY'),
@@ -120,6 +126,7 @@ module.exports = function(app){
 		if (req.body.fixed_to_flat === "") {
 			req.body.fixed_to_flat = null;
 		}
+		var models  = require('../models')(req.session.project);
 		models.habitant.update({
 			name: req.body.name,
 			birth_date: moment(req.body.birth_date, 'DD.MM.YYYY'),
@@ -143,6 +150,7 @@ module.exports = function(app){
 
 	/* Edit configuration */
 	router.get('/mixer/edit_flat/:id', security.isLoggedInAdmin, function(req, res, next) {
+		var models  = require('../models')(req.session.project);
 		models.flat.find({
 			where : {
 				id: req.params.id
@@ -155,6 +163,7 @@ module.exports = function(app){
 	/* Delete configuration */
 	router.get('/mixer/delete_flat/:id', security.isLoggedInAdmin, function(req, res) {
 		
+		var models  = require('../models')(req.session.project);
 		models.flat.find({
 			where: {
 				id: req.params.id
@@ -166,6 +175,7 @@ module.exports = function(app){
 	});
 
 	router.post('/mixer/add_flat', security.isLoggedInAdmin, function(req, res) {
+		var models  = require('../models')(req.session.project);
 		models.flat.create({
 			name: req.body.name,
 			min_habitant: req.body.min_habitant,
@@ -180,6 +190,7 @@ module.exports = function(app){
 	});
 	
 	router.post('/mixer/edit_flat', security.isLoggedInAdmin, function(req, res) {
+		var models  = require('../models')(req.session.project);
 		models.flat.update({
 			name: req.body.name,
 			min_habitant: req.body.min_habitant,
@@ -202,6 +213,7 @@ module.exports = function(app){
 
 	/* Edit configuration */
 	router.get('/mixer/edit_config/:id', security.isLoggedInAdmin, function(req, res, next) {
+		var models  = require('../models')(req.session.project);
 		models.mixer_config.find({
 			where : {
 				id: req.params.id
@@ -214,6 +226,7 @@ module.exports = function(app){
 	/* Delete configuration */
 	router.get('/mixer/delete_config/:id', security.isLoggedInAdmin, function(req, res) {
 		
+		var models  = require('../models')(req.session.project);
 		models.mixer_config.find({
 			where: {
 				id: req.params.id
@@ -225,6 +238,7 @@ module.exports = function(app){
 	});
 
 	router.post('/mixer/add_config', security.isLoggedInAdmin, function(req, res) {
+		var models  = require('../models')(req.session.project);
 		models.mixer_config.create({
 			name: req.body.name,
 			calculation_mode: req.body.calculation_mode
@@ -236,6 +250,7 @@ module.exports = function(app){
 	});
 	
 	router.post('/mixer/edit_config', security.isLoggedInAdmin, function(req, res) {
+		var models  = require('../models')(req.session.project);
 		models.mixer_config.update({
 			name: req.body.name,
 			calculation_mode: req.body.calculation_mode

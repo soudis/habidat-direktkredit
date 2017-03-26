@@ -28,6 +28,8 @@
     "multer" : "^1.1.0",
     "nchart" : "^1.0.1",
     "canvas" :"^1.3.12",
-    "validator" : "^4.0.4"
+    "validator" : "^4.0.4",
+    "nodemon" : "^1.11.0",
+    "mkdirp" : "^0.5.1"
   }
 }

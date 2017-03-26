@@ -1,4 +1,3 @@
-var models  = require('../models');
 var security = require('../utils/security');
 var moment = require("moment");
 var router = require('express').Router();
@@ -8,6 +7,7 @@ module.exports = function(app){
 
 	/* Add contract */
 	router.get('/contract/add/:id', security.isLoggedInAdmin, function(req, res, next) {
+		var models  = require('../models')(req.session.project);
 		models.user.findByIdFetchFull(models, req.params.id,function(user){
 			  res.render('contract/add', { user:user, title: 'Direktkredit Einfügen' });
 		});	
@@ -15,6 +15,7 @@ module.exports = function(app){
 
 	/* Edit contract */
 	router.get('/contract/edit/:id', security.isLoggedInAdmin, function(req, res, next) {
+		var models  = require('../models')(req.session.project);
 		models.contract.find({
 			where : {
 				id: req.params.id
@@ -27,6 +28,7 @@ module.exports = function(app){
 	});
 
 	router.post('/contract/add', security.isLoggedInAdmin, function(req, res) {		
+		var models  = require('../models')(req.session.project);
 		models.contract.create({
 			sign_date: moment(req.body.sign_date, 'DD.MM.YYYY')+1000*60*60*24,
 			termination_date: req.body.termination_date===""?null:moment(req.body.termination_date, "DD.MM.YYYY")+1000*60*60*24,
@@ -42,6 +44,7 @@ module.exports = function(app){
 	});
 	
 	router.post('/contract/edit', security.isLoggedInAdmin, function(req, res) {
+		var models  = require('../models')(req.session.project);
 		models.contract.update({
 			sign_date: moment(req.body.sign_date, 'DD.MM.YYYY')+1000*60*60*24,
 			termination_date: req.body.termination_date===""?null:moment(req.body.termination_date, "DD.MM.YYYY")+1000*60*60*24,
@@ -55,8 +58,8 @@ module.exports = function(app){
 		});	
 	});
 
-	router.get('/contract/delete/:id', security.isLoggedInAdmin, function(req, res) {
-		
+	router.get('/contract/delete/:id', security.isLoggedInAdmin, function(req, res) {		
+		var models  = require('../models')(req.session.project);
 		models.contract.find({
 			where: {
 				id: req.params.id

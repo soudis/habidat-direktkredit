@@ -1,7 +1,6 @@
 // config/passport.js
 
 var Sequelize = require("sequelize");
-var models  = require('../../models');
 var moment = require('moment');
 var fs = require('fs');
 
@@ -27,12 +26,13 @@ module.exports = function(passport) {
 
     // used to serialize the user for the session
     passport.serializeUser(function(user, done) {
-        done(null, user.id);
+        done(null, {id: user.id, project: user.project});
     });
 
     // used to deserialize the user
-    passport.deserializeUser(function(id, done) {
-    	models["user"].findById(id).then( function(user) {
+    passport.deserializeUser(function(sessionUser, done) {
+        var models  = require('../../models')(sessionUser.project); 
+    	models["user"].findById(sessionUser.id).then( function(user) {
             done(null, user);
         });
     });
@@ -54,6 +54,7 @@ module.exports = function(passport) {
         // find a user whose email is the same as the forms email
         // we are checking to see if the user trying to login already exists
     	console.log('try to logon');
+        var models  = require('../../models')(req.session.project);        
         models["user"].findOne({where: Sequelize.or({logon_id: userid}, {email: userid})}).then( function( user) {
 
             // if no user is found, return the message
@@ -69,6 +70,7 @@ module.exports = function(passport) {
             }
 
             // all is well, return successful user
+            user.project = req.session.project;
             return done(null, user);
         });
 
@@ -90,7 +92,8 @@ module.exports = function(passport) {
 
         // find a user whose email is the same as the forms email
         // we are checking to see if the user trying to login already exists
-    	console.log('try to logon');
+    	console.log('try to logon: ' + req.session.project + JSON.stringify(req.session));
+        var models  = require('../../models')(req.session.project);        
         models["user"].findOne({where: Sequelize.or({logon_id: userid}, {email: userid})}).then( function( user) {
 
             // if no user is found, return the message
@@ -111,6 +114,7 @@ module.exports = function(passport) {
             }
 
             // all is well, return successful user
+            user.project = req.session.project;            
             return done(null, user);
         });
 

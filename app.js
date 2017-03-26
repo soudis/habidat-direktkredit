@@ -12,16 +12,21 @@ var https = require('https');
 var http = require('http');
 var fs = require('fs');
 var multer = require('multer');
+var mkdirp = require('mkdirp');
+
+mkdirp('tmp', function(err) { });
+mkdirp('upload', function(err) { });
+
+
 
 
 var migrate = require('./models/migration');
 migrate.up();
 
 var site    = require('./config/site.json');
+var projects    = require('./config/projects.json');
 
-var privateKey  = fs.readFileSync(site.sslkey, 'utf8');
-var certificate = fs.readFileSync(site.sslcert, 'utf8');
-var credentials = {key: privateKey, cert: certificate};
+
 
 var models  = require('./models');
 
@@ -62,6 +67,14 @@ app.use(session({ secret: 'ilovescotchscotchyscotchscotch' })); // session secre
 app.use(passport.initialize());
 app.use(passport.session()); // persistent login sessions
 
+app.use(function(req,res,next){
+    res.locals.session = req.session;
+    if (req.session.project) {
+    	res.locals.project = projects[req.session.project];
+    }
+    next();
+});
+
 require('./routes/contract')(app);
 require('./routes/normaluser')(app);
 require('./routes/other')(app);
@@ -97,8 +110,11 @@ if (app.get('env') === 'development') {
 
 module.exports = app;
 
-models.sequelize.sync().then(function () {
+//models.sequelize.sync().then(function () {
 	if (site.https === "true") {
+	  var privateKey  = fs.readFileSync(site.sslkey, 'utf8');
+	  var certificate = fs.readFileSync(site.sslcert, 'utf8');
+	  var credentials = {key: privateKey, cert: certificate};		
 	  console.log("starting https server on: " + site.porthttps.toString());	
 	  var httpsServer = https.createServer(credentials, app);
 	  httpsServer.listen(site.porthttps);
@@ -108,4 +124,4 @@ models.sequelize.sync().then(function () {
 	  var httpServer = http.createServer(app);
 	  httpServer.listen(site.porthttp);
 	}
-	});
+//	});

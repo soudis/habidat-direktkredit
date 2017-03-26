@@ -1,6 +1,6 @@
 extends ../layout
 block content
-  +nav(site.projectname + " Admin", "dropdown_menu", site.logo)
+  +nav(project.projectname + " Admin", "dropdown_menu", project.logo)
     +nav_item( "/user/list" ) DK Liste
     +nav_item_dropdown( "#" )(label="Auswertungen")
      +nav_item( "/statistics/downloads" ) Downloads
