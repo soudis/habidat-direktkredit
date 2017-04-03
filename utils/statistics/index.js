@@ -286,7 +286,11 @@ exports.getNumbers = function(models, callback){
 				return 0;
 		});
 
-		numbers.total.medianInterestRate = contractHelper[Math.ceil(numbers.total.count/2)].interestRate;
+		if (numbers.total.count > 2) {
+			numbers.total.medianInterestRate = contractHelper[Math.ceil(numbers.total.count/2)].interestRate;
+		} else {
+			numbers.total.medianInterestRate = 0;
+		}
 
 		contractHelper.sort(function(a,b) {
 			if (a.amount > b.amount)
@@ -297,7 +301,11 @@ exports.getNumbers = function(models, callback){
 				return 0;
 		});
 
-		numbers.total.medianAmount = contractHelper[Math.ceil(numbers.total.count/2)].amount;
+		if (numbers.total.count > 2) {
+		 	numbers.total.medianAmount = contractHelper[Math.ceil(numbers.total.count/2)].amount;
+		} else {
+			numbers.total.medianAmount = 0;
+		}
 
 		contractHelper.sort(function(a,b) {
 			if (a.period > b.period)
@@ -307,9 +315,13 @@ exports.getNumbers = function(models, callback){
 			else
 				return 0;
 		});
-
-		numbers.total.medianPeriod = contractHelper[Math.ceil(numbers.total.count/2)].period;
 		
+		if (numbers.total.count > 2) {
+			numbers.total.medianPeriod = contractHelper[Math.ceil(numbers.total.count/2)].period;
+		} else {
+			numbers.total.medianPeriod = 0;
+		}
+
 		numbers.total.avgAmount = numbers.total.amount / numbers.total.count;
 		numbers.total.avgPeriod = numbers.total.avgPeriod / numbers.total.avgPeriodAmount;
 		numbers.cancelled.avgAmount = numbers.cancelled.amount / numbers.cancelled.count;
