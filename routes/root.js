@@ -55,7 +55,7 @@ module.exports = function(app){
 	//=====================================
 	router.get('/admin-logout', function(req, res) {
 	 req.logout();
-	 res.redirect('/admin');
+	 res.redirect('/');
 	});
 	
 	router.post('/logon', passport.authenticate('local-login', {
