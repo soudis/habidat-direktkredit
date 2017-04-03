@@ -15,13 +15,17 @@ module.exports = function(app){
 // we will want this protected so you have to be logged in to visit
 // we will use route middleware to verify this (the isLoggedIn function)
 router.get('/profile', security.isLoggedIn, function(req, res) {
-	var models  = require('../models')(req.session.project);
-	models.user.findByIdFetchFull(models, req.user.id,function(user){
-		res.render('profile', {
-			user : user, // get the user out of session and pass to template
-			title: "Direktkreditinfo"
+	if (req.user.isAdmin()) {
+		res.redirect('/admin');
+	} else {
+		var models  = require('../models')(req.session.project);
+		models.user.findByIdFetchFull(models, req.user.id,function(user){
+			res.render('profile', {
+				user : user, // get the user out of session and pass to template
+				title: "Direktkreditinfo"
+			});
 		});
-	});
+	}
 });
 
 router.get('/files', security.isLoggedIn, function(req, res) {

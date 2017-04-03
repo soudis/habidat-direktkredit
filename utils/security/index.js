@@ -7,6 +7,7 @@ exports.isLoggedIn = function(req, res, next) {
 	if (req.isAuthenticated())
     	return next();
 	// 	if they aren't redirect them to the home page
+	req.session.returnTo = req.url; 
 	res.redirect('/');
 };
 
@@ -18,6 +19,7 @@ exports.isLoggedInAdmin = function(req, res, next) {
 	else if (req.isAuthenticated())
 		req.logout();
 	// if they aren't redirect them to the home page
+	req.session.returnTo = req.url; 
 	res.redirect('/admin-logon');
 };
 
