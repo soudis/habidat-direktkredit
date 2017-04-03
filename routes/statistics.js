@@ -63,5 +63,14 @@ module.exports = function(app){
 		});	
 	});
 
+	router.get('/statistics/german', security.isLoggedInAdmin, function(req, res) {
+		var models  = require('../models')(req.session.project);		
+		statistics.getGermanContractsByYearAndInterestRate(models, function(years) {
+			//console.log("test: " + JSON.stringify(numbers);
+			res.render('statistics/german', { title: 'Deutsche Direktkredite', years: years});
+		});
+	});	
+
+
 	app.use('/', router);
 };

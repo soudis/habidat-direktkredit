@@ -6,13 +6,15 @@ block content
      +nav_item( "/statistics/downloads" ) Downloads
      +nav_item( "/statistics/numbers" ) Zahlen, Daten, Fakten
      +nav_item( "/user/list/expire" ) Ablaufende Kredite 
+     +nav_item( "/statistics/german") Direktkredite aus Deutschland
      +nav_item( "/mixer/main" ) Bewohner*innenmixer    
     +nav_item( "/communication/main" ) Kommunikation
     +nav_item( "/procrastinate") #[span.glyphicon.glyphicon-time]
     +nav_item( "/admin-logout" ) Abmelden
   if message && message != ""
     .row
-      .alert.alert-danger= message
+      .col-md-12
+        .alert.alert-danger= message
     
   block admin-content
  

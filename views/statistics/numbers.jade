@@ -7,7 +7,8 @@ block admin-content
   .row
     .col-md-6
       .row
-        h3 Alle Kredite     
+        .col-md-12
+          h3.underline Alle Kredite     
       .row
         .col-md-5.h4 Anzahl
         .col-md-7.h4= numbers.total.count
@@ -28,7 +29,8 @@ block admin-content
         .col-md-7.h4 #{sprintf('%.3f', numbers.total.avgPeriod )} Jahre
     .col-md-6
       .row
-        h3 Laufende Kredite
+        .col-md-12
+          h3.underline Laufende Kredite
       .row
         .col-md-5.h4 Anzahl
         .col-md-7.h4= numbers.running.count
@@ -45,7 +47,8 @@ block admin-content
         .col-md-5.h4 Durchschnittslaufzeit
         .col-md-7.h4 #{sprintf('%.3f', numbers.running.avgPeriod )} Jahre
       .row
-        h3 Gekündigte Kredite
+        .col-md-12
+          h3.underline Gekündigte Kredite
       .row
         .col-md-5.h4 Anzahl
         .col-md-7.h4= numbers.cancelled.count
@@ -62,4 +65,5 @@ block admin-content
         .col-md-5.h4 Durchschnittslaufzeit
         .col-md-7.h4 #{sprintf('%.3f', numbers.cancelled.avgPeriod )} Jahre
     .row
-      img(width="600" src="data:image/png;base64,"+numbers.charts.byRelationship)
+      .col-md-12
+        //img(width="600" src="data:image/png;base64,"+numbers.charts.byRelationship)

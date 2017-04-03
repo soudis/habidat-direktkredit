@@ -1,4 +1,5 @@
 var moment = require("moment");
+var sequelize = require("sequelize");
 
 var chartColors = [
 	"#a6cee3",
@@ -37,6 +38,78 @@ var generatePieChart = function(data, callback) {
 		    chartData
 		);
 	callback(canvas.toBuffer().toString('base64'));
+};
+
+exports.getGermanContractsByYearAndInterestRate = function(models, callback) {
+
+	// find all german contracts (NOTE: distinction is just by
+    // length of ZIP code > 4)
+	models.user.findAll({
+		  where: sequelize.where(sequelize.fn('char_length', sequelize.fn('trim', sequelize.col('zip'))), {$gte: 5}),
+		  include:{
+				model: models.contract,
+				as: 'contracts',
+				include : {
+					model: models.transaction,
+					as: 'transactions'
+				}
+			}
+	}).then(function(users){
+		// find first contract to have start date
+		var first = moment();
+		users.forEach(function(user) {
+			user.contracts.forEach(function(contract) {
+				if (first.diff(moment(contract.sign_date)) > 0) {
+					first = moment(contract.sign_date);
+				}
+			});
+		});
+
+        // init array for years since first contract
+ 	    var result = [];
+		var years = Math.ceil(Math.abs(moment().diff(first,'days')/365));
+		for(var i = 0; i<years;i++) {
+			result.push({
+				year: i+1, 
+				from: moment(first).add(i, 'years'), 
+				to: moment(first).add(i+1, 'years').add(-1,'days'), 
+				rates: []});
+		}
+
+        // iterate all contracts and push contracts in
+        // right year and right intest rate array
+		users.forEach(function(user) {
+			user.contracts.forEach(function(contract) {
+				var year = Math.floor(Math.abs(moment(contract.sign_date).diff(first,'days')/365));
+				var rate = Math.round(contract.interest_rate*10)/10;
+
+				var findRate = function(rates, rate) {
+					var found = -1;
+					for (var i = 0; i< rates.length; i++) {
+						if (rates[i].interest_rate === rate) {
+							found = i;
+						}
+					};
+					return found;
+				};
+
+				// see if rate already exists and push it if not
+				var rateIndex = findRate(result[year].rates, rate);
+				if (rateIndex === -1) {
+					result[year].rates.push({interest_rate: rate, total_amount: 0, contracts : []});					
+					rateIndex = result[year].rates.length-1;
+				}
+
+				// add contract to year and rate and increase total amount
+				result[year].rates[rateIndex].total_amount += contract.amount;
+				contract.user=user;
+				result[year].rates[rateIndex].contracts.push(contract);
+			});
+		});		
+		
+		callback(result);
+
+	});
 };
 
 exports.getNumbers = function(models, callback){
@@ -248,7 +321,6 @@ exports.getNumbers = function(models, callback){
 			numbers.charts.byRelationship = chart;
 		});*/
 
-		console.log("test2" + numbers.total.amount);
 		callback(numbers);
 	});
 

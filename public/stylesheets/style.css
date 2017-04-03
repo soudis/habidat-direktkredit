@@ -17,6 +17,13 @@ tr td.fit{
   white-space:nowrap;
 }
 
+h3.underline {
+  border-bottom: 1px solid; 
+}
+
+h4.underline {
+  border-bottom: 1px solid; 
+}
 
 .navbar-default {
   background-color: #a40023;
