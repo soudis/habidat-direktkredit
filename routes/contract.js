@@ -58,20 +58,24 @@ module.exports = function(app){
 		});	
 	});
 
-	router.get('/contract/delete/:id', security.isLoggedInAdmin, function(req, res) {		
+	router.get('/contract/delete/:id', security.isLoggedInAdmin, function(req, res) {
+		
 		var models  = require('../models')(req.session.project);
-		models.contract.find({
+		models.contract.destroy({
 			where: {
 				id: req.params.id
-			}, 
-			include:{ 
-				model: models.transaction, 
-				as: 'transactions'
 			}
-		}).then(function(contract) {
-			  contract.destroy();
-			  res.redirect(security.redirectReload(req.headers.referer));
-		});	
+		}).then(function(deleted) {
+			if(deleted > 0) {
+			 	res.redirect(security.redirectReload(req.headers.referer));
+			} else {
+				req.flash('error', 'Vertrag konnte nicht gelöscht werden, überprüfe bitte ob noch Zahlungen bestehen');
+				res.redirect(security.redirectReload(req.headers.referer));
+			}
+		}).catch(function(error) {
+			req.flash('error', 'Vertrag konnte nicht gelöscht werden, überprüfe bitte ob noch Zahlungen bestehen');
+			res.redirect(security.redirectReload(req.headers.referer));
+		});  
 	});
 	
 	app.use('/', router);

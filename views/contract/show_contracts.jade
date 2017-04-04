@@ -1,7 +1,8 @@
 include ../transaction/input
 
 .row
-  h3 Direktkredite #[a.btn.btn-default.btn-sm(href='/contract/add/'+user.id) #[span.glyphicon.glyphicon-plus]] 
+  .col-md-12
+    h3 Direktkredite #[a.btn.btn-default.btn-sm(href='/contract/add/'+user.id) #[span.glyphicon.glyphicon-plus]] 
 each contract in user.contracts
   - interest = contract.calculateInterest()
   if (editContract && contract.id == editContract.id )
@@ -9,7 +10,7 @@ each contract in user.contracts
   else
     .row
       .col-md-12 
-        h4 Direktkredit vom #{moment(contract.sign_date).format('DD.MM.YYYY')} #[a.btn.btn-default.btn-sm(href='/contract/edit/'+contract.id) #[span.glyphicon.glyphicon-pencil]] #[a.btn.btn-default.btn-sm(href='/contract/delete/'+contract.id) #[span.glyphicon.glyphicon-trash]]
+        h4 Direktkredit vom #{moment(contract.sign_date).format('DD.MM.YYYY')} #[a.btn.btn-default.btn-sm(href='/contract/edit/'+contract.id) #[span.glyphicon.glyphicon-pencil]] #[a.btn.btn-default.btn-sm.confirm(data-link='/contract/delete/'+contract.id, data-confirmtext='Willst du den Direktkredit vom ' + moment(contract.sign_date).format('DD.MM.YYYY') + ' von ' + user.first_name + ' ' + user.last_name  + ' wirklich löschen?') #[span.glyphicon.glyphicon-trash]]
     .row
       .col-md-4 Status:
       .col-md-8 #{contract.getStatus()} 
@@ -52,6 +53,6 @@ each contract in user.contracts
             .col-md-1 
             .col-md-3 #{moment(transaction.transaction_date).format('DD.MM.YYYY')}
             .col-md-3 #{transaction.getTypeText()}
-            .col-md-4.text-right #{sprintf('%.2f', transaction.amount )} EUR #[a.btn.btn-default.btn-sm(href='/transaction/edit/'+transaction.id) #[span.glyphicon.glyphicon-pencil]] #[a.btn.btn-default.btn-sm(href='/transaction/delete/'+transaction.id) #[span.glyphicon.glyphicon-trash]]
+            .col-md-4.text-right #{sprintf('%.2f', transaction.amount )} EUR #[a.btn.btn-default.btn-sm(href='/transaction/edit/'+transaction.id) #[span.glyphicon.glyphicon-pencil]] #[a.btn.btn-default.btn-sm.confirm(data-link='/transaction/delete/'+transaction.id, data-confirmtext='Willst du die Zahlung von ' + sprintf('%.2f', contract.amount) +  ' EUR vom ' + moment(transaction.transaction_date).format('DD.MM.YYYY') + ' von ' + user.first_name + ' ' + user.last_name  + ' wirklich löschen?') #[span.glyphicon.glyphicon-trash]]
       if (addTransaction && contract.id == addTransaction.contract_id)
         +transaction_input('/transaction/add', user, contract, addTransaction)    

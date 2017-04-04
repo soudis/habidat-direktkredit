@@ -36,7 +36,7 @@ module.exports = function(app){
 	router.get('/user/show/:id', security.isLoggedInAdmin, function(req, res, next) {
 		var models  = require('../models')(req.session.project);
 		models.user.findByIdFetchFull(models, req.params.id, function(user) {
-			  res.render('user/show', { user:user, title: 'Direktkreditgeber*in' });
+			  res.render('user/show', { user:user, title: 'Direktkreditgeber*in', message: req.flash('error') });
 		});	
 	});
 
@@ -85,6 +85,26 @@ module.exports = function(app){
 		}, {where:{id:req.body.id}}).then(function(user) {
 			res.redirect('/user/show/' + req.body.id);
 		});	
+	});
+
+	router.get('/user/delete/:id', security.isLoggedInAdmin, function(req, res) {
+		
+		var models  = require('../models')(req.session.project);
+		models.user.destroy({
+			where: {
+				id: req.params.id
+			}
+		}).then(function(deleted) {
+			if(deleted > 0) {
+			 	res.redirect('/user/list');
+			} else {
+				req.flash('error', 'Direktkreditgeber*in konnte nicht gelöscht werden, überprüfe bitte ob noch Verträge oder Dateien bestehen');
+				res.redirect('/user/show/' + req.params.id);
+			}
+		}).catch(function(error) {
+			req.flash('error', 'Direktkreditgeber*in konnte nicht gelöscht werden, überprüfe bitte ob noch Verträge oder Dateien bestehen');
+			res.redirect('/user/show/' + req.params.id);
+		});  
 	});
 
 	app.use('/', router);

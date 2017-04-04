@@ -1,16 +1,18 @@
 .row
-  h3 Stammdaten 
-   font.dropdown
-    #[a.btn.btn-default.btn-default(href='/user/edit/'+user.id) #[span.glyphicon.glyphicon-pencil]]    
-    a.btn.btn-default.dropdown-toggle(type="button" data-toggle="dropdown") #[span.glyphicon.glyphicon-file]
-      span.caret
-    ul.dropdown-menu
-      li
-        a(href='/docx/'+user.id+'?file=userdata_w_contract_return') Dankesschreiben (2 Verträge)
-      li 
-        a(href='/docx/'+user.id+'?file=userdata_w_contract') Dankesschreiben (1 Vertrag) 
-      li 
-        a(href='/docx/'+user.id+'?file=userdata_wo_contract') Dankesschreiben (ohne Vertrag) 
+  .col-md-12
+    h3 Stammdaten 
+     font.dropdown
+      #[a.btn.btn-default.btn-default(href='/user/edit/'+user.id) #[span.glyphicon.glyphicon-pencil]]    
+      #[a.btn.btn-default.btn-default.confirm(data-link='/user/delete/'+user.id, data-confirmtext='Willst du Direktkreditgeber*in ' + user.first_name + ' ' + user.last_name  + ' wirklich löschen?') #[span.glyphicon.glyphicon-trash]]        
+      a.btn.btn-default.dropdown-toggle(type="button" data-toggle="dropdown") #[span.glyphicon.glyphicon-file]
+        span.caret  
+      ul.dropdown-menu
+        li
+          a(href='/docx/'+user.id+'?file=userdata_w_contract_return') Dankesschreiben (2 Verträge)
+        li 
+          a(href='/docx/'+user.id+'?file=userdata_w_contract') Dankesschreiben (1 Vertrag) 
+        li 
+          a(href='/docx/'+user.id+'?file=userdata_wo_contract') Dankesschreiben (ohne Vertrag) 
 .row
   .col-md-3.h4 Name:
   .col-md-8.h4= user.first_name + ' ' + user.last_name 
