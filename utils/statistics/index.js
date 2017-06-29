@@ -80,7 +80,12 @@ exports.getGermanContractsByYearAndInterestRate = function(models, callback) {
         // right year and right intest rate array
 		users.forEach(function(user) {
 			user.contracts.forEach(function(contract) {
-				var year = Math.floor(Math.abs(moment(contract.sign_date).diff(first,'days')/365));
+				var year;
+				if (moment(contract.sign_date).isValid()) {
+					year = Math.floor(Math.abs(moment(contract.sign_date).diff(first,'days')/365));
+				} else {
+					year = years-1;
+				}
 				var rate = Math.round(contract.interest_rate*10)/10;
 
 				var findRate = function(rates, rate) {
