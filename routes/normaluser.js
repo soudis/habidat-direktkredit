@@ -35,8 +35,9 @@ router.get('/files', security.isLoggedIn, function(req, res) {
     var files = fs.readdirSync(dir);
     for (var i in files){
         name = dir + '/' + files[i];
+        link = dir.substr(dir.indexOf('/',2)) + '/' + files[i];
         if (!fs.statSync(name).isDirectory()){
-        	dk_files.push({"name": files[i], "link":name});
+        	dk_files.push({"name": files[i], "link":link});
         }
     }
     
@@ -45,8 +46,9 @@ router.get('/files', security.isLoggedIn, function(req, res) {
     files = fs.readdirSync(dir);
     for (i in files){
         name = dir + '/' + files[i];
+        link = dir.substr(dir.indexOf('/',2)) + '/' + files[i];
         if (!fs.statSync(name).isDirectory()){
-        	balance_files.push({"name": files[i], "link":name});
+        	balance_files.push({"name": files[i], "link":link});
         }
     }
    res.render('files', {
