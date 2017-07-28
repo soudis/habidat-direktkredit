@@ -184,18 +184,25 @@ module.exports = function(sequelize, DataTypes) {
   					aggregate.terminated++;
   					aggregate.terminatedSum += contract.amount;
   				} else {
-  					var sum = 0;
+  					var sumDeposit = 0, sumWithdrawal = 0;
   					contract.transactions.forEach(function (transaction){
-  						sum+=transaction.amount;
+              if (transaction.amount >= 0) {
+  						  sumDeposit+=transaction.amount;
+              } else {
+                sumWithdrawal+=transaction.amount;
+              }
   					});
-  					if (sum >= contract.amount) {
+  					if (sumDeposit >= contract.amount) {
   						aggregate.paid ++;
-  						aggregate.paidSum += contract.amount; 
+  						aggregate.paidSum += sumDeposit; 
   					} else {
   						aggregate.open ++;
-  						aggregate.openSum += contract.amount - sum;
-  						aggregate.paidSum += sum;
-  					}  					
+  						aggregate.openSum += contract.amount - sumDeposit;
+  						aggregate.paidSum += sumDeposit;
+  					}  		
+            if (sumWithdrawal <= 0) {
+              aggregate.terminatedSum -= sumWithdrawal;
+            }
   				}
   			});  	
   			if (count === 0) {

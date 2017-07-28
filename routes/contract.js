@@ -30,8 +30,8 @@ module.exports = function(app){
 	router.post('/contract/add', security.isLoggedInAdmin, function(req, res) {		
 		var models  = require('../models')(req.session.project);
 		models.contract.create({
-			sign_date: moment(req.body.sign_date, 'DD.MM.YYYY')+1000*60*60*24,
-			termination_date: req.body.termination_date===""?null:moment(req.body.termination_date, "DD.MM.YYYY")+1000*60*60*24,
+			sign_date: moment(req.body.sign_date, 'DD.MM.YYYY'),
+			termination_date: req.body.termination_date===""?null:moment(req.body.termination_date, "DD.MM.YYYY"),
 			amount: req.body.amount,
 			interest_rate: req.body.interest_rate,
 			period: req.body.period,	
@@ -46,8 +46,8 @@ module.exports = function(app){
 	router.post('/contract/edit', security.isLoggedInAdmin, function(req, res) {
 		var models  = require('../models')(req.session.project);
 		models.contract.update({
-			sign_date: moment(req.body.sign_date, 'DD.MM.YYYY')+1000*60*60*24,
-			termination_date: req.body.termination_date===""?null:moment(req.body.termination_date, "DD.MM.YYYY")+1000*60*60*24,
+			sign_date: moment(req.body.sign_date, 'DD.MM.YYYY'),
+			termination_date: req.body.termination_date===""?null:moment(req.body.termination_date, "DD.MM.YYYY"),
 			amount: req.body.amount,
 			interest_rate: req.body.interest_rate,
 			period: req.body.period,	
