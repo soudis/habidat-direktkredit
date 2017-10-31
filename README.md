@@ -1,4 +1,4 @@
-# habidat
+# habiDAT Direktkredite
 
 This app allows to manage direct loans from private persons to a project. In particula a habiTAT (Austrian housing syndikate) project. 
 
