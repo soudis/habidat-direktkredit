@@ -11,10 +11,11 @@ block content
     +nav_item( "/communication/main" ) Kommunikation
     +nav_item( "/procrastinate") #[span.glyphicon.glyphicon-time]
     +nav_item( "/admin-logout" ) Abmelden
-  if message && message != ""
-    .row
-      .col-md-12
-        .alert.alert-danger.alert-fadeout= message
-    
-  block admin-content
- 
+  div(class="col-md-8 col-md-offset-2 col-xs-12")    
+    if message && message != ""
+      .row
+        .col-md-12
+          .alert.alert-danger.alert-fadeout= message
+      
+    block admin-content
+   

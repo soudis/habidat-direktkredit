@@ -3,16 +3,16 @@ extends layout
 block content
   +nav("habiTAT Direktkredite", "dropdown_menu") 
     +nav_item("/project") Projekt auswählen
+  div(class="col-md-8 col-md-offset-2 col-xs-12")
+    .jumbotron
+      h2 Lieber Tausend Freund*innen im Rücken, als eine Bank im Nacken!
+      p Willkommen bei der Direktkredite-App des habiTAT. Bitte wähle das Projekt aus, das du unterstützt hast!
 
-  .jumbotron
-    h2 Lieber Tausend Freund*innen im Rücken, als eine Bank im Nacken!
-    p Willkommen bei der Direktkredite-App des habiTAT. Bitte wähle das Projekt aus, das du unterstützt hast!
-
-  each project, id in projects
-    .col-lg-3.col-sm-6.col-xs-12
-      .thumbnail
-        a(href='/project/'+id)
-          div(style="min-height:100px")
-            img(src=project.logo height="100")
-        .caption
-          h3=project.projectname
+    each project, id in projects
+      .col-lg-3.col-sm-6.col-xs-12
+        .thumbnail
+          a(href='/project/'+id)
+            div(style="min-height:100px")
+              img(src=project.logo height="100")
+          .caption
+            h3=project.projectname

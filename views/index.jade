@@ -5,14 +5,14 @@ block content
     +nav_item('/project') Projekt auswählen
     +nav_item('/admin') Adminbereich
     +nav_item("/") Einloggen
+  div(class="col-md-8 col-md-offset-2 col-xs-12")
+    .jumbotron
+      h2= project.projectname + " @ habiDAT"
+      p Bitte melde dich mit deinen Zugangsdaten an. Die Daten wurden dir nach Vertragsabschluss per Post zugesandt oder persönlich übergeben. Falls du die Zugangsdaten nicht bekommen hast oder verloren hast, dann melde dich bitte unter #[a(href='mailto:#{project.email}') #{project.email}] 
+    
+    if message && message.length > 0
+      div(class="alert alert-danger") 
+        p.message= message
 
-  .jumbotron
-    h2= project.projectname + " @ habiDAT"
-    p Bitte melde dich mit deinen Zugangsdaten an. Die Daten wurden dir nach Vertragsabschluss per Post zugesandt oder persönlich übergeben. Falls du die Zugangsdaten nicht bekommen hast oder verloren hast, dann melde dich bitte unter #[a(href='mailto:#{project.email}') #{project.email}] 
-  
-  if message && message.length > 0
-    div(class="alert alert-danger") 
-      p.message= message
-
-  .col-md-5.col-xs-12.col-sm-6.col-lg-4
-    +logon_form("logon")
+    .col-md-5.col-xs-12.col-sm-6.col-lg-4
+      +logon_form("logon")

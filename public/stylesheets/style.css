@@ -28,6 +28,7 @@ h4.underline {
 .navbar-default {
   background-color: #a40023;
   border-color: #a40023;
+  border-radius: 0px;
 }
 .navbar-default .navbar-brand {
   color: #ecf0f1;
