@@ -148,14 +148,32 @@ module.exports = function(sequelize, DataTypes) {
     						expires = true;
     					}
     				});
-    				if (expires === true) {
+    				if (expires) {
     					usersExpired.push(user);
     				}
     				expires = false;
     			});
     			callback(usersExpired);
     		});
-    	}
+      },
+      cancelledAndNotRepaid: function(models, whereClause, callback ){      
+        var cancelled = false;
+        var usersCancelled = [];
+        models.user.findFetchFull(models, whereClause, function(users){
+          users.forEach(function(user){
+            user.contracts.forEach(function(contract){
+              if (contract.isCancelledAndNotRepaid(moment())) {
+                cancelled = true;
+              }
+            });
+            if (cancelled) {
+              usersCancelled.push(user);
+            }
+            cancelled = false;
+          });
+          callback(usersCancelled);
+        });
+      }
 	},
   	instanceMethods: {
   		isActive: function() {

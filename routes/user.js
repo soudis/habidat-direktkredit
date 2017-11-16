@@ -9,8 +9,12 @@ module.exports = function(app){
 		var models  = require('../models')(req.session.project);
 		if (req.params.mode === 'expire') {
 			models.user.aboutToExpire(models, ['administrator <> 1'], 90, function(users) {
-				res.render('user/list', {users: users, title: 'Direktkreditgeber*innen Liste'});
+				res.render('user/list', {users: users, title: 'Direktkreditgeber*innen Liste (abgelaufene Kredite'});
 			});
+		} else if (req.params.mode === 'cancelled') {
+			models.user.cancelledAndNotRepaid(models, ['administrator <> 1'], function(users) {
+				res.render('user/list', {users: users, title: 'Direktkreditgeber*innen Liste (gekündigte, offene Kredite)'});
+			});			
 		}
 	});
 	

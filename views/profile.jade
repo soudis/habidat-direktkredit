@@ -5,60 +5,60 @@ block content
     +nav_item( "files" ) Dateien
     +nav_item( "/procrastinate") #[span.glyphicon.glyphicon-time]    
     +nav_item( "logout" ) Abmelden
-     
-  .jumbotron
-    h2= "Finanzstatus für " + user.first_name + ' ' + user.last_name
-    p Hier siehst du deinen aktuellen Finanzstatus und deine Stammdaten. Falls die Daten nicht stimmen, melde dich bitte unter #[a(href='mailto:#{project.email}') #{project.email}]
-  
-  .row
-    h3 Stammdaten
-  .row
-    .col-md-4 Name:
-    .col-md-8= user.first_name + ' ' + user.last_name 
-  .row
-    .col-md-4 Adresse:
-    .col-md-8= user.street + ', ' + user.zip + ' ' + user.place 
-  .row
-    .col-md-4 Telefonnummer:
-    .col-md-8= user.telno
-  .row
-    .col-md-4 E-Mail Adresse:
-    .col-md-8= user.email
-  .row
-    .col-md-4 IBAN:
-    .col-md-8= user.IBAN    
-  .row
-    .col-md-4 BIC:
-    .col-md-8= user.BIC
-  .row
-    h3 Direktkredite
-  each contract in user.contracts
-    - interest = contract.calculateInterest() 
+  div(class="col-md-8 col-md-offset-2 col-xs-12")     
+    .jumbotron
+      h2= "Finanzstatus für " + user.first_name + ' ' + user.last_name
+      p Hier siehst du deinen aktuellen Finanzstatus und deine Stammdaten. Falls die Daten nicht stimmen, melde dich bitte unter #[a(href='mailto:#{project.email}') #{project.email}]
+    
     .row
-      h4 Direktkredit vom #{moment(contract.sign_date).format('DD.MM.YYYY')}
+      h3 Stammdaten
     .row
-      .col-md-4 Status:
-      .col-md-8 #{contract.getStatus()} 
+      .col-md-4 Name:
+      .col-md-8= user.first_name + ' ' + user.last_name 
     .row
-      .col-md-4 Betrag (Vertrag):
-      .col-md-8 #{sprintf('%.2f', contract.amount )} EUR
+      .col-md-4 Adresse:
+      .col-md-8= user.street + ', ' + user.zip + ' ' + user.place 
     .row
-      .col-md-4 Zinssatz:
-      .col-md-8 #{sprintf('%.2f', contract.interest_rate )}%
-    .row 
-      .col-md-4 Zinsertrag (bis heute):
-      .col-md-8 #{sprintf('%.2f', interest.now)} EUR
+      .col-md-4 Telefonnummer:
+      .col-md-8= user.telno
     .row
-      .col-md-4 Zinsertrag (für #{interest.last_year_no}):
-      .col-md-8 #{sprintf('%.2f', interest.last_year)} EUR
+      .col-md-4 E-Mail Adresse:
+      .col-md-8= user.email
     .row
-      .col-md-12
-        h5 Zahlungen
-        each transaction in contract.transactions
-          .row
-            .col-md-1 
-            .col-md-3 #{moment(transaction.transaction_date).format('DD.MM.YYYY')}
-            .col-md-3 #{transaction.getTypeText()}
-            .col-md-3.text-right #{sprintf('%.2f', transaction.amount )} EUR            
+      .col-md-4 IBAN:
+      .col-md-8= user.IBAN    
+    .row
+      .col-md-4 BIC:
+      .col-md-8= user.BIC
+    .row
+      h3 Direktkredite
+    each contract in user.contracts
+      - interest = contract.calculateInterest() 
+      .row
+        h4 Direktkredit vom #{moment(contract.sign_date).format('DD.MM.YYYY')}
+      .row
+        .col-md-4 Status:
+        .col-md-8 #{contract.getStatus()} 
+      .row
+        .col-md-4 Betrag (Vertrag):
+        .col-md-8 #{sprintf('%.2f', contract.amount )} EUR
+      .row
+        .col-md-4 Zinssatz:
+        .col-md-8 #{sprintf('%.2f', contract.interest_rate )}%
+      .row 
+        .col-md-4 Zinsertrag (bis heute):
+        .col-md-8 #{sprintf('%.2f', interest.now)} EUR
+      .row
+        .col-md-4 Zinsertrag (für #{interest.last_year_no}):
+        .col-md-8 #{sprintf('%.2f', interest.last_year)} EUR
+      .row
+        .col-md-12
+          h5 Zahlungen
+          each transaction in contract.transactions
+            .row
+              .col-md-1 
+              .col-md-3 #{moment(transaction.transaction_date).format('DD.MM.YYYY')}
+              .col-md-3 #{transaction.getTypeText()}
+              .col-md-3.text-right #{sprintf('%.2f', transaction.amount )} EUR            
           
       

@@ -135,7 +135,23 @@ module.exports = function(sequelize, DataTypes) {
 				}
 			});
 			return count > 1 && sum <= 0 && this.termination_date;
-		}
+		},
+    isCancelledAndNotRepaid : function(date) {
+      // check if all money was paid back until given date      
+      var sum = 0;
+      var count = 0;
+      var toDate = date;
+      this.transactions.forEach(function(transaction) {
+        if (moment(toDate).diff(transaction.transaction_date) >= 0) {
+          //console.log('true trans '); 
+          count ++;
+          sum += transaction.amount;
+        }
+      });
+      var cancelled = sum > 0 && this.termination_date != null;
+      console.log('cancelled: ' + cancelled + ', sum: ' + sum + ', count: ' + count + ', term date: ' + this.termination_date + ', userid: ' + this.user_id);
+      return sum > 0 && this.termination_date != null;
     }
+  }
   });
 };
