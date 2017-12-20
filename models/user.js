@@ -153,8 +153,19 @@ module.exports = function(sequelize, DataTypes) {
     				}
     				expires = false;
     			});
-    			callback(usersExpired);
+    			callback(usersExpired);  
     		});
+      },
+      getUsers: function(models, mode, date, callback ){
+        var activeUsers = [];
+        models.user.findFetchFull(models, ['administrator <> 1'], function(users){
+          users.forEach(function(user){
+            if(mode == 'all' || user.hasNotTerminatedContracts(date)) {
+              activeUsers.push(user);
+            }
+          });
+          callback(activeUsers);  
+        });
       },
       cancelledAndNotRepaid: function(models, whereClause, callback ){      
         var cancelled = false;
@@ -176,6 +187,15 @@ module.exports = function(sequelize, DataTypes) {
       }
 	},
   	instanceMethods: {
+      hasNotTerminatedContracts: function(date) {
+        var notTerminated = false;
+        this.contracts.forEach(function(contract) {
+          if (!(contract.termination_date && moment(contract.termination_date).diff(date) <=0)) {
+            notTerminated = true;
+          }
+        });
+        return notTerminated;
+      },
   		isActive: function() {
   			var active;
   			this.contracts.forEach(function(contract){

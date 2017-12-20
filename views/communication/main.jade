@@ -17,5 +17,23 @@ block admin-content
               option(value='active') Nur aktive
           .col-md-2
             .text-right
-               button(type='submit' class='btn btn-primary') Download               
+               button(type='submit' class='btn btn-primary') Download     
+    .col-md-12
+      form.form-horizontal(action="/communication/addresses" method="post" role="form")
+        .form-group
+          .col-md-4
+            .h3 Adressen Download
+          label.control-label.col-md-2 Auswahl
+          .col-md-2
+            select.form-control(name="mode")
+              option(value='all') Alle
+              option(value='active') Nur aktive
+          .col-md-2
+            .input-group.date.datepicker(data-provide="datepicker" data-date-format="dd.mm.yyyy" data-date-language="de")
+              input.form-control(type="text" name="to_date" value=moment().format('DD.MM.YYYY'))
+              span.input-group-addon
+                span.glyphicon.glyphicon-calendar
+          .col-md-2
+            .text-right
+               button(type='submit' class='btn btn-primary') Download                           
    

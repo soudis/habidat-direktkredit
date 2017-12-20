@@ -54,7 +54,7 @@ module.exports = function(app){
 			var filename = "./tmp/Jahresliste_"+ req.body.year +".csv"
 			file = utils.generateTransactionList(transactionList, filename);
 
-			res.setHeader('Content-Length', file.length);
+			res.setHeader('Content-Length', (new Buffer(file)).length);
 			res.setHeader('Content-Type', 'text/csv');
 			res.setHeader('Content-Disposition', 'inline; filename=Jahresliste_'+ req.body.year +'.csv');
 			res.write(file);
