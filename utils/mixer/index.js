@@ -145,7 +145,7 @@ exports.calculate = function(generalConfig) {
 		}
 		
 		// TODO size of fixed habitants instead of hardcoded 1 !!!
-		var maxPermutate = Math.min(baseFlats[flatIndex].max_habitant-baseFlats[flatIndex].min_habitant-1, remHabitants.length);
+		var maxPermutate = Math.min(baseFlats[flatIndex].max_habitant-baseFlats[flatIndex].min_habitant, remHabitants.length);
 		console.log("Permutate Flat: " + flatIndex + " maxPermutate: " + maxPermutate);
 		
 		// loop from min size to max size minus fixed habitants
