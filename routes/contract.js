@@ -67,7 +67,7 @@ module.exports = function(app){
 			}
 		}).then(function(deleted) {
 			if(deleted > 0) {
-			 	res.redirect(security.redirectReload(req.get('Referrer'));
+			 	res.redirect(security.redirectReload(req.get('Referrer')));
 			} else {
 				req.flash('error', 'Vertrag konnte nicht gelöscht werden, überprüfe bitte ob noch Zahlungen bestehen');
 				res.redirect(security.redirectReload(req.get('Referrer')));
