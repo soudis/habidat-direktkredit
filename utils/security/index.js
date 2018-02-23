@@ -29,3 +29,11 @@ exports.redirectReload = function(redirectUrl) {
 	  delete u.search;
 	  return url.format(u);
 	};
+
+exports.getPrevURL = function(req) {
+	if (req.session.prevURLs && req.session.prevURLs.length >= 2) {
+		return req.session.prevURLs[req.session.prevURLs.length-2];
+	} else{
+		return "/";
+	}
+}

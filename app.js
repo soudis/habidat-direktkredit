@@ -72,6 +72,12 @@ app.use(function(req,res,next){
     if (req.session.project) {
     	res.locals.project = projects[req.session.project];
     }
+    var newPrevURLs = [];
+    if (req.session.prevURLs && req.session.prevURLs.length >= 1) {
+      newPrevURLs.push(req.session.prevURLs[req.session.prevURLs.length-1]);
+    }
+    newPrevURLs.push(req.originalUrl);
+    req.session.prevURLs = newPrevURLs;
     next();
 });
 

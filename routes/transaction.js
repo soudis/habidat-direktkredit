@@ -82,7 +82,7 @@ module.exports = function(app){
 			}
 		}).then(function(transaction) {
 			  transaction.destroy();
-			  res.redirect(security.redirectReload(req.get('Referrer')));
+			  res.redirect(security.redirectReload(security.getPrevURL(req)));
 		});	
 	});
 
