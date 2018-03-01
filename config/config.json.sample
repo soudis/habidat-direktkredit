@@ -1,5 +1,6 @@
 {
   "database": {
-	"host": "localhost
+	"host": "$HABIDAT_DK_DB_HOST",
+	"dialect": "mysql"
   }
 }
