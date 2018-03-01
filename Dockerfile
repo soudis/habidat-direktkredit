@@ -10,4 +10,6 @@ VOLUME /habidat/public/files
 VOLUME /habidat/public/images
 VOLUME /habidat/templates
 
+RUN envsubst < config/projects.json.sample > config/projects.json
+
 CMD pm2-docker start app.js 
