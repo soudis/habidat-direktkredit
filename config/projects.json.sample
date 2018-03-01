@@ -1,30 +1,16 @@
 { 
-	"willy-fred": {
-		"projectname": "Willy*Fred",
+	"$HABIDAT_DK_PROJECT_ID": {
+		"projectname": "$HABIDAT_DK_PROJECT_NAME",
 		"logo": "/public/images/willy-fred.gif",
-	    "email" : "willy-fred@servus.at",
-	    "files" : "/public/files/willy-fred",
-	    "templates": "/templates/willy-fred/docx",
-	    "usersuffix": "willyfred",
+	    "email" : "$HABIDAT_ADMIN_EMAIL",
+	    "files" : "/public/files/$HABIDAT_DK_PROJECT_ID",
+	    "templates": "/templates/$HABIDAT_DK_PROJECT_ID/docx",
+	    "usersuffix": "$HABIDAT_DK_PROJECT_ID",
 	    "db": {
-	    	"username": "dk_willy_fred",
-			"password": "test",
-			"database": "dk_willy_fred"
-	    }
-	},
-	"autonome-wohnfabrik": {
-		"projectname": "Autonome Wohnfabrik",
-		"logo": "/public/images/wohnfabrik.png",
-	    "email" : "wohnfabrik@systemli.org",
-	    "files" : "/public/files/autonome-wohnfabrik",
-	    "templates": "/templates/autonome-wohnfabrik/docx",
-	    "usersuffix": "wohnfabrik",
-	    "db": {
-	    	"username": "dk_autonome_wohnfabrik",
-			"password": "test",
-			"database": "dk_autonome_wohnfabrik"
+	    	"username": "$HABIDAT_DK_DB_USER",
+			"password": "$HABIDAT_DK_DB_PASSWORD",
+			"database": "$HABIDAT_DK_DB_DATABASE"
 	    }
 	}
-
 
 }
