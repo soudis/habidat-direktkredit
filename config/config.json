@@ -1,6 +1,0 @@
-{
-  "database": {
-	"host": "habidat-mysql-db",
-	"dialect": "mysql"
-  }
-}
