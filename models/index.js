@@ -21,6 +21,8 @@ var createdb = function(project) {
     .forEach(function(file) {
       var model = sequelize.import(path.join(__dirname, file));
       db[model.name] = model;
+      // create table if not exist
+      db[model.name].sync()
     });
 
   Object.keys(db).forEach(function(modelName) {
