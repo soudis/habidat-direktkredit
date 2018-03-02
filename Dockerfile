@@ -10,8 +10,14 @@ VOLUME /habidat/public/files
 VOLUME /habidat/public/images
 VOLUME /habidat/templates
 
-RUN envsubst < config/projects.json.sample > config/projects.json
-RUN envsubst < config/config.json.sample > config/config.json
-RUN envsubst < config/site.json.sample > config/site.json
+RUN \
+  apt-get update \
+  && apt-get -y install gettext-base \
+  && apt-get clean \
+  && rm -rf /var/lib/apt/lists/*
+
+RUN envsubst < /habidat/config/projects.json.sample > /habidat/config/projects.json
+RUN envsubst < /habidat/config/config.json.sample > /habidat/config/config.json
+RUN envsubst < /habidat/config/site.json.sample > /habidat/config/site.json
 
 CMD pm2-docker start app.js 
