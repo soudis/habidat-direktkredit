@@ -10,8 +10,6 @@ RUN \
   && apt-get -y install gettext-base \
   && apt-get clean \
   && rm -rf /var/lib/apt/lists/*
-  
-RUN ls /habidat/config
 
 RUN envsubst < /habidat/config/projects.json.sample > /habidat/config/projects.json
 RUN envsubst < /habidat/config/config.json.sample > /habidat/config/config.json
