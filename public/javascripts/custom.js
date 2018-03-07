@@ -37,6 +37,31 @@
     })
 
 
+    $('#by-zip').each(() => {
+        $.ajax({
+            type: 'get',     
+            dataType: 'json',
+            url: '/statistics/byzip',
+            complete: function (result) {
+              var data = JSON.parse(result.responseText);
+              console.log("resulst: " + result.responseText);
+              console.log("values: " + JSON.stringify(Object.values(data)));
+              var ctx = $("#by-zip").get(0).getContext('2d');
+              var colors = [];
+              for (var i in data) {
+                colors.push(dynamicColors());
+             }
+              var byRelationChart = new Chart(ctx,{
+                  type: 'pie',
+                  data: {
+                    datasets: [{data: Object.values(data), backgroundColor: colors}],
+                    labels: Object.keys(data)
+                  }
+              });              
+            }
+        }); 
+    })
+
 
     var table = $('#datatable').DataTable({
     	paging: false,

@@ -46,6 +46,43 @@ module.exports = function(app){
 		});
 	});
 	
+	router.get('/statistics/byzip', security.isLoggedInAdmin, (req, res) => {
+		var models  = require('../models')(req.session.project);		
+		models.user.all({
+			  include:{ 
+					model: models.contract, 
+					as: 'contracts', 
+					include : { 
+						model: models.transaction, 
+						as: 'transactions'
+					}
+				}
+		}).then(function(users) {
+			var byZip = {};
+			var today = moment();
+			users.forEach((user) => {
+				var key = "Sonstige";
+				if (user.zip) {
+					if (user.zip.length == 4) {
+						key = "AT " + user.zip.substr(0,1) + "XXX";
+					}
+					if (user.zip.length == 5) {
+						key = "DE"
+					}
+				} 
+				
+				if (!byZip[key]) {
+					byZip[key] = 0;
+				}
+				user.contracts.forEach((contract) => {
+					byZip[key] += contract.getAmountToDate(today);
+				})
+			})
+			res.setHeader('Content-Type', 'application/json');
+    		res.send(JSON.stringify(byZip));
+		});
+	});	
+
 	router.post('/statistics/transactionList', security.isLoggedInAdmin, function(req, res) {
 		var models  = require('../models')(req.session.project);		
 		models.user.all({
