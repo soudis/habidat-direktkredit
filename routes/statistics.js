@@ -18,6 +18,33 @@ module.exports = function(app){
 		});
 
 	});
+
+	router.get('/statistics/byrelation', security.isLoggedInAdmin, (req, res) => {
+		var models  = require('../models')(req.session.project);		
+		models.user.all({
+			  include:{ 
+					model: models.contract, 
+					as: 'contracts', 
+					include : { 
+						model: models.transaction, 
+						as: 'transactions'
+					}
+				}
+		}).then(function(users) {
+			var byRelation = {};
+			var today = moment();
+			users.forEach((user) => {
+				if (!byRelation[user.relationship]) {
+					byRelation[user.relationship] = 0;
+				}
+				user.contracts.forEach((contract) => {
+					byRelation[user.relationship] += contract.getAmountToDate(today);
+				})
+			})
+			res.setHeader('Content-Type', 'application/json');
+    		res.send(JSON.stringify(byRelation));
+		});
+	});
 	
 	router.post('/statistics/transactionList', security.isLoggedInAdmin, function(req, res) {
 		var models  = require('../models')(req.session.project);		

@@ -64,6 +64,6 @@ block admin-content
       .row
         .col-md-5.h4 Durchschnittslaufzeit
         .col-md-7.h4 #{sprintf('%.3f', numbers.cancelled.avgPeriod )} Jahre
-    .row
-      .col-md-12
+    .col-md-6
+      canvas(id="by-relation" width="400" height="400")
         //img(width="600" src="data:image/png;base64,"+numbers.charts.byRelationship)

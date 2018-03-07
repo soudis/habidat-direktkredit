@@ -136,6 +136,19 @@ module.exports = function(sequelize, DataTypes) {
 			});
 			return count > 1 && sum <= 0 && this.termination_date;
 		},
+    getAmountToDate : function(date) {    
+      var sum = 0;
+      this.transactions.forEach(function(transaction) {
+        if (moment(date).diff(transaction.transaction_date) >= 0) {
+          sum += transaction.amount + transaction.interestToDate(this.interest_rate, date);
+        }
+      });
+      if (sum > 0) {
+        return sum;
+      } else {
+        return 0;
+      }      
+    },
     isCancelledAndNotRepaid : function(date) {
       // check if all money was paid back until given date      
       var sum = 0;

@@ -1,5 +1,43 @@
   $(function () { $('.datepicker').datepicker({'format': 'dd.mm.yyyy', 'language': 'de'})});
   $(document).ready(function(){
+
+        
+
+         var dynamicColors = function() {
+            var r = Math.floor(Math.random() * 255);
+            var g = Math.floor(Math.random() * 255);
+            var b = Math.floor(Math.random() * 255);
+            return "rgb(" + r + "," + g + "," + b + ")";
+         };
+
+
+    $('#by-relation').each(() => {
+        $.ajax({
+            type: 'get',     
+            dataType: 'json',
+            url: '/statistics/byrelation',
+            complete: function (result) {
+              var data = JSON.parse(result.responseText);
+              console.log("resulst: " + result.responseText);
+              console.log("values: " + JSON.stringify(Object.values(data)));
+              var ctx = $("#by-relation").get(0).getContext('2d');
+              var colors = [];
+              for (var i in data) {
+                colors.push(dynamicColors());
+             }
+              var byRelationChart = new Chart(ctx,{
+                  type: 'pie',
+                  data: {
+                    datasets: [{data: Object.values(data), backgroundColor: colors}],
+                    labels: Object.keys(data)
+                  }
+              });              
+            }
+        }); 
+    })
+
+
+
     var table = $('#datatable').DataTable({
     	paging: false,
         language: {
