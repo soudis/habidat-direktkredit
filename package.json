@@ -23,7 +23,7 @@
     "sprintf": "^0.1.5",
     "docxtemplater": "^1.2.1",
     "json2csv" : "^2.0.12",
-    "numeral" : "^1.5.2",
+    "numeral" : "^2.0.6",
     "cloudconvert" : "^1.1.1",
     "multer" : "^1.1.0",
     "nchart" : "^1.0.1",

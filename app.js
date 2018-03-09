@@ -13,6 +13,7 @@ var http = require('http');
 var fs = require('fs');
 var multer = require('multer');
 var mkdirp = require('mkdirp');
+var numeral = require('numeral');
 
 mkdirp('tmp', function(err) { });
 mkdirp('upload', function(err) { });
@@ -39,6 +40,7 @@ var session      = require('express-session');
 var app = express();
 
 app.locals.moment = require('moment');
+app.locals.format = require('./utils/format');
 app.locals.sprintf = require('sprintf').sprintf;
 app.locals.site = site;
 

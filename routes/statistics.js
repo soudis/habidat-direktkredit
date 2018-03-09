@@ -83,6 +83,41 @@ module.exports = function(app){
 		});
 	});	
 
+	router.get('/statistics/bymonth', security.isLoggedInAdmin, (req, res) => {
+		var models  = require('../models')(req.session.project);		
+
+		models.user.all({
+			  include:{ 
+					model: models.contract, 
+					as: 'contracts', 
+					include : { 
+						model: models.transaction, 
+						as: 'transactions'
+					}
+				}
+		}).then(function(users) {
+			var currentDate = moment();
+			var months = [];
+			for (var i = 11; i>0; i--) {
+				months.push(moment().subtract(1*i, 'months').endOf('month'));
+			}
+			console.log("months: " + JSON.stringify(months));
+			var byMonth = {};
+			months.forEach((month)  => {
+				sum = 0;
+				users.forEach((user) => {
+					user.contracts.forEach((contract) => {
+						sum+= contract.getAmountToDate(month);
+					})
+				})
+				byMonth[month.format('MMM YYYY')]  = sum;
+			})			
+			res.setHeader('Content-Type', 'application/json');
+    		res.send(JSON.stringify(byMonth));
+		});
+	});	
+
+
 	router.post('/statistics/transactionList', security.isLoggedInAdmin, function(req, res) {
 		var models  = require('../models')(req.session.project);		
 		models.user.all({

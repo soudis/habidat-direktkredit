@@ -14,19 +14,19 @@ block admin-content
         .col-md-7.h4= numbers.total.count
       .row
         .col-md-5.h4 Gesamtwert
-        .col-md-7.h4 #{sprintf('%.2f', numbers.total.amount )} EUR
+        .col-md-7.h4 #{format.formatMoney(numbers.total.amount ,2)}
       .row 
         .col-md-5.h4 Durchschnittswert
-        .col-md-7.h4 #{sprintf('%.2f', numbers.total.avgAmount )} EUR 
+        .col-md-7.h4 #{format.formatMoney(numbers.total.avgAmount ,2)} 
       .row
         .col-md-5.h4 Medianwert
-        .col-md-7.h4  #{sprintf('%.2f', numbers.total.medianAmount )} EUR 
+        .col-md-7.h4  #{format.formatMoney(numbers.total.medianAmount ,2)} 
       .row
         .col-md-5.h4 Durchschnittszinssatz
-        .col-md-7.h4 #{sprintf('%.4f', numbers.total.avgInterestRate )} %
+        .col-md-7.h4 #{format.formatPercent(numbers.total.avgInterestRate ,4)}
       .row
         .col-md-5.h4 Durchschnittslaufzeit
-        .col-md-7.h4 #{sprintf('%.3f', numbers.total.avgPeriod )} Jahre
+        .col-md-7.h4 #{format.format(numbers.total.avgPeriod ,3, "# Jahre")} 
     .col-md-6
       .row
         .col-md-12
@@ -36,16 +36,16 @@ block admin-content
         .col-md-7.h4= numbers.running.count
       .row
         .col-md-5.h4 Gesamtwert
-        .col-md-7.h4 #{sprintf('%.2f', numbers.running.amount )} EUR
+        .col-md-7.h4 #{format.formatMoney(numbers.running.amount ,2)} 
       .row 
         .col-md-5.h4 Durchschnittswert
-        .col-md-7.h4 #{sprintf('%.2f', numbers.running.avgAmount )} EUR 
+        .col-md-7.h4 #{format.formatMoney(numbers.running.avgAmount ,2)} 
       .row
         .col-md-5.h4 Durchschnittszinssatz
-        .col-md-7.h4 #{sprintf('%.4f', numbers.running.avgInterestRate )} %
+        .col-md-7.h4 #{format.formatPercent(numbers.running.avgInterestRate ,4)} 
       .row
         .col-md-5.h4 Durchschnittslaufzeit
-        .col-md-7.h4 #{sprintf('%.3f', numbers.running.avgPeriod )} Jahre
+        .col-md-7.h4 #{format.format(numbers.running.avgPeriod ,3, "# Jahre")}
       .row
         .col-md-12
           h3.underline Gekündigte Kredite
@@ -54,20 +54,23 @@ block admin-content
         .col-md-7.h4= numbers.cancelled.count
       .row
         .col-md-5.h4 Gesamtwert
-        .col-md-7.h4 #{sprintf('%.2f', numbers.cancelled.amount )} EUR
+        .col-md-7.h4 #{format.formatMoney(numbers.cancelled.amount ,2)} 
       .row 
         .col-md-5.h4 Durchschnittswert
-        .col-md-7.h4 #{sprintf('%.2f', numbers.cancelled.avgAmount )} EUR 
+        .col-md-7.h4 #{format.formatMoney(numbers.cancelled.avgAmount ,2)} 
       .row
         .col-md-5.h4 Durchschnittszinssatz
-        .col-md-7.h4 #{sprintf('%.4f', numbers.cancelled.avgInterestRate )} %
+        .col-md-7.h4 #{format.formatPercent(numbers.cancelled.avgInterestRate ,4)} 
       .row
         .col-md-5.h4 Durchschnittslaufzeit
-        .col-md-7.h4 #{sprintf('%.3f', numbers.cancelled.avgPeriod )} Jahre
+        .col-md-7.h4 #{format.format(numbers.cancelled.avgPeriod ,3, "# Jahre")}  
     .col-md-6
       h3.underline Laufende Kredite nach Beziehung
       canvas(id="by-relation" width="400" height="400")
     .col-md-6
       h3.underline Laufende Kredite nach PLZ
       canvas(id="by-zip" width="400" height="400")      
+    .col-md-6
+      h3.underline Verschuldung (12 Monate)
+      canvas(id="by-month" width="400" height="400")  
         //img(width="600" src="data:image/png;base64,"+numbers.charts.byRelationship)

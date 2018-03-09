@@ -3,13 +3,26 @@
 
         
 
-         var dynamicColors = function() {
-            var r = Math.floor(Math.random() * 255);
-            var g = Math.floor(Math.random() * 255);
-            var b = Math.floor(Math.random() * 255);
-            return "rgb(" + r + "," + g + "," + b + ")";
-         };
+     var dynamicColors = function() {
+        var r = Math.floor(Math.random() * 255);
+        var g = Math.floor(Math.random() * 255);
+        var b = Math.floor(Math.random() * 255);
+        return "rgb(" + r + "," + g + "," + b + ")";
+     };
 
+    var valuesSorted = (data) => {
+      return Object.values(data).sort(function(a,b){return a-b})
+    }
+
+    var keysSorted = (data)  => {
+      var sum = Object.values(data).reduce(function(a, b) { return a + b; }, 0);
+      var labels = Object.keys(data).sort(function(a,b){return data[a]-data[b]})
+      labels.forEach((label, index) => {
+        var percentage = Math.round(data[label] / sum *10000) / 100;
+        labels[index] = label + " ("+percentage +"%)";
+      });
+      return labels;
+    }
 
     $('#by-relation').each(() => {
         $.ajax({
@@ -18,8 +31,6 @@
             url: '/statistics/byrelation',
             complete: function (result) {
               var data = JSON.parse(result.responseText);
-              console.log("resulst: " + result.responseText);
-              console.log("values: " + JSON.stringify(Object.values(data)));
               var ctx = $("#by-relation").get(0).getContext('2d');
               var colors = [];
               for (var i in data) {
@@ -28,8 +39,8 @@
               var byRelationChart = new Chart(ctx,{
                   type: 'pie',
                   data: {
-                    datasets: [{data: Object.values(data), backgroundColor: colors}],
-                    labels: Object.keys(data)
+                    datasets: [{data: valuesSorted(data), backgroundColor: colors}],
+                    labels: keysSorted(data)
                   }
               });              
             }
@@ -54,13 +65,63 @@
               var byRelationChart = new Chart(ctx,{
                   type: 'pie',
                   data: {
-                    datasets: [{data: Object.values(data), backgroundColor: colors}],
-                    labels: Object.keys(data)
+                    datasets: [{data: valuesSorted(data), backgroundColor: colors}],
+                    labels: keysSorted(data)
                   }
               });              
             }
         }); 
     })
+
+    $('#by-month').each(() => {
+        $.ajax({
+            type: 'get',     
+            dataType: 'json',
+            url: '/statistics/bymonth',
+            complete: function (result) {
+              var data = JSON.parse(result.responseText);
+              var min = Math.min.apply(Math, Object.values(data));
+              var max = Math.max.apply(Math, Object.values(data));
+              var ctx = $("#by-month").get(0).getContext('2d');
+
+              var byMonthChart = new Chart(ctx,{
+                  type: 'line',
+                  data: {
+                    datasets: [{data: Object.values(data), backgroundColor: dynamicColors(), label: "Verschuldung"}],
+                    labels: Object.keys(data)
+                  },
+                  options: {
+                    responsive: true,
+                    title: {
+                      display: true,
+                      text: 'Letzte 12 Monate'
+                    },
+                    scales: {
+                      xAxes: [{
+                        display: true,
+                        scaleLabel: {
+                          display: true,
+                          labelString: 'Monat'
+                        }
+                      }],
+                      yAxes: [{
+                        display: true,
+                        ticks: {
+                          suggestedMin : min * 0.95,
+                          suggestedMax : max * 1.05
+                        },
+                        scaleLabel: {
+                          display: true,
+                          labelString: 'Schuldenstand'
+                        }
+                      }]
+                    }
+                  }
+              });              
+            }
+        }); 
+    })
+
 
 
     var table = $('#datatable').DataTable({
