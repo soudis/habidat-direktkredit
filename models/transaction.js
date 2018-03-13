@@ -30,7 +30,7 @@ module.exports = function(sequelize, DataTypes) {
       allowNull: false,
       validate: {
     	  isValid: function(value) {
-    		  console.log("value " + this.type);
+    		  //console.log("value " + this.type);
     		  if (this.type === 'withdrawal' || this.type === 'termination'){
     			  if (value >= 0) {
     				  throw new Error("Rückzahlungen müssen negativ sein");
@@ -69,10 +69,10 @@ module.exports = function(sequelize, DataTypes) {
 			}
 			return "Unbekannt";
 		},
-		interestToDate: function(rate, date) {
-			if (rate > 0 && this.transaction_date < date)
-				return this.amount * Math.pow (1+(rate/100), date.diff(this.transaction_date, 'days') / 365) - this.amount;
-			else
+		interestToDate: function(rate, date) {      
+			if (rate > 0 && moment(date).diff(this.transaction_date) >= 0) {
+				return this.amount * Math.pow (1+(rate/100), moment(date).diff(this.transaction_date, 'days') / 365) - this.amount;
+			} else
 				return 0;
 		}
     }

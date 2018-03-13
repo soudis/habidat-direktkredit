@@ -122,6 +122,59 @@
         }); 
     })
 
+    $('#transactions-by-month').each(() => {
+        $.ajax({
+            type: 'get',     
+            dataType: 'json',
+            url: '/statistics/transactionsbymonth',
+            complete: function (result) {
+              var data = JSON.parse(result.responseText);
+              var dataCombined = Object.values(data.deposits).concat(Object.values(data.withdrawals)).concat(Object.values(data.interest));
+              var min = Math.min.apply(Math, dataCombined);
+              var max = Math.max.apply(Math, dataCombined);
+              var ctx = $("#transactions-by-month").get(0).getContext('2d');
+
+              var byMonthChart = new Chart(ctx,{
+                  type: 'line',
+                  data: {
+                    datasets: [
+                      {data: Object.values(data.deposits), borderColor: dynamicColors(), label: "Einzahlungen", steppedLine: false, fill: false}, 
+                      {data: Object.values(data.withdrawals), borderColor: dynamicColors(), label: "Rückzahlungen", steppedLine: false, fill: false},
+                      {data: Object.values(data.interest), borderColor: dynamicColors(), label: "Zinsen", steppedLine: false, fill: false}],
+                    labels: Object.keys(data.deposits)
+                  },
+                  options: {
+                    responsive: true,
+                    title: {
+                      display: true,
+                      text: 'Letzte 12 Monate'
+                    },
+                    scales: {
+                      xAxes: [{
+                        display: true,
+                        scaleLabel: {
+                          display: true,
+                          labelString: 'Monat'
+                        }
+                      }],
+                      yAxes: [{
+                        display: true,
+                        ticks: {
+                          suggestedMin : 0,
+                          suggestedMax : max * 1.05
+                        },
+                        scaleLabel: {
+                          display: true,
+                          labelString: 'Transaktionen'
+                        }
+                      }]
+                    }
+                  }
+              });              
+            }
+        }); 
+    })
+
 
 
     var table = $('#datatable').DataTable({

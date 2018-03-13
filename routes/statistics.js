@@ -13,7 +13,7 @@ module.exports = function(app){
 	router.get('/statistics/numbers', security.isLoggedInAdmin, function(req, res) {
 		var models  = require('../models')(req.session.project);		
 		statistics.getNumbers(models, function(numbers) {
-			console.log("test: " + numbers.amount);
+			//console.log("test: " + numbers.amount);
 			res.render('statistics/numbers', { title: 'Zahlen, Daten, Fakten', "numbers": numbers});
 		});
 
@@ -98,19 +98,70 @@ module.exports = function(app){
 		}).then(function(users) {
 			var currentDate = moment();
 			var months = [];
-			for (var i = 11; i>0; i--) {
+			for (var i = 11; i>=0; i--) {
 				months.push(moment().subtract(1*i, 'months').endOf('month'));
 			}
-			console.log("months: " + JSON.stringify(months));
+			//console.log("months: " + JSON.stringify(months));
 			var byMonth = {};
 			months.forEach((month)  => {
 				sum = 0;
 				users.forEach((user) => {
 					user.contracts.forEach((contract) => {
-						sum+= contract.getAmountToDate(month);
+						var contractAmount = contract.getAmountToDate(month);
+						//console.log("contract: " + contract.id + ", " + contractAmount);
+						sum+= contractAmount;
+
 					})
 				})
-				byMonth[month.format('MMM YYYY')]  = sum;
+				byMonth[month.format('MM YYYY')]  = sum;
+			})			
+			res.setHeader('Content-Type', 'application/json');
+    		res.send(JSON.stringify(byMonth));
+		});
+	});	
+
+	router.get('/statistics/transactionsbymonth', security.isLoggedInAdmin, (req, res) => {
+		var models  = require('../models')(req.session.project);		
+
+		models.user.all({
+			  include:{ 
+					model: models.contract, 
+					as: 'contracts', 
+					include : { 
+						model: models.transaction, 
+						as: 'transactions'
+					}
+				}
+		}).then(function(users) {
+			var currentDate = moment();
+			var months = [];
+			for (var i = 11; i>=0; i--) {
+				months.push(moment().subtract(1*i, 'months').endOf('month'));
+			}
+			//console.log("months: " + JSON.stringify(months));
+			var byMonth = { deposits: {}, withdrawals: {}, interest: {}};
+			months.forEach((month)  => {
+				var start = moment(month).startOf('month');
+				var end = month;
+				//console.log("start " + start + " end " + end);
+				var deposits = 0, withdrawals = 0, interest = 0;
+				users.forEach((user) => {
+					user.contracts.forEach((contract) => {
+						contract.transactions.forEach((transaction) => {
+							if (start.diff(transaction.transaction_date) <= 0 && end.diff(transaction.transaction_date) >= 0) {
+								if (transaction.amount > 0) {
+									deposits += transaction.amount;
+								} else {
+									withdrawals += transaction.amount;
+								}
+							}
+							interest += transaction.interestToDate(contract.interest_rate, end) - transaction.interestToDate(contract.interest_rate, start);
+						});
+					})
+				})
+				byMonth.deposits[month.format('MM YYYY')]  = deposits;
+				byMonth.withdrawals[month.format('MM YYYY')]  = -withdrawals;
+				byMonth.interest[month.format('MM YYYY')]  = interest;
 			})			
 			res.setHeader('Content-Type', 'application/json');
     		res.send(JSON.stringify(byMonth));

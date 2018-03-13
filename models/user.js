@@ -344,7 +344,7 @@ module.exports = function(sequelize, DataTypes) {
   	hooks: {
         beforeCreate: function (user, options) {
             user.logon_id = Math.abs(Math.random() * 100000000);
-            console.log("logonid" + user.logon_id);
+            //console.log("logonid" + user.logon_id);
         },
   		afterCreate: function(user, options) {
   		  var id = user.id + 10000;

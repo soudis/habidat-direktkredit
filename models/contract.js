@@ -138,9 +138,10 @@ module.exports = function(sequelize, DataTypes) {
 		},
     getAmountToDate : function(date) {    
       var sum = 0;
+      var contract = this;
       this.transactions.forEach(function(transaction) {
         if (moment(date).diff(transaction.transaction_date) >= 0) {
-          sum += transaction.amount + transaction.interestToDate(this.interest_rate, date);
+          sum += transaction.amount + transaction.interestToDate(contract.interest_rate, date);
         }
       });
       if (sum > 0) {
@@ -162,7 +163,7 @@ module.exports = function(sequelize, DataTypes) {
         }
       });
       var cancelled = sum > 0 && this.termination_date != null;
-      console.log('cancelled: ' + cancelled + ', sum: ' + sum + ', count: ' + count + ', term date: ' + this.termination_date + ', userid: ' + this.user_id);
+      //console.log('cancelled: ' + cancelled + ', sum: ' + sum + ', count: ' + count + ', term date: ' + this.termination_date + ', userid: ' + this.user_id);
       return sum > 0 && this.termination_date != null;
     }
   }
