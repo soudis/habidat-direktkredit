@@ -76,6 +76,7 @@ module.exports = function(sequelize, DataTypes) {
     		db.user.hasMany(db.file, {
     			as: 'files',
     			foreignKey: 'ref_id',
+          contraints: false,
     			scope: {
     				ref_table: 'user'
     			}

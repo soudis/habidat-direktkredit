@@ -1,10 +1,17 @@
 var security = require('../utils/security');
 var moment = require("moment");
 var router = require('express').Router();
+var utils = require('../utils');
 
 module.exports = function(app){
 
 
+    function renderUser(res, models, data) {
+    	utils.getUserTemplates(models, (templates) => {
+    		data.templates = templates;
+    		res.render('user/show', data);
+    	});
+    }
 
 	/* GET home page. */
 	router.get('/transaction/edit/:id', security.isLoggedInAdmin, function(req, res, next) {
@@ -20,7 +27,7 @@ module.exports = function(app){
 				}
 			}).then(function(contract) {
 				models.user.findByIdFetchFull(models, contract.user_id, function(user) {
-					  res.render('user/show', { user:user, editTransaction:transaction, title: 'Zahlung bearbeiten'});
+					  renderUser(res, models, { user:user, editTransaction:transaction, title: 'Zahlung bearbeiten'});
 				});	
 			});
 		});	
@@ -36,7 +43,7 @@ module.exports = function(app){
 			}).then(function(contract) {
 				models.user.findByIdFetchFull(models, contract.user_id, function(user) {
 					  var addTransaction =  {contract_id : contract.id};
-					  res.render('user/show', { user:user, addTransaction:addTransaction, title: 'Zahlung anlegen' });
+					  renderUser(res, models, { user:user, addTransaction:addTransaction, title: 'Zahlung anlegen' });
 				});	
 			});
 	});
@@ -52,7 +59,7 @@ module.exports = function(app){
 			res.redirect('/user/show/' + req.body.user_id);
 		}).catch(function(err) {
 			models.user.findByIdFetchFull(models,req.body.user_id,function(user) {
-				res.render('user/show', { user:user, addTransaction:{contract_id: req.body.contract_id, amount: req.body.amount, type: req.body.type, transaction_date : moment(req.body.transaction_date, 'DD.MM.YYYY')}, title: 'Zahlung anlegen', message: err.message });
+				renderUser(res, models,  { user:user, addTransaction:{contract_id: req.body.contract_id, amount: req.body.amount, type: req.body.type, transaction_date : moment(req.body.transaction_date, 'DD.MM.YYYY')}, title: 'Zahlung anlegen', message: err.message });
 			});	
 		});
 	});
@@ -67,7 +74,7 @@ module.exports = function(app){
 			res.redirect('/user/show/' + req.body.user_id);
 		}).catch(function(err) {
 			models.user.findByIdFetchFull(models,req.body.user_id,function(user) {
-				res.render('user/show', { user:user, editTransaction:{id: req.body.id, contract_id: req.body.contract_id, amount: req.body.amount, type: req.body.type, transaction_date : moment(req.body.transaction_date, 'DD.MM.YYYY')}, title: 'Zahlung bearbeiten', message: err.message });
+				renderUser(res, models,  { user:user, editTransaction:{id: req.body.id, contract_id: req.body.contract_id, amount: req.body.amount, type: req.body.type, transaction_date : moment(req.body.transaction_date, 'DD.MM.YYYY')}, title: 'Zahlung bearbeiten', message: err.message });
 			});	
 		});
 	});

@@ -200,10 +200,10 @@ exports.getNumbers = function(models, callback){
 
 					contract.transactions.forEach(function (transaction) {
 
+						interest += transaction.interestToDate(now);
 						// general statistics
 						if (transaction.amount > 0) {
 							deposits += transaction.amount;
-							interest += transaction.interestToDate(now);
 						} else {
 							withdrawals += transaction.amount;
 						}
@@ -319,7 +319,7 @@ exports.getNumbers = function(models, callback){
 				return -1;
 			else
 				return 0;
-		});
+		}); 
 		
 		if (numbers.total.count > 2) {
 			numbers.total.medianPeriod = contractHelper[Math.ceil(numbers.total.count/2)].period;

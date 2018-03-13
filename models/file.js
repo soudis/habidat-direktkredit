@@ -42,6 +42,7 @@ module.exports = function(sequelize, DataTypes) {
     	associate: function(db) {
     		db.file.belongsTo(db.user, {
     	          onDelete: "CASCADE",
+  				  constraints: false,
     	          foreignKey: 'ref_id',
     	          as: 'files'
     	        });

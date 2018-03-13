@@ -95,33 +95,50 @@ router.post('/accountnotification', security.isLoggedIn, function(req, res) {
 				"street" :user.street,
 				"zip": user.zip,
 				"place": user.place,
+				"country": user.country,
+				"telno": user.telno,
+				"email": user.email,
+				"IBAN": user.IBAN,
+				"BIC": user.BIC,				
 				"year": req.body.year,
 				"current_date": format.formatDate(moment()),
 				"transactionList": transactionList,
 				"interestTotal": format.formatMoney(interestTotal)};
 		var filename =  "Kontomitteilung " + user.id + " " + req.body.year;
-		utils.generateDocx("account_notification", filename, data, req.session.project);
-		utils.convertToPdf(filename, function(err) {
-			var file;
-			if (!err) {
-				file = fs.readFileSync("./tmp/"+ filename +".pdf", 'binary');
+	    models.file.find({
+		where: {
+			ref_table: "template_account_notification"
+		}}).then(function(file) {
+			return file.path;		
+		}).catch((error) => {
+			return "account_notification";
+		}).then((template) => {
+			utils.generateDocx(template, filename, data, req.session.project);
 
-				res.setHeader('Content-Length', file.length);
-				res.setHeader('Content-Type', 'application/pdf');
-				res.setHeader('Content-Disposition', 'inline; filename=' + filename + '.pdf');
-				res.write(file, 'binary');
-				res.end();			
-			} else {
-				console.log("Error generating PDF: ", err)
-				file = fs.readFileSync("./tmp/"+ filename +".docx", 'binary');
+			utils.convertToPdf(filename, function(err) {
+				var file;
+				if (!err) {
+					file = fs.readFileSync("./tmp/"+ filename +".pdf", 'binary');
 
-				res.setHeader('Content-Length', file.length);
-				res.setHeader('Content-Type', 'application/msword');
-				res.setHeader('Content-Disposition', 'inline; filename=' + filename + '.docx');
-				res.write(file, 'binary');
-				res.end();
-			}
-		});
+					res.setHeader('Content-Length', file.length);
+					res.setHeader('Content-Type', 'application/pdf');
+					res.setHeader('Content-Disposition', 'inline; filename=' + filename + '.pdf');
+					res.write(file, 'binary');
+					res.end();			
+				} else {
+					console.log("Error generating PDF: ", err)
+					file = fs.readFileSync("./tmp/"+ filename +".docx", 'binary');
+
+					res.setHeader('Content-Length', file.length);
+					res.setHeader('Content-Type', 'application/msword');
+					res.setHeader('Content-Disposition', 'inline; filename=' + filename + '.docx');
+					res.write(file, 'binary');
+					res.end();
+				}
+			});
+		});		
+
+
 	});
 });
 app.use('/', router);

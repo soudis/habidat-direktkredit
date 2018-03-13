@@ -15,6 +15,7 @@ var multer = require('multer');
 var mkdirp = require('mkdirp');
 var numeral = require('numeral');
 
+
 mkdirp('tmp', function(err) { });
 mkdirp('upload', function(err) { });
 
@@ -36,6 +37,7 @@ var models  = require('./models');
 require('./utils/security/passport')(passport); 
 
 var session      = require('express-session');
+var FileStore = require('session-file-store')(session);
 
 var app = express();
 
@@ -65,7 +67,11 @@ var oneDay = 86400000;
 
 app.use('/public', express.static(__dirname + '/public/',  { maxAge: oneDay }));
 
-app.use(session({ secret: 'ilovescotchscotchyscotchscotch' })); // session secret
+app.use(session({ 
+  secret: 'klasjdf098034lja2309bdjkla789lsdfjsafd098',
+  store: new FileStore,
+  resave: true,
+  saveUninitialized: true})); 
 app.use(passport.initialize());
 app.use(passport.session()); // persistent login sessions
 

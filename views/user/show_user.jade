@@ -7,12 +7,17 @@
       a.btn.btn-default.dropdown-toggle(type="button" data-toggle="dropdown") #[span.glyphicon.glyphicon-file]
         span.caret  
       ul.dropdown-menu
-        li
-          a(href='/docx/'+user.id+'?file=userdata_w_contract_return') Dankesschreiben (2 Verträge)
-        li 
-          a(href='/docx/'+user.id+'?file=userdata_w_contract') Dankesschreiben (1 Vertrag) 
-        li 
-          a(href='/docx/'+user.id+'?file=userdata_wo_contract') Dankesschreiben (ohne Vertrag) 
+        if (templates && templates.length > 0)
+          each template in templates
+            li
+              a(href='/docx/'+user.id+'?fileid='+template.id)=template.description
+        else
+          li
+            a(href='/docx/'+user.id+'?file=userdata_w_contract_return') Dankesschreiben (2 Verträge)
+          li 
+            a(href='/docx/'+user.id+'?file=userdata_w_contract') Dankesschreiben (1 Vertrag) 
+          li 
+            a(href='/docx/'+user.id+'?file=userdata_wo_contract') Dankesschreiben (ohne Vertrag) 
 .row
   .col-md-3.h4 Name:
   .col-md-8.h4= user.first_name + ' ' + user.last_name 

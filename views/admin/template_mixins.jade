@@ -1,0 +1,14 @@
+mixin add_template(title, type)
+    form.form-horizontal(action="/admin/addtemplate" method="post" role="form" enctype="multipart/form-data")
+      input(type="hidden" name="type" value=type)
+      legend=title
+      .form-group
+        label.control-label.col-md-2 Datei
+        .col-md-8
+          input.form-control(type="file"  name="file")
+      .form-group 
+        label.control-label.col-md-2 Titel
+        .col-md-8
+          input.form-control(type="text" name="description")  
+        .col-md-2.text-right
+          button(type='submit' class='btn btn-primary') Speichern

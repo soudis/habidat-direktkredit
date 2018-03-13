@@ -7,10 +7,25 @@ var cloudconvert = new (require('cloudconvert'))('oqxW0tKE_7gykv8GDULnAcRTv50QTq
 
 var json2csv = require('json2csv');
 
+exports.getUserTemplates = function(models, callback){
+	models.file.findAll({
+		where: {
+			ref_table: "template_user"
+		}
+	}).then(function(templates) {
+		callback(templates);
+	}).catch(() => {
+		callback([]);
+	});	
+};
+
 
 exports.generateDocx = function(templateFile, outputFile, data, project){
-	var path = projects[project].templates;
-	var file = fs.readFileSync(__dirname + '/..' + path + "/" + templateFile + ".docx", 'binary');
+	var path = templateFile;
+	if (templateFile.indexOf('/') === -1) {
+		path = __dirname + '/..' +  projects[project].templates + "/" + templateFile + ".docx";
+	}
+	var file = fs.readFileSync(path, 'binary');
 		var zip = new JSZipUtils(file);
         var doc=new DocxGen(zip);
         doc.setData(data); 

@@ -31,7 +31,7 @@ module.exports = function(app){
 		
 		var models  = require('../models')(req.session.project);
 		models.file.findById(req.params.id).then(function(file) {
-			if (file.ref_table === 'user') {
+			if (file.ref_table) {
 				fs.unlinkSync(file.path);  
 				file.destroy();
 			}
@@ -61,6 +61,62 @@ module.exports = function(app){
 			});
 		}
 	});
+
+	router.get('/admin/templates', security.isLoggedInAdmin, function(req, res) {
+		var models  = require('../models')(req.session.project);		
+		models.file.findAll({
+			where: {
+				ref_table: {
+			      $like: "template_%"
+			    }
+			}
+		}).then(function(templates) {
+			res.render('admin/templates', { title: 'Vorlagen', templates:templates });
+		});	
+	});
+
+	router.post('/admin/addtemplate', security.isLoggedInAdmin, function(req, res) {
+		var models  = require('../models')(req.session.project);
+		var type = req.body.type;
+
+		if (type == "template_account_notification") {
+		    models.file.find({
+			where: {
+				ref_table: "template_account_notification"
+			}}).then(function(file) {
+				fs.unlinkSync(file.path);  
+				file.destroy();				
+			});
+			models.file.create({
+				filename: req.file.originalname,
+				description: req.body.description,
+				mime: req.file.mimetype,
+				path: req.file.path,
+				ref_id: req.user.id,
+				ref_table: "template_account_notification"
+			}).then(function(transaction) {
+				res.redirect('/admin/templates');
+			}).catch(function(err) {
+				console.log("Error: " +err);				
+				res.redirect('/admin/templates');
+			});			
+		} else if (type =="template_user") {
+			
+			models.file.create({
+				filename: req.file.originalname,
+				description: req.body.description,
+				mime: req.file.mimetype,
+				path: req.file.path,
+				ref_id: req.user.id,
+				ref_table: "template_user"
+			}).then(function(transaction) {
+				res.redirect('/admin/templates');
+			}).catch(function(err) {
+				console.log("Error: " +err);
+				res.redirect('/admin/templates');
+			});
+		}
+	});	
 
 	app.use('/', router);
 };

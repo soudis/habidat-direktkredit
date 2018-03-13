@@ -1,0 +1,50 @@
+include ./template_mixins
+extends ../admin/layout
+block admin-content
+  .col-md-12
+    .page-header
+      h2 Vorlage für Jahresliste für Buchhaltung
+      p Vorlage für die Jahresliste die sich jede*r DK-Geber*in selbst ausdrucken kann. Die Vorlage muss im Format .docx sein und kann folgende Platzhalter beinhalten (jeweils in geschwungenen Klammern {...}): first_name, last_name, street, zip, place, country, telno, email, IBAN, BIC, year, current_date. 
+      p Außerdem kann die Liste an Transaktionen eingefügt werden. Diesen Block startet man mit {#transactionList} und endet ihn mit {/transactionList}. Dazwischen können folgende Platzhalter verwendet werden: contract_id, type, date, amount, interest_rate.
+  .col-md-12
+    table.table.table-striped
+      thead
+        tr
+          th Bezeichnung
+          th Datei
+      tbody
+        each template in templates
+          if (template.ref_table == "template_account_notification")
+            tr
+              td=template.description
+              td
+                a(href='/file/get/' + template.id) #{template.filename} 
+  .col-md-12
+    hr
+  .col-md-12
+      +add_template("Vorlage überschreiben", "template_account_notification")    
+  .col-md-12
+    .page-header
+      h2 Vorlagen für Direktkreditgeber*in
+      p Vorlagen für die automatische Dokumentgenerierung (pro Direktkreditgeber*in). Die Vorlagen müssen im Format .docx sein und können folgende Platzhalter beinhalten (jeweils in geschwungenen Klammern {...}): first_name, last_name, logon_id, password, street, zip, place, country, telno, email, IBAN, BIC
+  .col-md-12
+    table.table.table-striped
+      thead
+        tr
+          th Bezeichnung
+          th Datei
+          th Aktionen
+      tbody
+        each template in templates
+          if (template.ref_table == "template_user")
+            tr
+              td=template.description
+              td
+                a(href='/file/get/' + template.id) #{template.filename} 
+              td.fit
+                  a.btn.btn-default.btn-sm(href='/file/delete/'+template.id) #[span.glyphicon.glyphicon-trash]
+  .col-md-12
+    hr
+  .col-md-12
+    +add_template("Neue Vorlage", "template_user")
+              

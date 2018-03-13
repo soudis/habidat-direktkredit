@@ -2,8 +2,16 @@ var security = require('../utils/security');
 var moment = require("moment");
 var router = require('express').Router();
 var url = require('url');
+var utils = require('../utils');
 
 module.exports = function(app){
+
+	function renderUser(res, models, data) {
+    	utils.getUserTemplates(models, (templates) => {
+    		data.templates = templates;
+    		res.render('user/show', data);
+    	});
+    }
 
 	router.get('/user/list/:mode', security.isLoggedInAdmin, function(req, res) {
 		var models  = require('../models')(req.session.project);
@@ -40,7 +48,10 @@ module.exports = function(app){
 	router.get('/user/show/:id', security.isLoggedInAdmin, function(req, res, next) {
 		var models  = require('../models')(req.session.project);
 		models.user.findByIdFetchFull(models, req.params.id, function(user) {
-			  res.render('user/show', { user:user, title: 'Direktkreditgeber*in', message: req.flash('error') });
+	    	utils.getUserTemplates(models, (templates) => {
+				res.render('user/show', { user:user, templates: templates, title: 'Direktkreditgeber*in', message: req.flash('error') });
+	    	});			
+			  
 		});	
 	});
 
