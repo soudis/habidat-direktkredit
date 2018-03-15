@@ -95,3 +95,8 @@ h4.underline {
     background-color: #e50031;
   }
 }
+
+.move-left {
+    width: auto;
+    box-shadow: none;
+  }

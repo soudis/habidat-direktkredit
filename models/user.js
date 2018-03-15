@@ -16,6 +16,10 @@ module.exports = function(sequelize, DataTypes) {
       type: DataTypes.BOOLEAN,
       alowNull: true
     },
+    ldap: {
+      type: DataTypes.BOOLEAN,
+      alowNull: true
+    },    
     password: {
       type: DataTypes.STRING,
       allowNull: false
@@ -76,7 +80,6 @@ module.exports = function(sequelize, DataTypes) {
     		db.user.hasMany(db.file, {
     			as: 'files',
     			foreignKey: 'ref_id',
-          contraints: false,
     			scope: {
     				ref_table: 'user'
     			}
@@ -344,18 +347,22 @@ module.exports = function(sequelize, DataTypes) {
   	},
   	hooks: {
         beforeCreate: function (user, options) {
+          if (!user.administrator) {
             user.logon_id = Math.abs(Math.random() * 100000000);
+          }
             //console.log("logonid" + user.logon_id);
         },
   		afterCreate: function(user, options) {
-  		  var id = user.id + 10000;
-  		  return user.update({
-  		    logon_id: id + "_" + global.project.usersuffix
-  		  }, {
-  		    where: {
-  		      id: user.id
-  		    }
-  		  });
+        if (!user.administrator) {
+    		  var id = user.id + 10000;
+    		  return user.update({
+    		    logon_id: id + "_" + global.project.usersuffix
+    		  }, {
+    		    where: {
+    		      id: user.id
+    		    }
+    		  });
+        }
   		}
     }
   });

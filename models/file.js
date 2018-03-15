@@ -28,7 +28,7 @@ module.exports = function(sequelize, DataTypes) {
 		},
 		ref_id:  {
 			type: DataTypes.INTEGER(11),
-			allowNull: false
+			allowNull: true
 		},
 		ref_table:  {
 			type: DataTypes.STRING,
@@ -42,7 +42,6 @@ module.exports = function(sequelize, DataTypes) {
     	associate: function(db) {
     		db.file.belongsTo(db.user, {
     	          onDelete: "CASCADE",
-  				  constraints: false,
     	          foreignKey: 'ref_id',
     	          as: 'files'
     	        });

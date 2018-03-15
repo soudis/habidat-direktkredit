@@ -6,12 +6,15 @@ var Sequelize = require("sequelize");
 var env       = process.env.NODE_ENV || "database";
 var config    = require(__dirname + '/../config/config.json')[env];
 var projects  = require(__dirname + '/../config/projects.json');
+var migration = require('./migration');
 var currentProject, sequelize;
 
 var createdb = function(project) {
 
   if (!currentProject || project !== currentProject) {
-    sequelize = new Sequelize('mysql://'+projects[project].db.username+':'+projects[project].db.password+'@'+config.host+'/'+projects[project].db.database, {logging:false});
+    sequelize = new Sequelize('mysql://'+projects[project].db.username+':'+projects[project].db.password+'@'+config.host+'/'+projects[project].db.database, {logging:false, pool:false});
+    sequelize.query('SET FOREIGN_KEY_CHECKS = 0', {raw: true}).catch(console.log);
+    migration.up(sequelize);
     currentProject = project;
   }
   global.project = projects[project];

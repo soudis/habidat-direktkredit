@@ -84,6 +84,74 @@ module.exports = function(app){
 		});	
 	});
 
+	router.get('/admin/accounts', security.isLoggedInAdmin, function(req, res) {
+		
+		var models  = require('../models')(req.session.project);
+		models.user.findFetchFull(models, ['administrator = true'], function(users) {
+			res.render('admin/admin_accounts', {accounts: users, message: req.flash('error'), title: 'Administrator*innen Accounts'});
+		});
+	});
+
+	router.get('/admin/delete/:id', security.isLoggedInAdmin, function(req, res) {
+		
+		var models  = require('../models')(req.session.project);
+		models.user.destroy({
+			where: {
+				id: req.params.id,
+				administrator: true
+			}
+		}).then(function(deleted) {
+			if(deleted > 0) {
+			 	res.redirect('/admin/accounts');
+			} else {
+				req.flash('error', 'Es wurde kein Account gelöscht, das sollte nicht passieren!');
+				res.redirect('/admin/accounts');
+			}
+		}).catch(function(error) {
+			req.flash('error', 'Account konnte nicht gelöscht werden: ' + error);
+			res.redirect('/admin/accounts');
+		});  
+	});
+
+
+	router.post('/admin/add', security.isLoggedInAdmin, function(req, res) {
+		
+		if (!req.body.logon_id) {
+			req.flash('error', 'Login ID muss angegeben werden!');
+			return res.redirect('/admin/accounts');
+		} else if (!req.body.ldap && !req.body.password) {
+			req.flash('error', 'Passwort fehlt!');
+			return res.redirect('/admin/accounts');			
+		} else if (!req.body.ldap && req.body.password != req.body.password2) {
+			req.flash('error', 'Passwörter sind nicht gleich!');
+			return res.redirect('/admin/accounts');			
+		}
+
+		var models  = require('../models')(req.session.project);
+		var length = 16,
+	    charset = "!#+?-_abcdefghijklnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789",
+	    generatedPassword = "";
+		for (var i = 0, n = charset.length; i < length; ++i) {
+			generatedPassword += charset.charAt(Math.floor(Math.random() * n));
+		}
+		var user = {
+			logon_id: req.body.logon_id,
+			administrator: true
+		}
+		if (req.body.ldap) {
+			user.ldap = true;
+			user.password = generatedPassword;
+		} else {
+			user.ldap = false;
+			user.password = req.body.password;
+		}
+		
+		models.user.create(user).then(function(user) {
+			res.redirect('/admin/accounts');
+		});	
+	});
+
+
 	router.post('/user/edit', security.isLoggedInAdmin, function(req, res) {
 		var models  = require('../models')(req.session.project);
 		models.user.update({

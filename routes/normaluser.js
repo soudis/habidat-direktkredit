@@ -15,7 +15,7 @@ module.exports = function(app){
 // we will want this protected so you have to be logged in to visit
 // we will use route middleware to verify this (the isLoggedIn function)
 router.get('/profile', security.isLoggedIn, function(req, res) {
-	if (req.user.isAdmin()) {
+	if (req.user.dn || req.user.administrator) {
 		res.redirect('/admin');
 	} else {
 		var models  = require('../models')(req.session.project);
@@ -106,8 +106,8 @@ router.post('/accountnotification', security.isLoggedIn, function(req, res) {
 				"interestTotal": format.formatMoney(interestTotal)};
 		var filename =  "Kontomitteilung " + user.id + " " + req.body.year;
 	    models.file.find({
-		where: {
-			ref_table: "template_account_notification"
+			where: {
+				ref_table: "template_account_notification"
 		}}).then(function(file) {
 			return file.path;		
 		}).catch((error) => {

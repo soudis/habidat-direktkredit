@@ -22,10 +22,8 @@ mkdirp('upload', function(err) { });
 
 
 
-var migrate = require('./models/migration');
-migrate.up();
-
 var site    = require('./config/site.json');
+var config    = require('./config/config.json');
 var projects    = require('./config/projects.json');
 
 
@@ -77,6 +75,7 @@ app.use(passport.session()); // persistent login sessions
 
 app.use(function(req,res,next){
     res.locals.session = req.session;
+    res.locals.config = config;
     if (req.session.project) {
     	res.locals.project = projects[req.session.project];
     }

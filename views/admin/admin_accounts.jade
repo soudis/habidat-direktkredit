@@ -1,0 +1,26 @@
+include ./admin_mixins
+extends ../admin/layout
+block admin-content
+  .col-md-12
+    .jumbotron
+      h2 Administrator*innen Accounts
+      p Hier können Administrator*innen-Accounts angelegt werden. Es gibt 2 Arten von Accounts. Lokale (normale) Accounts können mit Passwort angegeben werden. Werden LDAP Accounts angelegt, können sich aus der zentralen Benutzer*innendatenbank nur mehr diese Benutzer*innen einloggen (zusätzlich zu den lokalen Benutzer*innen). 
+  .col-md-12
+    table.table.table-striped
+      thead
+        tr
+          th Login ID
+          th Typ
+          th Aktionen
+      tbody
+        each account in accounts
+          tr
+            td=account.logon_id
+            td=(account.ldap?"LDAP":"Lokal")
+            td.fit
+                a.btn.btn-default.btn-sm(href='/admin/delete/'+account.id) #[span.glyphicon.glyphicon-trash]              
+  .col-md-12
+    hr
+  .col-md-12
+    +add_admin("Neuer Account")
+              

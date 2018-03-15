@@ -84,15 +84,17 @@ module.exports = function(app){
 			where: {
 				ref_table: "template_account_notification"
 			}}).then(function(file) {
-				fs.unlinkSync(file.path);  
-				file.destroy();				
+				if (file && file.path) {
+					fs.unlinkSync(file.path);  
+					file.destroy();				
+				}
 			});
 			models.file.create({
 				filename: req.file.originalname,
 				description: req.body.description,
 				mime: req.file.mimetype,
 				path: req.file.path,
-				ref_id: req.user.id,
+				ref_id: -1,
 				ref_table: "template_account_notification"
 			}).then(function(transaction) {
 				res.redirect('/admin/templates');
@@ -107,7 +109,7 @@ module.exports = function(app){
 				description: req.body.description,
 				mime: req.file.mimetype,
 				path: req.file.path,
-				ref_id: req.user.id,
+				ref_id: -1,
 				ref_table: "template_user"
 			}).then(function(transaction) {
 				res.redirect('/admin/templates');

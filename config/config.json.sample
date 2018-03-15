@@ -1,6 +1,18 @@
 {
-  "database": {
-	"host": "$HABIDAT_DK_DB_HOST",
-	"dialect": "mysql"
-  }
+	"database": {
+		"host": "$HABIDAT_DK_DB_HOST",
+		"dialect": "mysql"
+	},
+  	"adminauth": "ldap", 
+	"ldap": {
+	    "server":  {
+	        "url": "ldap://$HABIDAT_DK_LDAP_HOST:$HABIDAT_DK_LDAP_PORT",
+	        "bindDN": "$HABIDAT_DK_LDAP_BINDDN",
+	        "bindCredentials": "$HABIDAT_DK_LDAP_PASSWORD",
+	        "searchBase": "$HABIDAT_DK_LDAP_BASE",
+	        "searchFilter": "$HABIDAT_DK_LDAP_SEARCHFILTER"
+	    },
+	    "passReqToCallback": true,
+	    "usernameField": "userid"
+	}
 }

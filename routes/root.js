@@ -3,6 +3,7 @@ var moment = require("moment");
 var passport = require('passport');
 var router = require('express').Router();
 var projects = require('../config/projects.json');
+var config = require('../config/config.json');
 
 module.exports = function(app){
 
@@ -57,14 +58,21 @@ module.exports = function(app){
 	 req.logout();
 	 res.redirect('/');
 	});
+
+	var loginStrategies = ['local-login-admin', 'local-login'];
+	var adminLoginStrategy = 'local-login-admin';
+	if (config.adminauth == 'ldap') {
+		loginStrategies = ['ldap-login-admin', 'local-login-admin','local-login'];
+		adminLoginStrategy = ['ldap-login-admin', 'local-login-admin'];
+	}
 	
-	router.post('/logon', passport.authenticate('local-login', {
+	router.post('/logon', passport.authenticate(loginStrategies, {
 	    successReturnToOrRedirect : '/profile', // redirect to the secure profile section
 	    failureRedirect : '/', // redirect back to the signup page if there is an error
 	    failureFlash : true // allow flash messages
 	}));
 
-	router.post('/admin-logon', passport.authenticate('local-login-admin', {
+	router.post('/admin-logon', passport.authenticate(adminLoginStrategy, {
 	    successReturnToOrRedirect : '/admin', // redirect to the secure profile section
 	    failureRedirect : '/admin-logon', // redirect back to the signup page if there is an error
 	    failureFlash : true // allow flash messages
