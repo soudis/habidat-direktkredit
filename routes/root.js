@@ -29,16 +29,6 @@ module.exports = function(app){
      	res.redirect('/');
 	});
 
-
-	/* Admin Logon page */
-	router.get('/admin-logon', function(req, res, next) {
-		if (req.session.project) {
-       	    res.render('admin/admin-logon', { title: 'habiDAT Login', message: req.flash('loginMessage') });
-     	} else {
-     		res.redirect('/project');
-     	}	  
-	});
-	
 	router.get('/admin', security.isLoggedInAdmin, function(req, res) {
 		res.redirect('/user/list');
 	});
@@ -60,10 +50,8 @@ module.exports = function(app){
 	});
 
 	var loginStrategies = ['local-login-admin', 'local-login'];
-	var adminLoginStrategy = 'local-login-admin';
 	if (config.adminauth == 'ldap') {
 		loginStrategies = ['ldap-login-admin', 'local-login-admin','local-login'];
-		adminLoginStrategy = ['ldap-login-admin', 'local-login-admin'];
 	}
 	
 	router.post('/logon', passport.authenticate(loginStrategies, {
@@ -72,11 +60,6 @@ module.exports = function(app){
 	    failureFlash : true // allow flash messages
 	}));
 
-	router.post('/admin-logon', passport.authenticate(adminLoginStrategy, {
-	    successReturnToOrRedirect : '/admin', // redirect to the secure profile section
-	    failureRedirect : '/admin-logon', // redirect back to the signup page if there is an error
-	    failureFlash : true // allow flash messages
-	}));
 
 	app.use('/', router);
 };

@@ -1,3 +1,4 @@
+include ../country
 extends ../admin/layout
 block admin-content
   form.form-horizontal(action="/user/add" method="post" role="form")
@@ -14,11 +15,15 @@ block admin-content
           .col-md-3
             input.form-control(type="text" name="street")
           label.control-label.col-md-1 PLZ
-          .col-md-2
+          .col-md-1
             input.form-control(type="text" name="zip")    
           label.control-label.col-md-1 Ort
-          .col-md-3
+          .col-md-2
             input.form-control(type="text" name="place")    
+          label.control-label.col-md-1 Land
+          .col-md-1
+            select.form-control(name="country")            
+              +country_select_options(null)
         .form-group
           label.control-label.col-md-2 Telefonnummer
           .col-md-4

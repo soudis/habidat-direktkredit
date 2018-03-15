@@ -25,7 +25,7 @@ exports.isLoggedInAdmin = function(req, res, next) {
 	}
 	// if they aren't redirect them to the home page
 	req.session.returnTo = req.url; 
-	res.redirect('/admin-logon');
+	res.redirect('/logon');
 };
 
 exports.redirectReload = function(redirectUrl) {

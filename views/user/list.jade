@@ -28,7 +28,7 @@ block admin-content
           else
             td= user.first_name
           td 
-            | #{user.street} <br /> #{user.zip} #{user.place}
+            | #{user.street} <br /> #{user.country}-#{user.zip} #{user.place}
           td.text-center #[font.text-success(data-toggle="tooltip" title="Bezahlt")= aggregate.paid] 
           td.text-center #[font.text-danger(data-toggle="tooltip" title="Offen")= aggregate.open]
           td.text-center #[font.text-muted(data-toggle="tooltip" title="Gekündigt")= aggregate.terminated]

@@ -5,7 +5,6 @@ var config    = require(__dirname + '/../../config/config.json')[env];
 
 module.exports = {
   up: function(sequelize) {
-   sequelize.query('ALTER TABLE user ADD ldap boolean');
-   
+
   }
 };

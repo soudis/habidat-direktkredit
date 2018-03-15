@@ -24,3 +24,6 @@
 2018-03-15 11:28:69 AUTH-FAIL: URL: /logon, USER: Florian Humerr, CLIENT IP: ::ffff:172.18.0.1
 2018-03-15 11:28:24 AUTH-FAIL: URL: /logon, USER: Florian Humerr, CLIENT IP: ::ffff:172.18.0.1
 2018-03-15 11:28:31 AUTH-FAIL: URL: /logon, USER: Florian Humerr, CLIENT IP: ::ffff:172.18.0.1
+2018-03-15 12:02:57 AUTH-FAIL: URL: /logon, USER: 10058_willyfred, CLIENT IP: ::ffff:172.18.0.1
+2018-03-15 12:02:61 AUTH-FAIL: URL: /logon, USER: 10058_willyfred, CLIENT IP: ::ffff:172.18.0.1
+2018-03-15 12:03:76 AUTH-FAIL: URL: /logon, USER: 10196_willyfred, CLIENT IP: ::ffff:172.18.0.1
