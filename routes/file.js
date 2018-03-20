@@ -94,7 +94,7 @@ module.exports = function(app){
 				description: req.body.description,
 				mime: req.file.mimetype,
 				path: req.file.path,
-				ref_id: -1,
+//				ref_id: -1,
 				ref_table: "template_account_notification"
 			}).then(function(transaction) {
 				res.redirect('/admin/templates');
@@ -109,7 +109,7 @@ module.exports = function(app){
 				description: req.body.description,
 				mime: req.file.mimetype,
 				path: req.file.path,
-				ref_id: -1,
+//				ref_id: -1,
 				ref_table: "template_user"
 			}).then(function(transaction) {
 				res.redirect('/admin/templates');
