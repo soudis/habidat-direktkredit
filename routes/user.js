@@ -78,6 +78,7 @@ module.exports = function(app){
 			BIC: req.body.BIC,
 	        logon_id: Math.abs(Math.random() * 100000000),
 	        password: password,
+	        administrator:false,
 	        relationship: req.body.relationship
 			
 		}).then(function(user) {
