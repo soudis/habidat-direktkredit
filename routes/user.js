@@ -79,6 +79,7 @@ module.exports = function(app){
 	        logon_id: Math.abs(Math.random() * 100000000),
 	        password: password,
 	        administrator:false,
+	        ldap: false,
 	        relationship: req.body.relationship
 			
 		}).then(function(user) {
