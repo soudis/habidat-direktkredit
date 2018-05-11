@@ -84,7 +84,7 @@ router.post('/accountnotification', security.isLoggedIn, function(req, res) {
 			}
 			transaction.date = format.formatDate(transaction.date);
 			transaction.amount = format.formatMoney(transaction.amount);
-			transaction.interest_rate = format.formatPercent(transaction.interest_rate/100);
+			transaction.interest_rate = format.formatPercent(transaction.interest_rate);
 
 		});
 		

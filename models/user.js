@@ -1,4 +1,4 @@
-var moment = require('moment');
+  var moment = require('moment');
 
 module.exports = function(sequelize, DataTypes) {
   var User = sequelize.define('user', {

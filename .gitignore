@@ -4,6 +4,7 @@ config/key.pem
 config/certificate.pem
 config/projects.json
 config/site.json
+sessions
 bin
 tmp
 upload
