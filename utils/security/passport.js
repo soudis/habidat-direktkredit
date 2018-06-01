@@ -34,12 +34,24 @@ module.exports = function(passport) {
     // used to deserialize the user
     passport.deserializeUser(function(sessionUser, done) {
         if (sessionUser.dn) {
-            done(null, sessionUser)
-        } else if (sessionUser.project){
-           var models  = require('../../models')(sessionUser.project); 
-    	   models["user"].findById(sessionUser.id).then( function(user) {
+            if (!sessionUser.id) {
+               var models  = require('../../models')(sessionUser.project);                            
+               models["user"].find({
+                        where : {
+                            logon_id: sessionUser.cn
+                        }
+                    }).then( function(user) {
+                        sessionUser.id = user.id;
+                        done(null, sessionUser);
+                    });
+            } else {
+                done(null, sessionUser)                
+            }
+        } else if (sessionUser.project){   
+           var models  = require('../../models')(sessionUser.project);         
+      	   models["user"].findById(sessionUser.id).then( function(user) {
              done(null, user);
-            });
+           );
         } else {
             done(null, sessionUser);
         }
