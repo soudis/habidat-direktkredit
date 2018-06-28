@@ -10,14 +10,16 @@ each contract in user.contracts
   else
     .row
       .col-md-12 
-        h4 Direktkredit vom #{moment(contract.sign_date).format('DD.MM.YYYY')} #[a.btn.btn-default.btn-sm(href='/contract/edit/'+contract.id) #[span.glyphicon.glyphicon-pencil]] #[a.btn.btn-default.btn-sm.confirm(data-link='/contract/delete/'+contract.id, data-confirmtext='Willst du den Direktkredit vom ' + moment(contract.sign_date).format('DD.MM.YYYY') + ' von ' + user.first_name + ' ' + user.last_name  + ' wirklich löschen?') #[span.glyphicon.glyphicon-trash]]
-        a.btn.btn-default.dropdown-toggle(type="button" data-toggle="dropdown") #[span.glyphicon.glyphicon-file]
-          span.caret  
-        ul.dropdown-menu
-          if (templates_contract && templates_contract.length > 0)
-            each template in templates_contract
-              li
-                a(href='/docx_c/'+contract.id+'?fileid='+template.id)=template.description
+        h4 Direktkredit vom #{moment(contract.sign_date).format('DD.MM.YYYY')} 
+          font.dropdown
+            #[a.btn.btn-default.btn-sm(href='/contract/edit/'+contract.id) #[span.glyphicon.glyphicon-pencil]] #[a.btn.btn-default.btn-sm.confirm(data-link='/contract/delete/'+contract.id, data-confirmtext='Willst du den Direktkredit vom ' + moment(contract.sign_date).format('DD.MM.YYYY') + ' von ' + user.first_name + ' ' + user.last_name  + ' wirklich löschen?') #[span.glyphicon.glyphicon-trash]]&nbsp;
+            if (templates_contract && templates_contract.length > 0)
+              a.btn.btn-default.btn-sm.dropdown-toggle(type="button" data-toggle="dropdown") #[span.glyphicon.glyphicon-file]
+                span.caret  
+              ul.dropdown-menu
+                each template in templates_contract
+                  li
+                    a(href='/docx_c/'+contract.id+'?fileid='+template.id)=template.description
     .row
       .col-md-4 Status:
       .col-md-8 #{contract.getStatus()} 
