@@ -19,6 +19,18 @@ exports.getUserTemplates = function(models, callback){
 	});	
 };
 
+exports.getContractTemplates = function(models, callback){
+	models.file.findAll({
+		where: {
+			ref_table: "template_contract"
+		}
+	}).then(function(templates) {
+		callback(templates);
+	}).catch(() => {
+		callback([]);
+	});	
+};
+
 
 exports.generateDocx = function(templateFile, outputFile, data, project){
 	var path = templateFile;
@@ -27,7 +39,8 @@ exports.generateDocx = function(templateFile, outputFile, data, project){
 	}
 	var file = fs.readFileSync(path, 'binary');
 		var zip = new JSZipUtils(file);
-        var doc=new DocxGen(zip);
+        var doc=new DocxGen();
+        doc.loadZip(zip);
         doc.setData(data); 
         doc.render();
         var out=doc.getZip().generate({type:"nodebuffer"});

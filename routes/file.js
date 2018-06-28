@@ -102,7 +102,7 @@ module.exports = function(app){
 				console.log("Error: " +err);				
 				res.redirect('/admin/templates');
 			});			
-		} else if (type =="template_user") {
+		} else if (type =="template_user" || type == "template_contract") {
 			
 			models.file.create({
 				filename: req.file.originalname,
@@ -110,7 +110,7 @@ module.exports = function(app){
 				mime: req.file.mimetype,
 				path: req.file.path,
 				ref_id: 1,
-				ref_table: "template_user"
+				ref_table: type
 			}).then(function(transaction) {
 				res.redirect('/admin/templates');
 			}).catch(function(err) {

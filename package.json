@@ -22,7 +22,7 @@
     "mysql": "^2.5.4",
     "sequelize": "^3.15.1",
     "sprintf": "^0.1.5",
-    "docxtemplater": "^1.2.1",
+    "docxtemplater": "^3.6.6",
     "json2csv" : "^2.0.12",
     "numeral" : "^2.0.6",
     "cloudconvert" : "^1.1.1",
@@ -32,6 +32,7 @@
     "validator" : "^4.0.4",
     "nodemon" : "^1.11.0",
     "mkdirp" : "^0.5.1",
-    "session-file-store": "^1.2.0"
+    "session-file-store": "^1.2.0",
+    "jszip": "^2.6.1"
   }
 }

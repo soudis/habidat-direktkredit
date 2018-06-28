@@ -8,8 +8,11 @@ module.exports = function(app){
 
 	function renderUser(res, models, data) {
     	utils.getUserTemplates(models, (templates) => {
-    		data.templates = templates;
-    		res.render('user/show', data);
+    		data.templates_user = templates;
+    		utils.getContractTemplates(models, (templates) => {
+    			data.templates_contract = templates;
+    			res.render('user/show', data);
+    		});
     	});
     }
 
@@ -48,10 +51,7 @@ module.exports = function(app){
 	router.get('/user/show/:id', security.isLoggedInAdmin, function(req, res, next) {
 		var models  = require('../models')(req.session.project);
 		models.user.findByIdFetchFull(models, req.params.id, function(user) {
-	    	utils.getUserTemplates(models, (templates) => {
-				res.render('user/show', { user:user, templates: templates, title: 'Direktkreditgeber*in', message: req.flash('error') });
-	    	});			
-			  
+			renderUser(res, models, { user:user, title: 'Direktkreditgeber*in', message: req.flash('error') });			  
 		});	
 	});
 

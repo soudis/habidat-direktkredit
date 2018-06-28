@@ -1,6 +1,6 @@
 include ./template_mixins
 extends ../admin/layout
-block admin-content
+block admin-content 
   .col-md-12
     .page-header
       h2 Vorlage für Jahresliste für Buchhaltung
@@ -47,4 +47,29 @@ block admin-content
     hr
   .col-md-12
     +add_template("Neue Vorlage", "template_user")
+  .col-md-12
+    .page-header
+      h2 Vorlagen für Kredite
+      p Vorlage für den Direktkreditvertrag oder andere Kreditdokuente, verfügbare Platzhalter (jeweils in geschwungenen Klammern {...}): first_name, last_name, street, zip, place, country, telno, email, IBAN, BIC, amount, interest_rate, period, contract_date, termination_date, notes, status. 
+      p Außerdem kann die Liste an Transaktionen eingefügt werden. Diesen Block startet man mit {#transactionList} und endet ihn mit {/transactionList}. Dazwischen können folgende Platzhalter verwendet werden: type, date, amount
+  .col-md-12
+    table.table.table-striped
+      thead
+        tr
+          th Bezeichnung
+          th Datei
+          th Aktionen          
+      tbody
+        each template in templates
+          if (template.ref_table == "template_contract")
+            tr
+              td=template.description
+              td
+                a(href='/file/get/' + template.id) #{template.filename} 
+              td.fit
+                  a.btn.btn-default.btn-sm(href='/file/delete/'+template.id) #[span.glyphicon.glyphicon-trash]                
+  .col-md-12
+    hr
+  .col-md-12
+      +add_template("Neue Vorlage", "template_contract")       
               

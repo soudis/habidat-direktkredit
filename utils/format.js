@@ -23,6 +23,11 @@ exports.format = function(number, precision, formatString) {
     return formatString.replace("#", numberString);
 };
 
+exports.formatNumber= function(percent, precision) {
+    return exports.format(percent, precision, "#");
+};
+
+
 exports.formatDate = function(date) {
 	return moment(date).format("DD.MM.YYYY");
 };

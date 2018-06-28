@@ -7,8 +7,8 @@
       a.btn.btn-default.dropdown-toggle(type="button" data-toggle="dropdown") #[span.glyphicon.glyphicon-file]
         span.caret  
       ul.dropdown-menu
-        if (templates && templates.length > 0)
-          each template in templates
+        if (templates_user && templates_user.length > 0)
+          each template in templates_user
             li
               a(href='/docx/'+user.id+'?fileid='+template.id)=template.description
         else

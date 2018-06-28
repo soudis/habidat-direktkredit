@@ -34,7 +34,7 @@ module.exports = function(passport) {
     // used to deserialize the user
     passport.deserializeUser(function(sessionUser, done) {
         if (sessionUser.dn) {
-            if (!sessionUser.id) {
+            if (!sessionUser.id && sessionUser.project) {
                var models  = require('../../models')(sessionUser.project);                            
                models["user"].find({
                         where : {
@@ -51,7 +51,7 @@ module.exports = function(passport) {
            var models  = require('../../models')(sessionUser.project);         
       	   models["user"].findById(sessionUser.id).then( function(user) {
              done(null, user);
-           );
+           });
         } else {
             done(null, sessionUser);
         }
