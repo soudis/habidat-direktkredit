@@ -34,7 +34,7 @@ module.exports = function(app){
 			termination_date: req.body.termination_date===""?null:moment(req.body.termination_date, "DD.MM.YYYY"),
 			amount: req.body.amount,
 			interest_rate: req.body.interest_rate,
-			period: req.body.period,	
+			period: req.body.period===""?0:req.body.period,	
 			user_id: req.body.id,
 			status: req.body.status,
 			notes: req.body.notes
@@ -50,7 +50,7 @@ module.exports = function(app){
 			termination_date: req.body.termination_date===""?null:moment(req.body.termination_date, "DD.MM.YYYY"),
 			amount: req.body.amount,
 			interest_rate: req.body.interest_rate,
-			period: req.body.period,	
+			period: req.body.period===""?0:req.body.period,	
 			status: req.body.status,
 			notes: req.body.notes
 		}, {where:{id:req.body.id}}).then(function(contract) {
