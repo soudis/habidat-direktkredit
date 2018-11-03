@@ -69,11 +69,36 @@ module.exports = function(sequelize, DataTypes) {
 			}
 			return "Unbekannt";
 		},
-		interestToDate: function(rate, date) {      
-			if (rate > 0 && moment(date).diff(this.transaction_date) >= 0) {
-				return this.amount * Math.pow (1+(rate/100), moment(date).diff(this.transaction_date, 'days') / 365) - this.amount;
-			} else
+		interestToDate: function(rate, toDate) {      
+
+      if (rate > 0 && moment(toDate).diff(this.transaction_date) >= 0) {
+        const method = 365;
+
+        var amountWithInterest = this.amount;
+        var fromDate = this.transaction_date;
+        var endOfYear = moment(fromDate).endOf('year');
+        // if toDate is before end of year
+        if (endOfYear.diff(toDate) >= 0) {
+          // calculation interest until toDate
+          amountWithInterest += amountWithInterest * rate / 100 * toDate.diff(fromDate, 'days') / method;
+        // if toDate is after end of year
+        } else {
+          // calculation interest until end of first year
+          amountWithInterest += amountWithInterest * rate / 100 * endOfYear.diff(fromDate, 'days') / method;
+
+          // calculation interest for all full years
+          var years = toDate.diff(endOfYear, 'years');
+          if (years > 0) {
+            amountWithInterest = amountWithInterest * Math.pow(1+rate/100, years);
+          }
+
+          //calculate interest for remaining days in last year
+          amountWithInterest += amountWithInterest * rate / 100 * toDate.diff(endOfYear.add(years, 'years'),'days') / method;
+        }
+				return amountWithInterest - this.amount;
+			} else {
 				return 0;
+      }
 		}
     }
   });
