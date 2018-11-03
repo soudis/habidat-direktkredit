@@ -215,40 +215,71 @@ module.exports = function(sequelize, DataTypes) {
   			}
   		},
   		getAggregateNumbers: function() {
-  			var aggregate = {open:0, openSum:0, paid:0, paidSum:0, terminated:0, terminatedSum:0, status:"C"};
-  			var count = 0;
+  			var aggregate = {contracts: 0, contractAmount: 0, outstandingAmount: 0, paidAmount: 0, repaidAmount: 0, statusContract: null, statusPaid: null, statusRepaid: null};
+
+        // status: 1.. OK, 0.. not OK, 2.. mixed
+        var setStatus = (status, value) => {
+          if (aggregate[status] == null) {
+            aggregate[status] = value;
+          } else if (aggregate[status] != value) {
+            aggregate[status] = 1;
+          }
+        }
+
   			this.contracts.forEach(function(contract) {
-  				count ++;
+
+          // contract status
+  				aggregate.contracts ++;
   				if (contract.status !== "complete") {
-  					aggregate.status = "O";
-  				}
-  				if (contract.termination_date) {
-  					aggregate.terminated++;
-  					aggregate.terminatedSum += contract.amount;
+  					setStatus('statusContract', 0)
   				} else {
-  					var sumDeposit = 0, sumWithdrawal = 0;
-  					contract.transactions.forEach(function (transaction){
-              if (transaction.amount >= 0) {
-  						  sumDeposit+=transaction.amount;
-              } else {
-                sumWithdrawal+=transaction.amount;
-              }
-  					});
-  					if (sumDeposit >= contract.amount) {
-  						aggregate.paid ++;
-  						aggregate.paidSum += sumDeposit; 
-  					} else {
-  						aggregate.open ++;
-  						aggregate.openSum += contract.amount - sumDeposit;
-  						aggregate.paidSum += sumDeposit;
-  					}  		
-            if (sumWithdrawal <= 0) {
-              aggregate.terminatedSum -= sumWithdrawal;
+            setStatus('statusContract', 2)
+          }
+
+          // get transaction sums
+          var sumDeposit = 0, sumWithdrawal = 0;
+          contract.transactions.forEach(function (transaction){
+            var now = moment();
+            if (transaction.amount >= 0) {
+              sumDeposit+=transaction.amount;
+            } else {
+              sumWithdrawal-=transaction.amount;
             }
-  				}
+          });
+
+          // paid status
+          if (sumDeposit >= contract.amount) {
+            setStatus('statusPaid', 2);
+          } else {
+            setStatus('statusPaid', 0);
+          }
+
+          // repaid status
+  				if (contract.termination_date) {
+            if (sumWithdrawal >= sumDeposit) {
+              setStatus('statusRepaid', 2);
+            } else {
+              setStatus('statusRepaid', 0);
+            }
+  				} 
+
+          aggregate.contractAmount += contract.amount;
+          aggregate.outstandingAmount += contract.getAmountToDate(moment());
+          aggregate.paidAmount += sumDeposit;
+          aggregate.repaidAmount += sumWithdrawal;
+
   			});  	
-  			if (count === 0) {
-  				aggregate.status = "O";
+        if (aggregate.statusRepaid == null) {
+          aggregate.statusRepaid = 99;
+        }
+        if (aggregate.statusPaid == null) {
+          aggregate.statusPaid = 99;
+        }
+        if (aggregate.statusContract == null) {
+          aggregate.statusContract = 99;
+        }        
+  			if (aggregate.contracts === 0) {
+  				aggregate.statusContract = 0;
   			}
   			return aggregate;
   		},

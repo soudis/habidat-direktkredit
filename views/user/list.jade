@@ -1,4 +1,15 @@
 extends ../admin/layout
+
+mixin status(tooltip, status)
+  td.text-center(data-order=status)
+    font(data-toggle="tooltip" title=tooltip)
+      if status == 2
+        span.glyphicon.glyphicon-ok-sign.text-success
+      else if status == 0
+        span.glyphicon.glyphicon-minus-sign.text-danger
+      else if status == 1
+        span.glyphicon.glyphicon-question-sign.text-warning 
+
 block admin-content
   a.btn.btn-default.btn-sm(href='/user/add') Neue*r Direktkreditgeber*in
   table.table.table-striped(id="datatable")
@@ -6,18 +17,19 @@ block admin-content
       tr
         th.col-md-1(rowspan="2") ID
         th.col-md-2(rowspan="2") Name
-        th.col-md-3(rowspan="2") Adresse
-        th.col-md-1.text-center(colspan="3") Verträge
-        th.col-md-3.text-right(colspan="3") Gesamtbetrag
-        th.col-md-1.text-center(rowspan="2") S
+        th.col-md-2(rowspan="2") Adresse
+        th.col-md-1.text-center(rowspan="2") Verträge
+        th.col-md-4.text-center(colspan="4") Beträge
+        th.col-md-1.text-center(colspan="3") Status
         th.col-md-1.text-center(rowspan="2") Aktionen
       tr
-        th.col-md-1.text-center B
-        th.col-md-1.text-center O
-        th.col-md-1.text-center G
-        th.col-md-1.text-right Bez.
-        th.col-md-1.text-right Off.
-        th.col-md-1.text-right Gek.
+        th.col-md-1.text-right Vertrag
+        th.col-md-1.text-right Aushaftend
+        th.col-md-1.text-right Einbezahlt
+        th.col-md-1.text-right Ausbezahlt
+        th.col-md-1.text-right V
+        th.col-md-1.text-right E
+        th.col-md-1.text-right A
     tbody
       each user in users
         - aggregate = user.getAggregateNumbers()
@@ -29,13 +41,14 @@ block admin-content
             td= user.first_name
           td 
             | #{user.street} <br /> #{user.country}-#{user.zip} #{user.place}
-          td.text-center #[font.text-success(data-toggle="tooltip" title="Bezahlt")= aggregate.paid] 
-          td.text-center #[font.text-danger(data-toggle="tooltip" title="Offen")= aggregate.open]
-          td.text-center #[font.text-muted(data-toggle="tooltip" title="Gekündigt")= aggregate.terminated]
-          td.text-right #[font.text-success(data-toggle="tooltip" title="Bezahlt") #{sprintf('%.2f', aggregate.paidSum)}]  
-          td.text-right #[font.text-danger(data-toggle="tooltip" title="Offen") #{sprintf('%.2f', aggregate.openSum)}] 
-          td.text-right #[font.text-muted(data-toggle="tooltip" title="Gekündigt") #{sprintf('%.2f', aggregate.terminatedSum)}]
-          td.text-center #[font.text-muted(data-toggle="tooltip" title="Vertragsstatus (Complete/Open)")= aggregate.status]
+          td.text-center #[font(data-toggle="tooltip" title="Anzahl der Verträge")= aggregate.contracts] 
+          td.text-center #[font(data-toggle="tooltip" title="Vertragssumme") #{sprintf('%.2f', aggregate.contractAmount)}]  
+          td.text-center #[font(data-toggle="tooltip" title="Aushaftender Betrag") #{sprintf('%.2f', aggregate.outstandingAmount)}]  
+          td.text-right #[font.text-success(data-toggle="tooltip" title="Eingezahlt") #{sprintf('%.2f', aggregate.paidAmount)}]  
+          td.text-right #[font.text-danger(data-toggle="tooltip" title="Ausbezahlt") #{sprintf('%.2f', aggregate.repaidAmount)}] 
+          +status("Vertragsstatus", aggregate.statusContract)
+          +status("Einzahlungsstatus", aggregate.statusPaid)
+          +status("Auszahlungsstatus", aggregate.statusRepaid)
           td.fit
               a.btn.btn-default.btn-sm(href='/user/show/'+user.id) #[span.glyphicon.glyphicon-search]
               a.btn.btn-default.btn-sm(href='/user/edit/'+user.id) #[span.glyphicon.glyphicon-pencil]
