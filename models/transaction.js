@@ -80,20 +80,20 @@ module.exports = function(sequelize, DataTypes) {
         // if toDate is before end of year
         if (endOfYear.diff(toDate) >= 0) {
           // calculation interest until toDate
-          amountWithInterest += amountWithInterest * rate / 100 * toDate.diff(fromDate, 'days') / method;
+          amountWithInterest += amountWithInterest * rate / 100 * moment(toDate).diff(fromDate, 'days') / method;
         // if toDate is after end of year
         } else {
           // calculation interest until end of first year
           amountWithInterest += amountWithInterest * rate / 100 * endOfYear.diff(fromDate, 'days') / method;
 
           // calculation interest for all full years
-          var years = toDate.diff(endOfYear, 'years');
+          var years = moment(toDate).diff(endOfYear, 'years');
           if (years > 0) {
             amountWithInterest = amountWithInterest * Math.pow(1+rate/100, years);
           }
 
           //calculate interest for remaining days in last year
-          amountWithInterest += amountWithInterest * rate / 100 * toDate.diff(endOfYear.add(years, 'years'),'days') / method;
+          amountWithInterest += amountWithInterest * rate / 100 * moment(toDate).diff(endOfYear.add(years, 'years'),'days') / method;
         }
 				return amountWithInterest - this.amount;
 			} else {
