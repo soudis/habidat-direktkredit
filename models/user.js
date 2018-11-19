@@ -317,6 +317,9 @@ module.exports = function(sequelize, DataTypes) {
   									amount: transaction.amount,
   									interest: ""
   							};
+                if (transaction.type === 'notreclaimed') {
+                  trans.type = "Nicht rückgefordert"
+                }
   							transactionList.push(trans);
   							sums.transactions++;
   							
