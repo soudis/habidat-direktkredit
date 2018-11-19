@@ -5,75 +5,93 @@ block admin-content
     h2 Zahlen, Daten, Fakten
     p Auswertungen für Hobby-Nummerolog*innen und Zahlennerds 
   .row
-    .col-md-6
-      .row
-        .col-md-12
-          h3.underline Alle Kredite     
-      .row
-        .col-md-5.h4 Anzahl
-        .col-md-7.h4= numbers.total.count
-      .row
-        .col-md-5.h4 Gesamtwert
-        .col-md-7.h4 #{format.formatMoney(numbers.total.amount ,2)}
-      .row 
-        .col-md-5.h4 Durchschnittswert
-        .col-md-7.h4 #{format.formatMoney(numbers.total.avgAmount ,2)} 
-      .row
-        .col-md-5.h4 Medianwert
-        .col-md-7.h4  #{format.formatMoney(numbers.total.medianAmount ,2)} 
-      .row
-        .col-md-5.h4 Durchschnittszinssatz
-        .col-md-7.h4 #{format.formatPercent(numbers.total.avgInterestRate ,4)}
-      .row
-        .col-md-5.h4 Durchschnittslaufzeit
-        .col-md-7.h4 #{format.format(numbers.total.avgPeriod ,3, "# Jahre")} 
-    .col-md-6
-      .row
-        .col-md-12
-          h3.underline Laufende Kredite
-      .row
-        .col-md-5.h4 Anzahl
-        .col-md-7.h4= numbers.running.count
-      .row
-        .col-md-5.h4 Gesamtwert
-        .col-md-7.h4 #{format.formatMoney(numbers.running.amount ,2)} 
-      .row 
-        .col-md-5.h4 Durchschnittswert
-        .col-md-7.h4 #{format.formatMoney(numbers.running.avgAmount ,2)} 
-      .row
-        .col-md-5.h4 Durchschnittszinssatz
-        .col-md-7.h4 #{format.formatPercent(numbers.running.avgInterestRate ,4)} 
-      .row
-        .col-md-5.h4 Durchschnittslaufzeit
-        .col-md-7.h4 #{format.format(numbers.running.avgPeriod ,3, "# Jahre")}
-      .row
-        .col-md-12
-          h3.underline Gekündigte Kredite
-      .row
-        .col-md-5.h4 Anzahl
-        .col-md-7.h4= numbers.cancelled.count
-      .row
-        .col-md-5.h4 Gesamtwert
-        .col-md-7.h4 #{format.formatMoney(numbers.cancelled.amount ,2)} 
-      .row 
-        .col-md-5.h4 Durchschnittswert
-        .col-md-7.h4 #{format.formatMoney(numbers.cancelled.avgAmount ,2)} 
-      .row
-        .col-md-5.h4 Durchschnittszinssatz
-        .col-md-7.h4 #{format.formatPercent(numbers.cancelled.avgInterestRate ,4)} 
-      .row
-        .col-md-5.h4 Durchschnittslaufzeit
-        .col-md-7.h4 #{format.format(numbers.cancelled.avgPeriod ,3, "# Jahre")}  
-    .col-md-6
+    .col-md-12
+      h3.underline Kennzahlen
+    .col-md-12
+      table.table
+        thead
+          tr
+            th Kennzahl
+            th Alle Kredite
+            th Gekündigte Kredite
+            th Laufende Kredite
+        tbody
+          tr
+            td 
+              strong Anzahl der Kredite
+            td= numbers.total.count
+            td= numbers.cancelled.count
+            td= numbers.running.count
+          tr
+            td 
+              strong Anzahl der Kreditgeber*innen
+            td= numbers.total.users
+            td= numbers.cancelled.users
+            td= numbers.running.users
+          tr
+            td 
+              strong Vertragswert Gesamt
+            td #{format.formatMoney(numbers.total.contractAmount ,2)}
+            td #{format.formatMoney(numbers.cancelled.contractAmount ,2)}
+            td #{format.formatMoney(numbers.running.contractAmount ,2)}
+          tr
+            td 
+              strong Vertragswert Durchschnitt
+            td #{format.formatMoney(numbers.total.avgAmount ,2)}
+            td #{format.formatMoney(numbers.cancelled.avgAmount ,2)}
+            td #{format.formatMoney(numbers.running.avgAmount ,2)}
+          tr
+            td 
+              strong Vertragswert Median
+            td #{format.formatMoney(numbers.total.medianAmount ,2)}
+            td -
+            td - 
+          tr
+            td 
+              strong Vertragszinssatz Durchschnitt
+            td #{format.formatPercent(numbers.total.avgInterestRate ,4)}
+            td #{format.formatPercent(numbers.cancelled.avgInterestRate ,4)}
+            td #{format.formatPercent(numbers.running.avgInterestRate ,4)}   
+          tr
+            td 
+              strong Einzahlungen
+            td #{format.formatMoney(numbers.total.deposits ,2)}
+            td #{format.formatMoney(numbers.cancelled.deposits ,2)}
+            td #{format.formatMoney(numbers.running.deposits ,2)}            
+          tr
+            td 
+              strong Rückzahlungen
+            td #{format.formatMoney(numbers.total.withdrawals ,2)}
+            td #{format.formatMoney(numbers.cancelled.withdrawals ,2)}
+            td #{format.formatMoney(numbers.running.withdrawals ,2)}            
+          tr
+            td 
+              strong Nicht rückgefordert
+            td #{format.formatMoney(numbers.total.notReclaimed ,2)}
+            td #{format.formatMoney(numbers.cancelled.notReclaimed ,2)}
+            td #{format.formatMoney(numbers.running.notReclaimed ,2)}            
+          tr
+            td 
+              strong Zinsen
+            td #{format.formatMoney(numbers.total.interestToDate + numbers.total.interestPaid ,2)}
+            td #{format.formatMoney(numbers.cancelled.interestPaid ,2)}
+            td #{format.formatMoney(numbers.running.interestToDate ,2)}            
+          tr
+            td 
+              strong Aushaftender Betrag
+            td #{format.formatMoney(numbers.total.outstandingAmount ,2)}
+            td #{format.formatMoney(0 ,2)}
+            td #{format.formatMoney(numbers.running.outstandingAmount ,2)}                 
+    .col-md-6.col-xs-12
       h3.underline Laufende Kredite nach Beziehung
       canvas(id="by-relation" width="400" height="400")
-    .col-md-6
+    .col-md-6.col-xs-12
       h3.underline Laufende Kredite nach PLZ
       canvas(id="by-zip" width="400" height="400")      
-    .col-md-6
+    .col-md-6.col-xs-12
       h3.underline Verschuldung (12 Monate)
       canvas(id="by-month" width="400" height="400")  
-    .col-md-6
+    .col-md-6.col-xs-12
       h3.underline Transaktionen (12 Monate)
       canvas(id="transactions-by-month" width="400" height="400")        
         //img(width="600" src="data:image/png;base64,"+numbers.charts.byRelationship)

@@ -13,7 +13,7 @@ module.exports = function(app){
 	router.get('/statistics/numbers', security.isLoggedInAdmin, function(req, res) {
 		var models  = require('../models')(req.session.project);		
 		statistics.getNumbers(models, function(numbers) {
-			//console.log("test: " + numbers.amount);
+			console.log("numbers: " + JSON.stringify(numbers, null, 2));
 			res.render('statistics/numbers', { title: 'Zahlen, Daten, Fakten', "numbers": numbers});
 		});
 
@@ -139,12 +139,12 @@ module.exports = function(app){
 				months.push(moment().subtract(1*i, 'months').endOf('month'));
 			}
 			//console.log("months: " + JSON.stringify(months));
-			var byMonth = { deposits: {}, withdrawals: {}, interest: {}};
+			var byMonth = { deposits: {}, withdrawals: {}, interest: {}, notReclaimed: {}};
 			months.forEach((month)  => {
 				var start = moment(month).startOf('month');
 				var end = month;
 				//console.log("start " + start + " end " + end);
-				var deposits = 0, withdrawals = 0, interest = 0;
+				var deposits = 0, withdrawals = 0, interest = 0, notReclaimed = 0;
 				users.forEach((user) => {
 					user.contracts.forEach((contract) => {
 						contract.transactions.forEach((transaction) => {
@@ -152,7 +152,11 @@ module.exports = function(app){
 								if (transaction.amount > 0) {
 									deposits += transaction.amount;
 								} else {
-									withdrawals += transaction.amount;
+									if (transaction.type === 'notreclaimed') {
+										notReclaimed += transaction.amount;
+									} else {
+										withdrawals += transaction.amount;
+									}									
 								}
 							}
 							interest += transaction.interestToDate(contract.interest_rate, end) - transaction.interestToDate(contract.interest_rate, start);
@@ -161,6 +165,7 @@ module.exports = function(app){
 				})
 				byMonth.deposits[month.format('MM YYYY')]  = deposits;
 				byMonth.withdrawals[month.format('MM YYYY')]  = -withdrawals;
+				byMonth.notReclaimed[month.format('MM YYYY')]  = -withdrawals;
 				byMonth.interest[month.format('MM YYYY')]  = interest;
 			})			
 			res.setHeader('Content-Type', 'application/json');

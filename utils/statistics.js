@@ -124,35 +124,56 @@ exports.getNumbers = function(models, callback){
 	var numbers = {
 			total : {
 				amount : 0,
+				contractAmount: 0,
+				deposits: 0,
+				withdrawals: 0,
+				notReclaimed: 0,
+				outstandingAmount: 0,
+				interestToDate : 0,
+
 				avgAmount : 0,
 				medianAmount: 0,
 
 				count : 0,
 
-				interestToDate : 0,
 				interestPaid : 0,
 				avgInterestRate : 0,
 				medianInterestRate : 0,
 				
 				avgPeriod : 0,
 				avgPeriodAmount: 0,
-				medianPeriod : 0
+				medianPeriod : 0,
+				users: 0
 			},
 			running : {
 				amount :0,
+				contractAmount: 0,
+				deposits: 0,
+				withdrawals: 0,
+				notReclaimed: 0,				
+				outstandingAmount: 0,
+				interestToDate : 0,
 				avgAmount : 0,
 				count :0,
 				avgInterestRate :0,
 				avgPeriod :0,
-				avgPeriodAmount: 0
+				avgPeriodAmount: 0,
+				users: 0
 			},
 			cancelled : {
 				amount :0,
+				contractAmount: 0,
+				deposits: 0,
+				withdrawals: 0,
+				interestPaid: 0,
+				notReclaimed: 0,
+
 				avgAmount : 0,
 				count :0,
 				avgInterestRate :0,
 				avgPeriod : 0,
-				avgPeriodAmount: 0
+				avgPeriodAmount: 0,
+				users: 0
 			},
 			lastMonth : {
 				amountNew : 0,
@@ -192,20 +213,28 @@ exports.getNumbers = function(models, callback){
 
 			users.forEach(function(user){
 
+				hasNotTerminatedContracts = false;
+
 				user.contracts.forEach(function (contract) {
 
 					var deposits = 0,
 						withdrawals = 0,
-						interest = 0;
+						interest = 0,
+						notReclaimed = 0;
 
 					contract.transactions.forEach(function (transaction) {
 
-						interest += transaction.interestToDate(now);
+						//toDate = transaction.interestToDate(contract.interest_rate, now);
+						//console.log("user: " + user.first_name + " " + user.last_name + ", now: " + now + ", transactions(date, amount):" + transaction.transaction_date + ", " + transaction.amount +" interest: " + toDate);
+						interest += transaction.interestToDate(contract.interest_rate, now);
 						// general statistics
 						if (transaction.amount > 0) {
 							deposits += transaction.amount;
 						} else {
 							withdrawals += transaction.amount;
+							if (transaction.type === 'notreclaimed') {
+								notReclaimed += transaction.amount;
+							}							
 						}
 
 						// last month statistics
@@ -248,9 +277,22 @@ exports.getNumbers = function(models, callback){
 							numbers.cancelled.avgPeriodAmount += contract.amount;
 						}
 						numbers.cancelled.avgInterestRate  += contract.amount * contract.interest_rate;
-						numbers.total.interestPaid -= deposits + withdrawals;
-						numbers.total.interestToDate -= deposits + withdrawals;
+
+
+						numbers.cancelled.contractAmount += contract.amount;
+						numbers.cancelled.deposits += deposits;
+						numbers.cancelled.withdrawals -= withdrawals - notReclaimed;
+						numbers.cancelled.notReclaimed -= notReclaimed;
+						numbers.cancelled.interestPaid -= deposits + withdrawals - notReclaimed;
+
+						numbers.total.contractAmount += contract.amount;
+						numbers.total.deposits += deposits;
+						numbers.total.withdrawals -= withdrawals - notReclaimed;
+						numbers.total.notReclaimed -= notReclaimed;
+						numbers.total.interestPaid -= deposits + withdrawals - notReclaimed;
+
 					} else {
+						hasNotTerminatedContracts = true;
 						numbers.running.count ++;
 						numbers.running.amount += deposits;
 						if (contract.period > 0) {
@@ -258,6 +300,19 @@ exports.getNumbers = function(models, callback){
 							numbers.running.avgPeriodAmount += contract.amount;
 						}
 						numbers.running.avgInterestRate  += contract.amount * contract.interest_rate;
+
+						numbers.running.contractAmount += contract.amount;
+						numbers.running.deposits += deposits;
+						numbers.running.withdrawals -= withdrawals - notReclaimed;
+						numbers.running.notReclaimed -= notReclaimed;
+						numbers.running.outstandingAmount += deposits + withdrawals + interest;
+						numbers.running.interestToDate += interest;
+
+						numbers.total.contractAmount += contract.amount;
+						numbers.total.deposits += deposits;
+						numbers.total.withdrawals -= withdrawals - notReclaimed;
+						numbers.total.notReclaimed -= notReclaimed;
+						numbers.total.outstandingAmount += deposits + withdrawals + interest;
 						numbers.total.interestToDate += interest;
 					}
 					
@@ -269,18 +324,25 @@ exports.getNumbers = function(models, callback){
 
 					contractHelper.push ({
 						interestRate : contract.interest_rate,
-						amount : deposits,
+						amount : contract.amount,
 						period : contract.period
 						});
 
 				});
 
+				if (hasNotTerminatedContracts) {
+					numbers.running.users ++;
+				} else {
+					numbers.cancelled.users ++;
+				}
+				numbers.total.users++;
+
 
 			});
 
-		numbers.total.avgInterestRate = numbers.total.avgInterestRate / numbers.total.amount;
-		numbers.running.avgInterestRate = numbers.running.avgInterestRate / numbers.running.amount;
-		numbers.cancelled.avgInterestRate = numbers.cancelled.avgInterestRate / numbers.cancelled.amount;
+		numbers.total.avgInterestRate = numbers.total.avgInterestRate / numbers.total.contractAmount;
+		numbers.running.avgInterestRate = numbers.running.avgInterestRate / numbers.running.contractAmount;
+		numbers.cancelled.avgInterestRate = numbers.cancelled.avgInterestRate / numbers.cancelled.contractAmount;
 
 		contractHelper.sort(function(a,b) {
 			if (a.interestRate > b.interestRate)
@@ -327,11 +389,11 @@ exports.getNumbers = function(models, callback){
 			numbers.total.medianPeriod = 0;
 		}
 
-		numbers.total.avgAmount = numbers.total.amount / numbers.total.count;
+		numbers.total.avgAmount = numbers.total.contractAmount / numbers.total.count;
 		numbers.total.avgPeriod = numbers.total.avgPeriod / numbers.total.avgPeriodAmount;
-		numbers.cancelled.avgAmount = numbers.cancelled.amount / numbers.cancelled.count;
+		numbers.cancelled.avgAmount = numbers.cancelled.contractAmount / numbers.cancelled.count;
 		numbers.cancelled.avgPeriod = numbers.cancelled.avgPeriod / numbers.cancelled.avgPeriodAmount;
-		numbers.running.avgAmount = numbers.running.amount / numbers.running.count;
+		numbers.running.avgAmount = numbers.running.contractAmount / numbers.running.count;
 		numbers.running.avgPeriod = numbers.running.avgPeriod / numbers.running.avgPeriodAmount;
 		
 /*		generatePieChart(numbers.byRelationship, function(chart) {

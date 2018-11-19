@@ -21,6 +21,7 @@ mixin transaction_input(action, user, contract, transaction)
           option(selected=transaction && transaction.type == 'deposit' value='deposit') Zusatzzahlung
           option(selected=transaction && transaction.type == 'withdrawal' value='withdrawal') Teilauszahlung
           option(selected=transaction && transaction.type == 'termination' value='termination') Rückzahlung
+          option(selected=transaction && transaction.type == 'notreclaimed' value='notreclaimed') Nicht rückgefordert
       label.control-label.col-md-1 Betrag
       .col-md-3
         input.form-control(type="number" step="0.01" name="amount" value=transaction ? transaction.amount : "")
