@@ -1,0 +1,27 @@
+include ./template_mixins
+extends ../admin/layout
+block admin-content 
+  each group, group_id in groups
+    .col-md-12
+      .page-header
+        h2= group.title
+    .col-md-12
+      table.table.table-striped
+        thead
+          tr
+            th Bescheibung
+            th Datei
+            th Aktionen
+        tbody
+          each file in groups[group_id].files
+            tr
+              td=file.description
+              td
+                a(href='/file/get/' + file.id) #{file.filename} 
+              td.fit
+                  a.btn.btn-default.btn-sm(href='/file/delete/'+file.id) #[span.glyphicon.glyphicon-trash]
+    .col-md-12
+      hr                    
+    .col-md-12
+        +add_template("Datei hinzufügen", "infopack_" + group_id)                       
+

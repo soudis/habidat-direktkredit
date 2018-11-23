@@ -35,3 +35,25 @@
 2018-11-19 20:56:09 AUTH-FAIL: URL: /logon, USER: Florian Humer, CLIENT IP: ::ffff:172.25.0.1
 2018-11-19 22:38:34 AUTH-FAIL: URL: /logon, USER: Florian Humer, CLIENT IP: ::ffff:172.25.0.1
 2018-11-19 22:38:40 AUTH-FAIL: URL: /logon, USER: Florian Humer, CLIENT IP: ::ffff:172.25.0.1
+2018-11-23 12:39:66 AUTH-FAIL: URL: /logon, USER: Florian Humer, CLIENT IP: ::ffff:172.25.0.1
+2018-11-23 12:39:73 AUTH-FAIL: URL: /logon, USER: Florian Humer, CLIENT IP: ::ffff:172.25.0.1
+2018-11-23 12:39:77 AUTH-FAIL: URL: /logon, USER: Florian Humer, CLIENT IP: ::ffff:172.25.0.1
+2018-11-23 12:39:80 AUTH-FAIL: URL: /logon, USER: Florian Humer, CLIENT IP: ::ffff:172.25.0.1
+2018-11-23 12:39:85 AUTH-FAIL: URL: /logon, USER: Florian Humer, CLIENT IP: ::ffff:172.25.0.1
+2018-11-23 12:39:89 AUTH-FAIL: URL: /logon, USER: Florian Humer, CLIENT IP: ::ffff:172.25.0.1
+2018-11-23 12:39:57 AUTH-FAIL: URL: /logon, USER: Florian Humer, CLIENT IP: ::ffff:172.25.0.1
+2018-11-23 12:39:65 AUTH-FAIL: URL: /logon, USER: Florian Humer, CLIENT IP: ::ffff:172.25.0.1
+2018-11-23 12:39:26 AUTH-FAIL: URL: /logon, USER: Florian Humer, CLIENT IP: ::ffff:172.25.0.1
+2018-11-23 12:39:29 AUTH-FAIL: URL: /logon, USER: Florian Humer, CLIENT IP: ::ffff:172.25.0.1
+2018-11-23 12:40:09 AUTH-FAIL: URL: /logon, USER: Florian Humer, CLIENT IP: ::ffff:172.25.0.1
+2018-11-23 12:40:14 AUTH-FAIL: URL: /logon, USER: Florian Humer, CLIENT IP: ::ffff:172.25.0.1
+2018-11-23 14:20:33 AUTH-FAIL: URL: /logon, USER: Florian Humer, CLIENT IP: ::ffff:172.25.0.1
+2018-11-23 14:20:37 AUTH-FAIL: URL: /logon, USER: Florian Humer, CLIENT IP: ::ffff:172.25.0.1
+2018-11-23 14:33:71 AUTH-FAIL: URL: /logon, USER: 10058_willyfred, CLIENT IP: ::ffff:172.25.0.1
+2018-11-23 14:33:05 AUTH-FAIL: URL: /logon, USER: 10196_willyfred, CLIENT IP: ::ffff:172.25.0.1
+2018-11-23 15:22:27 AUTH-FAIL: URL: /logon, USER: 10058_willyfred, CLIENT IP: ::ffff:172.25.0.1
+2018-11-23 15:22:31 AUTH-FAIL: URL: /logon, USER: 10196_willyfred, CLIENT IP: ::ffff:172.25.0.1
+2018-11-23 15:26:53 AUTH-FAIL: URL: /logon, USER: 10196_willyfred, CLIENT IP: ::ffff:172.25.0.1
+2018-11-23 15:26:35 AUTH-FAIL: URL: /logon, USER: 10196_willyfred, CLIENT IP: ::ffff:172.25.0.1
+2018-11-23 15:27:46 AUTH-FAIL: URL: /logon, USER: 10196_willyfred, CLIENT IP: ::ffff:172.25.0.1
+2018-11-23 15:39:65 AUTH-FAIL: URL: /logon, USER: 10196_willyfred, CLIENT IP: ::ffff:172.25.0.1

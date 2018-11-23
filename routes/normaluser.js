@@ -29,31 +29,37 @@ router.get('/profile', security.isLoggedIn, function(req, res) {
 });
 
 router.get('/files', security.isLoggedIn, function(req, res) {
-    var dk_files = [];
-    var dir = __dirname + "/.." + projects[req.session.project].files + "/dk";
-    var name;
-    var files = fs.readdirSync(dir);
-    for (var i in files){
-        name = dir + '/' + files[i];
-        link = dir.substr(dir.indexOf('/',2)) + '/' + files[i];
-        if (!fs.statSync(name).isDirectory()){
-        	dk_files.push({"name": files[i], "link":link});
-        }
-    }
-    
-    var balance_files = [];
-    dir = __dirname + "/.." + projects[req.session.project].files + "/balance";
-    files = fs.readdirSync(dir);
-    for (i in files){
-        name = dir + '/' + files[i];
-        link = dir.substr(dir.indexOf('/',2)) + '/' + files[i];
-        if (!fs.statSync(name).isDirectory()){
-        	balance_files.push({"name": files[i], "link":link});
-        }
-    }
-   res.render('files', {
-     dk_files : dk_files, balance_files:balance_files, title: "Dateien" // get the user out of session and pass to template
- });
+	var models  = require('../models')(req.session.project);		
+	models.file.findAll({
+		where: {
+			ref_table: {
+		      $like: "infopack_%"
+		    }
+		}
+	}).then(function(files) {
+		groups = {
+			balance: {
+				title: "Jahresabschlüsse",
+				files: []
+			},
+			infopack: {
+				title: "Direktkreditinformationen",
+				files: []
+			},
+			other: {
+				title: "Sonstige Dateien",
+				files: []
+			}
+		}
+		files.map((file => {
+			var group = file.ref_table.split("_")[1];
+			file.group = group;
+			if (groups[group]) {
+				groups[group].files.push(file);
+			} 
+		}))
+		res.render('files', { title: 'Dateien und Informationen zum Projekt', groups: groups });
+	});		
 });
 
 

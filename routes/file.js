@@ -26,6 +26,24 @@ module.exports = function(app){
 			res.end();			});	
 
 	});
+
+	router.get('/file/getpublic/:id', security.isLoggedIn, function(req, res, next) {
+		var models  = require('../models')(req.session.project);
+		models.file.findById(req.params.id).then(function(file) {
+			if (file.ref_table.startsWith("infopack_")) {
+				var fileData = fs.readFileSync(file.path, 'binary');
+
+				res.setHeader('Content-Length', fileData.length);
+				res.setHeader('Content-Type', file.mime);
+				res.setHeader('Content-Disposition', 'inline; filename=' + file.filename);
+				res.write(fileData, 'binary');
+				res.end();			
+
+			} else {
+				res.send(404);
+			}
+		});				
+	});	
 	
 	router.get('/file/delete/:id', security.isLoggedInAdmin, function(req, res, next) {
 		
@@ -75,6 +93,41 @@ module.exports = function(app){
 		});	
 	});
 
+	router.get('/admin/infopack', security.isLoggedInAdmin, function(req, res) {
+		var models  = require('../models')(req.session.project);		
+		models.file.findAll({
+			where: {
+				ref_table: {
+			      $like: "infopack_%"
+			    }
+			}
+		}).then(function(files) {
+			groups = {
+				balance: {
+					title: "Jahresabschlüsse",
+					files: []
+				},
+				infopack: {
+					title: "Direktkreditinformationen",
+					files: []
+				},
+				other: {
+					title: "Sonstige Dateien",
+					files: []
+				}
+			}
+			files.map((file => {
+				var group = file.ref_table.split("_")[1];
+				file.group = group;
+				if (groups[group]) {
+					groups[group].files.push(file);
+				} 
+			}))
+			res.render('admin/infopack', { title: 'Downloads für Direktkreditgeber*innen', groups: groups });
+		});	
+	});
+
+
 	router.post('/admin/addtemplate', security.isLoggedInAdmin, function(req, res) {
 		var models  = require('../models')(req.session.project);
 		var type = req.body.type;
@@ -116,6 +169,21 @@ module.exports = function(app){
 			}).catch(function(err) {
 				console.log("Error: " +err);
 				res.redirect('/admin/templates');
+			});
+		} else if (type.startsWith("infopack_")) {
+			
+			models.file.create({
+				filename: req.file.originalname,
+				description: req.body.description,
+				mime: req.file.mimetype,
+				path: req.file.path,
+				ref_id: 1,
+				ref_table: type
+			}).then(function(transaction) {
+				res.redirect('/admin/infopack');
+			}).catch(function(err) {
+				console.log("Error: " +err);
+				res.redirect('/admin/infopack');
 			});
 		}
 	});	
