@@ -21,7 +21,7 @@ module.exports = function(app){
 
 			res.setHeader('Content-Length', fileData.length);
 			res.setHeader('Content-Type', file.mime);
-			res.setHeader('Content-Disposition', 'inline; filename=' + file.filename);
+			res.setHeader('Content-Disposition', 'inline; filename="' + file.filename + '"');
 			res.write(fileData, 'binary');
 			res.end();			});	
 
@@ -35,7 +35,7 @@ module.exports = function(app){
 
 				res.setHeader('Content-Length', fileData.length);
 				res.setHeader('Content-Type', file.mime);
-				res.setHeader('Content-Disposition', 'inline; filename=' + file.filename);
+				res.setHeader('Content-Disposition', 'inline; filename="' + file.filename + '"');
 				res.write(fileData, 'binary');
 				res.end();			
 

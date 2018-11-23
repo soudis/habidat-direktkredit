@@ -27,7 +27,7 @@ block content
           h4= group.title + ":"
           .list-group        
             each file in group.files
-              a.list-group-item.list-group-item-action(href='/file/getpublic/' + file.id download)
+              a.list-group-item.list-group-item-action(href='/file/getpublic/' + file.id download=file.filename)
                 span.glyphicon.glyphicon-file(style="color: green")
                 span &nbsp;
                 span= file.description 
