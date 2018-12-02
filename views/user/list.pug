@@ -32,7 +32,7 @@ block admin-content
         th.col-md-1.text-right A
     tbody
       each user in users
-        - aggregate = user.getAggregateNumbers()
+        - aggregate = user.getAggregateNumbers(projectid)
         tr
           td= user.id 
           if (user.last_name)

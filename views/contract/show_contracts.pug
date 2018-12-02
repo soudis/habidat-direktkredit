@@ -4,7 +4,7 @@ include ../transaction/input
   .col-md-12
     h3 Direktkredite #[a.btn.btn-default.btn-sm(href='/contract/add/'+user.id) #[span.glyphicon.glyphicon-plus]] 
 each contract in user.contracts
-  - interest = contract.calculateInterest()
+  - interest = contract.calculateInterest(projectid)
   if (editContract && contract.id == editContract.id )
     include ./edit_contract 
   else

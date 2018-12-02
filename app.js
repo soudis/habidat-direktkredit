@@ -78,6 +78,7 @@ app.use(function(req,res,next){
     res.locals.config = config;
     if (req.session.project) {
     	res.locals.project = projects[req.session.project];
+      res.locals.projectid = req.session.project;
     }
     var newPrevURLs = [];
     if (req.session.prevURLs && req.session.prevURLs.length >= 1) {

@@ -61,7 +61,7 @@ module.exports = function(sequelize, DataTypes) {
     	}
     },
     instanceMethods: {
-  		calculateInterest: function() {
+  		calculateInterest: function(project) {
   			var interest = {"now": 0.00, "last_year": 0.00};
   			var last_year_end = moment().startOf("year");
         var last_year_begin = moment().subtract(1, "years").startOf("year");
@@ -78,17 +78,17 @@ module.exports = function(sequelize, DataTypes) {
   					if (terminatedLastYear) {
   						interest.last_year += transaction.amount;
   					} else if (last_year_end.diff(transaction.transaction_date, 'days') > 0)  {
-  					  interest.last_year += transaction.interestToDate(contract.interest_rate, last_year_end);
-              interest.last_year -= transaction.interestToDate(contract.interest_rate, last_year_begin);
+  					  interest.last_year += transaction.interestToDate(project, contract.interest_rate, last_year_end);
+              interest.last_year -= transaction.interestToDate(project, contract.interest_rate, last_year_begin);
   					}
   				});  	
   				interest.now = Math.abs(interest.now);
   				interest.last_year = Math.abs(interest.last_year);
   			} else {
   				this.transactions.forEach(function(transaction) {
-  					interest.now += transaction.interestToDate(contract.interest_rate, now);
-            interest.last_year += transaction.interestToDate(contract.interest_rate, last_year_end);
-            interest.last_year -= transaction.interestToDate(contract.interest_rate, last_year_begin);
+  					interest.now += transaction.interestToDate(project, contract.interest_rate, now);
+            interest.last_year += transaction.interestToDate(project, contract.interest_rate, last_year_end);
+            interest.last_year -= transaction.interestToDate(project, contract.interest_rate, last_year_begin);
   				});
   				interest.now = Math.ceil(interest.now*100) / 100;
   			}
@@ -136,12 +136,12 @@ module.exports = function(sequelize, DataTypes) {
 			});
 			return count > 1 && sum <= 0 && this.termination_date;
 		},
-    getAmountToDate : function(date) {    
+    getAmountToDate : function(project, date) {    
       var sum = 0;
       var contract = this;
       this.transactions.forEach(function(transaction) {
         if (moment(date).diff(transaction.transaction_date) >= 0) {
-          sum += transaction.amount + transaction.interestToDate(contract.interest_rate, date);
+          sum += transaction.amount + transaction.interestToDate(project, contract.interest_rate, date);
         }
       });
       if (sum > 0) {

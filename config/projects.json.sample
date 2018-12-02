@@ -6,6 +6,7 @@
 	    "files" : "/public/files/$HABIDAT_DK_PROJECT_ID",
 	    "templates": "/templates/$HABIDAT_DK_PROJECT_ID/docx",
 	    "usersuffix": "$HABIDAT_DK_PROJECT_ID",
+	    "interest_method": "365_compound",	    // 365_compound or 365_nocompound
 	    "db": {
 	    	"username": "$HABIDAT_DK_DB_USER",
 			"password": "$HABIDAT_DK_DB_PASSWORD",

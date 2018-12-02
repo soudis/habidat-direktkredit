@@ -214,7 +214,7 @@ module.exports = function(sequelize, DataTypes) {
   				return true;
   			}
   		},
-  		getAggregateNumbers: function() {
+  		getAggregateNumbers: function(project) {
   			var aggregate = {contracts: 0, contractAmount: 0, outstandingAmount: 0, paidAmount: 0, repaidAmount: 0, statusContract: null, statusPaid: null, statusRepaid: null};
 
         // status: 1.. OK, 0.. not OK, 2.. mixed
@@ -264,7 +264,7 @@ module.exports = function(sequelize, DataTypes) {
   				} 
 
           aggregate.contractAmount += contract.amount;
-          aggregate.outstandingAmount += contract.getAmountToDate(moment());
+          aggregate.outstandingAmount += contract.getAmountToDate(project, moment());
           aggregate.paidAmount += sumDeposit;
           aggregate.repaidAmount += sumWithdrawal;
 
@@ -283,7 +283,7 @@ module.exports = function(sequelize, DataTypes) {
   			}
   			return aggregate;
   		},
-  		getTransactionList: function(year) {
+  		getTransactionList: function(project, year) {
   			var transactionList = [];
   			var user = this;
   			var firstDay = moment(year + " +00:00", "YYYY Z");
@@ -302,9 +302,9 @@ module.exports = function(sequelize, DataTypes) {
   					contract.transactions.forEach(function(transaction) {
   						if (firstDay.diff(transaction.transaction_date) >= 0) {
   							sums.begin.amount += transaction.amount;
-  							sums.begin.interest += + transaction.interestToDate(contract.interest_rate, firstDay);
+  							sums.begin.interest += + transaction.interestToDate(project, contract.interest_rate, firstDay);
   							sums.end.amount += transaction.amount;
-  							sums.end.interest += + transaction.interestToDate(contract.interest_rate, firstDayNextYear);
+  							sums.end.interest += + transaction.interestToDate(project, contract.interest_rate, firstDayNextYear);
   						} else  if ( firstDay.diff(transaction.transaction_date) < 0 && firstDayNextYear.diff(transaction.transaction_date) >= 0) {
   							var trans =  {
   									id : user.id,
@@ -324,7 +324,7 @@ module.exports = function(sequelize, DataTypes) {
   							sums.transactions++;
   							
   							sums.end.amount += transaction.amount;
-  							sums.end.interest += + transaction.interestToDate(contract.interest_rate, firstDayNextYear);
+  							sums.end.interest += + transaction.interestToDate(project, contract.interest_rate, firstDayNextYear);
 
   						}				
   					});

@@ -66,7 +66,7 @@ router.get('/files', security.isLoggedIn, function(req, res) {
 router.post('/accountnotification', security.isLoggedIn, function(req, res) {
 	var models  = require('../models')(req.session.project);	
 	models.user.findByIdFetchFull(models, req.user.id,function(user){
-		var transactionList = user.getTransactionList(req.body.year);
+		var transactionList = user.getTransactionList(req.session.project, req.body.year);
 		
 		transactionList.sort(function(a,b) {
 			if (a.contract_id > b.contract_id)

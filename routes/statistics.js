@@ -12,7 +12,7 @@ module.exports = function(app){
 
 	router.get('/statistics/numbers', security.isLoggedInAdmin, function(req, res) {
 		var models  = require('../models')(req.session.project);		
-		statistics.getNumbers(models, function(numbers) {
+		statistics.getNumbers(models, req.session.project, function(numbers) {
 			console.log("numbers: " + JSON.stringify(numbers, null, 2));
 			res.render('statistics/numbers', { title: 'Zahlen, Daten, Fakten', "numbers": numbers});
 		});
@@ -38,7 +38,7 @@ module.exports = function(app){
 					byRelation[user.relationship] = 0;
 				}
 				user.contracts.forEach((contract) => {
-					byRelation[user.relationship] += contract.getAmountToDate(today);
+					byRelation[user.relationship] += contract.getAmountToDate(req.session.project, today);
 				})
 			})
 			res.setHeader('Content-Type', 'application/json');
@@ -75,7 +75,7 @@ module.exports = function(app){
 					byZip[key] = 0;
 				}
 				user.contracts.forEach((contract) => {
-					byZip[key] += contract.getAmountToDate(today);
+					byZip[key] += contract.getAmountToDate(req.session.project, today);
 				})
 			})
 			res.setHeader('Content-Type', 'application/json');
@@ -107,7 +107,7 @@ module.exports = function(app){
 				sum = 0;
 				users.forEach((user) => {
 					user.contracts.forEach((contract) => {
-						var contractAmount = contract.getAmountToDate(month);
+						var contractAmount = contract.getAmountToDate(req.session.project, month);
 						//console.log("contract: " + contract.id + ", " + contractAmount);
 						sum+= contractAmount;
 
@@ -159,7 +159,7 @@ module.exports = function(app){
 									}									
 								}
 							}
-							interest += transaction.interestToDate(contract.interest_rate, end) - transaction.interestToDate(contract.interest_rate, start);
+							interest += transaction.interestToDate(req.session.project, contract.interest_rate, end) - transaction.interestToDate(contract.interest_rate, start);
 						});
 					})
 				})
@@ -188,7 +188,7 @@ module.exports = function(app){
 		}).then(function(users) {
 			var transactionList = [];
 			users.forEach(function(user) {
-				user.getTransactionList(req.body.year).forEach( function (transaction) {
+				user.getTransactionList(req.session.project, req.body.year).forEach( function (transaction) {
 					transactionList.push(transaction);
 				});
 			});

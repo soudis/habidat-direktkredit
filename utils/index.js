@@ -61,19 +61,6 @@ exports.convertToPdf = function(file, callback){
 		}
 	});
 
-/*	fs.createReadStream()
-	.pipe(cloudconvert.convert({
-	    inputformat: 'docx',
-	    outputformat: 'pdf'
-	 }))
-	.pipe(fs.createWriteStream("./tmp/" + file + ".pdf")
-	.on('finish', function() {
-	    callback(null);
-	})
-	.on('error', function(err) {
-		callback(err);
-	}));*/
-
 };
 
 exports.generateTransactionList = function(transactionList, outputFile){

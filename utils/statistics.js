@@ -117,7 +117,7 @@ exports.getGermanContractsByYearAndInterestRate = function(models, callback) {
 	});
 };
 
-exports.getNumbers = function(models, callback){
+exports.getNumbers = function(models, project, callback){
 
 	var contractHelper = [];
 
@@ -226,7 +226,7 @@ exports.getNumbers = function(models, callback){
 
 						//toDate = transaction.interestToDate(contract.interest_rate, now);
 						//console.log("user: " + user.first_name + " " + user.last_name + ", now: " + now + ", transactions(date, amount):" + transaction.transaction_date + ", " + transaction.amount +" interest: " + toDate);
-						interest += transaction.interestToDate(contract.interest_rate, now);
+						interest += transaction.interestToDate(project, contract.interest_rate, now);
 						// general statistics
 						if (transaction.amount > 0) {
 							deposits += transaction.amount;
