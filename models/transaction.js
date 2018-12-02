@@ -1,4 +1,5 @@
 var moment = require('moment');
+var projects = require('../config/projects')
 
 
 module.exports = function(sequelize, DataTypes) {

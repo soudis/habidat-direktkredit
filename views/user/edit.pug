@@ -1,5 +1,5 @@
-include ../country
 extends ../admin/layout
+include ../country
 block admin-content
   form.form-horizontal(action="/user/edit" method="post" role="form")
         input(type="hidden" name="id" value=user.id)

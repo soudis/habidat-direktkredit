@@ -16,7 +16,7 @@ block content
           .list-group-item
             .input-group
               span.input-group-addon Jahr
-              input.form-control(type="number" step="1" name="year" required="true" min="2015" max=moment().get('year'))= moment().subtract(1, 'year').get('year')
+              input.form-control(type="number" step="1" name="year" required="true" min="2015" max=moment().get('year') value=moment().subtract(1, 'year').get('year'))
               .input-group-btn
                 button(type='submit' ).btn.btn-default
                   a.glyphicon.glyphicon-download

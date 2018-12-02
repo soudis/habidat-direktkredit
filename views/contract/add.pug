@@ -1,8 +1,8 @@
 extends ../admin/layout
 
 block admin-content
-  include ../user/show_user.jade 
-  include ./show_contracts.jade 
+  include ../user/show_user 
+  include ./show_contracts 
   .row
     form.form-horizontal(action="/contract/add" method="post" role="form")
       input(type="hidden" name="id" value=user.id)

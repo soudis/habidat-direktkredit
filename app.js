@@ -46,7 +46,7 @@ app.locals.site = site;
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
-app.set('view engine', 'jade');
+app.set('view engine', 'pug');
 
 if (site.reverseproxy === 'true') {
 	app.enable('trust proxy');
