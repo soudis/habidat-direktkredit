@@ -298,6 +298,7 @@ module.exports = function(sequelize, DataTypes) {
   							interest: 0},
   						transactions : 0
   				} ;
+          var lastTransaction;
   				if (contract.isTerminated(firstDay) === false) {
   					contract.transactions.forEach(function(transaction) {
   						if (firstDay.diff(transaction.transaction_date) >= 0) {
@@ -322,7 +323,7 @@ module.exports = function(sequelize, DataTypes) {
                 }
   							transactionList.push(trans);
   							sums.transactions++;
-  							
+  							lastTransaction = transaction.transaction_date;
   							sums.end.amount += transaction.amount;
   							sums.end.interest += + transaction.interestToDate(project, contract.interest_rate, firstDayNextYear);
 
@@ -368,7 +369,7 @@ module.exports = function(sequelize, DataTypes) {
   							first_name: user.first_name,
   							contract_id: contract.id,
   							interest_rate: contract.interest_rate,
-  							date: moment(firstDayNextYear).subtract(1, 'days'),
+  							date: (contract.isTerminated(firstDayNextYear)&&lastTransaction?moment(lastTransaction):moment(firstDayNextYear).subtract(1, 'days')),
   							type: 'Zinsertrag ' + year,
   							amount: sums.end.interest - sums.begin.interest,
   							interest: ""
