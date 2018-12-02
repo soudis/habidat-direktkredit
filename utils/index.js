@@ -65,8 +65,8 @@ exports.convertToPdf = function(file, callback){
 
 exports.generateTransactionList = function(transactionList, outputFile){
 
-	var fieldNames = ["Nachname", "Vorname", "Vertragsnummer", "Vorgang", "Datum", "Betrag", "Zinssatz", "Zinsbetrag"];
-	var fieldList = ['last_name', 'first_name','contract_id', 'type', 'date', 'amount', 'interest_rate', 'interest'];
+	var fieldNames = ["Nummer", "Nachname", "Vorname", "Vertragsnummer", "Vorgang", "Datum", "Betrag", "Zinssatz", "Zinsbetrag"];
+	var fieldList = ['id', 'last_name', 'first_name','contract_id', 'type', 'date', 'amount', 'interest_rate', 'interest'];
 	var csvRet;
 	json2csv({ data: transactionList, fieldNames: fieldNames, fields: fieldList }, function(err, csv) {
 		  if (err) console.log(err);
