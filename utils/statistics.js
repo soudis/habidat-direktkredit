@@ -173,7 +173,9 @@ exports.getNumbers = function(models, project, callback){
 				avgInterestRate :0,
 				avgPeriod : 0,
 				avgPeriodAmount: 0,
-				users: 0
+				users: 0,
+				avgDaysToRepay: 0,
+				avgDaysToRepayCount: 0
 			},
 			lastMonth : {
 				amountNew : 0,
@@ -220,7 +222,8 @@ exports.getNumbers = function(models, project, callback){
 					var deposits = 0,
 						withdrawals = 0,
 						interest = 0,
-						notReclaimed = 0;
+						notReclaimed = 0,
+						lastTransaction;
 
 					contract.transactions.forEach(function (transaction) {
 
@@ -259,6 +262,8 @@ exports.getNumbers = function(models, project, callback){
 							}
 						}
 
+						lastTransaction = transaction.transaction_date;
+
 					});
 
 					// general statistics
@@ -283,7 +288,14 @@ exports.getNumbers = function(models, project, callback){
 						numbers.cancelled.deposits += deposits;
 						numbers.cancelled.withdrawals -= withdrawals - notReclaimed;
 						numbers.cancelled.notReclaimed -= notReclaimed;
-						numbers.cancelled.interestPaid -= deposits + withdrawals - notReclaimed;
+						numbers.cancelled.interestPaid -= deposits + withdrawals - notReclaimed;	
+						if (lastTransaction && contract.termination_date) {
+							var daysToRepay = moment(lastTransaction).diff(moment(contract.termination_date), 'days');
+							if (daysToRepay > 0) {
+								numbers.cancelled.avgDaysToRepay += daysToRepay;
+								numbers.cancelled.avgDaysToRepayCount ++;
+							}
+						}
 
 						numbers.total.contractAmount += contract.amount;
 						numbers.total.deposits += deposits;
@@ -395,6 +407,8 @@ exports.getNumbers = function(models, project, callback){
 		numbers.cancelled.avgPeriod = numbers.cancelled.avgPeriod / numbers.cancelled.avgPeriodAmount;
 		numbers.running.avgAmount = numbers.running.contractAmount / numbers.running.count;
 		numbers.running.avgPeriod = numbers.running.avgPeriod / numbers.running.avgPeriodAmount;
+
+		numbers.cancelled.avgDaysToRepay = numbers.cancelled.avgDaysToRepay / numbers.cancelled.avgDaysToRepayCount;
 		
 /*		generatePieChart(numbers.byRelationship, function(chart) {
 			numbers.charts.byRelationship = chart;

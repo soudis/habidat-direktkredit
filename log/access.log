@@ -71,3 +71,5 @@
 2018-12-02 13:48:32 AUTH-FAIL: URL: /logon, USER: 10196_willyfred, CLIENT IP: ::ffff:172.25.0.1
 2018-12-02 13:48:32 AUTH-FAIL: URL: /logon, USER: 10058_willyfred, CLIENT IP: ::ffff:172.25.0.1
 2018-12-02 14:17:93 AUTH-FAIL: URL: /logon, USER: 10024_willyfred, CLIENT IP: ::ffff:172.25.0.1
+2018-12-26 19:30:27 AUTH-FAIL: URL: /logon, USER: Florian Humer, CLIENT IP: ::ffff:172.25.0.1
+2018-12-26 19:30:63 AUTH-FAIL: URL: /logon, USER: Florian Humer, CLIENT IP: ::ffff:172.25.0.1

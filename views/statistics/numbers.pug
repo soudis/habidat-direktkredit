@@ -82,6 +82,12 @@ block admin-content
             td #{format.formatMoney(numbers.total.outstandingAmount ,2)}
             td #{format.formatMoney(0 ,2)}
             td #{format.formatMoney(numbers.running.outstandingAmount ,2)}                 
+          tr
+            td 
+              strong Rückzahlungsdauer Durchschschnitt
+            td -
+            td #{format.format(numbers.cancelled.avgDaysToRepay ,2, '# Tage')}
+            td -
     .col-md-6.col-xs-12
       h3.underline Laufende Kredite nach Beziehung
       canvas(id="by-relation" width="400" height="400")
