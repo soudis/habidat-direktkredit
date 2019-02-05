@@ -36,10 +36,7 @@ exports.formatMoney = function(money, precision = 2) {
     return exports.format(money, precision, "# €");
 };
 
-exports.formatPercent = function (percent) {
-    return formatPercent(percent, 2);
-}
-exports.formatPercent = function(percent, precision) {
+exports.formatPercent = function(percent, precision = 2) {
     return exports.format(percent, precision, "# %");
 };
 
