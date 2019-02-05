@@ -32,10 +32,7 @@ exports.formatDate = function(date) {
 	return moment(date).format("DD.MM.YYYY");
 };
 
-exports.formatMoney = function (money) {
-    return formatMoney(money, 2);
-}
-exports.formatMoney = function(money, precision) {
+exports.formatMoney = function(money, precision = 2) {
     return exports.format(money, precision, "# €");
 };
 
