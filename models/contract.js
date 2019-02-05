@@ -62,7 +62,7 @@ module.exports = function(sequelize, DataTypes) {
     },
     instanceMethods: {
   		calculateInterest: function(project) {
-  			var interest = {"now": 0.00, "last_year": 0.00};
+  			var interest = {"now": 0.00, "last_year": 0.00, "termination": 0.00};
   			var last_year_end = moment().startOf("year");
         var last_year_begin = moment().subtract(1, "years").startOf("year");
         var now = moment();
@@ -89,8 +89,12 @@ module.exports = function(sequelize, DataTypes) {
   					interest.now += transaction.interestToDate(project, contract.interest_rate, now);
             interest.last_year += transaction.interestToDate(project, contract.interest_rate, last_year_end);
             interest.last_year -= transaction.interestToDate(project, contract.interest_rate, last_year_begin);
+            if (contract.termination_date) {
+              interest.termination += transaction.interestToDate(project, contract.interest_rate, moment(contract.termination_date));
+            }
   				});
   				interest.now = Math.ceil(interest.now*100) / 100;
+          interest.termination = Math.ceil(interest.termination*100) / 100;
   			}
   			return interest;
   		},

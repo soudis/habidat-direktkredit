@@ -25,7 +25,7 @@ each contract in user.contracts
       .col-md-8 #{contract.getStatus()} 
     .row
       .col-md-4 Betrag (Vertrag):
-      .col-md-8 #{sprintf('%.2f', contract.amount )} EUR
+      .col-md-8= format.formatMoney(contract.amount)
     .row
       .col-md-4 Kündigungsdatum:
       if (contract.termination_date)
@@ -34,19 +34,23 @@ each contract in user.contracts
         .col-md-8 nicht gekündigt
     .row
       .col-md-4 Zinssatz:
-      .col-md-8 #{sprintf('%.3f', contract.interest_rate )}%
+      .col-md-8 #{format.formatNumber(contract.interest_rate,3)}%
     .row 
       .col-md-4 Zinsertrag (bis heute):
-      .col-md-8 #{sprintf('%.2f', interest.now)} EUR
+      .col-md-8= format.formatMoney(interest.now)
     .row
       .col-md-4 Zinsertrag (für #{interest.last_year_no}):
-      .col-md-8 #{sprintf('%.2f', interest.last_year)} EUR
+      .col-md-8= format.formatMoney(interest.last_year)
+    if contract.termination_date
+      .row
+        .col-md-4 Zinsertrag bis Kündigungsdatum:
+        .col-md-8= format.formatMoney(interest.termination) 
     .row 
       .col-md-4 Vertragsstatus:
       .col-md-8 #{contract.getStatusText()} 
     .row 
       .col-md-4 Laufzeit:
-      .col-md-8 #{sprintf('%.2f', contract.period)} Jahre
+      .col-md-8 #{format.formatNumber(contract.period,2)} Jahre
     .row 
       .col-md-4 Notizen:
       .col-md-8= contract.notes
@@ -62,6 +66,6 @@ each contract in user.contracts
             .col-md-1 
             .col-md-3 #{moment(transaction.transaction_date).format('DD.MM.YYYY')}
             .col-md-3 #{transaction.getTypeText()}
-            .col-md-4.text-right #{sprintf('%.2f', transaction.amount )} EUR #[a.btn.btn-default.btn-sm(href='/transaction/edit/'+transaction.id) #[span.glyphicon.glyphicon-pencil]] #[a.btn.btn-default.btn-sm.confirm(data-link='/transaction/delete/'+transaction.id, data-confirmtext='Willst du die Zahlung von ' + sprintf('%.2f', contract.amount) +  ' EUR vom ' + moment(transaction.transaction_date).format('DD.MM.YYYY') + ' von ' + user.first_name + ' ' + user.last_name  + ' wirklich löschen?') #[span.glyphicon.glyphicon-trash]]
+            .col-md-4.text-right #{format.formatMoney(transaction.amount)} #[a.btn.btn-default.btn-sm(href='/transaction/edit/'+transaction.id) #[span.glyphicon.glyphicon-pencil]] #[a.btn.btn-default.btn-sm.confirm(data-link='/transaction/delete/'+transaction.id, data-confirmtext='Willst du die Zahlung von ' + sprintf('%.2f', contract.amount) +  ' EUR vom ' + moment(transaction.transaction_date).format('DD.MM.YYYY') + ' von ' + user.first_name + ' ' + user.last_name  + ' wirklich löschen?') #[span.glyphicon.glyphicon-trash]]
       if (addTransaction && contract.id == addTransaction.contract_id)
         +transaction_input('/transaction/add', user, contract, addTransaction)    
