@@ -20,12 +20,11 @@ exports.isLoggedInAdmin = function(req, res, next) {
 	else if (req.isAuthenticated() && (req.user.administrator))
 		return next();
 	else if (req.isAuthenticated()) {
-		console.log("no admin");
-		req.logout();
+		res.redirect('/profile');
+	} else {
+		req.session.returnTo = req.url; 
+		res.redirect('/');		
 	}
-	// if they aren't redirect them to the home page
-	req.session.returnTo = req.url; 
-	res.redirect('/');
 };
 
 exports.redirectReload = function(redirectUrl) {

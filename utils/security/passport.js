@@ -162,7 +162,7 @@ module.exports = function(passport) {
             
             if (!user.isAdmin()) {
             	logAuthFailed(req,userid);            	
-            	return done(null, false, req.flash('loginMessage', 'Das ist leider kein Administrator Account')); // create the loginMessage and save it to session as flashdata
+            	return done(null, false, null); // create the loginMessage and save it to session as flashdata
             }
 
             // all is well, return successful user
