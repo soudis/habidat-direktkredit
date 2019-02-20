@@ -1,17 +1,16 @@
 { 
-	"$HABIDAT_DK_PROJECT_ID": {
-		"projectname": "$HABIDAT_DK_PROJECT_NAME",
-		"logo": "/public/images/willy-fred.gif",
-	    "email" : "$HABIDAT_ADMIN_EMAIL",
-	    "files" : "/public/files/$HABIDAT_DK_PROJECT_ID",
-	    "templates": "/templates/$HABIDAT_DK_PROJECT_ID/docx",
-	    "usersuffix": "$HABIDAT_DK_PROJECT_ID",
-	    "interest_method": "365_compound",	    // 365_compound or 365_nocompound
-	    "db": {
-	    	"username": "$HABIDAT_DK_DB_USER",
-			"password": "$HABIDAT_DK_DB_PASSWORD",
-			"database": "$HABIDAT_DK_DB_DATABASE"
-	    }
-	}
-
+    "$HABIDAT_DK_PROJECT_ID": {
+        "projectname": "$HABIDAT_DK_PROJECT_NAME",
+        "logo": "/public/images/$HABIDAT_LOGO",
+        "email" : "$HABIDAT_ADMIN_EMAIL",
+        "files" : "/public/files/$HABIDAT_DK_PROJECT_ID",
+        "templates": "/templates/$HABIDAT_DK_PROJECT_ID/docx",
+        "usersuffix": "$HABIDAT_DK_PROJECT_ID",
+        "interest_method": "365_compound",     
+        "db": {
+            "username": "$HABIDAT_DK_DB_USER",
+            "password": "$HABIDAT_DK_DB_PASSWORD",
+            "database": "$HABIDAT_DK_DB_DATABASE"
+        }
+    }
 }
