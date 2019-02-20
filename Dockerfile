@@ -24,8 +24,6 @@ RUN \
 
 ADD . /habidat
 
-RUN rm /habidat/config/*.json
-
 RUN mkdir -p /habidat/public/images
 
 WORKDIR /habidat
