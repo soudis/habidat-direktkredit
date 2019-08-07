@@ -171,20 +171,19 @@ module.exports = function(sequelize, DataTypes) {
           callback(activeUsers);  
         });
       },
-      cancelledAndNotRepaid: function(models, whereClause, callback ){      
-        var cancelled = false;
+      cancelledAndNotRepaid: function(models, project, whereClause,  callback ){      
         var usersCancelled = [];
+        var now = moment();
         models.user.findFetchFull(models, whereClause, function(users){
           users.forEach(function(user){
             user.contracts.forEach(function(contract){
-              if (contract.isCancelledAndNotRepaid(moment())) {
-                cancelled = true;
+              if (contract.isCancelledAndNotRepaid(now)) {
+                var copiedUser = JSON.parse(JSON.stringify(user));
+                user.termination_date = contract.termination_date;
+                user.payback_amount = contract.getAmountToDate(project, now);
+                usersCancelled.push(user);
               }
             });
-            if (cancelled) {
-              usersCancelled.push(user);
-            }
-            cancelled = false;
           });
           callback(usersCancelled);
         });

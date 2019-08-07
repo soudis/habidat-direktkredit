@@ -1,3 +1,4 @@
+try{
 var express = require('express');
 var router = express.Router();
 var path = require('path');
@@ -139,3 +140,6 @@ module.exports = app;
 	  httpServer.listen(site.porthttp);
 	}
 //	});
+}catch(e) {
+  console.log(e.stack);
+}
