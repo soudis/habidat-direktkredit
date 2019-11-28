@@ -41,16 +41,16 @@ block content
         .col-md-8 #{contract.getStatus()} 
       .row
         .col-md-4 Betrag (Vertrag):
-        .col-md-8 #{sprintf('%.2f', contract.amount )} EUR
+        .col-md-8= format.formatMoney(contract.amount )
       .row
         .col-md-4 Zinssatz:
-        .col-md-8 #{sprintf('%.2f', contract.interest_rate )}%
+        .col-md-8 #{format.formatNumber(contract.interest_rate,3)}%
       .row 
         .col-md-4 Zinsertrag (bis heute):
-        .col-md-8 #{sprintf('%.2f', interest.now)} EUR
+        .col-md-8= format.formatMoney(interest.now)
       .row
         .col-md-4 Zinsertrag (für #{interest.last_year_no}):
-        .col-md-8 #{sprintf('%.2f', interest.last_year)} EUR
+        .col-md-8= format.formatMoney(interest.last_year)
       .row
         .col-md-12
           h5 Zahlungen
@@ -59,6 +59,6 @@ block content
               .col-md-1 
               .col-md-3 #{moment(transaction.transaction_date).format('DD.MM.YYYY')}
               .col-md-3 #{transaction.getTypeText()}
-              .col-md-3.text-right #{sprintf('%.2f', transaction.amount )} EUR            
+              .col-md-3.text-right=format.formatMoney(transaction.amount )
           
       

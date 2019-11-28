@@ -77,3 +77,4 @@
 2019-08-07 07:15:51 AUTH-FAIL: URL: /logon, USER: Florian Humer, CLIENT IP: ::ffff:172.19.0.1
 2019-11-28 12:39:14 AUTH-FAIL: URL: /logon, USER: Florian Humer, CLIENT IP: ::ffff:172.24.0.1
 2019-11-28 12:39:19 AUTH-FAIL: URL: /logon, USER: Florian Humer, CLIENT IP: ::ffff:172.24.0.1
+2019-11-28 13:04:81 AUTH-FAIL: URL: /logon, USER: 10058_willyfred, CLIENT IP: ::ffff:172.24.0.1

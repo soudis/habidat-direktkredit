@@ -13,7 +13,7 @@ module.exports = function(app){
 		if (req.session.project) {
      		res.render('index', { title: 'habiDAT', message: req.flash('loginMessage') } );  	
      	} else {
-     		res.redirect('/project');
+     		res.redirect('/project'); 
      	}
 	});
 
