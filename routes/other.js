@@ -8,7 +8,7 @@ var router = require('express').Router();
 module.exports = function(app){
 	router.get('/docx/:id', security.isLoggedInAdmin, function(req, res) {
 		var models  = require('../models')(req.session.project);		
-		models.user.find({
+		models.user.findOne({
 			where: {
 				id: req.params.id
 			}
@@ -28,7 +28,7 @@ module.exports = function(app){
 				"BIC": user.BIC
 			};
 
-		    models.file.find({
+		    models.file.findOne({
 				where: {
 					id: req.query.fileid
 			}}).then(function(file) {
@@ -51,7 +51,7 @@ module.exports = function(app){
 
 	router.get('/docx_c/:id', security.isLoggedInAdmin, function(req, res) {
 		var models  = require('../models')(req.session.project);
-		models.contract.find({
+		models.contract.findOne({
 			where : {
 				id: req.params.id
 			},
@@ -85,7 +85,7 @@ module.exports = function(app){
 					"transactionList": contract.transactions
 				};
 
-				models.file.find({
+				models.file.findOne({
 					where: {
 						id: req.query.fileid
 				}}).then(function(file) {

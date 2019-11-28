@@ -1,5 +1,7 @@
 var moment = require("moment");
 var sequelize = require("sequelize");
+var Op = require("sequelize").Op;
+
 
 var chartColors = [
 	"#a6cee3",
@@ -45,7 +47,7 @@ exports.getGermanContractsByYearAndInterestRate = function(models, callback) {
 	// find all german contracts (NOTE: distinction is just by
     // length of ZIP code > 4)
 	models.user.findAll({
-		  where: sequelize.where(sequelize.fn('char_length', sequelize.fn('trim', sequelize.col('zip'))), {$gte: 5}),
+		  where: sequelize.where(sequelize.fn('char_length', sequelize.fn('trim', sequelize.col('zip'))), {[Op.gte]: 5}),
 		  include:{
 				model: models.contract,
 				as: 'contracts',
@@ -202,7 +204,7 @@ exports.getNumbers = function(models, project, callback){
 	var now = moment();
 
 	models.user.findAll({
-		  where: ['administrator <> 1'],
+		  where: { administrator: {[Op.not]: '1'}},
 		  include:{
 				model: models.contract,
 				as: 'contracts',

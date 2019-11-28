@@ -1,6 +1,6 @@
 
-module.exports = function(sequelize, DataTypes) {
-  return sequelize.define('habitant', {
+module.exports = (sequelize, DataTypes) => {
+  habitant = sequelize.define('habitant', {
     id: {
       type: DataTypes.INTEGER(11),
       allowNull: false,
@@ -37,22 +37,22 @@ module.exports = function(sequelize, DataTypes) {
     }
   }, {
     tableName: 'habitant',
-    freezeTableName: true,
-    classMethods: {
-    	associate: function(db) {
-
-    		db.habitant.belongsTo(db.flat, {
-    	          foreignKey: 'fixed_to_flat',
-    	          as: 'fixed_habitants'
-    	        });
-    		
-    		db.habitant.belongsTo(db.mixer_config, {
-  	          onDelete: "CASCADE",
-  	          foreignKey: 'configuration',
-  	          as: 'habitants'
-  	        });
-    	}
-    },
-    instanceMethods: {}
+    freezeTableName: true
   });
+
+  habitant.associate = function (db) {
+
+    db.habitant.belongsTo(db.flat, {
+            foreignKey: 'fixed_to_flat',
+//            as: 'fixed_habitants'
+          });
+    
+    db.habitant.belongsTo(db.mixer_config, {
+          onDelete: "CASCADE",
+          foreignKey: 'configuration',
+  //        as: 'habitants'
+        });
+  }
+
+  return habitant;
 };

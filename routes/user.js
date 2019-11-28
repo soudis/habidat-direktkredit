@@ -3,6 +3,7 @@ var moment = require("moment");
 var router = require('express').Router();
 var url = require('url');
 var utils = require('../utils');
+var Op = require("sequelize").Op;
 
 module.exports = function(app){
 
@@ -19,11 +20,11 @@ module.exports = function(app){
 	router.get('/user/list/:mode', security.isLoggedInAdmin, function(req, res) {
 		var models  = require('../models')(req.session.project);
 		if (req.params.mode === 'expire') {
-			models.user.aboutToExpire(models, ['administrator <> 1'], 90, function(users) {
+			models.user.aboutToExpire(models, { administrator: {[Op.not]: '1'}}, 90, function(users) {
 				res.render('user/list', {users: users, title: 'Direktkreditgeber*innen Liste (abgelaufene Kredite'});
 			});
 		} else if (req.params.mode === 'cancelled') {
-			models.user.cancelledAndNotRepaid(models, req.session.project, ['administrator <> 1'], function(users) {
+			models.user.cancelledAndNotRepaid(models, req.session.project, { administrator: {[Op.not]: '1'}}, function(users) {
 				res.render('user/list', {users: users, title: 'Direktkreditgeber*innen Liste (gekündigte, nicht ausgezahlte Kredite)', noAggregation: true, additionalFields: [{label: "Auszubezahlender Betrag", key: "payback_amount", type: "number"},{label: "Kündigungsdatum", key: "termination_date", type: "date"}]});
 			});			
 		}
@@ -31,7 +32,7 @@ module.exports = function(app){
 	
 	router.get('/user/list', security.isLoggedInAdmin, function(req, res) {
 		var models  = require('../models')(req.session.project);
-		models.user.findFetchFull(models, ['administrator <> 1'], function(users) {
+		models.user.findFetchFull(models, { administrator: {[Op.not]: '1'}}, function(users) {
 			res.render('user/list', {users: users, title: 'Direktkreditgeber*innen Liste'});
 		});
 
@@ -90,7 +91,7 @@ module.exports = function(app){
 	router.get('/admin/accounts', security.isLoggedInAdmin, function(req, res) {
 		
 		var models  = require('../models')(req.session.project);
-		models.user.findFetchFull(models, ['administrator = true'], function(users) {
+		models.user.findFetchFull(models, {administrator: true}, function(users) {
 			res.render('admin/admin_accounts', {accounts: users, message: req.flash('error'), title: 'Administrator*innen Accounts'});
 		});
 	});

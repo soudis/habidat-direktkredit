@@ -16,7 +16,7 @@ module.exports = function(app){
 	/* Edit contract */
 	router.get('/contract/edit/:id', security.isLoggedInAdmin, function(req, res, next) {
 		var models  = require('../models')(req.session.project);
-		models.contract.find({
+		models.contract.findOne({
 			where : {
 				id: req.params.id
 			}

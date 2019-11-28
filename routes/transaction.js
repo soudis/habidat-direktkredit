@@ -16,12 +16,12 @@ module.exports = function(app){
 	/* GET home page. */
 	router.get('/transaction/edit/:id', security.isLoggedInAdmin, function(req, res, next) {
 		var models  = require('../models')(req.session.project);
-		models.transaction.find({
+		models.transaction.findOne({
 			where : {
 				id: req.params.id
 			}
 		}).then(function(transaction) {
-			models.contract.find({
+			models.contract.findOne({
 				where:{
 					id: transaction.contract_id
 				}
@@ -36,7 +36,7 @@ module.exports = function(app){
 	/* GET home page. */
 	router.get('/transaction/add/:id', security.isLoggedInAdmin, function(req, res, next) {
 		var models  = require('../models')(req.session.project);
-			models.contract.find({
+			models.contract.findOne({
 				where:{
 					id: req.params.id
 				}
@@ -53,7 +53,7 @@ module.exports = function(app){
 		models.transaction.create({
 			transaction_date: moment(req.body.transaction_date, 'DD.MM.YYYY'),
 			amount: req.body.amount,
-			type: req.body.type,
+			type: req.body.type, 
 			contract_id: req.body.contract_id
 		}).then(function(transaction) {
 			res.redirect('/user/show/' + req.body.user_id);
@@ -83,7 +83,7 @@ module.exports = function(app){
 	router.get('/transaction/delete/:id', security.isLoggedInAdmin, function(req, res) {
 		
 		var models  = require('../models')(req.session.project);
-		models.transaction.find({
+		models.transaction.findOne({
 			where: {
 				id: req.params.id
 			}

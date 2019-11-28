@@ -11,7 +11,18 @@ var currentProject, sequelize;
 
 var createdb = function(project) {
   if (!currentProject || project !== currentProject) {
-    sequelize = new Sequelize('mysql://'+projects[project].db.username+':'+encodeURIComponent(projects[project].db.password)+'@'+config.database.host+'/'+projects[project].db.database, {logging:false, pool:false});
+    sequelize = new Sequelize('mysql://'+projects[project].db.username+':'+encodeURIComponent(projects[project].db.password)+'@'+config.database.host+'/'+projects[project].db.database, 
+      {
+        logging:false, 
+        pool: {
+          idle: 30000,
+          min: 1, 
+          max: 1
+        },
+        dialectOptions: {
+          decimalNumbers: true
+        }
+      });
     sequelize.query('SET FOREIGN_KEY_CHECKS = 0', {raw: true}).catch(console.log);
     migration.up(sequelize);
     currentProject = project;

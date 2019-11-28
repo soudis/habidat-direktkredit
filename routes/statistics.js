@@ -21,7 +21,7 @@ module.exports = function(app){
 
 	router.get('/statistics/byrelation', security.isLoggedInAdmin, (req, res) => {
 		var models  = require('../models')(req.session.project);		
-		models.user.all({
+		models.user.findAll({
 			  include:{ 
 					model: models.contract, 
 					as: 'contracts', 
@@ -48,7 +48,7 @@ module.exports = function(app){
 	
 	router.get('/statistics/byzip', security.isLoggedInAdmin, (req, res) => {
 		var models  = require('../models')(req.session.project);		
-		models.user.all({
+		models.user.findAll({
 			  include:{ 
 					model: models.contract, 
 					as: 'contracts', 
@@ -86,7 +86,7 @@ module.exports = function(app){
 	router.get('/statistics/bymonth', security.isLoggedInAdmin, (req, res) => {
 		var models  = require('../models')(req.session.project);		
 
-		models.user.all({
+		models.user.findAll({
 			  include:{ 
 					model: models.contract, 
 					as: 'contracts', 
@@ -123,7 +123,7 @@ module.exports = function(app){
 	router.get('/statistics/transactionsbymonth', security.isLoggedInAdmin, (req, res) => {
 		var models  = require('../models')(req.session.project);		
 
-		models.user.all({
+		models.user.findAll({
 			  include:{ 
 					model: models.contract, 
 					as: 'contracts', 
@@ -176,7 +176,7 @@ module.exports = function(app){
 
 	router.post('/statistics/transactionList', security.isLoggedInAdmin, function(req, res) {
 		var models  = require('../models')(req.session.project);		
-		models.user.all({
+		models.user.findAll({
 			  include:{ 
 					model: models.contract, 
 					as: 'contracts', 

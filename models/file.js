@@ -1,8 +1,8 @@
 var moment = require('moment');
 
 
-module.exports = function(sequelize, DataTypes) {
-  return sequelize.define('file',
+module.exports = (sequelize, DataTypes) => {
+  file = sequelize.define('file',
 	    	{
 		id: {
 			type: DataTypes.INTEGER(11),
@@ -38,15 +38,14 @@ module.exports = function(sequelize, DataTypes) {
 	}, {
     tableName: 'file',
     freezeTableName: true,
-    classMethods: {
-    	associate: function(db) {
-    		db.file.belongsTo(db.user, {
-    	          onDelete: "CASCADE",
-    	          foreignKey: 'ref_id',
-    	          as: 'files'
-    	        });
-    	}
-    },
-    instanceMethods: {}
   });
+
+  file.associate = function (db) {
+	db.file.belongsTo(db.user, {
+          onDelete: "CASCADE",
+          foreignKey: 'ref_id'
+        });
+  }
+
+  return file;
 };

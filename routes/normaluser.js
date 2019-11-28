@@ -7,6 +7,8 @@ var format = require('../utils/format');
 var router = require('express').Router();
 var projects = require('../config/projects.json');
 
+var Op = require("sequelize").Op;
+
 module.exports = function(app){
 
 // =====================================
@@ -33,7 +35,7 @@ router.get('/files', security.isLoggedIn, function(req, res) {
 	models.file.findAll({
 		where: {
 			ref_table: {
-		      $like: "infopack_%"
+		      [Op.like]: "infopack_%"
 		    }
 		}
 	}).then(function(files) {
@@ -111,7 +113,7 @@ router.post('/accountnotification', security.isLoggedIn, function(req, res) {
 				"transactionList": transactionList,
 				"interestTotal": format.formatMoney(interestTotal)};
 		var filename =  "Kontomitteilung " + user.id + " " + req.body.year;
-	    models.file.find({
+	    models.file.findOne({
 			where: {
 				ref_table: "template_account_notification"
 		}}).then(function(file) {

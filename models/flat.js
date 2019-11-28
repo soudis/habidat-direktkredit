@@ -1,7 +1,7 @@
 var moment = require('moment');
 
-module.exports = function(sequelize, DataTypes) {
-  return sequelize.define('flat', {
+module.exports = (sequelize, DataTypes) => {
+  flat = sequelize.define('flat', {
     id: {
       type: DataTypes.INTEGER(11),
       allowNull: false,
@@ -35,19 +35,19 @@ module.exports = function(sequelize, DataTypes) {
   }, {
     tableName: 'flat',
     freezeTableName: true,
-    classMethods: {
-    	associate: function(db) {
-    		db.flat.hasMany(db.habitant, {
-    			as: 'fixed_habitants', 
-    			foreignKey: 'fixed_to_flat'});
-    		db.flat.belongsTo(db.mixer_config, {
-    	          onDelete: "CASCADE",
-    	          foreignKey: 'configuration',
-    	          as: 'flats'
-    	        });
-
-    	}
-    },
-    instanceMethods: {}
   });
+
+  flat.associate = function (db) {
+    db.flat.hasMany(db.habitant, {
+//      as: 'fixed_habitants', 
+      foreignKey: 'fixed_to_flat'
+    });
+    db.flat.belongsTo(db.mixer_config, {
+      onDelete: "CASCADE",
+      foreignKey: 'configuration',
+//      as: 'flats'
+    });
+  }
+
+  return flat;
 };

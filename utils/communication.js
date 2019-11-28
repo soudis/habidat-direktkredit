@@ -1,10 +1,11 @@
 var models  = require('../models');
 var moment = require("moment");
 var validator = require("validator");
+var Op = require("sequelize").Op;
 
 exports.getEmails = function(mode, project, callback){
 
-	var whereClause = ['administrator <> 1'];
+	var whereClause = { administrator: {[Op.not]: '1'}};
 	var usersString = 'test';
 	var models  = require('../models')(project);  
 	models.user.findFetchFull(models, whereClause, function(users){

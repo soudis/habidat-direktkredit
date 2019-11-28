@@ -1,6 +1,7 @@
 var security = require('../utils/security');
 var router = require('express').Router();
 var fs = require('fs');
+var Op = require("sequelize").Op;
 
 module.exports = function(app){
 
@@ -85,7 +86,7 @@ module.exports = function(app){
 		models.file.findAll({
 			where: {
 				ref_table: {
-			      $like: "template_%"
+			      [Op.like]: "template_%"
 			    }
 			}
 		}).then(function(templates) {
@@ -98,7 +99,7 @@ module.exports = function(app){
 		models.file.findAll({
 			where: {
 				ref_table: {
-			      $like: "infopack_%"
+			      [Op.like]: "infopack_%"
 			    }
 			}
 		}).then(function(files) {
@@ -133,7 +134,7 @@ module.exports = function(app){
 		var type = req.body.type;
 
 		if (type == "template_account_notification") {
-		    models.file.find({
+		    models.file.findOne({
 			where: {
 				ref_table: "template_account_notification"
 			}}).then(function(file) {

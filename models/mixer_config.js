@@ -1,7 +1,7 @@
 var moment = require('moment');
 
-module.exports = function(sequelize, DataTypes) {
-  return sequelize.define('mixer_config', {
+module.exports = (sequelize, DataTypes) => {
+  mixerConfig = sequelize.define('mixer_config', {
     id: {
       type: DataTypes.INTEGER(11),
       allowNull: false,
@@ -18,18 +18,18 @@ module.exports = function(sequelize, DataTypes) {
     }
   }, {
     tableName: 'mixer_config',
-    freezeTableName: true,
-    classMethods: {
-    	associate: function(db) {
-    		db.mixer_config.hasMany(db.habitant, {
-    			as: 'habitants', 
-    			foreignKey: 'configuration'});
-    		db.mixer_config.hasMany(db.flat, {
-    			as: 'flats', 
-    			foreignKey: 'configuration'});
-
-    	}
-    },
-    instanceMethods: {}
+    freezeTableName: true
   });
+
+  mixerConfig.associate = function (db) {
+    db.mixer_config.hasMany(db.habitant, {
+//      as: 'habitants', 
+      foreignKey: 'configuration'});
+    db.mixer_config.hasMany(db.flat, {
+//      as: 'flats', 
+      foreignKey: 'configuration'});
+
+  }  
+
+  return mixerConfig;
 };
