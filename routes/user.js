@@ -19,13 +19,9 @@ module.exports = function(app){
 
 	router.get('/user/list/:mode', security.isLoggedInAdmin, function(req, res) {
 		var models  = require('../models')(req.session.project);
-		if (req.params.mode === 'expire') {
-			models.user.aboutToExpire(models, { administrator: {[Op.not]: '1'}}, 90, function(users) {
-				res.render('user/list', {users: users, title: 'Direktkreditgeber*innen Liste (abgelaufene Kredite'});
-			});
-		} else if (req.params.mode === 'cancelled') {
+        if (req.params.mode === 'cancelled') {
 			models.user.cancelledAndNotRepaid(models, req.session.project, { administrator: {[Op.not]: '1'}}, function(users) {
-				res.render('user/list', {users: users, title: 'Direktkreditgeber*innen Liste (gekündigte, nicht ausgezahlte Kredite)', noAggregation: true, additionalFields: [{label: "Auszubezahlender Betrag", key: "payback_amount", type: "number"},{label: "Kündigungsdatum", key: "termination_date", type: "date"}]});
+				res.render('user/list', {users: users, title: 'Direktkreditgeber*innen Liste (gekündigte, nicht ausgezahlte Kredite)', noAggregation: true, additionalFields: [{label: "Auszubezahlender Betrag", key: "payback_amount", type: "number"},{label: "Vertragsdatum", key: "contract_date", type: "date"},{label: "Kündigungsart", key: "termination_type", type: "string"},{label: "Rückzahlungsdatum", key: "payback_date", type: "date"}]});
 			});			
 		}
 	});

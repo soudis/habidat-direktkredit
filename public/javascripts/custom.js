@@ -1,6 +1,11 @@
   $(function () { $('.datepicker').datepicker({'format': 'dd.mm.yyyy', 'language': 'de'})});
   $(document).ready(function(){
 
+
+    $('#termination_type_input').on('change', function() {
+      $(".termination-type-group").addClass("hidden");
+      $("#termination_type_"+$(this).val()).removeClass("hidden");
+    });
         
 
      var dynamicColors = function() {

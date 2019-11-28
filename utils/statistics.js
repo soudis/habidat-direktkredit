@@ -141,10 +141,7 @@ exports.getNumbers = function(models, project, callback){
 				interestPaid : 0,
 				avgInterestRate : 0,
 				medianInterestRate : 0,
-				
-				avgPeriod : 0,
-				avgPeriodAmount: 0,
-				medianPeriod : 0,
+
 				users: 0
 			},
 			running : {
@@ -158,8 +155,6 @@ exports.getNumbers = function(models, project, callback){
 				avgAmount : 0,
 				count :0,
 				avgInterestRate :0,
-				avgPeriod :0,
-				avgPeriodAmount: 0,
 				users: 0
 			},
 			cancelled : {
@@ -173,8 +168,6 @@ exports.getNumbers = function(models, project, callback){
 				avgAmount : 0,
 				count :0,
 				avgInterestRate :0,
-				avgPeriod : 0,
-				avgPeriodAmount: 0,
 				users: 0,
 				avgDaysToRepay: 0,
 				avgDaysToRepayCount: 0
@@ -272,17 +265,10 @@ exports.getNumbers = function(models, project, callback){
 					numbers.total.amount += deposits;
 					numbers.total.avgInterestRate += contract.amount * contract.interest_rate;
 					numbers.total.count ++;
-					if (contract.period > 0) {
-						numbers.total.avgPeriod += contract.period * contract.amount;
-						numbers.total.avgPeriodAmount += contract.amount;
-					}
+
 					if (contract.isTerminated(now)) {
 						numbers.cancelled.count ++;
 						numbers.cancelled.amount += deposits;
-						if (contract.period > 0) {
-							numbers.cancelled.avgPeriod += contract.period * contract.amount;
-							numbers.cancelled.avgPeriodAmount += contract.amount;
-						}
 						numbers.cancelled.avgInterestRate  += contract.amount * contract.interest_rate;
 
 
@@ -291,7 +277,7 @@ exports.getNumbers = function(models, project, callback){
 						numbers.cancelled.withdrawals -= withdrawals - notReclaimed;
 						numbers.cancelled.notReclaimed -= notReclaimed;
 						numbers.cancelled.interestPaid -= deposits + withdrawals - notReclaimed;	
-						if (lastTransaction && contract.termination_date) {
+						if (lastTransaction && contract.termination_date && (!contract.termination_type || contract.termination_type == "T")) {
 							var daysToRepay = moment(lastTransaction).diff(moment(contract.termination_date), 'days');
 							if (daysToRepay > 0) {
 								numbers.cancelled.avgDaysToRepay += daysToRepay;
@@ -309,10 +295,6 @@ exports.getNumbers = function(models, project, callback){
 						hasNotTerminatedContracts = true;
 						numbers.running.count ++;
 						numbers.running.amount += deposits;
-						if (contract.period > 0) {
-							numbers.running.avgPeriod += contract.period * contract.amount;
-							numbers.running.avgPeriodAmount += contract.amount;
-						}
 						numbers.running.avgInterestRate  += contract.amount * contract.interest_rate;
 
 						numbers.running.contractAmount += contract.amount;
@@ -338,8 +320,7 @@ exports.getNumbers = function(models, project, callback){
 
 					contractHelper.push ({
 						interestRate : contract.interest_rate,
-						amount : contract.amount,
-						period : contract.period
+						amount : contract.amount
 						});
 
 				});
@@ -388,27 +369,10 @@ exports.getNumbers = function(models, project, callback){
 			numbers.total.medianAmount = 0;
 		}
 
-		contractHelper.sort(function(a,b) {
-			if (a.period > b.period)
-				return 1;
-			else if(b.period > a.period)
-				return -1;
-			else
-				return 0;
-		}); 
-		
-		if (numbers.total.count > 2) {
-			numbers.total.medianPeriod = contractHelper[Math.ceil(numbers.total.count/2)].period;
-		} else {
-			numbers.total.medianPeriod = 0;
-		}
 
 		numbers.total.avgAmount = numbers.total.contractAmount / numbers.total.count;
-		numbers.total.avgPeriod = numbers.total.avgPeriod / numbers.total.avgPeriodAmount;
 		numbers.cancelled.avgAmount = numbers.cancelled.contractAmount / numbers.cancelled.count;
-		numbers.cancelled.avgPeriod = numbers.cancelled.avgPeriod / numbers.cancelled.avgPeriodAmount;
 		numbers.running.avgAmount = numbers.running.contractAmount / numbers.running.count;
-		numbers.running.avgPeriod = numbers.running.avgPeriod / numbers.running.avgPeriodAmount;
 
 		numbers.cancelled.avgDaysToRepay = numbers.cancelled.avgDaysToRepay / numbers.cancelled.avgDaysToRepayCount;
 		

@@ -40,10 +40,18 @@ var FileStore = require('session-file-store')(session);
 
 var app = express();
 
-app.locals.moment = require('moment');
-app.locals.format = require('./utils/format');
-app.locals.sprintf = require('sprintf').sprintf;
-app.locals.site = site;
+
+
+app.use((req, res, next) => {
+  if (req.session && req.session.project) {
+    res.locals.project = projects[req.session.project];
+  }
+  res.locals.moment = require('moment');
+  res.locals.format = require('./utils/format');
+  res.locals.sprintf = require('sprintf').sprintf;
+  res.locals.site = site;  
+  next();
+});
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));

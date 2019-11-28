@@ -6,7 +6,7 @@ include ../transaction/input
 each contract in user.contracts
   - interest = contract.calculateInterest(projectid)
   if (editContract && contract.id == editContract.id )
-    include ./edit_contract 
+    include ./contract_form
   else
     .row
       .col-md-12 
@@ -21,39 +21,56 @@ each contract in user.contracts
                   li
                     a(href='/docx_c/'+contract.id+'?fileid='+template.id)=template.description
     .row
-      .col-md-4 Status:
-      .col-md-8 #{contract.getStatus()} 
+      .col-md-3 Status:
+      .col-md-9 #{contract.getStatus()} 
     .row
-      .col-md-4 Betrag (Vertrag):
-      .col-md-8= format.formatMoney(contract.amount)
+      .col-md-3 Betrag (Vertrag):
+      .col-md-9= format.formatMoney(contract.amount)
     .row
-      .col-md-4 Kündigungsdatum:
+      .col-md-3 Kündigungsart:
+      .col-md-9=contract.getTerminationTypeFullString(project)
+    if contract.termination_type == "T"
       if (contract.termination_date)
-        .col-md-8 #{moment(contract.termination_date).format('DD.MM.YYYY')}
+        .row
+          .col-md-3 Kündigungsdatum:
+          .col-md-9 #{moment(contract.termination_date).format('DD.MM.YYYY')}
+        .row
+          .col-md-3 Rückzahlungsfrist:
+          .col-md-9 #{moment(contract.getPaybackDate(project)).format('DD.MM.YYYY')}          
       else
-        .col-md-8 nicht gekündigt
+        .row
+          .col-md-3 Kündigungsdatum:
+          .col-md-9 nicht gekündigt
+    else if contract.termination_type=="D"
+      .row
+        .col-md-3 Rückzahlungsdatum:
+        .col-md-9 #{moment(contract.getPaybackDate(project)).format('DD.MM.YYYY')}          
+    else if contract.termination_type=="P"
+      .row
+        .col-md-3 Ende der Laufzeit:
+        .col-md-9 #{moment(contract.getPaybackDate(project)).format('DD.MM.YYYY')}          
     .row
-      .col-md-4 Zinssatz:
-      .col-md-8 #{format.formatNumber(contract.interest_rate,3)}%
+      .col-md-3 Zinssatz:
+      .col-md-9 #{format.formatNumber(contract.interest_rate,3)}%
     .row 
-      .col-md-4 Zinsertrag (bis heute):
-      .col-md-8= format.formatMoney(interest.now)
+      .col-md-3 Zinsertrag (bis heute):
+      .col-md-9= format.formatMoney(interest.now)
     .row
-      .col-md-4 Zinsertrag (für #{interest.last_year_no}):
-      .col-md-8= format.formatMoney(interest.last_year)
+      .col-md-3 Zinsertrag (für #{interest.last_year_no}):
+      .col-md-9= format.formatMoney(interest.last_year)
     if contract.termination_date
       .row
-        .col-md-4 Zinsertrag bis Kündigungsdatum:
-        .col-md-8= format.formatMoney(interest.termination) 
+        .col-md-3 Zinsertrag bis Kündigungsdatum:
+        .col-md-9= format.formatMoney(interest.termination) 
     .row 
-      .col-md-4 Vertragsstatus:
-      .col-md-8 #{contract.getStatusText()} 
+      .col-md-3 Vertragsstatus:
+      .col-md-9 #{contract.getStatusText()} 
     .row 
-      .col-md-4 Laufzeit:
-      .col-md-8 #{format.formatNumber(contract.period,2)} Jahre
+      .col-md-3 Laufzeit:
+      .col-md-9 #{format.formatNumber(contract.period,2)} Jahre
     .row 
-      .col-md-4 Notizen:
-      .col-md-8= contract.notes
+      .col-md-3 Notizen:
+      .col-md-9= contract.notes
   .row
     .col-md-12
       h5 Zahlungen #[a.btn.btn-default.btn-sm(href='/transaction/add/'+contract.id) #[span.glyphicon.glyphicon-plus]]

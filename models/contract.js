@@ -13,20 +13,28 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.DATE,
         allowNull: true
       },
+      termination_type : {
+        type: DataTypes.STRING,
+        allowNull: true
+      },
       termination_date: {
         type: DataTypes.DATE,
         allowNull: true
       },
+      termination_period: {
+        type: DataTypes.DECIMAL,
+        allowNull: true
+      },
+      termination_period_type: {
+        type: DataTypes.STRING,
+        allowNull: true
+      },      
       amount: {
         type: DataTypes.DECIMAL,
         allowNull: true
       },
       interest_rate: {
         type: DataTypes.DECIMAL,
-        allowNull: true
-      },
-      period: {
-        type: DataTypes.FLOAT,
         allowNull: true
       },
       status: {
@@ -66,8 +74,79 @@ module.exports = (sequelize, DataTypes) => {
         sum += transaction.amount;
       }
     });
-    return count > 1 && sum <= 0 && this.termination_date;
+    return count > 1 && sum <= 0;
   }
+
+  contract.prototype.getTerminationTypeString = function () {
+    switch(this.termination_type) {
+      case "T": 
+        return 'Kündigungsfrist';
+      case "P": 
+        return 'Laufzeit';
+      case "D":
+        return 'Enddatum';
+    }
+    return "Kündigungsfrist";
+  }
+
+  contract.prototype.getTerminationPeriodTypeString = function () {
+    switch(this.termination_period_type) {
+      case "M": 
+        return 'Monat(e)';
+      case "w": 
+        return 'Woche(n)';
+      case "Y":
+        return 'Jahr(e)';
+    }
+    return "Monat(e)";
+  }
+
+  contract.prototype.getTerminationTypeFullString = function (projectConfig, noPeriod = false) {
+    var termination_type = (projectConfig.defaults && projectConfig.defaults.termination_type? projectConfig.defaults.termination_type:"T");
+    this.termination_type = (this.termination_type?this.termination_type:termination_type);
+    console.log("termination type: " + termination_type);
+    if (this.termination_type == "P") {
+      var termination_period = (projectConfig.defaults && projectConfig.defaults.termination_period? projectConfig.defaults.termination_period:6);
+      this.termination_period = (this.termination_period?this.termination_period:termination_period);
+      var termination_period_type = (projectConfig.defaults && projectConfig.defaults.termination_period_type? projectConfig.defaults.termination_period_type:"M");
+      this.termination_period_type = (this.termination_period_type?this.termination_period_type:termination_period_type);
+      return this.getTerminationTypeString() + " - " + this.termination_period + " " + this.getTerminationPeriodTypeString();
+    } else if (this.termination_type == "D") {
+      return this.getTerminationTypeString();
+    } else if (this.termination_type == "T") {
+      var termination_period = (projectConfig.defaults && projectConfig.defaults.termination_period? projectConfig.defaults.termination_period:6);
+      this.termination_period = (this.termination_period?this.termination_period:termination_period);
+      var termination_period_type = (projectConfig.defaults && projectConfig.defaults.termination_period_type? projectConfig.defaults.termination_period_type:"M");
+      this.termination_period_type = (this.termination_period_type?this.termination_period_type:termination_period_type);
+      return this.getTerminationTypeString() + (noPeriod?"":" - " + this.termination_period + " " + this.getTerminationPeriodTypeString());
+    }    
+  }
+
+
+  contract.prototype.getPaybackDate = function (projectConfig) {
+    var termination_type = (projectConfig.defaults && projectConfig.defaults.termination_type? projectConfig.defaults.termination_type:"T");
+    this.termination_type = (this.termination_type?this.termination_type:termination_type);
+    if (this.termination_type == "P") {
+      var termination_period = (projectConfig.defaults && projectConfig.defaults.termination_period? projectConfig.defaults.termination_period:6);
+      this.termination_period = (this.termination_period?this.termination_period:termination_period);
+      var termination_period_type = (projectConfig.defaults && projectConfig.defaults.termination_period_type? projectConfig.defaults.termination_period_type:"M");
+      this.termination_period_type = (this.termination_period_type?this.termination_period_type:termination_period_type);
+      return moment(this.sign_date).add(this.termination_period, this.termination_period_type);
+    } else if (this.termination_type == "D") {
+      return moment(this.termination_date); 
+    } else if (this.termination_type == "T") {
+      if (this.termination_date) {
+        var termination_period = (projectConfig.defaults && projectConfig.defaults.termination_period? projectConfig.defaults.termination_period:6);
+        this.termination_period = (this.termination_period?this.termination_period:termination_period);
+        var termination_period_type = (projectConfig.defaults && projectConfig.defaults.termination_period_type? projectConfig.defaults.termination_period_type:"M");
+        this.termination_period_type = (this.termination_period_type?this.termination_period_type:termination_period_type);
+        console.log("DATE: " +moment(this.termination_date).add(this.termination_period, this.termination_period_type));
+        return moment(this.termination_date).add(this.termination_period, this.termination_period_type);
+      } else {
+        return null;
+      }      
+    }    
+  }  
 
   contract.prototype.calculateInterest = function (project) {
 			var interest = {"now": 0.00, "last_year": 0.00, "termination": 0.00};
@@ -112,7 +191,7 @@ module.exports = (sequelize, DataTypes) => {
 		}
 
 	contract.prototype.getStatus = function () {
-		return this.termination_date? "Gekündigt" : "Laufend";
+		return this.isTerminated(moment())? "Zurückbezahlt" : (this.transactions.length == 0 ? "Noch nicht eingezahlt":"Laufend");
 	}
 
 	contract.prototype.getStatusText = () => {
@@ -156,7 +235,7 @@ module.exports = (sequelize, DataTypes) => {
     }      
   }
 
-  contract.prototype.isCancelledAndNotRepaid = function (date) {
+  contract.prototype.isCancelledAndNotRepaid = function (projectConfig, date) {
     // check if all money was paid back until given date      
     var sum = 0;
     var count = 0;
@@ -170,7 +249,13 @@ module.exports = (sequelize, DataTypes) => {
     });
     var cancelled = sum > 0 && this.termination_date != null;
     //console.log('cancelled: ' + cancelled + ', sum: ' + sum + ', count: ' + count + ', term date: ' + this.termination_date + ', userid: ' + this.user_id);
-    return sum > 0 && this.termination_date != null;
+    var termination_type = projectConfig.defaults && projectConfig.defaults.termination_type?projectConfig.defaults.termination_type:"T";
+    var termination_type = this.termination_type?this.termination_type:termination_type;
+    var terminated = false;
+    if (this.termination_date || termination_type == "P" || termination_type == "D") {
+      terminated = true;
+    }
+    return sum > 0 && terminated;
   }
 
   return contract;

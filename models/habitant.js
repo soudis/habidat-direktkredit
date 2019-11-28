@@ -22,7 +22,7 @@ module.exports = (sequelize, DataTypes) => {
     fixed_to_flat: {
         type: DataTypes.INTEGER(11),
         allowNull: true,
-        references: {
+        references: { 
           model: 'flat',
           key: 'id'
         }

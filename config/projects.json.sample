@@ -12,5 +12,10 @@
             "password": "$HABIDAT_DK_DB_PASSWORD",
             "database": "$HABIDAT_DK_DB_DATABASE"
         }
+        "defaults": {
+            "termination_type": "T",
+            "termination_period": "6",
+            "termination_period_type": "M"
+        }
     }
 }

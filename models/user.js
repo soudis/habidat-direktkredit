@@ -1,5 +1,6 @@
 var moment = require('moment');
 var Op = require("sequelize").Op;
+var projects    = require('../config/projects.json');
 
 
 module.exports = (sequelize, DataTypes) => {
@@ -166,25 +167,6 @@ module.exports = (sequelize, DataTypes) => {
     });
   }
 
-  User.aboutToExpire = function (models, whereClause, daysToExpire, callback) {
-    var expires = false;
-    var usersExpired = [];
-    models.user.findFetchFull(models, whereClause, function(users){
-      users.forEach(function(user){
-        user.contracts.forEach(function(contract){
-          if (!contract.isTerminated() && moment(contract.sign_date).add( daysToExpire + contract.period*365, 'days').diff(moment()) <= 0) {
-            expires = true;
-          }
-        });
-        if (expires) {
-          usersExpired.push(user);
-        }
-        expires = false;
-      });
-      callback(usersExpired);  
-    });
-  }
-
   User.getUsers = function (models, mode, date, callback) {
     var activeUsers = [];
     models.user.findFetchFull(models, { administrator: {[Op.not]: '1'}}, function(users){
@@ -203,11 +185,14 @@ module.exports = (sequelize, DataTypes) => {
     models.user.findFetchFull(models, whereClause, function(users){
       users.forEach(function(user){
         user.contracts.forEach(function(contract){
-          if (contract.isCancelledAndNotRepaid(now)) {
+          if (contract.isCancelledAndNotRepaid(projects[project], now)) {
             var copiedUser = JSON.parse(JSON.stringify(user));
-            user.termination_date = contract.termination_date;
-            user.payback_amount = contract.getAmountToDate(project, now);
-            usersCancelled.push(user);
+            var projectConfig = projects[project];
+            copiedUser.payback_date = contract.getPaybackDate(projectConfig);
+            copiedUser.termination_type = contract.getTerminationTypeFullString(projectConfig);
+            copiedUser.payback_amount = contract.getAmountToDate(project, now);
+            copiedUser.contract_date = moment(contract.sign_date);
+            usersCancelled.push(copiedUser);
           }
         });
       });

@@ -29,28 +29,60 @@ module.exports = function(app){
 
 	router.post('/contract/add', security.isLoggedInAdmin, function(req, res) {		
 		var models  = require('../models')(req.session.project);
+		var termination_date = null;
+		if (req.body.termination_type == "T") {
+			termination_date = req.body.termination_date_T==""?null:moment(req.body.termination_date_T, "DD.MM.YYYY");
+		} else if (req.body.termination_type == "D") {
+			termination_date = req.body.termination_date_D==""?null:moment(req.body.termination_date_D, "DD.MM.YYYY");
+		}
+		var termination_period_type = null, termination_period = null;
+		if (req.body.termination_type == "T") {
+			termination_period_type = req.body.termination_period_type_T;
+			termination_period = req.body.termination_period_T;
+		} else if (req.body.termination_type == "P") {
+			termination_period_type = req.body.termination_period_type_P;
+			termination_period = req.body.termination_period_P;
+		}		
 		models.contract.create({
 			sign_date: moment(req.body.sign_date, 'DD.MM.YYYY'),
-			termination_date: req.body.termination_date===""?null:moment(req.body.termination_date, "DD.MM.YYYY"),
+			termination_date: termination_date,
+			termination_type: req.body.termination_type,
+			termination_period: termination_period,
+			termination_period_type: termination_period_type,
 			amount: req.body.amount,
 			interest_rate: req.body.interest_rate,
-			period: req.body.period===""?0:req.body.period,	
-			user_id: req.body.id,
+			user_id: req.body.user_id,
 			status: req.body.status,
 			notes: req.body.notes
 		}).then(function(user) {
-			res.redirect('/user/show/' + req.body.id);
+			res.redirect('/user/show/' + req.body.user_id);
 		});	
 	});
 	
 	router.post('/contract/edit', security.isLoggedInAdmin, function(req, res) {
 		var models  = require('../models')(req.session.project);
+		var termination_date = null;
+		if (req.body.termination_type == "T") {
+			termination_date = req.body.termination_date_T==""?null:moment(req.body.termination_date_T, "DD.MM.YYYY");
+		} else if (req.body.termination_type == "D") {
+			termination_date = req.body.termination_date_D==""?null:moment(req.body.termination_date_D, "DD.MM.YYYY");
+		}
+		var termination_period_type = null, termination_period = null;
+		if (req.body.termination_type == "T") {
+			termination_period_type = req.body.termination_period_type_T;
+			termination_period = req.body.termination_period_T;
+		} else if (req.body.termination_type == "P") {
+			termination_period_type = req.body.termination_period_type_P;
+			termination_period = req.body.termination_period_P;
+		}
 		models.contract.update({
 			sign_date: moment(req.body.sign_date, 'DD.MM.YYYY'),
-			termination_date: req.body.termination_date===""?null:moment(req.body.termination_date, "DD.MM.YYYY"),
+			termination_date: termination_date,
+			termination_type: req.body.termination_type,
+			termination_period: termination_period,
+			termination_period_type: termination_period_type,
 			amount: req.body.amount,
 			interest_rate: req.body.interest_rate,
-			period: req.body.period===""?0:req.body.period,	
 			status: req.body.status,
 			notes: req.body.notes
 		}, {where:{id:req.body.id}}).then(function(contract) {

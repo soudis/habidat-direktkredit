@@ -78,8 +78,10 @@ module.exports = function(app){
 					"interest_rate": format.formatNumber(contract.interest_rate,2),
 					"has_interest": contract.interest_rate > 0,
 					"contract_date": format.formatDate(contract.contract_date),
+					"termination_type": contract.termination_type,
 					"termination_date": format.formatDate(contract.termination_date),
-					"period": contract.period,
+					"termination_period": contract.termination_period,
+					"termination_period_type": contract.termination_period_type,
 					"notes": contract.notes,
 					"status": contract.status,
 					"transactionList": contract.transactions
