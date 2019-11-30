@@ -46,9 +46,11 @@ var createdb = function(project) {
               .then((count) => {
                 if (count == 0) {
                   var password = process.env["HABIDAT_DK_ADMIN_PASSWORD"];
+                  var username = process.env["HABIDAT_DK_ADMIN_USERNAME"] || 'admin';
+
                   console.log("Create admin account...");
                   return model.create({
-                    logon_id: 'admin',
+                    logon_id: username,
                     password: password,
                     administrator:true,
                     ldap: false                

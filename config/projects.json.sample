@@ -11,7 +11,7 @@
             "username": "$HABIDAT_DK_DB_USER",
             "password": "$HABIDAT_DK_DB_PASSWORD",
             "database": "$HABIDAT_DK_DB_DATABASE"
-        }
+        },
         "defaults": {
             "termination_type": "T",
             "termination_period": "6",

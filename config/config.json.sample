@@ -3,7 +3,7 @@
 		"host": "$HABIDAT_DK_DB_HOST",
 		"dialect": "mysql"
 	},
-  	"adminauth": "ldap", 
+  	"adminauth": "$HABIDAT_DK_ADMIN_AUTH", 
 	"ldap": {
 	    "server":  {
 	        "url": "ldap://$HABIDAT_DK_LDAP_HOST:$HABIDAT_DK_LDAP_PORT",

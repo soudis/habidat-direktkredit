@@ -4,6 +4,7 @@ ENV HABIDAT_DK_PROJECT_ID project
 ENV HABIDAT_DK_PROJECT_NAME Projectname
 ENV HABIDAT_LOGO logo.gif
 ENV HABIDAT_ADMIN_EMAIL admin@example.com
+ENV HABIDAT_DK_ADMIN_USERNAME admin
 ENV HABIDAT_DK_ADMIN_PASSWORD secret
 ENV HABIDAT_DK_DB_USER project
 ENV HABIDAT_DK_DB_PASSWORD secret
@@ -15,7 +16,13 @@ ENV HABIDAT_DK_LDAP_BINDDN cn=ldap-read,dc=example,dc=com
 ENV HABIDAT_DK_LDAP_PASSWORD secret
 ENV HABIDAT_DK_LDAP_BASE dc=example,dc=com
 ENV HABIDAT_DK_LDAP_SEARCHFILTER (cn={{username}})
-
+ENV HABIDAT_DK_ADMIN_AUTH ldap
+ENV HABIDAT_DK_PORT_HTTP 8020
+ENV HABIDAT_DK_HTTPS false
+ENV HABIDAT_DK_PORT_HTTPS 8010
+ENV HABIDAT_DK_SSL_CERT config/certificate.pem
+ENV HABIDAT_DK_SSL_KEY config/key.pem
+  
 RUN \
   apt-get update \
   && apt-get -y install gettext-base unoconv \

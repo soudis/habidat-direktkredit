@@ -1,9 +1,9 @@
 {
   "http": "true",
-  "https": "false",
-  "sslcert": "config/certificate.pem",
-  "sslkey": "config/key.pem",
-  "porthttps": 8010,
-  "porthttp": 8020,
+  "https": "$HABIDAT_DK_HTTPS",
+  "sslcert": "$HABIDAT_DK_SSL_CERT",
+  "sslkey": "$HABIDAT_DK_SSL_KEY",
+  "porthttps": "$HABIDAT_DK_PORT_HTTPS",
+  "porthttp": "$HABIDAT_DK_PORT_HTTP",
   "reverseproxy": "false"
 }

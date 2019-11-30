@@ -11,6 +11,7 @@ upload
 templates
 public/files
 public/images
+docker-compose.yml
 
 # Compiled source #
 ###################

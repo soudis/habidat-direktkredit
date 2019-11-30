@@ -141,12 +141,12 @@ module.exports = app;
 	  var credentials = {key: privateKey, cert: certificate};		
 	  console.log("starting https server on: " + site.porthttps.toString());	
 	  var httpsServer = https.createServer(credentials, app);
-	  httpsServer.listen(site.porthttps);
+	  httpsServer.listen(parseInt(site.porthttps));
 	}
 	if (site.http === "true") {
 	  console.log("starting http server on: " + site.porthttp.toString());
 	  var httpServer = http.createServer(app);
-	  httpServer.listen(site.porthttp);
+	  httpServer.listen(parseInt(site.porthttp));
 	}
 //	});
 }catch(e) {

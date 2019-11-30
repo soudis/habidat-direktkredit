@@ -9,6 +9,14 @@ module.exports = (sequelize, DataTypes) => {
         primaryKey: true,
         autoIncrement: true
       },
+      user_id: {
+        type: DataTypes.INTEGER(11),
+        allowNull: false,
+        references: {
+          model: 'user',
+          key: 'id'
+        }
+      },      
       sign_date: {
         type: DataTypes.DATE,
         allowNull: true

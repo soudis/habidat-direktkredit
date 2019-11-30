@@ -1,0 +1,78 @@
+version: '2'
+
+volumes:
+  db:
+  config:
+  files:
+  upload:
+  images:    
+
+services:
+
+  # Database
+  #
+  # mysql instances
+  #
+  db:
+    image: mariadb
+    restart: always
+    volumes:
+      - db:/var/lib/mysql
+    environment:
+      # please change:
+      - MYSQL_ROOT_PASSWORD=secret
+      - MYSQL_PASSWORD=secret
+      # no need to change for default setup:
+      - MYSQL_DATABASE=direktkredit
+      - MYSQL_USER=direktkredit
+    logging:
+      options:
+        max-size: 50m      
+
+  # Web app
+  #
+  # NodeJS Web App
+  #
+  web:
+    image: habidat/direktkredit
+    restart: always
+    volumes:
+      - config:/habidat/config
+      - files:/habidat/public/files
+      - images:/habidat/public/images
+      - upload:/habidat/upload     
+    environment:
+      # please change:
+      - HABIDAT_DK_PROJECT_ID=project
+      - HABIDAT_DK_PROJECT_NAME=Projectname
+      - HABIDAT_LOGO=logo.gif
+      - HABIDAT_ADMIN_EMAIL=admin@example.com
+      - HABIDAT_DK_ADMIN_USERNAME=admin
+      - HABIDAT_DK_ADMIN_PASSWORD=secret
+      - HABIDAT_DK_DB_PASSWORD=secret
+      # no need to change for default setup:
+      - HABIDAT_DK_DB_USER=direktkredit
+      - HABIDAT_DK_DB_DATABASE=direktkredit
+      - HABIDAT_DK_DB_HOST=db
+      - HABIDAT_DK_ADMIN_AUTH=local
+      - HABIDAT_DK_LDAP_HOST=ldap
+      - HABIDAT_DK_LDAP_PORT=389
+      - HABIDAT_DK_LDAP_BINDDN=cn=ldap-read,dc=example,dc=com
+      - HABIDAT_DK_LDAP_PASSWORD=secret
+      - HABIDAT_DK_LDAP_BASE=dc=example,dc=com
+      - HABIDAT_DK_LDAP_SEARCHFILTER=(cn={{username}})
+      - HABIDAT_DK_PORT_HTTP=8020
+      # change if you need https:
+      - HABIDAT_DK_HTTPS=false
+      - HABIDAT_DK_PORT_HTTPS=8010
+      - HABIDAT_DK_SSL_CERT=config/certificate.pem
+      - HABIDAT_DK_SSL_KEY=config/key.pem      
+    depends_on:
+      - db
+    links:
+      - db
+    ports:
+      - 8020:8020
+    logging:
+      options:
+        max-size: 50m    
