@@ -228,11 +228,11 @@ module.exports = (sequelize, DataTypes) => {
 		});
 	}
 
-  contract.prototype.getAmountToDate = function (project, date) {    
+  contract.prototype.getAmountToDate = function (project, date, currentTransactionId) {    
     var sum = 0;
     var contract = this;
     this.transactions.forEach(function(transaction) {
-      if (moment(date).diff(transaction.transaction_date) >= 0) {
+      if (moment(date).diff(transaction.transaction_date) >= 0 && transaction.id != currentTransactionId) {        
         sum += transaction.amount + transaction.interestToDate(project, contract.interest_rate, date);
       }
     });
