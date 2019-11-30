@@ -41,12 +41,8 @@ block admin-content
           - aggregate = user.getAggregateNumbers(projectid)
         tr
           td= user.id 
-          if (user.last_name)
-            td= user.last_name + ", " + user.first_name
-          else
-            td= user.first_name
-          td 
-            | #{user.street} <br /> #{user.country}-#{user.zip} #{user.place}
+          td=user.getFullName()
+          td!=user.getAddress(true)
           if (!noAggregation)
             td.text-center #[font(data-toggle="tooltip" title="Anzahl der Verträge")= aggregate.contracts] 
             td.text-center #[font(data-toggle="tooltip" title="Vertragssumme") #{sprintf('%.2f', aggregate.contractAmount)}]  

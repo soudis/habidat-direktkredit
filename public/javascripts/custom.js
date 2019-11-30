@@ -5,7 +5,25 @@
     $('#termination_type_input').on('change', function() {
       $(".termination-type-group").addClass("hidden");
       $("#termination_type_"+$(this).val()).removeClass("hidden");
+      $(".termination-type-input").attr('required', false);
+      $(".termination-type-input-"+$(this).val()).attr('required', true);
     });
+
+    $('#transaction_type').on('change', function() {
+      var transactionsAmount = parseFloat($('#transaction_amount').attr('transactions-amount'));
+      var amountToDate =Math.ceil(parseFloat($('#transaction_amount').attr('amount-to-date'))*100)/100;
+      var contractAmount = parseFloat($('#transaction_amount').attr('contract-amount'));
+      if ($(this).val() == 'initial' || $(this).val() == 'deposit') {
+        $('#transaction_amount').attr('min', '0.01');
+        $('#transaction_amount').attr('max', contractAmount-transactionsAmount);
+      } else {
+        $('#transaction_amount').attr('max', '-0.01');
+        $('#transaction_amount').attr('min', '-'+amountToDate);
+      }
+    });
+
+    $('#termination_type_input').change();
+    $('#transaction_type').change();
         
 
      var dynamicColors = function() {

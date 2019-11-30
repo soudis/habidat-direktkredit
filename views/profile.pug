@@ -14,10 +14,10 @@ block content
       h3 Stammdaten
     .row
       .col-md-4 Name:
-      .col-md-8= user.first_name + ' ' + user.last_name 
+      .col-md-8= user.getFullName()
     .row
       .col-md-4 Adresse:
-      .col-md-8= user.street + ', ' + user.zip + ' ' + user.place 
+      .col-md-8!= user.getAddress(true)
     .row
       .col-md-4 Telefonnummer:
       .col-md-8= user.telno

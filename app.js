@@ -45,6 +45,7 @@ var app = express();
 app.use((req, res, next) => {
   if (req.session && req.session.project) {
     res.locals.project = projects[req.session.project];
+    res.locals.projectId = req.session.project;
   }
   res.locals.moment = require('moment');
   res.locals.format = require('./utils/format');

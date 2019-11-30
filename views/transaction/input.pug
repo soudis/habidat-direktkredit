@@ -9,14 +9,14 @@ mixin transaction_input(action, user, contract, transaction)
       .col-md-3
         .input-group.date.datepicker(data-provide="datepicker" data-date-format="dd.mm.yyyy" data-date-language="de")
           if transaction && transaction.transaction_date
-            input.form-control(type="text" name="transaction_date" value=moment(transaction.transaction_date).format('DD.MM.YYYY'))
+            input.form-control(type="text" name="transaction_date" value=moment(transaction.transaction_date).format('DD.MM.YYYY') required)
           else 
-            input.form-control(type="text" name="transaction_date")
+            input.form-control(type="text" name="transaction_date" required)
           span.input-group-addon
             span.glyphicon.glyphicon-calendar
       label.control-label.col-md-1 Art
       .col-md-3
-        select.form-control(name="type")
+        select.form-control(name="type" id="transaction_type" required)
           option(selected=transaction && transaction.type == 'initial' value='initial') Einzahlung
           option(selected=transaction && transaction.type == 'deposit' value='deposit') Zusatzzahlung
           option(selected=transaction && transaction.type == 'withdrawal' value='withdrawal') Teilauszahlung
@@ -24,6 +24,6 @@ mixin transaction_input(action, user, contract, transaction)
           option(selected=transaction && transaction.type == 'notreclaimed' value='notreclaimed') Nicht rückgefordert
       label.control-label.col-md-1 Betrag
       .col-md-3
-        input.form-control(type="number" step="0.01" name="amount" value=transaction ? transaction.amount : "")
+        input.form-control(id="transaction_amount" type="number" step="0.01" name="amount" value=(transaction ? transaction.amount : "") contract-amount=contract.amount transactions-amount=contract.getTransactionsAmount() amount-to-date=contract.getAmountToDate(projectId, moment()) required) 
     .text-right
       button(type='submit' class='btn btn-primary') Speichern

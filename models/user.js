@@ -200,6 +200,44 @@ module.exports = (sequelize, DataTypes) => {
     });
   }
 
+  User.prototype.getAddress = function (lineBreak=false) {
+    var address = "";
+    if (this.street) {
+      address += this.street;
+      if (lineBreak) {
+        address += "</br>";
+      } else {
+         address+= ", ";
+      }
+    }
+    if (this.country) {
+      address += this.country;
+      if (this.zip) {
+        address += "-"
+      }
+    }
+    if (this.zip) {
+      address += this.zip
+    }
+    if (this.place) {
+      if (address != "") {
+        address += " ";
+      } 
+      address += this.place      
+    }
+    return address;
+  }
+
+  User.prototype.getFullName = function () {
+    var name = this.first_name;
+    if (this.last_name) {
+      name += " " + this.last_name;
+    }
+    return name;
+  }
+
+
+
 
   User.prototype.hasNotTerminatedContracts = function (date) {
     var notTerminated = false;

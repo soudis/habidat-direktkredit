@@ -63,6 +63,9 @@ each contract in user.contracts
         .col-md-3 Zinsertrag bis Kündigungsdatum:
         .col-md-9= format.formatMoney(interest.termination) 
     .row 
+      .col-md-3 Aushaftender Betrag (heute):
+      .col-md-9= format.formatMoney(contract.getAmountToDate(projectId, moment()))        
+    .row 
       .col-md-3 Vertragsstatus:
       .col-md-9 #{contract.getStatusText()} 
     .row 

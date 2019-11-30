@@ -20,10 +20,10 @@
             a(href='/docx/'+user.id+'?file=userdata_wo_contract') Dankesschreiben (ohne Vertrag) 
 .row
   .col-md-3.h4 Name:
-  .col-md-8.h4= user.first_name + ' ' + user.last_name 
+  .col-md-8.h4= user.getFullName()
 .row
   .col-md-3.h4 Adresse:
-  .col-md-8.h4= user.street + ', ' + user.country + "-" + user.zip + ' ' + user.place 
+  .col-md-8.h4!= user.getAddress(true)
 .row
   .col-md-3.h4 Telefonnummer:
   .col-md-8.h4= user.telno

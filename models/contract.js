@@ -235,6 +235,15 @@ module.exports = (sequelize, DataTypes) => {
     }      
   }
 
+  contract.prototype.getTransactionsAmount = function () {    
+    var sum = 0;
+    var contract = this;
+    this.transactions.forEach(function(transaction) {
+      sum += transaction.amount;
+    });
+    return sum;
+  }
+
   contract.prototype.isCancelledAndNotRepaid = function (projectConfig, date) {
     // check if all money was paid back until given date      
     var sum = 0;
