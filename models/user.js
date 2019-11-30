@@ -1,6 +1,7 @@
 var moment = require('moment');
 var Op = require("sequelize").Op;
 var projects    = require('../config/projects.json');
+var clonedeep = require('lodash.clonedeep');
 
 
 module.exports = (sequelize, DataTypes) => {
@@ -186,7 +187,7 @@ module.exports = (sequelize, DataTypes) => {
       users.forEach(function(user){
         user.contracts.forEach(function(contract){
           if (contract.isCancelledAndNotRepaid(projects[project], now)) {
-            var copiedUser = JSON.parse(JSON.stringify(user));
+            var copiedUser = clonedeep(user);
             var projectConfig = projects[project];
             copiedUser.payback_date = contract.getPaybackDate(projectConfig);
             copiedUser.termination_type = contract.getTerminationTypeFullString(projectConfig);
