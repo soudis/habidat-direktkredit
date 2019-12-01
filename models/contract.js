@@ -202,7 +202,7 @@ module.exports = (sequelize, DataTypes) => {
 		return this.isTerminated(moment())? "Zurückbezahlt" : (this.transactions.length == 0 ? "Noch nicht eingezahlt":"Laufend");
 	}
 
-	contract.prototype.getStatusText = () => {
+	contract.prototype.getStatusText = function() {
 		switch(this.status) {
   		case "unknown": 
   			return 'Noch kein Vertrag';
