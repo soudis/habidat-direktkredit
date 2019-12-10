@@ -2,6 +2,17 @@
 
 This app allows to manage direct loans from private persons to a project. In particular a habiTAT (Austrian housing syndicate) project. 
 
+## Features
+
+- Manage contacts, contracts and transaction with input validation to minimize human errors
+- Different forms of loans (cancellation period, duration, end date)
+- Multiagent (manage different projects / loan takers with 1 installation)
+- Automatic interest calculation with different interest calculation methods
+- Export of yearly summary for accounting
+- Generate fully customizable documents for lenders (supports office document templates)
+- Loan statistics including payback management and German legal limits (Bagatellgrenze)
+- Procrastination support
+
 ## Usage
 
 Either clone repository or build Dockerfile. Create 
