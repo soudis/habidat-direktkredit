@@ -17,7 +17,7 @@ module.exports = function(app){
 	
 	router.get('/file/get/:id', security.isLoggedInAdmin, function(req, res, next) {
 		var models  = require('../models')(req.session.project);
-		models.file.findById(req.params.id).then(function(file) {
+		models.file.findByPk(req.params.id).then(function(file) {
 			var fileData = fs.readFileSync(file.path, 'binary');
 
 			res.setHeader('Content-Length', fileData.length);
@@ -30,7 +30,7 @@ module.exports = function(app){
 
 	router.get('/file/getpublic/:id', security.isLoggedIn, function(req, res, next) {
 		var models  = require('../models')(req.session.project);
-		models.file.findById(req.params.id).then(function(file) {
+		models.file.findByPk(req.params.id).then(function(file) {
 			if (file.ref_table.startsWith("infopack_")) {
 				var fileData = fs.readFileSync(file.path, 'binary');
 
@@ -49,7 +49,7 @@ module.exports = function(app){
 	router.get('/file/delete/:id', security.isLoggedInAdmin, function(req, res, next) {
 		
 		var models  = require('../models')(req.session.project);
-		models.file.findById(req.params.id).then(function(file) {
+		models.file.findByPk(req.params.id).then(function(file) {
 			if (file.ref_table) {
 				fs.unlinkSync(file.path);  
 				file.destroy();
