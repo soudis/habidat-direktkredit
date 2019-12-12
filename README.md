@@ -44,6 +44,9 @@ in config folder. Run app.js or run docker container.
 
 It's recommended to use a revery proxy such as apache or nginx on your web server.
 
+## Document templates
+
+You can generate custom documents within the app. Go to "Administration / Vorlagen" to upload new templates. The fields you can use are listed on the upload page and you can find examples here in the respository under "template samples".
 
 ## Developing
 

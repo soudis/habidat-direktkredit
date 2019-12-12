@@ -31,7 +31,8 @@ RUN \
 
 ADD . /habidat
 
-RUN mkdir -p /habidat/public/images
+RUN mkdir -p /habidat/public/images \
+    && rm -r "/habidat/template samples"
 
 WORKDIR /habidat
 RUN npm install && npm install pm2 -g
