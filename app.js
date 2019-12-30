@@ -40,6 +40,26 @@ var FileStore = require('session-file-store')(session);
 
 var app = express();
 
+const umlautMap = {
+  '\u00dc': 'UE',
+  '\u00c4': 'AE',
+  '\u00d6': 'OE',
+  '\u00fc': 'ue',
+  '\u00e4': 'ae',
+  '\u00f6': 'oe',
+  '\u00df': 'ss',
+}
+
+var replaceUmlaute = function (str) {
+  return str
+    .replace(/[\u00dc|\u00c4|\u00d6][a-z]/g, (a) => {
+      const big = umlautMap[a.slice(0, 1)];
+      return big.charAt(0) + big.charAt(1).toLowerCase() + a.slice(1);
+    })
+    .replace(new RegExp('['+Object.keys(umlautMap).join('|')+']',"g"),
+      (a) => umlautMap[a]
+    );
+}
 
 
 app.use((req, res, next) => {
@@ -48,6 +68,7 @@ app.use((req, res, next) => {
     res.locals.projectId = req.session.project;
   }
   res.locals.moment = require('moment');
+  res.locals.replaceUmlaute = replaceUmlaute;
   res.locals.format = require('./utils/format');
   res.locals.sprintf = require('sprintf').sprintf;
   res.locals.site = site;  

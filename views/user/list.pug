@@ -41,7 +41,7 @@ block admin-content
           - aggregate = user.getAggregateNumbers(projectid)
         tr
           td= user.id 
-          td=user.getFullName()
+          td(data-order=replaceUmlaute(user.getFullName()))=user.getFullName()
           td!=user.getAddress(true)
           if (!noAggregation)
             td.text-center #[font(data-toggle="tooltip" title="Anzahl der Verträge")= aggregate.contracts] 
