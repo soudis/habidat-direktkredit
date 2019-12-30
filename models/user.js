@@ -232,7 +232,7 @@ module.exports = (sequelize, DataTypes) => {
   User.prototype.getFullName = function () {
     var name = this.first_name;
     if (this.last_name) {
-      name += " " + this.last_name;
+      name = this.last_name.toUpperCase() + " " + name;
     }
     return name;
   }

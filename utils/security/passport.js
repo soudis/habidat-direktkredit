@@ -49,7 +49,7 @@ module.exports = function(passport) {
             }
         } else if (sessionUser.project){   
            var models  = require('../../models')(sessionUser.project);         
-      	   models["user"].findById(sessionUser.id).then( function(user) {
+      	   models["user"].findByPk(sessionUser.id).then( function(user) {
              done(null, user);
            });
         } else {
