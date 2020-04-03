@@ -47,7 +47,7 @@ exports.getGermanContractsByYearAndInterestRate = function(models, callback) {
 	// find all german contracts (NOTE: distinction is just by
     // length of ZIP code > 4)
 	models.user.findAll({
-		  where: sequelize.where(sequelize.fn('char_length', sequelize.fn('trim', sequelize.col('zip'))), {[Op.gte]: 5}),
+		  where: { country: 'DE' },
 		  include:{
 				model: models.contract,
 				as: 'contracts',

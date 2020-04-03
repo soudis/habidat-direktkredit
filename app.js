@@ -15,6 +15,9 @@ var fs = require('fs');
 var multer = require('multer');
 var mkdirp = require('mkdirp');
 var numeral = require('numeral');
+const sass = require('node-sass-middleware');
+
+
 
 
 mkdirp('tmp', function(err) { });
@@ -40,6 +43,29 @@ var FileStore = require('session-file-store')(session);
 
 var app = express();
 
+app.use(sass({
+  src: path.join(__dirname, '/'),
+  dest: path.join(__dirname, '/'),
+  debug: true
+}));
+
+var oneDay = 86400000;
+
+app.use('/public', express.static(path.join(__dirname, 'public'),  { maxAge: oneDay }));
+app.use('/public/datatables', express.static(path.join(__dirname, 'node_modules/datatables.net-bs4/js'),  { maxAge: oneDay }));
+app.use('/public/datatables', express.static(path.join(__dirname, 'node_modules/datatables.net-bs4/css'),  { maxAge: oneDay }));
+app.use('/public/datatables', express.static(path.join(__dirname, 'node_modules/datatables.net/js'),  { maxAge: oneDay }));
+app.use('/public/bootstrap', express.static(path.join(__dirname, 'node_modules/bootstrap/dist/js'),  { maxAge: oneDay }));
+app.use('/public/jquery', express.static(path.join(__dirname, 'node_modules/jquery/dist'),  { maxAge: oneDay }));
+app.use('/public/moment', express.static(path.join(__dirname, 'node_modules/moment/min'),  { maxAge: oneDay }));
+app.use('/public/datepicker', express.static(path.join(__dirname, 'node_modules/bootstrap-datepicker/dist/js'),  { maxAge: oneDay }));
+app.use('/public/datepicker', express.static(path.join(__dirname, 'node_modules/bootstrap-datepicker/dist/css'),  { maxAge: oneDay }));
+app.use('/public/bootbox', express.static(path.join(__dirname, 'node_modules/bootbox/dist'),  { maxAge: oneDay }));
+app.use('/public/chart.js', express.static(path.join(__dirname, 'node_modules/chart.js/dist'),  { maxAge: oneDay }));
+app.use('/public/popper', express.static(path.join(__dirname, 'node_modules/@popperjs/core/dist/umd'),  { maxAge: oneDay }));
+app.use('/public/webfonts', express.static(path.join(__dirname, 'node_modules/@fortawesome/fontawesome-free/webfonts'), { maxAge: 31557600000 }));
+
+
 const umlautMap = {
   '\u00dc': 'UE',
   '\u00c4': 'AE',
@@ -62,18 +88,6 @@ var replaceUmlaute = function (str) {
 }
 
 
-app.use((req, res, next) => {
-  if (req.session && req.session.project) {
-    res.locals.project = projects[req.session.project];
-    res.locals.projectId = req.session.project;
-  }
-  res.locals.moment = require('moment');
-  res.locals.replaceUmlaute = replaceUmlaute;
-  res.locals.format = require('./utils/format');
-  res.locals.sprintf = require('sprintf').sprintf;
-  res.locals.site = site;  
-  next();
-});
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -92,9 +106,7 @@ app.use(cookieParser());
 app.use(multer({dest:'./upload/'}).single('file'));
 app.use(flash());
 
-var oneDay = 86400000;
 
-app.use('/public', express.static(__dirname + '/public/',  { maxAge: oneDay }));
 
 app.use(session({ 
   secret: 'klasjdf098034lja2309bdjkla789lsdfjsafd098',
@@ -104,9 +116,24 @@ app.use(session({
 app.use(passport.initialize());
 app.use(passport.session()); // persistent login sessions
 
+app.use((req, res, next) => {
+  if (req.session && req.session.project) {
+    res.locals.project = projects[req.session.project];
+    res.locals.projectId = req.session.project;
+  }
+  res.locals.moment = require('moment');
+  res.locals.replaceUmlaute = replaceUmlaute;
+  res.locals.format = require('./utils/format');
+  res.locals.sprintf = require('sprintf').sprintf;
+  res.locals.site = site;  
+  next();
+});
+
+
 app.use(function(req,res,next){
     res.locals.session = req.session;
     res.locals.config = config;
+    res.locals.user = req.user;
     if (req.session.project) {
     	res.locals.project = projects[req.session.project];
       res.locals.projectid = req.session.project;

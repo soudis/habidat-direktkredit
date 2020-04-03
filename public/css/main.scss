@@ -1,3 +1,15 @@
+$theme-colors: (
+  "primary": rgb(164, 0, 35)
+);
+
+
+@import "node_modules/bootstrap/scss/bootstrap";
+@import "node_modules/@fortawesome/fontawesome-free/scss/fontawesome";
+@import "node_modules/@fortawesome/fontawesome-free/scss/brands";
+@import "node_modules/@fortawesome/fontawesome-free/scss/regular";
+@import "node_modules/@fortawesome/fontawesome-free/scss/solid";
+
+
 body {
   
   font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
@@ -18,11 +30,11 @@ tr td.fit{
 }
 
 h3.underline {
-  border-bottom: 1px solid; 
+  border-bottom: 1px solid #aaa;
 }
 
 h4.underline {
-  border-bottom: 1px solid; 
+  border-bottom: 1px solid #aaa;
 }
 
 .navbar-default {
@@ -100,3 +112,72 @@ h4.underline {
     width: auto;
     box-shadow: none;
   }
+
+.datatable-button {
+  margin-right: 6px;
+}
+
+#root-container {
+  margin-top: 20px;
+}
+
+.jumbotron {
+
+    padding: 1.5rem 0rem;
+    margin-bottom: 2rem;
+    background-color: inherit;
+    border-radius: 0.3rem;
+    border-bottom: 1px dashed rgb(164, 0, 35);
+
+}
+
+.table th {
+    border-top: 0px;
+}
+
+.details-control:hover {
+  cursor: pointer;
+}
+
+.card-body .table td {
+    padding: 0.25rem;
+    vertical-align: middle;
+    border-top: 1px solid #dee2e6;
+}
+
+.card-body .table tbody tr:first-child td {
+  border-top: 0px;
+}
+
+.card-body table {
+  margin-bottom: 0px;
+}
+
+.card {
+  margin-bottom: 20px;
+}
+
+tr.margin {
+  margin-top: 10px;
+}
+
+.card .card {
+    border: 1px solid rgba(0, 0, 0, 0.225);
+    box-shadow: 2px 4px 10px 4px rgba(0,0,0,0.1);
+}
+
+.btn-light {
+  background-color: inherit;
+}
+
+.section-title.h6 {
+  padding-top:8px;
+}
+
+.section-title.h5 {
+  padding-top:4px;
+}
+
+.section-actions {
+  white-space:nowrap;
+}

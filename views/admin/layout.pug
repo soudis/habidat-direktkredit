@@ -1,21 +1,19 @@
 extends ../layout
 block content
   +nav(project.projectname + " Admin", "dropdown_menu", project.logo)
-    +nav_item( "/user/list" ) DK Liste
+    +nav_item( "/user/list" ) Direktkreditliste
     +nav_item_dropdown( "#" )(label="Auswertungen")
-     +nav_item( "/statistics/downloads" ) Downloads
-     +nav_item( "/statistics/numbers" ) Zahlen, Daten, Fakten
-     +nav_item( "/user/list/cancelled" ) Anstehende Rückzahlungen
-     +nav_item( "/statistics/german") Direktkredite aus Deutschland
-     +nav_item( "/mixer/main" ) Bewohner*innenmixer    
-    +nav_item( "/communication/main" ) Kommunikation
+     +dd_item( "/statistics/downloads" ) Downloads
+     +dd_item( "/statistics/numbers" ) Zahlen, Daten, Fakten
+     +dd_item( "/user/list/cancelled" ) Anstehende Rückzahlungen
+     +dd_item( "/statistics/german") Direktkredite aus Deutschland
+     +dd_item( "/mixer/main" ) Bewohner*innenmixer    
     +nav_item_dropdown( "#" )(label="Administration")
-     +nav_item( "/admin/accounts" ) Admin Accounts
-     +nav_item( "/admin/templates" ) Vorlagen
-     +nav_item( "/admin/infopack" ) Unterlagen für DK-Geber*innen     
-    +nav_item( "/procrastinate") #[span.glyphicon.glyphicon-time]
-    +nav_item( "/logout" ) Abmelden
-  div(class="col-md-8 col-md-offset-2 col-xs-12")    
+     +dd_item( "/admin/accounts" ) Admin Accounts
+     +dd_item( "/admin/templates" ) Vorlagen
+     +dd_item( "/admin/infopack" ) Unterlagen für DK-Geber*innen     
+    +nav_item( "/procrastinate") #[span.fa.fa-clock]
+  .container-fluid(id="root-container" class="col-xl-8 col-xl-offset-2 col-lg-12")    
     if message && message != ""
       .row
         .col-md-12

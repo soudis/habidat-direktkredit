@@ -252,6 +252,28 @@ module.exports = (sequelize, DataTypes) => {
     return sum;
   }
 
+  contract.prototype.getDepositAmount = function () {    
+    var sum = 0;
+    var contract = this;
+    this.transactions.forEach(function(transaction) {
+      if (transaction.amount > 0) {
+        sum += transaction.amount;        
+      }
+    });
+    return sum;
+  }  
+
+  contract.prototype.getWithdrawalAmount = function () {    
+    var sum = 0;
+    var contract = this;
+    this.transactions.forEach(function(transaction) {
+      if (transaction.amount < 0) {
+        sum += transaction.amount;        
+      }
+    });
+    return sum;
+  }  
+
   contract.prototype.isCancelledAndNotRepaid = function (projectConfig, date) {
     // check if all money was paid back until given date      
     var sum = 0;

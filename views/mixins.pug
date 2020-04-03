@@ -1,29 +1,34 @@
 mixin nav(name, id, logo, style)
-    - var style = (typeof style === 'undefined') ? "default" : style
-    nav( role="navigation", class=["navbar", "navbar-" + style] )
-        .navbar-header
-            button.navbar-toggle.collapsed( type="button", data-toggle="collapse", data-target="#" + id, aria-expanded="false", aria-controls="navbar")
-                span.sr-only Toggle navigation
-                span.icon-bar
-                span.icon-bar
-                span.icon-bar
-            if logo
-              a.navbar-brand(href="#") #[img(height="25" src=logo)] &nbsp; #{name}
-            else 
-              a.navbar-brand(href="#")= name
- 
-        .collapse.navbar-collapse( id=id )
-            ul.nav.navbar-nav
-                block
+  .navbar.navbar-expand-lg.navbar-default
+      if logo
+        a.navbar-brand(href="#") #[img(height="25" src=logo)] &nbsp; #{name}
+      else 
+        a.navbar-brand(href="#")= name
+      button.navbar-toggler.collapsed( type="button", data-toggle="collapse", data-target="#" + id, aria-expanded="false", aria-controls="navbar")
+        span.sr-only Toggle navigation
+        span.navbar-toggler-icon
+      .collapse.navbar-collapse( id=id )
+          ul.nav.navbar-nav
+              block
+          ul.nav.navbar-nav.ml-auto
+            - console.log("user: " + JSON.stringify(user));
+            if (user)
+              li.nav-item: a.nav-link( href="/logout" ) Abmelden                          
+            else
+              li.nav-item: a.nav-link( href="/login" ) Anmelden
+
  
 mixin nav_item(href, active)
-    li(class=active): a( href=href )
+    li.nav-item(class=active): a.nav-link( href=href )
         block
+
+mixin dd_item(href, active)
+    a.dropdown-item(class=active href=href )
+        block        
  
 mixin nav_item_dropdown(href, active)
-    li(class=["dropdown", active])
-        a.dropdown-toggle( href=href, data-toggle="dropdown", role="button", aria-expanded="false" )= attributes.label
-            span.caret
+    li.nav-item.dropdown
+        a.nav-link.dropdown-toggle( href='#', data-toggle="dropdown", role="button", aria-expanded="false" )= attributes.label
         ul.dropdown-menu( role="menu" )
             block
  

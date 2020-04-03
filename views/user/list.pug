@@ -4,14 +4,17 @@ mixin status(tooltip, status)
   td.text-center(data-order=status)
     font(data-toggle="tooltip" title=tooltip)
       if status == 2
-        span.glyphicon.glyphicon-ok-sign.text-success
+        span.fa.fa-check-circle.text-success
       else if status == 0
-        span.glyphicon.glyphicon-minus-sign.text-danger
+        span.fa.fa-minus-circle.text-danger
       else if status == 1
-        span.glyphicon.glyphicon-question-sign.text-warning 
+        span.fa.fa-question-circle.text-warning 
 
 block admin-content
-  a.btn.btn-default.btn-sm(href='/user/add') Neue*r Direktkreditgeber*in
+  .d-none.datatable-buttons(for-id="datatable_length")
+    a.datatable-button.btn.btn-primary.btn-sm(href='/user/add')
+      span.fa.fa-plus 
+      span  Kreditgeber*in
   table.table.table-striped(id="datatable")
     thead
       tr
@@ -61,6 +64,6 @@ block admin-content
               else
                 td.text-center= user[field.key]
           td.fit
-              a.btn.btn-default.btn-sm(href='/user/show/'+user.id) #[span.glyphicon.glyphicon-search]
-              a.btn.btn-default.btn-sm(href='/user/edit/'+user.id) #[span.glyphicon.glyphicon-pencil]
+              a.btn.btn-light.btn-sm(href='/user/show/'+user.id) #[span.fa.fa-search]
+              a.btn.btn-light.btn-sm(href='/user/edit/'+user.id) #[span.fa.fa-edit]
               

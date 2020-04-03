@@ -7,10 +7,6 @@ var json2csv = require('json2csv');
 
 module.exports = function(app){
 	
-	router.get('/communication/main', security.isLoggedInAdmin, function(req, res) {
-		res.render('communication/main', { title: 'Kommunikation'});
-	});
-	
 	router.post('/communication/email', security.isLoggedInAdmin, function(req, res) {
 		communication.getEmails(req.body.mode, req.session.project, function(emails) {
 			res.setHeader('Content-Length', emails.length);

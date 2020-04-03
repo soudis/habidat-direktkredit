@@ -1,4 +1,4 @@
-FROM node:carbon
+FROM node:lts
 
 ENV HABIDAT_DK_PROJECT_ID project
 ENV HABIDAT_DK_PROJECT_NAME Projectname
