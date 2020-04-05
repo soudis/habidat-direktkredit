@@ -4,9 +4,10 @@
       h4.card-header 
         span Stammdaten 
         span.float-right
-         font.dropdown
-          | #[a.btn.btn-light.btn-sm(href='/user/edit/'+user.id) #[span.fa.fa-edit]]    
-          | #[a.btn.btn-light.btn-sm.confirm(data-link='/user/delete/'+user.id, data-confirmtext='Willst du Direktkreditgeber*in ' + user.first_name + ' ' + user.last_name  + ' wirklich löschen?') #[span.fa.fa-trash]]        
+          a.btn.btn-light.btn-sm.sidebar-action(href='/user/edit/'+user.id) 
+            span.fa.fa-edit
+          a.btn.btn-light.btn-sm.confirm-action(data-link='/user/delete/'+user.id, data-confirmtext='Willst du Direktkreditgeber*in ' + user.first_name + ' ' + user.last_name  + ' wirklich löschen?') 
+            span.fa.fa-trash
           if (templates_user && templates_user.length > 0)
             .btn-group.dropdown
               button.btn.btn-light.btn-sm.dropdown-toggle(id='userTemplateButton' type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false") 

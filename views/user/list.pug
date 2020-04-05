@@ -12,7 +12,7 @@ mixin status(tooltip, status)
 
 block admin-content
   .d-none.datatable-buttons(for-id="datatable_length")
-    a.datatable-button.btn.btn-primary.btn-sm(href='/user/add')
+    a.datatable-button.btn.btn-primary.btn-sm.sidebar-action(href='/user/add')
       span.fa.fa-plus 
       span  Kreditgeber*in
   table.table.table-striped(id="datatable")
@@ -65,5 +65,5 @@ block admin-content
                 td.text-center= user[field.key]
           td.fit
               a.btn.btn-light.btn-sm(href='/user/show/'+user.id) #[span.fa.fa-search]
-              a.btn.btn-light.btn-sm(href='/user/edit/'+user.id) #[span.fa.fa-edit]
+              a.btn.btn-light.btn-sm.sidebar-action(href='/user/edit/'+user.id) #[span.fa.fa-edit]
               

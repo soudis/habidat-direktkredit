@@ -11,11 +11,16 @@ mixin nav(name, id, logo, style)
           ul.nav.navbar-nav
               block
           ul.nav.navbar-nav.ml-auto
-            - console.log("user: " + JSON.stringify(user));
             if (user)
-              li.nav-item: a.nav-link( href="/logout" ) Abmelden                          
+              li.nav-item
+                a.nav-link( href="/logout" ) 
+                  span.fa.fa-sign-out-alt
+                  span  Abmelden                          
             else
-              li.nav-item: a.nav-link( href="/login" ) Anmelden
+              li.nav-item
+                a.nav-link( href="/login" ) 
+                  span.fa.fa-sign-in-alt
+                  span  Anmelden                 
 
  
 mixin nav_item(href, active)
@@ -28,7 +33,11 @@ mixin dd_item(href, active)
  
 mixin nav_item_dropdown(href, active)
     li.nav-item.dropdown
-        a.nav-link.dropdown-toggle( href='#', data-toggle="dropdown", role="button", aria-expanded="false" )= attributes.label
+        a.nav-link.dropdown-toggle( href='#', data-toggle="dropdown", role="button", aria-expanded="false" )
+          if (attributes.icon)
+            span.fa(class=attributes.icon)
+            span  
+          span= attributes.label
         ul.dropdown-menu( role="menu" )
             block
  
@@ -47,5 +56,5 @@ mixin logon_form(action)
     .form-group
       label Passwort
       input(type="password" class="form-control" name="password")
-    button(type='submit' class='btn btn-warning btn-lg') Einloggen
+    button(type='submit' class='btn btn-primary btn-lg') Einloggen
         

@@ -8,30 +8,14 @@ var converter = require('office-converter')();
 
 var json2csv = require('json2csv');
 
-exports.getUserTemplates = function(models, callback){
-	models.file.findAll({
-		where: {
-			ref_table: "template_user"
-		}
-	}).then(function(templates) {
-		callback(templates);
-	}).catch(() => {
-		callback([]);
-	});	
-};
 
-exports.getContractTemplates = function(models, callback){
-	models.file.findAll({
-		where: {
-			ref_table: "template_contract"
-		}
-	}).then(function(templates) {
-		callback(templates);
-	}).catch(() => {
-		callback([]);
-	});	
-};
-
+exports.render = (req, res, template, data, title = undefined) => {
+	return Promise.resolve()
+		.then(() => {
+			data.title = title;
+			res.render(template, data);
+		})
+}
 
 exports.generateDocx = function(templateFile, outputFile, data, project){
 	var path = templateFile;

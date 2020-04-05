@@ -140,7 +140,7 @@ h4.underline {
 }
 
 .card-body .table td {
-    padding: 0.25rem;
+    padding: 0.25rem 0.75rem 0.25rem 0.75rem;
     vertical-align: middle;
     border-top: 1px solid #dee2e6;
 }
@@ -180,4 +180,65 @@ tr.margin {
 
 .section-actions {
   white-space:nowrap;
+}
+
+
+
+#sidebar {
+  box-shadow: 2px 4px 10px 4px rgba(0,0,0,0.1);
+  height: 100%; /* 100% Full-height */
+  position: fixed; /* Stay in place */
+  z-index: 100; /* Stay on top */
+  top: 0; /* Stay at the top */
+  right: -100%;
+  background-color: #fff; /* Black*/
+  overflow-x: hidden; /* Disable horizontal scroll */
+  padding-top: 30px; /* Place content 60px from the top */
+    -webkit-animation: slide 0.5s forwards;
+    animation: slide 0.5s forwards;
+  padding-left: 30px;
+  padding-right: 30px;
+}
+
+#sidebar legend {
+  margin-bottom: 30px;
+}
+
+
+
+@-webkit-keyframes slide {
+    100% { right: 0; }
+}
+
+@keyframes slide {
+    100% { right: 0; }
+}
+
+.btn-light span.fa {
+  color: rgb(164, 0, 35);
+}
+
+.project-card {
+  
+}
+
+.project-card .card-title {
+  margin-bottom: 0px;
+  color: black; 
+}
+
+.project-card {
+    box-shadow: 2px 4px 10px 4px rgba(0,0,0,0.1);
+}
+
+.project-card .card-img-top {
+  margin-top: 0.6rem;
+}
+
+.project-card:hover {
+    box-shadow: 2px 4px 10px 4px rgba(164, 0, 35,0.3);
+}
+
+a.project-link:hover {
+    text-decoration: none;
 }

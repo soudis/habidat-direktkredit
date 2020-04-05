@@ -1,6 +1,2 @@
-extends ../admin/layout
-
-block admin-content
-  include ../user/show_user 
-  include ./show_contracts 
-  include ./contract_form
+include ./form
++contract_form("Direktkredit Hinzufügen", "/contract/add", "append", "contracts_container", false)

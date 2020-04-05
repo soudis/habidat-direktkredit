@@ -1,0 +1,54 @@
+include ../country
+mixin user_form(formTitle, action, user)
+  form.form-horizontal(action=action method="post" role="form")
+    input(type="hidden" name="id" value=user.id)
+    legend= formTitle
+    .form-row
+      .form-group.col-md-6
+        label.control-label(for="first_name") Vorname
+        input.form-control(type="text" id="first_name" name="first_name" value=user.first_name required)
+      form-group.col-md-6
+        label.control-label(for="last_name") Nachname
+        input.form-control(type="text" id="last_name" name="last_name" value=user.last_name) 
+    .form-row
+      .form-group.col-md-12
+        label.control-label Strasse
+        input.form-control(type="text" name="street" value=user.street)
+    .form-row
+      .form-group.col-md-3
+        label.control-label PLZ      
+        input.form-control(type="text" name="zip" value=user.zip)    
+      .form-group.col-md-9
+        label.control-label Ort
+        input.form-control(type="text" name="place" value=user.place)    
+    .form-row
+      .form-group.col-md-12
+        label.control-label Land
+        select.form-control(name="country")            
+          +country_select_options(user.country)            
+    .form-group
+      label.control-label Telefonnummer
+      input.form-control(type="text" name="telno" value=user.telno)         
+    .form-group
+      label.control-label E-Mail
+      input.form-control(type="text" name="email" value=user.email)                                   
+    .form-group
+      label.control-label IBAN
+      input.form-control(type="text" name="IBAN" value=user.IBAN)         
+    .form-group
+      label.control-label BIC
+      input.form-control(type="text" name="BIC" value=user.BIC)
+    .form-row
+      .form-group.col-md-12
+        label.control-label Beziehung zum Projekt
+        select.form-control(name="relationship")
+          option(selected=user && user.relationship == 'Unbekannt' value='Unbekannt') Unbekannt
+          option(selected=user && user.relationship == 'Bewohner_innen' value='Bewohner_innen') Bewohner_innen
+          option(selected=user && user.relationship == 'Nutzer_innen' value='Nutzer_innen') Nutzer_innen
+          option(selected=user && user.relationship == 'Verwandte' value='Verwandte') Verwandte
+          option(selected=user && user.relationship == 'Freund_innen' value='Freund_innen') Freund_innen
+          option(selected=user && user.relationship == 'Bekannte' value='Bekannte') Bekannte
+          option(selected=user && user.relationship == 'MHS' value='MHS') Mietshäusersyndikat
+          option(selected=user && user.relationship == 'habiTAT' value='habiTAT') habiTAT            
+    .text-right
+      button(type='submit' class='btn btn-primary') Speichern

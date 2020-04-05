@@ -1,6 +1,2 @@
-extends ../admin/layout
-
-block admin-content
-  include ../user/show_user 
-  include ./show_contracts 
-
+include ./form
++contract_form("Direktkredit Bearbeiten", "/contract/edit", "replace", "contract_"+editContract.id, editContract)

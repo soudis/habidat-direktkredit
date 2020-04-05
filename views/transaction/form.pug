@@ -1,0 +1,35 @@
+mixin transaction_form(formTitle, action, updateAction, updateTag, contract, transaction)
+  form.form-horizontal.update-form(action=action update-tag=updateTag update-action=updateAction  method="post" role="form")
+    if transaction
+      input(id="transaction_id" type="hidden" name="id" value=transaction? transaction.id : "")
+    input(id="transaction_contract_id" type="hidden" name="contract_id" value=contract.id)
+    legend=formTitle
+    .form-group
+      label.control-label Datum
+      .input-group.date.datepicker(data-provide="datepicker" data-date-format="dd.mm.yyyy" data-date-language="de")
+        .input-group-prepend
+          span.input-group-text
+            span.fa.fa-calendar        
+        if transaction && transaction.transaction_date
+          input.form-control(id="transaction_date" type="text" name="transaction_date" value=moment(transaction.transaction_date).format('DD.MM.YYYY') required)
+        else 
+          input.form-control(id="transaction_date" type="text" name="transaction_date" required)
+    .form-group
+      label.control-label Art
+      select.form-control(name="type" id="transaction_type" required)
+        option(selected=transaction && transaction.type == 'initial' value='initial') Einzahlung
+        option(selected=transaction && transaction.type == 'deposit' value='deposit') Zusatzzahlung
+        option(selected=transaction && transaction.type == 'withdrawal' value='withdrawal') Teilauszahlung
+        option(selected=transaction && transaction.type == 'termination' value='termination') Rückzahlung
+        option(selected=transaction && transaction.type == 'notreclaimed' value='notreclaimed') Nicht rückgefordert
+    .form-group
+      label.control-label Betrag
+      - console.log('amount: ' + contract.getTransactionsAmount() + ", minus: " + (transaction ? transaction.amount : 0) )
+      input.form-control(id="transaction_amount" type="number" step="0.01" name="amount" value=(transaction ? transaction.amount : "") contract-amount=contract.amount transactions-amount=contract.getTransactionsAmount()-(transaction ? transaction.amount : 0) amount-to-date=contract.getAmountToDate(projectId, transaction?moment(transaction.transaction_date):moment() , transaction.id) required) 
+    .text-right
+      button(type='submit' class='btn btn-primary') Speichern
+  script.
+
+    $('.datepicker').datepicker({'format': 'dd.mm.yyyy', 'language': 'de'});
+
+    $('#transaction_type').change();        

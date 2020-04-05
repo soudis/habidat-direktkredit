@@ -69,7 +69,10 @@ module.exports = (sequelize, DataTypes) => {
         foreignKey: 'user_id'
       });
   	}
-  
+
+  contract.findByIdFetchFull = function (models, id) {
+    return models.contract.findOne({ where : { id: id }, include: [{model: models.transaction, as: "transactions"}]});
+  }    
 
   contract.prototype.isTerminated = function (date) {
     // check if all money was paid back until given date      

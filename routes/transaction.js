@@ -5,92 +5,70 @@ var utils = require('../utils');
 
 module.exports = function(app){
 
-
-    function renderUser(res, models, data) {
-    	utils.getUserTemplates(models, (templates) => {
-    		data.templates = templates;
-    		res.render('user/show', data);
-    	});
-    }
-
 	/* GET home page. */
 	router.get('/transaction/edit/:id', security.isLoggedInAdmin, function(req, res, next) {
 		var models  = require('../models')(req.session.project);
-		models.transaction.findOne({
-			where : {
-				id: req.params.id
-			}
-		}).then(function(transaction) {
-			models.contract.findOne({
-				where:{
-					id: transaction.contract_id
-				}
-			}).then(function(contract) {
-				models.user.findByIdFetchFull(models, contract.user_id, function(user) {
-					  renderUser(res, models, { user:user, editTransaction:transaction, title: 'Zahlung bearbeiten'});
-				});	
-			});
-		});	
+		models.transaction.findByPk(req.params.id)
+			.then(transaction => {
+				return models.contract.findByIdFetchFull(models, transaction.contract_id)
+					.then(contract => utils.render(req, res, 'transaction/edit', {contract: contract, transaction: transaction}))
+			})
+			.catch(error => next(error));
 	});
 
 	/* GET home page. */
 	router.get('/transaction/add/:id', security.isLoggedInAdmin, function(req, res, next) {
 		var models  = require('../models')(req.session.project);
-			models.contract.findOne({
-				where:{
-					id: req.params.id
-				}
-			}).then(function(contract) {
-				models.user.findByIdFetchFull(models, contract.user_id, function(user) {
-					  var addTransaction =  {contract_id : contract.id};
-					  renderUser(res, models, { user:user, addTransaction:addTransaction, title: 'Zahlung anlegen' });
-				});	
-			});
+		models.contract.findByIdFetchFull(models, req.params.id)
+			.then(contract => utils.render(req, res, 'transaction/add', {contract: contract}))
+			.catch(error => next(error));
 	});
 
-	router.post('/transaction/add', security.isLoggedInAdmin, function(req, res) {
+	router.post('/transaction/add', security.isLoggedInAdmin, function(req, res, next) {
 		var models  = require('../models')(req.session.project);
 		models.transaction.create({
-			transaction_date: moment(req.body.transaction_date, 'DD.MM.YYYY'),
-			amount: req.body.amount,
-			type: req.body.type, 
-			contract_id: req.body.contract_id
-		}).then(function(transaction) {
-			res.redirect('/user/show/' + req.body.user_id);
-		}).catch(function(err) {
-			models.user.findByIdFetchFull(models,req.body.user_id,function(user) {
-				renderUser(res, models,  { user:user, addTransaction:{contract_id: req.body.contract_id, amount: req.body.amount, type: req.body.type, transaction_date : moment(req.body.transaction_date, 'DD.MM.YYYY')}, title: 'Zahlung anlegen', message: err.message });
-			});	
-		});
+				transaction_date: moment(req.body.transaction_date, 'DD.MM.YYYY'),
+				amount: req.body.amount,
+				type: req.body.type, 
+				contract_id: req.body.contract_id
+			})
+			.then(() => models.contract.findByIdFetchFull(models, req.body.contract_id))
+			.then(contract => {
+				return models.file.getContractTemplates()
+					.then(templates => utils.render(req, res, 'contract/show', {templates_contract: templates, contract:contract}))
+			})
+		    .catch(error => next(error));
 	});
 	
-	router.post('/transaction/edit', security.isLoggedInAdmin, function(req, res) {
+	router.post('/transaction/edit', security.isLoggedInAdmin, function(req, res, next) {
 		var models  = require('../models')(req.session.project);
 		models.transaction.update({
-			transaction_date: moment(req.body.transaction_date, 'DD.MM.YYYY'),
-			amount: req.body.amount,
-			type: req.body.type
-		}, {where:{id:req.body.id}}).then(function(transaction) {
-			res.redirect('/user/show/' + req.body.user_id);
-		}).catch(function(err) {
-			models.user.findByIdFetchFull(models,req.body.user_id,function(user) {
-				renderUser(res, models,  { user:user, editTransaction:{id: req.body.id, contract_id: req.body.contract_id, amount: req.body.amount, type: req.body.type, transaction_date : moment(req.body.transaction_date, 'DD.MM.YYYY')}, title: 'Zahlung bearbeiten', message: err.message });
-			});	
-		});
+				transaction_date: moment(req.body.transaction_date, 'DD.MM.YYYY'),
+				amount: req.body.amount,
+				type: req.body.type
+			}, {where:{id:req.body.id}})
+			.then(() => models.contract.findByIdFetchFull(models, req.body.contract_id))
+			.then(contract => {
+				return models.file.getContractTemplates()
+					.then(templates => utils.render(req, res, 'contract/show', {templates_contract: templates, contract:contract}))		
+			})
+		    .catch(error => next(error));
 	});
 
 
-	router.get('/transaction/delete/:id', security.isLoggedInAdmin, function(req, res) {
+	router.get('/transaction/delete/:id', security.isLoggedInAdmin, function(req, res, next) {
 		
 		var models  = require('../models')(req.session.project);
-		models.transaction.findOne({
-			where: {
-				id: req.params.id
-			}
-		}).then(function(transaction) {
-			  transaction.destroy();
-			  res.redirect(security.redirectReload(security.getPrevURL(req)));
-		});	
+		models.transaction.findByPk( req.params.id)
+			.then(transaction =>  {
+				transaction.destroy()
+					.then(() => models.contract.findByIdFetchFull(models, transaction.contract_id))
+					.then(contract => {
+						return models.file.getContractTemplates()
+							.then(templates => utils.render(req, res, 'contract/show', {templates_contract: templates, contract:contract}))				
+							})		
+			})
+			.catch(error => next(error));
 	});
 
 	app.use('/', router);

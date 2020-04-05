@@ -109,8 +109,8 @@ module.exports = (sequelize, DataTypes) => {
     });
   }
   
-  User.findByIdFetchFull = function (models, id, callback) {
-    models.user.findOne({
+  User.findByIdFetchFull = function (models, id) {
+    return models.user.findOne({
       where: {
         id: id
       }, 
@@ -136,13 +136,11 @@ module.exports = (sequelize, DataTypes) => {
         as: 'transactions'
         }, 
         'transaction_date']]
-    }).then(function(user) {
-        callback(user);
     });
   }
 
-  User.findFetchFull = function (models, whereClause, callback) {
-    models.user.findAll({         
+  User.findFetchFull = function (models, whereClause) {
+    return models.user.findAll({         
       where: whereClause,
       include:{ 
         model: models.contract, 
@@ -163,41 +161,41 @@ module.exports = (sequelize, DataTypes) => {
         as: 'transactions'
         }, 
         'transaction_date']]
-    }).then(function(users){
-      callback(users);
     });
   }
 
-  User.getUsers = function (models, mode, date, callback) {
+  User.getUsers = function (models, mode, date) {
     var activeUsers = [];
-    models.user.findFetchFull(models, { administrator: {[Op.not]: '1'}}, function(users){
-      users.forEach(function(user){
-        if(mode == 'all' || user.hasNotTerminatedContracts(date)) {
-          activeUsers.push(user);
-        }
-      });
-      callback(activeUsers);  
-    });
-  }
-
-  User.cancelledAndNotRepaid = function (models, project, whereClause,  callback) {      
-    var usersCancelled = [];
-    var now = moment();
-    models.user.findFetchFull(models, whereClause, function(users){
-      users.forEach(function(user){
-        user.contracts.forEach(function(contract){
-          if (contract.isCancelledAndNotRepaid(projects[project], now)) {
-            var copiedUser = clonedeep(user);
-            var projectConfig = projects[project];
-            copiedUser.payback_date = contract.getPaybackDate(projectConfig);
-            copiedUser.termination_type = contract.getTerminationTypeFullString(projectConfig);
-            copiedUser.payback_amount = contract.getAmountToDate(project, now);
-            copiedUser.contract_date = moment(contract.sign_date);
-            usersCancelled.push(copiedUser);
+    return models.user.findFetchFull(models, { administrator: {[Op.not]: '1'}})
+      .then(users => {
+        users.forEach(function(user){
+          if(mode == 'all' || user.hasNotTerminatedContracts(date)) {
+            activeUsers.push(user);
           }
         });
+        return activeUsers;
       });
-      callback(usersCancelled);
+  }
+
+  User.cancelledAndNotRepaid = function (models, project, whereClause) {      
+    return models.user.findFetchFull(models, whereClause)
+      .then(users => {
+        var usersCancelled = [];
+        var now = moment();
+        users.forEach(function(user){
+          user.contracts.forEach(function(contract){
+            if (contract.isCancelledAndNotRepaid(projects[project], now)) {
+              var copiedUser = clonedeep(user);
+              var projectConfig = projects[project];
+              copiedUser.payback_date = contract.getPaybackDate(projectConfig);
+              copiedUser.termination_type = contract.getTerminationTypeFullString(projectConfig);
+              copiedUser.payback_amount = contract.getAmountToDate(project, now);
+              copiedUser.contract_date = moment(contract.sign_date);
+              usersCancelled.push(copiedUser);
+            }
+          });
+        });
+        return usersCancelled;
     });
   }
 

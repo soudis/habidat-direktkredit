@@ -1,15 +1,7 @@
-  $(function () { $('.datepicker').datepicker({'format': 'dd.mm.yyyy', 'language': 'de'})});
+
   $(document).ready(function(){
 
-
-    $('#termination_type_input').on('change', function() {
-      $(".termination-type-group").addClass("hidden");
-      $("#termination_type_"+$(this).val()).removeClass("hidden");
-      $(".termination-type-input").attr('required', false);
-      $(".termination-type-input-"+$(this).val()).attr('required', true);
-    });
-
-    $('#transaction_type').on('change', function() {
+    $(document).on("change", '#transaction_type', function(e) {
       var transactionsAmount = parseFloat($('#transaction_amount').attr('transactions-amount'));
       var amountToDate =Math.ceil(parseFloat($('#transaction_amount').attr('amount-to-date'))*100)/100;
       var contractAmount = parseFloat($('#transaction_amount').attr('contract-amount'));
@@ -20,11 +12,21 @@
         $('#transaction_amount').attr('max', '-0.01');
         $('#transaction_amount').attr('min', '-'+amountToDate);
       }
-    });
+    });    
 
-    $('#termination_type_input').change();
-    $('#transaction_type').change();
-        
+    $(document).on("change", '#transaction_date', function(e) {
+      var transactionDate = $('#transaction_date').val();
+      var contractId = $('#transaction_contract_id').val();
+      var transactionId = -1;
+      if ($('#transaction_id').length > 0) {
+        transactionId = $('#transaction_id').val();
+      }
+      $.get('/contract/amount_to_date/'+contractId+'/' + transactionId + '/' +transactionDate, function( data ) {       
+        $('#transaction_amount').attr('amount_to_date', data.amountToDate);    
+      }, 'json');
+      $('transaction_type').change();
+    });        
+
 
      var dynamicColors = function() {
         var r = Math.floor(Math.random() * 255);
@@ -246,31 +248,6 @@
 
     $(".alert-fadeout").fadeTo(5000, 500).slideUp(500, function(){
         $(".alert-fadeout").slideUp(500);
-    });
-
-    // confirm dialog on delete
-    $('a.confirm').click(function() {
-
-        var link = $(this).data('link');
-
-        bootbox.confirm({
-            message: $(this).data('confirmtext'),
-            buttons: {
-                confirm: {
-                    label: 'Ja',
-                    className: 'btn-success'
-                },
-                cancel: {
-                    label: 'Lieber nicht',
-                    className: 'btn-danger'
-                }
-            },
-            callback: function (result) {
-               if (result) {
-                    window.location.href = link;
-               }
-            }
-        });
     });
 
     $('#root-container').removeClass('d-none');

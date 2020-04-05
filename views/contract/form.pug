@@ -1,0 +1,89 @@
+mixin contract_form(formTitle, action, updateAction, updateTag, editContract)
+  form.form-horizontal.update-form(action=action update-tag=updateTag update-action=updateAction method="post" role="form")
+    input(type="hidden" name="user_id" value=user.id)
+    if (editContract)
+      input(type="hidden" name="id" value=editContract.id)
+    legend= formTitle
+    - var termination_type = (project.defaults && project.defaults.termination_type ? project.defaults.termination_type:"T");
+    - termination_type = (editContract && editContract.termination_type?editContract.termination_type:termination_type);
+    - var termination_period = (project.defaults && project.defaults.termination_period != null ? project.defaults.termination_period:undefined);
+    - termination_period = (editContract && editContract.termination_period?editContract.termination_period:termination_period);
+    - var termination_period_type = (project.defaults && project.defaults.termination_period_type ? project.defaults.termination_period_type:"M");
+    - termination_period_type = (editContract && editContract.termination_period_type?editContract.termination_period_type:termination_period_type);
+    .form-group 
+      label.control-label Vertragsdatum
+      .input-group.date.datepicker(data-provide="datepicker" data-date-format="dd.mm.yyyy" data-date-language="de")
+        .input-group-prepend
+          span.input-group-text
+            span.fa.fa-calendar
+        input.form-control(type="text" name="sign_date" value=(editContract&&editContract.sign_date?moment(editContract.sign_date).format('DD.MM.YYYY'):"") required) 
+
+    .form-group
+      label.control-label Betrag
+      input.form-control(type="number" step="0.01" name="amount" value=(editContract&&editContract.amount!=null?editContract.amount:undefined) required)
+    .form-group
+      label.control-label Zinssatz
+      input.form-control(type="number" step="0.001" min="0" max="10" name="interest_rate" value=(editContract&&editContract.interest_rate!=null?editContract.interest_rate:undefined) required) 
+    .form-group
+      label.control-label Kündigungsart
+      select.form-control(name="termination_type" id="termination_type_input" required)
+        option(selected=termination_type == 'T' value='T') Kündigungsfrist
+        option(selected=termination_type == 'P' value='P') Laufzeit
+        option(selected=termination_type == 'D' value='D') Enddatum
+    .form-group.termination-type-group.termination_type_T(class=(!editContract || !editContract.termination_type || editContract && editContract.termination_type == 'T'?"":"d-none"))
+      label.control-label Kündigungsfrist
+      .input-group
+        input.form-control.termination-type-input-T.termination-type-input(type="number" step="1" name="termination_period_T" value=termination_period)
+        select.form-control.termination-type-input-T.termination-type-input(name="termination_period_type_T")
+          option(selected=termination_period_type == 'M' value='M') Monat(e)
+          option(selected=termination_period_type == 'w' value='w') Woche(n)
+          option(selected=termination_period_type == 'Y' value='Y') Jahr(e)
+    .form-group.termination-type-group.termination_type_T
+      label.control-label Kündigungsdatum
+      .input-group.date.datepicker(data-provide="datepicker" data-date-format="dd.mm.yyyy" data-date-language="de")
+        .input-group-prepend
+          span.input-group-text
+            span.fa.fa-calendar
+        input.form-control(type="text" name="termination_date_T"  value=(editContract&&editContract.termination_date?moment(editContract.termination_date).format('DD.MM.YYYY'):"")) 
+    .form-group.termination-type-group.termination_type_P(class=(contract && contract.termination_type == 'P'?"":"d-none"))
+      label.control-label Laufzeit
+      .input-group
+        input.form-control.termination-type-input.termination-type-input-P(type="number" step="1" name="termination_period_P" value=termination_period)
+        select.form-control.termination-type-input.termination-type-input-P(name="termination_period_type_P")
+          option(selected=termination_period_type == 'M' value='M') Monat(e)
+          option(selected=termination_period_type == 'w' value='w') Woche(n)
+          option(selected=termination_period_type == 'Y' value='Y') Jahr(e)  
+    .form-group.termination-type-group.termination_type_D(class=(editContract && editContract.termination_type == 'D'?"":"d-none"))
+      label.control-label Rückzahlungsdatum
+      .input-group.date.datepicker(data-provide="datepicker" data-date-format="dd.mm.yyyy" data-date-language="de")
+        .input-group-prepend
+          span.input-group-text
+            span.fa.fa-calendar
+        input.form-control.termination-type-input-D.termination-type-input(type="text" name="termination_date_D" value=(editContract&&editContract.termination_date?moment(editContract.termination_date).format('DD.MM.YYYY'):"")) 
+    .form-group
+      label.control-label Vertragsstatus
+      select.form-control(name="status")
+        option(selected=editContract && editContract.status == 'unknown' value='unknown') Noch kein Vertrag
+        option(selected=editContract && editContract.status == 'sign' value='sign') Vertrag ist zu unterschreiben
+        option(selected=editContract && editContract.status == 'sent' value='sent') Vertrag ist verschickt
+        option(selected=editContract && editContract.status == 'complete' value='complete') Vertrag abgeschlossen               
+    .form-group 
+      label.control-label Notizen
+      if editContract
+        textarea.form-control(type="text" name="notes")=editContract.notes
+      else
+        textarea.form-control(type="text" name="notes")
+    .text-right
+      button(type='submit' class='btn btn-primary') Speichern
+  script.
+
+    $('.datepicker').datepicker({'format': 'dd.mm.yyyy', 'language': 'de'});
+    $('#termination_type_input').on('change', function() {
+      $(".termination-type-group").addClass("d-none");
+      $(".termination_type_"+$(this).val()).removeClass("d-none");
+      $(".termination-type-input").attr('required', false);
+      $(".termination-type-input-"+$(this).val()).attr('required', true);
+    });
+
+    $('#termination_type_input').change();
+  

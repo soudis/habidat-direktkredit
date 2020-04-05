@@ -1,102 +1,15 @@
-include ../transaction/input
+include ./contract
 .row
   .col-md-12
     .card
       h4.card-header 
         span Direktkredite
         span.float-right
-          a.btn.btn-light.btn-sm(href='/contract/add/'+user.id)
+          a.btn.btn-light.btn-sm.sidebar-action(href='/contract/add/'+user.id)
             span.fa.fa-plus
       .card-body
-        .row
+        #contracts_container.row
+          if (user.contracts.length == 0)
+            .col-md-12 Keine Direktkredite vorhanden
           each contract in user.contracts
-            - interest = contract.calculateInterest(projectid)
-            .col-md-6
-              .card
-                .card-header
-                  .row
-                    .h5.section-title.col-md-auto Direktkredit vom #{moment(contract.sign_date).format('DD.MM.YYYY')}
-                    .col-md.text-right.section-actions
-                      a.btn.btn-light.btn-sm(href='/contract/edit/'+contract.id)
-                        span.fa.fa-edit              
-                      a.btn.btn-light.btn-sm.confirm(data-link='/contract/delete/'+contract.id, data-confirmtext='Willst du den Direktkredit vom ' + moment(contract.sign_date).format('DD.MM.YYYY') + ' von ' + user.first_name + ' ' + user.last_name  + ' wirklich löschen?')                  
-                        span.fa.fa-trash
-                      a.btn.btn-light.btn-sm.dropdown-toggle(id='contractTemplateButton' type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false") 
-                        span.fa.fa-file                          
-                      .dropdown-menu.dropdown-menu-right( aria-labelledby="contractTemplateButton")
-                        each template in templates_contract
-                          a.dropdown-item(href='/docx_c/'+contract.id+'?fileid='+template.id)
-                            span.fa.fa-file-download
-                            span  
-                            span= template.description                          
-                .card-body
-                  table.table
-                    tbody
-                      tr
-                        td.label Betrag (Vertrag)
-                        td= format.formatMoney(contract.amount)
-                      tr
-                        td Zinssatz
-                        td= format.formatPercent(contract.interest_rate,3)                        
-                      tr
-                        td Status
-                        td= contract.getStatusText()
-                      tr
-                        td Einzahlungen
-                        td= format.formatMoney(contract.getDepositAmount())
-                      tr
-                        td Auszahlungen
-                        td= format.formatMoney(contract.getWithdrawalAmount())
-                      tr
-                        td Zinsen bis heute
-                        td= format.formatMoney(interest.now)
-                      tr
-                        td Aushaftender Betrag
-                        td= format.formatMoney(contract.getAmountToDate(projectId, moment()))    
-                      tr
-                        td Kündigungsart
-                        td= contract.getTerminationTypeFullString(project)
-                      if contract.termination_type == "T"
-                        if (contract.termination_date)
-                          tr
-                            td Kündigungsdatum
-                            td= moment(contract.termination_date).format('DD.MM.YYYY')
-                          tr
-                            td Rückzahlungsfrist
-                            td= moment(contract.getPaybackDate(project)).format('DD.MM.YYYY')
-                        else
-                          tr
-                            td Kündigungsdatum
-                            td nicht gekündigt
-                      else if contract.termination_type=="D"
-                        tr
-                          td Rückzahlungsdatum
-                          td= moment(contract.getPaybackDate(project)).format('DD.MM.YYYY')
-                      else if contract.termination_type=="P"
-                        tr
-                          td Ende der Laufzeit:
-                          td= moment(contract.getPaybackDate(project)).format('DD.MM.YYYY')
-                      tr
-                        td Notizen
-                        td!= contract.notes.replace("\n", '<br/>')
-                  table.table
-                    thead
-                      tr
-                        th(colspan="4")
-                          .row
-                            .h6.section-title.col-md-10
-                              b Zahlungen
-                            .col-md-2.text-right.section-actions
-                              a.btn.btn-light.btn-sm(href='/transaction/add/'+contract.id)
-                                span.fa.fa-plus
-                    tbody
-                      each transaction in contract.transactions
-                        tr
-                          td= moment(transaction.transaction_date).format('DD.MM.YYYY')
-                          td= transaction.getTypeText()
-                          td.text-right= format.formatMoney(transaction.amount)
-                          td.text-right
-                            a.btn.btn-light.btn-sm(href='/transaction/edit/'+transaction.id)
-                              span.fa.fa-edit
-                            a.btn.btn-light.btn-sm.confirm(data-link='/transaction/delete/'+transaction.id, data-confirmtext='Willst du die Zahlung von ' + sprintf('%.2f', contract.amount) +  ' EUR vom ' + moment(transaction.transaction_date).format('DD.MM.YYYY') + ' von ' + user.first_name + ' ' + user.last_name  + ' wirklich löschen?')   
-                              span.fa.fa-trash
+            +contract(contract)

@@ -47,5 +47,31 @@ module.exports = (sequelize, DataTypes) => {
         });
   }
 
+  file.getContractTemplates = function(){
+	return this.findAll({
+		where: {
+			ref_table: "template_contract"
+		}
+	});	
+  };
+
+  file.getUserTemplates = function(){
+	return this.findAll({
+		where: {
+			ref_table: "template_user"
+		}
+	});	
+  };
+
+  file.getFilesFor = function (ref_table, ref_id) {
+  	return this.findAll({
+  		where: {
+  			ref_table: ref_table,
+  			ref_id: ref_id
+  		}
+  	});
+  }
+
+
   return file;
 };

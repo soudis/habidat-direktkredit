@@ -1,12 +1,14 @@
 extends layout
 
 block content
-  +nav(project.projectname, "dropdown_menu", project.logo) 
-    +nav_item('/project') Projekt auswählen
-  div(class="col-md-8 col-md-offset-2 col-xs-12")
+  +nav(project.projectname + ' Kreditportal', "dropdown_menu", project.logo) 
+    +nav_item('/project') 
+      span.fa.fa-th-large
+      span  Projekt auswählen    
+  .container-fluid(id="root-container" class="col-xl-8 col-xl-offset-2 col-lg-12")  
     .jumbotron
       h2= project.projectname + " @ habiDAT"
-      p Bitte melde dich mit deinen Zugangsdaten an. Die Daten wurden dir nach Vertragsabschluss per Post zugesandt oder persönlich übergeben. Falls du die Zugangsdaten nicht bekommen hast oder verloren hast, dann melde dich bitte unter #[a(href='mailto:#{project.email}') #{project.email}] 
+      p.lead Bitte melde dich mit deinen Zugangsdaten an. Die Daten wurden dir nach Vertragsabschluss per Post zugesandt oder persönlich übergeben. Falls du die Zugangsdaten nicht bekommen hast oder verloren hast, dann melde dich bitte unter #[a(href='mailto:#{project.email}') #{project.email}] 
     
     if message && message.length > 0
       div(class="alert alert-danger") 
