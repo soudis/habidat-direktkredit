@@ -83,3 +83,7 @@
 2019-11-30 13:11:66 AUTH-FAIL: URL: /logon, USER: 10058_willyfred, CLIENT IP: ::ffff:172.24.0.1
 2020-04-05 22:15:87 AUTH-FAIL: URL: /logon, USER: Florian Humer, CLIENT IP: ::ffff:172.24.0.1
 2020-04-05 22:15:27 AUTH-FAIL: URL: /logon, USER: Florian Humer, CLIENT IP: ::ffff:172.24.0.1
+2020-04-05 22:24:30 AUTH-FAIL: URL: /logon, USER: Florian Humer, CLIENT IP: ::ffff:172.24.0.1
+2020-04-05 22:24:32 AUTH-FAIL: URL: /logon, USER: Florian Humer, CLIENT IP: ::ffff:172.24.0.1
+2020-04-05 22:31:19 AUTH-FAIL: URL: /logon, USER: Florian Humer, CLIENT IP: ::ffff:172.24.0.1
+2020-04-05 22:31:21 AUTH-FAIL: URL: /logon, USER: Florian Humer, CLIENT IP: ::ffff:172.24.0.1

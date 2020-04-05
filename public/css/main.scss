@@ -161,9 +161,14 @@ tr.margin {
   margin-top: 10px;
 }
 
+.card {
+    box-shadow: 2px 4px 10px 4px rgba(0,0,0,0.1);
+}
+
+
 .card .card {
     border: 1px solid rgba(0, 0, 0, 0.225);
-    box-shadow: 2px 4px 10px 4px rgba(0,0,0,0.1);
+    box-shadow: 2px 4px 10px 4px rgba(0,0,0,0.3);
 }
 
 .btn-light {
