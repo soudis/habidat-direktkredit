@@ -4,6 +4,7 @@ $theme-colors: (
 
 
 @import "node_modules/bootstrap/scss/bootstrap";
+@import "node_modules/bootstrap-multiselect/dist/scss/bootstrap-multiselect.scss";
 @import "node_modules/@fortawesome/fontawesome-free/scss/fontawesome";
 @import "node_modules/@fortawesome/fontawesome-free/scss/brands";
 @import "node_modules/@fortawesome/fontawesome-free/scss/regular";
@@ -27,6 +28,8 @@ a {
 tr td.fit{
   width: 1%;
   white-space:nowrap;
+  padding-top: 0.25rem;
+  padding-bottom: 0.25rem;
 }
 
 h3.underline {
@@ -113,7 +116,7 @@ h4.underline {
     box-shadow: none;
   }
 
-.datatable-button {
+.datatable-button, button.multiselect {
   margin-right: 6px;
 }
 
@@ -171,6 +174,10 @@ tr.margin {
     box-shadow: 2px 4px 10px 4px rgba(0,0,0,0.3);
 }
 
+#contracts_container > div.contract-active > .card {
+  box-shadow: 2px 4px 10px 4px rgba(164, 0, 35,0.3);
+}
+
 .btn-light {
   background-color: inherit;
 }
@@ -219,9 +226,14 @@ tr.margin {
     100% { right: 0; }
 }
 
-.btn-light span.fa {
+.btn-light {
+    border: 1px solid rgba(0,0,0,0.1);
+}
+
+.btn-light span.fa, .details-control span.fa {
   color: rgb(164, 0, 35);
 }
+
 
 .project-card {
   
@@ -246,4 +258,73 @@ tr.margin {
 
 a.project-link:hover {
     text-decoration: none;
+}
+
+.multiselect-container {
+    padding-top: 10px;
+    padding-bottom: 10px;
+}
+
+.multiselect-container > li > a > label {
+
+    padding: 3px 15px 3px 15px;
+
+}
+
+
+table.dataTable.dtr-column > tbody > tr > td.control::before, table.dataTable.dtr-column > tbody > tr > th.control::before {
+  top: inherit;
+  left: inherit;
+  position: relative;
+  display: inline-block;
+  font-weight: 400;
+  color: #212529;
+  height: inherit;
+  width: inherit;
+  margin-top: inherit;
+  margin-left: inherit;
+  text-align: center;
+  vertical-align: middle;
+  cursor: pointer;
+  user-select: none;
+  background-color: transparent;
+  border: 0px solid rgba(0, 0, 0, 0.1);
+  box-shadow: inherit;
+  padding: 0.25rem 0.5rem;
+  font-size: 0.875rem;
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+  line-height: 1.5;
+  content: "\f0da";
+  border-radius: 0.2rem;
+  width: max-content;
+  color: rgba(164, 0, 35, 1);
+}
+
+table.dataTable.dtr-column > tbody > tr.parent td.control::before, table.dataTable.dtr-column > tbody > tr.parent th.control::before {
+  content: '\f0d7';
+  background-color: transparent;
+}
+
+td.control {
+  padding-left: 0.25rem;
+  padding-right: 0.25rem;
+}
+
+div.dataTables_wrapper div.dataTables_length {
+  text-align: inherit;
+  white-space:nowrap;
+}
+
+div.dataTables_wrapper div.dataTables_filter {
+  text-align: right;
+}
+
+div.dataTables_wrapper div.dataTables_filter input {
+  margin-left: 0;
+}
+
+div.dataTables_wrapper div.dataTables_filter .input-group-text,  div.dataTables_wrapper div.dataTables_length .input-group-text{
+  background-color: transparent;
+  color: rgba(164, 0, 35,1);
 }

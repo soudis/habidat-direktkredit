@@ -26,6 +26,7 @@ module.exports = function(app){
 		/* Welcome Site */
 	router.get('/project/:project', function(req, res, next) {
 		req.session.project = req.params.project;
+		req.session.projectConfig = projects[req.params.project];
 		req.logout();
      	res.redirect('/');
 	});

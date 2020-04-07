@@ -64,6 +64,10 @@ app.use('/public/bootbox', express.static(path.join(__dirname, 'node_modules/boo
 app.use('/public/chart.js', express.static(path.join(__dirname, 'node_modules/chart.js/dist'),  { maxAge: oneDay }));
 app.use('/public/popper', express.static(path.join(__dirname, 'node_modules/@popperjs/core/dist/umd'),  { maxAge: oneDay }));
 app.use('/public/webfonts', express.static(path.join(__dirname, 'node_modules/@fortawesome/fontawesome-free/webfonts'), { maxAge: 31557600000 }));
+app.use('/public/multiselect', express.static(path.join(__dirname, 'node_modules/bootstrap-multiselect/dist/js'), { maxAge: 31557600000 }));
+app.use('/public/datatables', express.static(path.join(__dirname, 'node_modules/datatables.net-responsive/js'), { maxAge: 31557600000 }));
+app.use('/public/datatables', express.static(path.join(__dirname, 'node_modules/datatables.net-responsive-bs4/js'), { maxAge: 31557600000 }));
+app.use('/public/datatables', express.static(path.join(__dirname, 'node_modules/datatables.net-responsive-bs4/css'), { maxAge: 31557600000 }));
 
 
 const umlautMap = {
@@ -134,10 +138,7 @@ app.use(function(req,res,next){
     res.locals.session = req.session;
     res.locals.config = config;
     res.locals.user = req.user;
-    if (req.session.project) {
-    	res.locals.project = projects[req.session.project];
-      res.locals.projectid = req.session.project;
-    }
+
     var newPrevURLs = [];
     if (req.session.prevURLs && req.session.prevURLs.length >= 1) {
       newPrevURLs.push(req.session.prevURLs[req.session.prevURLs.length-1]);

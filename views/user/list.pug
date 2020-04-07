@@ -11,59 +11,30 @@ mixin status(tooltip, status)
         span.fa.fa-question-circle.text-warning 
 
 block admin-content
-  .d-none.datatable-buttons(for-id="datatable_length")
-    a.datatable-button.btn.btn-primary.btn-sm.sidebar-action(href='/user/add')
-      span.fa.fa-plus 
-      span  Kreditgeber*in
-  table.table.table-striped(id="datatable")
-    thead
-      tr
-        th.col-md-1(rowspan=(noAggregation?"1":"2")) ID
-        th.col-md-2(rowspan=(noAggregation?"1":"2")) Name
-        th.col-md-2(rowspan=(noAggregation?"1":"2")) Adresse
-        if (!noAggregation)
-          th.col-md-1.text-center(rowspan="2") Verträge
-          th.col-md-4.text-center(colspan="4") Beträge
-          th.col-md-1.text-center(colspan="3") Status
-        if (additionalFields) 
-          each field in additionalFields
-            th.col-md-1(rowspan=(noAggregation?"1":"2") class=(field.type==="number"?"text-right":"text-center"))=field.label
-        th.col-md-1.text-center(rowspan=(noAggregation?"1":"2")) Aktionen
-      if (!noAggregation)
+  .d-none(id="datatable_parent")
+    .d-none.datatable-buttons(for-id="datatable_length")
+      select.checkbox-select(id="column_select" multiple="multiple" autocomplete="off") #[span.fa.fa-cogs]
+        each column in contracts.columns
+          option(value=column.id selected=column.visible?"selected":undefined)= column.label
+
+      a.datatable-button.btn.btn-light.sidebar-action(href='/user/add' title="Kreditgeber*in Hinzufügen")
+        span.fa.fa-plus 
+        span  
+        span.fa.fa-id-card
+    table.table.table-striped(id="datatable" data-auto-width="false")
+      thead
         tr
-          th.col-md-1.text-right Vertrag
-          th.col-md-1.text-right Aushaftend
-          th.col-md-1.text-right Einbezahlt
-          th.col-md-1.text-right Ausbezahlt
-          th.col-md-1.text-right V
-          th.col-md-1.text-right E
-          th.col-md-1.text-right A
-    tbody
-      each user in users
-        if (!noAggregation)
-          - aggregate = user.getAggregateNumbers(projectid)
-        tr
-          td= user.id 
-          td(data-order=replaceUmlaute(user.getFullName()))=user.getFullName()
-          td!=user.getAddress(true)
-          if (!noAggregation)
-            td.text-center #[font(data-toggle="tooltip" title="Anzahl der Verträge")= aggregate.contracts] 
-            td.text-center #[font(data-toggle="tooltip" title="Vertragssumme") #{sprintf('%.2f', aggregate.contractAmount)}]  
-            td.text-center #[font(data-toggle="tooltip" title="Aushaftender Betrag") #{sprintf('%.2f', aggregate.outstandingAmount)}]  
-            td.text-right #[font.text-success(data-toggle="tooltip" title="Eingezahlt") #{sprintf('%.2f', aggregate.paidAmount)}]  
-            td.text-right #[font.text-danger(data-toggle="tooltip" title="Ausbezahlt") #{sprintf('%.2f', aggregate.repaidAmount)}] 
-            +status("Vertragsstatus", aggregate.statusContract)
-            +status("Einzahlungsstatus", aggregate.statusPaid)
-            +status("Auszahlungsstatus", aggregate.statusRepaid)
-          if (additionalFields)
-            each field in additionalFields
-              if field.type === "date"
-                td.text-center(data-order=moment(user[field.key]).format("YYYY-MM-DD"))= moment(user[field.key]).format("DD.MM.YYYY")
-              else if field.type === "number"
-                td.text-right= sprintf('%.2f', user[field.key])
-              else
-                td.text-center= user[field.key]
-          td.fit
-              a.btn.btn-light.btn-sm(href='/user/show/'+user.id) #[span.fa.fa-search]
-              a.btn.btn-light.btn-sm.sidebar-action(href='/user/edit/'+user.id) #[span.fa.fa-edit]
-              
+          th.control.fit.text-center(data-orderable="false")
+          each column in contracts.columns
+            th(data-name=column.id id=column.id data-visible=!column.visible class=column.class data-responsive-priority=(column.priority?column.priority:"100"))= column.label
+          th(data-orderable="false" data-responsive-priority="1").fit.text-center 
+            span.fa.fa-cogs
+      tbody
+        each row in contracts.data
+          tr
+            td.control.fit
+            each cell, cellIndex in row
+              td(data-order=(cell.order?cell.order:undefined) class=cell.class + (contracts.columns[cellIndex].class?" "+contracts.columns[cellIndex].class:""))!=cell.value
+            td.fit.text-right
+              a.btn.btn-light.btn-sm(href='/user/show/'+row[1].value+'#contract_'+row[9].value) #[span.fa.fa-search-plus]
+        

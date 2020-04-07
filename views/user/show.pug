@@ -7,5 +7,11 @@ block admin-content
   +files_show(user.files, 'user', user.id, addFile)  
   include ../contract/show_contracts
 
+  script.
+    $(document).ready(function(){
+      var hash = $(location).attr('hash');
+      $(hash).addClass('contract-active');
+    })
+
               
             

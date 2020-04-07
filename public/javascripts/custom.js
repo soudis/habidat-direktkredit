@@ -204,21 +204,29 @@
 
     var dataTableLanguange = {
       "sEmptyTable":      "Keine Daten in der Tabelle vorhanden",
-      "sInfo":            "_START_ bis _END_ von _TOTAL_ Einträgen",
-      "sInfoEmpty":       "0 bis 0 von 0 Einträgen",
+      "sInfo":            "_START_ bis _END_ von _TOTAL_",
+      "sInfoEmpty":       "0 bis 0 von 0",
       "sInfoFiltered":    "(gefiltert von _MAX_ Einträgen)",
       "sInfoPostFix":     "",
       "sInfoThousands":   ".",
-      "sLengthMenu":      "_MENU_ Einträge anzeigen",
+      "sLengthMenu":      "_MENU_ Einträge",
       "sLoadingRecords":  "Wird geladen...",
       "sProcessing":      "Bitte warten...",
-      "sSearch":          "Suchen",
+      "lengthMenu": '<div class="input-group" id="datatable_pagelength"><span class="input-group-prepend"><span class="input-group-text fa fa-list-ol"></span></span><select class="custom-select form-control form-control-sm custom-select-sm">'+
+            '<option value="10">10</option>'+
+            '<option value="25">25</option>'+
+            '<option value="50">50</option>'+
+            '<option value="100">100</option>'+
+            '<option value="-1">Alle</option>'+
+            '</select></div>',
+      "search": '<div class="input-group"><span class="input-group-prepend"><span class="input-group-text fa fa-search"></span></span>',
+      "searchPlaceholder": "Suchen",
       "sZeroRecords":     "Keine Einträge vorhanden.",
-      "oPaginate": {
-          "sFirst":       "Erste",
-          "sPrevious":    "Zurück",
-          "sNext":        "Nächste",
-          "sLast":        "Letzte"
+      "paginate": {
+          "first":       "Erste",
+          "previous":    '<span class="fa fa-arrow-left"></span>',
+          "next":        '<span class="fa fa-arrow-right"></span>',
+          "last":        "Letzte"
       },
       "oAria": {
           "sSortAscending":  ": aktivieren, um Spalte aufsteigend zu sortieren",
@@ -234,14 +242,46 @@
     }
 
 
-    var table = $('#datatable').DataTable({
+    table = $('#datatable').DataTable({
     	pageLength: 25,
-      language: dataTableLanguange
+      language: dataTableLanguange,
+      order: [[ 1, 'desc' ]],      
+      responsive: {
+        details: {
+          type: "column"
+        }
+      },
+      initComplete: function(settings, json) {       
+        
+
+      }      
     });
-    table
-    .column( '1:visible' )
-    .order( 'asc' );
-    
+
+    $('#column_select').multiselect({
+        buttonClass: 'btn btn-light',
+        enableHTML: true,
+        buttonText: function(options, select) {
+            return '<span class="fa fa-columns "></span>';
+        },
+        onChange: function(option, checked, select) {
+            table.column($(option).val()+':name').visible(checked);
+        }            
+    });          
+    $('.datatable-buttons').children().each(function(index) {
+      var forId = $(this).parent().attr('for-id');
+      $(this).detach().prependTo($('#'+forId));
+    });        
+    $("#datatable_parent").removeClass("d-none");           
+    table.responsive.recalc();
+    $("#datatable_pagelength").parent().detach().prependTo($('#datatable_filter'));
+    $('#datatable_filter').parent().removeClass('col-sm-12').removeClass('col-md-6').addClass('col-sm-9');
+    $('#datatable_length').parent().removeClass('col-sm-12').removeClass('col-md-6').addClass('col-sm-3');
+    $('#datatable_info').parent().removeClass('col-sm-12').removeClass('col-md-5').addClass('col-sm-5');
+    $('#datatable_paginate').parent().removeClass('col-sm-12').removeClass('col-md-7').addClass('col-sm-7');
+
+
+//setInterval(function(){ table.columns.adjust().draw(); }, 3000);
+
 
     $('[data-toggle="tooltip"]').tooltip(); 
 
@@ -250,12 +290,7 @@
         $(".alert-fadeout").slideUp(500);
     });
 
-    $('#root-container').removeClass('d-none');
 
-    $('.datatable-buttons').each(function(index) {
-      var forId = $(this).attr('for-id');
-      $('#'+forId).prepend($(this).html());
-    });
 
     var detailsTable = $('#details-table').DataTable({
       "paging":   false,

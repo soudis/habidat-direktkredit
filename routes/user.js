@@ -1,4 +1,5 @@
 var security = require('../utils/security');
+var format = require('../utils/format');
 var moment = require("moment");
 var router = require('express').Router();
 var url = require('url');
@@ -8,6 +9,28 @@ var Op = require("sequelize").Op;
 
 module.exports = function(app){
 
+	const umlautMap = {
+	  '\u00dc': 'UE',
+	  '\u00c4': 'AE',
+	  '\u00d6': 'OE',
+	  '\u00fc': 'ue',
+	  '\u00e4': 'ae',
+	  '\u00f6': 'oe',
+	  '\u00df': 'ss',
+	}
+
+	var replaceUmlaute = function (str) {
+	  return str
+	    .replace(/[\u00dc|\u00c4|\u00d6][a-z]/g, (a) => {
+	      const big = umlautMap[a.slice(0, 1)];
+	      return big.charAt(0) + big.charAt(1).toLowerCase() + a.slice(1);
+	    })
+	    .replace(new RegExp('['+Object.keys(umlautMap).join('|')+']',"g"),
+	      (a) => umlautMap[a]
+	    );
+	}
+
+
 	function renderUser(req, res, models, data) {
 		return Promise.join(models.file.getUserTemplates(), models.file.getContractTemplates(),
 			(templates_user, templates_contract) => {
@@ -16,6 +39,74 @@ module.exports = function(app){
 				utils.render(req, res, 'user/show', data)
 			})
     }
+
+    function generateContractTable(req, res, users) {
+    	contracts = {
+    		columns: [
+    			{id: "contract_sign_date", label: "Vertragsdatum", priority: "2"},
+    			{id: "user_id", label: "User ID"},
+    			{id: "user_name", label: "Name", priority: "2"},
+    			{id: "user_address", label: "Adresse"},
+    			{id: "user_telno", label:"Telefon"},
+    			{id: "user_email", label:"E-Mail"},
+    			{id: "user_iban", label:"IBAN"},
+    			{id: "user_bic", label: "BIC"},
+    			{id: "user_relationship", label:"Beziehung"},
+    			{id: "contract_id", label:"Vertrag ID"},
+    			{id: "contract_amount", label: "Vertragswert", class: "text-right"},
+    			{id: "contract_interest_rate", label: "Zinssatz", class: "text-right"},
+    			{id: "contract_deposit", label: "Einzahlungen", class: "text-right"},
+    			{id: "contract_withdrawal", label: "Auszahlungen", class: "text-right"},
+    			{id: "contract_amount_to_date", label: "Aushaftend", class: "text-right"},
+    			{id: "contract_interest_to_date", label: "Zinsen", class: "text-right"},
+    			{id: "contract_termination_type", label: "Kündigungsart"},
+    			{id: "contract_termination_date", label: "Kündigungsdatum"},
+    			{id: "contract_payback_date", label: "Rückzahlungsdatum"},
+    			{id: "contract_status", label: "Status", class: "text-center", priority: "2"}
+    		],
+		    setColumnsVisible: function(visibleColumns) {
+		    	this.columns.forEach(column => {
+		    		if (visibleColumns.includes(column.id)) {
+		    			column.visible = true;
+		    		} else {
+		    			column.visible = false;
+		    		}
+		    	})
+		    	return this;
+		    },
+    		data: []
+    	}
+    	users.forEach(user => {
+    		user.contracts.forEach(contract => {
+    			var interest = contract.calculateInterest(req.session.project)
+    			contracts.data.push([
+    				{ value: moment(contract.sign_date).format('DD.MM.YYYY'), order: moment(contract.sign_date) },
+		            { value:  user.id  },
+		            { value: user.getFullName(), order: replaceUmlaute(user.getFullName())},
+		            { value: user.getAddress(true) },
+		            { value: user.telno },
+		            { value: user.email },
+		            { value: user.IBAN },
+		            { value: user.BIC },
+		            { value: user.relationship },
+		            { value: contract.id },
+		            { value: format.formatMoney(contract.amount,2) },
+		            { value: format.formatPercent(contract.interest,3)},
+		            { value: format.formatMoney(contract.getDepositAmount(), 2), class: contract.getDepositAmount()>0?"text-success":""},
+		            { value: format.formatMoney(contract.getWithdrawalAmount(), 2), class: contract.getWithdrawalAmount()<0?"text-danger":"" },
+		            { value: format.formatMoney(contract.getAmountToDate(req.session.project, moment())) },
+		            { value: format.formatMoney(interest.now) },
+		            { value: contract.getTerminationTypeFullString(req.session.projectConfig) },
+		            { value: moment(contract.termination_date).format('DD.MM.YYYY'), order: moment(contract.termination_date)},
+		            { value: moment(contract.getPaybackDate(req.session.projectConfig)).format('DD.MM.YYYY'), order: moment(contract.getPaybackDate(req.session.projectConfig))},
+		            { value: contract.getStatus() }
+    			]);
+    		})
+    	})
+    	return contracts;
+    }    
+
+    const columnsVisible = ['contract_sign_date', 'user_name', 'contract_status', 'contract_amount', "contract_deposit", "contract_withdrawal", 'contract_amount_to_date'];
 
 	router.get('/user/list/cancelled', security.isLoggedInAdmin, function(req, res, next) {
 		var models  = require('../models')(req.session.project);
@@ -29,11 +120,11 @@ module.exports = function(app){
 			.catch(error => next(error));
 	});
 	
-	router.get('/user/list', security.isLoggedInAdmin, function(req, res) {
+	router.get('/user/list', security.isLoggedInAdmin, function(req, res, next) {
 		var models  = require('../models')(req.session.project);
 		models.user.findFetchFull(models, { administrator: {[Op.not]: '1'}})
-			.then(users => utils.render(req, res, 'user/list', {users: users}, 'Direktkreditgeber*innen Liste'))
-			.catch(error => res.next(error));
+			.then(users => utils.render(req, res, 'user/list', {contracts: generateContractTable(req, res, users).setColumnsVisible(columnsVisible)}, 'Kreditliste'))
+			.catch(error => next(error));
 	});
 
 	router.get('/user/add', security.isLoggedInAdmin, function(req, res, next) {
@@ -44,7 +135,7 @@ module.exports = function(app){
 		var models  = require('../models')(req.session.project);
 		models.user.findByIdFetchFull(models, req.params.id)
 			.then(user => utils.render(req, res, 'user/edit', { user:user}, 'Direktkreditgeber*in Bearbeiten'))
-			.catch(error => res.next(error));
+			.catch(error => next(error));
 	});
 
 	router.get('/user/show/:id', security.isLoggedInAdmin, function(req, res, next) {
