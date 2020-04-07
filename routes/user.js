@@ -90,15 +90,15 @@ module.exports = function(app){
 		            { value: user.BIC },
 		            { value: user.relationship },
 		            { value: contract.id },
-		            { value: format.formatMoney(contract.amount,2) },
-		            { value: format.formatPercent(contract.interest,3)},
-		            { value: format.formatMoney(contract.getDepositAmount(), 2), class: contract.getDepositAmount()>0?"text-success":""},
-		            { value: format.formatMoney(contract.getWithdrawalAmount(), 2), class: contract.getWithdrawalAmount()<0?"text-danger":"" },
-		            { value: format.formatMoney(contract.getAmountToDate(req.session.project, moment())) },
-		            { value: format.formatMoney(interest.now) },
+		            { value: format.formatMoney(contract.amount,2), order: contract.amount},
+		            { value: format.formatPercent(contract.interest_rate,3), order: contract.interest_rate},
+		            { value: format.formatMoney(contract.getDepositAmount(), 2), order: contract.getDepositAmount(), class: contract.getDepositAmount()>0?"text-success":""},
+		            { value: format.formatMoney(contract.getWithdrawalAmount(), 2), order: contract.getWithdrawalAmount(), class: contract.getWithdrawalAmount()<0?"text-danger":"" },
+		            { value: format.formatMoney(contract.getAmountToDate(req.session.project, moment())), order: contract.getAmountToDate(req.session.project, moment()) },
+		            { value: format.formatMoney(interest.now), order: interest.now},
 		            { value: contract.getTerminationTypeFullString(req.session.projectConfig) },
-		            { value: moment(contract.termination_date).format('DD.MM.YYYY'), order: moment(contract.termination_date)},
-		            { value: moment(contract.getPaybackDate(req.session.projectConfig)).format('DD.MM.YYYY'), order: moment(contract.getPaybackDate(req.session.projectConfig))},
+		            { value: contract.termination_date?moment(contract.termination_date).format('DD.MM.YYYY'):"", order: contract.termination_date?moment(contract.termination_date):""},
+		            { value: contract.getPaybackDate(req.session.projectConfig)?moment(contract.getPaybackDate(req.session.projectConfig)).format('DD.MM.YYYY'):"", order: contract.getPaybackDate(req.session.projectConfig)?moment(contract.getPaybackDate(req.session.projectConfig)):""},
 		            { value: contract.getStatus() }
     			]);
     		})
