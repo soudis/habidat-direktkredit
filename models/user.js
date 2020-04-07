@@ -183,19 +183,15 @@ module.exports = (sequelize, DataTypes) => {
         var usersCancelled = [];
         var now = moment();
         users.forEach(function(user){
+          var contracts = [];
           user.contracts.forEach(function(contract){
             if (contract.isCancelledAndNotRepaid(projects[project], now)) {
-              var copiedUser = clonedeep(user);
-              var projectConfig = projects[project];
-              copiedUser.payback_date = contract.getPaybackDate(projectConfig);
-              copiedUser.termination_type = contract.getTerminationTypeFullString(projectConfig);
-              copiedUser.payback_amount = contract.getAmountToDate(project, now);
-              copiedUser.contract_date = moment(contract.sign_date);
-              usersCancelled.push(copiedUser);
+              contracts.push(contract);
             }
           });
+          user.contracts = contracts;
         });
-        return usersCancelled;
+        return users;
     });
   }
 

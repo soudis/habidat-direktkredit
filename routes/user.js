@@ -111,12 +111,7 @@ module.exports = function(app){
 	router.get('/user/list/cancelled', security.isLoggedInAdmin, function(req, res, next) {
 		var models  = require('../models')(req.session.project);
 		models.user.cancelledAndNotRepaid(models, req.session.project, { administrator: {[Op.not]: '1'}})
-			.then(users => utils.render(req, res, 'user/list', 
-				{
-					users: users, 
-					noAggregation: true, 
-					additionalFields: [{label: "Auszubezahlender Betrag", key: "payback_amount", type: "number"},{label: "Vertragsdatum", key: "contract_date", type: "date"},{label: "Kündigungsart", key: "termination_type", type: "string"},{label: "Rückzahlungsdatum", key: "payback_date", type: "date"}]
-				}, 'Direktkreditgeber*innen Liste (gekündigte, nicht ausgezahlte Kredite)'))
+			.then(users => utils.render(req, res, 'user/list', {contracts: generateContractTable(req, res, users).setColumnsVisible((columnsVisible.join(',')+',contract_termination_type,contract_termination_date,contract_payback_date').split(','))}, 'Gekündigte, nicht ausgezahlte Kredite'))
 			.catch(error => next(error));
 	});
 	
