@@ -4,12 +4,9 @@ mixin contract_form(formTitle, action, updateAction, updateTag, editContract)
     if (editContract)
       input(type="hidden" name="id" value=editContract.id)
     legend= formTitle
-    - var termination_type = (project.defaults && project.defaults.termination_type ? project.defaults.termination_type:"T");
-    - termination_type = (editContract && editContract.termination_type?editContract.termination_type:termination_type);
-    - var termination_period = (project.defaults && project.defaults.termination_period != null ? project.defaults.termination_period:undefined);
-    - termination_period = (editContract && editContract.termination_period?editContract.termination_period:termination_period);
-    - var termination_period_type = (project.defaults && project.defaults.termination_period_type ? project.defaults.termination_period_type:"M");
-    - termination_period_type = (editContract && editContract.termination_period_type?editContract.termination_period_type:termination_period_type);
+    - var termination_type = editContract.getTerminationType();
+    - var termination_period = editContract.getTerminationPeriod();
+    - var termination_period_type = editContract.getTerminationPeriodType();
     .form-group 
       label.control-label Vertragsdatum
       .input-group.date.datepicker(data-provide="datepicker" data-date-format="dd.mm.yyyy" data-date-language="de")

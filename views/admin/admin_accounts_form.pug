@@ -4,7 +4,7 @@ mixin add_admin_form()
     .form-group
       label.control-label Username
       input.form-control(type="text"  name="logon_id" required)
-    if (config.adminauth === "ldap")
+    if (settings.config.get('auth.admin.method') === "ldap")
       .form-group
         .form-check
           input.form-check-input(id="ldap_account_checkbox" type="checkbox" name="ldap" aria-describedby="ldapHelp")

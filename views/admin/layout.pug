@@ -1,7 +1,7 @@
 extends ../layout
 block content
   #body-container
-    +nav(project.projectname + " Kreditverwaltung", "dropdown_menu", project.logo)
+    +nav(settings.project.get('projectname') + " Kreditverwaltung", "dropdown_menu", settings.project.get('logo'))
       +nav_item( "/user/list" ) 
         span.fa.fa-th-list
         span  Kredite

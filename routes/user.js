@@ -1,11 +1,12 @@
-var security = require('../utils/security');
-var format = require('../utils/format');
-var moment = require("moment");
-var router = require('express').Router();
-var url = require('url');
-var utils = require('../utils');
-var Promise = require('bluebird');
-var Op = require("sequelize").Op;
+const security = require('../utils/security');
+const format = require('../utils/format');
+const moment = require("moment");
+const router = require('express').Router();
+const url = require('url');
+const utils = require('../utils');
+const Promise = require('bluebird');
+const Op = require("sequelize").Op;
+const models  = require('../models');
 
 module.exports = function(app){
 
@@ -78,7 +79,7 @@ module.exports = function(app){
     	}
     	users.forEach(user => {
     		user.contracts.forEach(contract => {
-    			var interest = contract.calculateInterest(req.session.project)
+    			var interest = contract.calculateInterest()
     			contracts.data.push([
     				{ value: moment(contract.sign_date).format('DD.MM.YYYY'), order: moment(contract.sign_date) },
 		            { value:  user.id  },
@@ -94,11 +95,11 @@ module.exports = function(app){
 		            { value: format.formatPercent(contract.interest_rate,3), order: contract.interest_rate},
 		            { value: format.formatMoney(contract.getDepositAmount(), 2), order: contract.getDepositAmount(), class: contract.getDepositAmount()>0?"text-success":""},
 		            { value: format.formatMoney(contract.getWithdrawalAmount(), 2), order: contract.getWithdrawalAmount(), class: contract.getWithdrawalAmount()<0?"text-danger":"" },
-		            { value: format.formatMoney(contract.getAmountToDate(req.session.project, moment())), order: contract.getAmountToDate(req.session.project, moment()) },
+		            { value: format.formatMoney(contract.getAmountToDate(moment())), order: contract.getAmountToDate(moment()) },
 		            { value: format.formatMoney(interest.now), order: interest.now},
-		            { value: contract.getTerminationTypeFullString(req.session.projectConfig) },
+		            { value: contract.getTerminationTypeFullString()},
 		            { value: contract.termination_date?moment(contract.termination_date).format('DD.MM.YYYY'):"", order: contract.termination_date?moment(contract.termination_date):""},
-		            { value: contract.getPaybackDate(req.session.projectConfig)?moment(contract.getPaybackDate(req.session.projectConfig)).format('DD.MM.YYYY'):"", order: contract.getPaybackDate(req.session.projectConfig)?moment(contract.getPaybackDate(req.session.projectConfig)):""},
+		            { value: contract.getPaybackDate()?moment(contract.getPaybackDate()).format('DD.MM.YYYY'):"", order: contract.getPaybackDate()?moment(contract.getPaybackDate()):""},
 		            { value: contract.getStatus() }
     			]);
     		})
@@ -109,14 +110,12 @@ module.exports = function(app){
     const columnsVisible = ['contract_sign_date', 'user_name', 'contract_status', 'contract_amount', "contract_deposit", "contract_withdrawal", 'contract_amount_to_date'];
 
 	router.get('/user/list/cancelled', security.isLoggedInAdmin, function(req, res, next) {
-		var models  = require('../models')(req.session.project);
-		models.user.cancelledAndNotRepaid(models, req.session.project, { administrator: {[Op.not]: '1'}})
+		models.user.cancelledAndNotRepaid(models, { administrator: {[Op.not]: '1'}})
 			.then(users => utils.render(req, res, 'user/list', {contracts: generateContractTable(req, res, users).setColumnsVisible((columnsVisible.join(',')+',contract_termination_type,contract_termination_date,contract_payback_date').split(','))}, 'Gekündigte, nicht ausgezahlte Kredite'))
 			.catch(error => next(error));
 	});
 	
 	router.get('/user/list', security.isLoggedInAdmin, function(req, res, next) {
-		var models  = require('../models')(req.session.project);
 		models.user.findFetchFull(models, { administrator: {[Op.not]: '1'}})
 			.then(users => utils.render(req, res, 'user/list', {contracts: generateContractTable(req, res, users).setColumnsVisible(columnsVisible)}, 'Kreditliste'))
 			.catch(error => next(error));
@@ -127,21 +126,18 @@ module.exports = function(app){
 	});
 
 	router.get('/user/edit/:id', security.isLoggedInAdmin, function(req, res, next) {
-		var models  = require('../models')(req.session.project);
 		models.user.findByIdFetchFull(models, req.params.id)
 			.then(user => utils.render(req, res, 'user/edit', { user:user}, 'Direktkreditgeber*in Bearbeiten'))
 			.catch(error => next(error));
 	});
 
 	router.get('/user/show/:id', security.isLoggedInAdmin, function(req, res, next) {
-		var models  = require('../models')(req.session.project);
 		models.user.findByIdFetchFull(models, req.params.id)
 			.then(user =>  renderUser(req, res, models, { user:user, title: 'Direktkreditgeber*in' }))
 			.catch(error => next(error));
 	});
 
 	router.post('/user/add', security.isLoggedInAdmin, function(req, res, next) {
-		var models  = require('../models')(req.session.project);
 		Promise.resolve()
 			.then(() => {
 				var length = 8,
@@ -173,7 +169,6 @@ module.exports = function(app){
 	});
 
 	router.get('/admin/accounts', security.isLoggedInAdmin, function(req, res, next) {
-		var models  = require('../models')(req.session.project);
 		models.user.findFetchFull(models, {administrator: true})
 			.then(users => utils.render(req, res, 'admin/admin_accounts', {accounts: users, message: req.flash('error')}, 'Administrator*innen Accounts'))
 			.catch(error => next(error));
@@ -185,7 +180,6 @@ module.exports = function(app){
 	});	
 
 	router.get('/admin/delete/:id', security.isLoggedInAdmin, function(req, res, next) {
-		var models  = require('../models')(req.session.project);
 		models.user.destroy({
 			where: {
 				id: req.params.id,
@@ -216,7 +210,6 @@ module.exports = function(app){
 					throw 'Passwörter sind nicht gleich!';
 				}
 
-				var models  = require('../models')(req.session.project);
 				var length = 16,
 			    charset = "!#+?-_abcdefghijklnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789",
 			    generatedPassword = "";
@@ -244,7 +237,6 @@ module.exports = function(app){
 
 
 	router.post('/user/edit', security.isLoggedInAdmin, function(req, res, next) {
-		var models  = require('../models')(req.session.project);
 		models.user.update({
 				first_name: req.body.first_name,
 				last_name: req.body.last_name,
@@ -263,7 +255,6 @@ module.exports = function(app){
 	});
 
 	router.get('/user/delete/:id', security.isLoggedInAdmin, function(req, res, next) {
-		var models  = require('../models')(req.session.project);
 		models.user.destroy({ where: { id: req.params.id }})
 			.then(function(deleted) {
 				if(deleted > 0) {

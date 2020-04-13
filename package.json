@@ -27,6 +27,7 @@
     "express-session": "^1.15.6",
     "jquery": "^3.4.1",
     "json2csv": "^2.0.12",
+    "jsonfile": "^6.0.1",
     "jszip": "^2.6.1",
     "lodash.clonedeep": "^4.5.0",
     "mkdirp": "^0.5.1",
@@ -48,6 +49,7 @@
     "serve-favicon": "^2.5.0",
     "session-file-store": "^1.2.0",
     "sprintf": "^0.1.5",
+    "umzug": "^2.3.0",
     "validator": "^4.0.4"
   }
 }

@@ -1,9 +1,10 @@
-var moment = require("moment");
-var sequelize = require("sequelize");
-var Op = require("sequelize").Op;
+const moment = require("moment");
+const sequelize = require("sequelize");
+const Op = require("sequelize").Op;
+const models = require('../models');
 
 
-var chartColors = [
+const chartColors = [
 	"#a6cee3",
 	"#1f78b4",
 	"#b2df8a",
@@ -42,11 +43,11 @@ var generatePieChart = function(data, callback) {
 	callback(canvas.toBuffer().toString('base64'));
 };
 
-exports.getGermanContractsByYearAndInterestRate = function(models, callback) {
+exports.getGermanContractsByYearAndInterestRate = function() {
 
 	// find all german contracts (NOTE: distinction is just by
     // length of ZIP code > 4)
-	models.user.findAll({
+	return models.user.findAll({
 		  where: { country: 'DE' },
 		  include:{
 				model: models.contract,
@@ -114,12 +115,12 @@ exports.getGermanContractsByYearAndInterestRate = function(models, callback) {
 			});
 		});		
 		
-		callback(result);
+		return result;
 
 	});
 };
 
-exports.getNumbers = function(models, project, callback){
+exports.getNumbers = function() {
 
 	var contractHelper = [];
 
@@ -196,7 +197,7 @@ exports.getNumbers = function(models, project, callback){
 	var lastYear = moment().subtract(1,"year");
 	var now = moment();
 
-	models.user.findAll({
+	return models.user.findAll({
 		  where: { administrator: {[Op.not]: '1'}},
 		  include:{
 				model: models.contract,
@@ -224,7 +225,7 @@ exports.getNumbers = function(models, project, callback){
 
 						//toDate = transaction.interestToDate(contract.interest_rate, now);
 						//console.log("user: " + user.first_name + " " + user.last_name + ", now: " + now + ", transactions(date, amount):" + transaction.transaction_date + ", " + transaction.amount +" interest: " + toDate);
-						interest += transaction.interestToDate(project, contract.interest_rate, now);
+						interest += transaction.interestToDate(contract.interest_rate, now);
 						// general statistics
 						if (transaction.amount > 0) {
 							deposits += transaction.amount;
@@ -380,7 +381,7 @@ exports.getNumbers = function(models, project, callback){
 			numbers.charts.byRelationship = chart;
 		});*/
 
-		callback(numbers);
+		return numbers;
 	});
 
 };

@@ -1,13 +1,13 @@
-var security = require('../utils/security');
-var moment = require("moment");
-var router = require('express').Router();
-var utils = require('../utils');
+const security = require('../utils/security');
+const moment = require("moment");
+const router = require('express').Router();
+const utils = require('../utils');
+const models  = require('../models');
 
 module.exports = function(app){
 
 	/* GET home page. */
 	router.get('/transaction/edit/:id', security.isLoggedInAdmin, function(req, res, next) {
-		var models  = require('../models')(req.session.project);
 		models.transaction.findByPk(req.params.id)
 			.then(transaction => {
 				return models.contract.findByIdFetchFull(models, transaction.contract_id)
@@ -18,14 +18,12 @@ module.exports = function(app){
 
 	/* GET home page. */
 	router.get('/transaction/add/:id', security.isLoggedInAdmin, function(req, res, next) {
-		var models  = require('../models')(req.session.project);
 		models.contract.findByIdFetchFull(models, req.params.id)
 			.then(contract => utils.render(req, res, 'transaction/add', {contract: contract}))
 			.catch(error => next(error));
 	});
 
 	router.post('/transaction/add', security.isLoggedInAdmin, function(req, res, next) {
-		var models  = require('../models')(req.session.project);
 		models.transaction.create({
 				transaction_date: moment(req.body.transaction_date, 'DD.MM.YYYY'),
 				amount: req.body.amount,
@@ -41,7 +39,6 @@ module.exports = function(app){
 	});
 	
 	router.post('/transaction/edit', security.isLoggedInAdmin, function(req, res, next) {
-		var models  = require('../models')(req.session.project);
 		models.transaction.update({
 				transaction_date: moment(req.body.transaction_date, 'DD.MM.YYYY'),
 				amount: req.body.amount,
@@ -57,8 +54,6 @@ module.exports = function(app){
 
 
 	router.get('/transaction/delete/:id', security.isLoggedInAdmin, function(req, res, next) {
-		
-		var models  = require('../models')(req.session.project);
 		models.transaction.findByPk( req.params.id)
 			.then(transaction =>  {
 				transaction.destroy()

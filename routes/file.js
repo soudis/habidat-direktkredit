@@ -1,20 +1,19 @@
-var security = require('../utils/security');
-var utils = require('../utils');
-var router = require('express').Router();
-var fs = require('fs');
-var Op = require("sequelize").Op;
+const security = require('../utils/security');
+const utils = require('../utils');
+const router = require('express').Router();
+const fs = require('fs');
+const Op = require("sequelize").Op;
+const models  = require('../models');
 
 module.exports = function(app){
 
 
 	router.get('/file/add/user/:id', security.isLoggedInAdmin, function(req, res, next) {
-		var models  = require('../models')(req.session.project);
 		utils.render(req, res, 'file/add', { id: req.params.id, type: 'user' })
 			.catch(error => next(error));
 	});
 	
 	router.get('/file/get/:id', security.isLoggedInAdmin, function(req, res, next) {
-		var models  = require('../models')(req.session.project);
 		models.file.findByPk(req.params.id)
 			.then(file => {
 				var fileData = fs.readFileSync(file.path, 'binary');
@@ -30,7 +29,6 @@ module.exports = function(app){
 	});
 
 	router.get('/file/getpublic/:id', security.isLoggedIn, function(req, res, next) {
-		var models  = require('../models')(req.session.project);
 		models.file.findByPk(req.params.id)
 			.then(file => {
 				if (file.ref_table.startsWith("infopack_")) {
@@ -50,8 +48,6 @@ module.exports = function(app){
 	});	
 	
 	router.get('/file/delete/user/:id', security.isLoggedInAdmin, function(req, res, next) {
-		
-		var models  = require('../models')(req.session.project);
 		models.file.findByPk(req.params.id)
 			.then(function(file) {
 				fs.unlinkSync(file.path);  
@@ -64,8 +60,6 @@ module.exports = function(app){
 	});
 
 	router.get('/file/delete/:id', security.isLoggedInAdmin, function(req, res, next) {
-		
-		var models  = require('../models')(req.session.project);
 		models.file.findByPk(req.params.id)
 			.then(function(file) {
 				fs.unlinkSync(file.path);  
@@ -78,8 +72,6 @@ module.exports = function(app){
 	});	
 	
 	router.post('/file/add/user', security.isLoggedInAdmin, function(req, res, next) {
-		console.log(req.file);
-		var models  = require('../models')(req.session.project);
 		models.file.create({
 				filename: req.file.originalname,
 				description: req.body.description,
@@ -94,7 +86,6 @@ module.exports = function(app){
 	});
 
 	router.get('/admin/templates', security.isLoggedInAdmin, function(req, res, next) {
-		var models  = require('../models')(req.session.project);		
 		models.file.findAll({
 			where: {
 				ref_table: {
@@ -107,7 +98,6 @@ module.exports = function(app){
 	});
 
 	router.get('/admin/infopack', security.isLoggedInAdmin, function(req, res, next) {
-		var models  = require('../models')(req.session.project);		
 		models.file.findAll({
 			where: {
 				ref_table: {
@@ -154,9 +144,7 @@ module.exports = function(app){
 	});
 
 	router.post('/admin/addtemplate', security.isLoggedInAdmin, function(req, res, next) {
-		var models  = require('../models')(req.session.project);
 		var type = req.body.type;
-
 		Promise.resolve()
 			.then(() => {
 				if (type == "template_account_notification") {

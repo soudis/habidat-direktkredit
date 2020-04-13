@@ -1,13 +1,12 @@
-var security = require('../utils/security');
-var moment = require("moment");
-var utils = require('../utils');
-var fs = require('fs');
-var numeral = require('numeral');
-var format = require('../utils/format');
-var router = require('express').Router();
-var projects = require('../config/projects.json');
-
-var Op = require("sequelize").Op;
+const security = require('../utils/security');
+const moment = require("moment");
+const utils = require('../utils');
+const fs = require('fs');
+const numeral = require('numeral');
+const format = require('../utils/format');
+const router = require('express').Router();
+const models  = require('../models');
+const Op = require("sequelize").Op;
 
 module.exports = function(app){
 
@@ -20,7 +19,6 @@ router.get('/profile', security.isLoggedIn, function(req, res) {
 	if (req.user.dn || req.user.administrator) {
 		res.redirect('/admin');
 	} else {
-		var models  = require('../models')(req.session.project);
 		models.user.findByIdFetchFull(models, req.user.id,function(user){
 			res.render('profile', {
 				user : user, // get the user out of session and pass to template
@@ -31,7 +29,6 @@ router.get('/profile', security.isLoggedIn, function(req, res) {
 });
 
 router.get('/files', security.isLoggedIn, function(req, res) {
-	var models  = require('../models')(req.session.project);		
 	models.file.findAll({
 		where: {
 			ref_table: {
@@ -66,9 +63,8 @@ router.get('/files', security.isLoggedIn, function(req, res) {
 
 
 router.post('/accountnotification', security.isLoggedIn, function(req, res) {
-	var models  = require('../models')(req.session.project);	
 	models.user.findByIdFetchFull(models, req.user.id,function(user){
-		var transactionList = user.getTransactionList(req.session.project, req.body.year);
+		var transactionList = user.getTransactionList(req.body.year);
 		
 		transactionList.sort(function(a,b) {
 			if (a.contract_id > b.contract_id)
@@ -121,7 +117,7 @@ router.post('/accountnotification', security.isLoggedIn, function(req, res) {
 		}).catch((error) => {
 			return "account_notification";
 		}).then((template) => {
-			utils.generateDocx(template, filename, data, req.session.project);
+			utils.generateDocx(template, filename, data);
 
 			utils.convertToPdf(filename, function(err) {
 				var file;

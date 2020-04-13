@@ -1,0 +1,14 @@
+{
+    "projectname": "My Project",
+    "logo": "/public/images/logo.png",
+    "email" : "project@example.com",    
+    "admin": {
+        "email": "admin@example.com"
+    },
+    "defaults": {
+        "interest_method": "365_compound",    
+        "termination_type": "T",
+        "termination_period": "6",
+        "termination_period_type": "M"
+    }
+}

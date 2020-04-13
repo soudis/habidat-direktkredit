@@ -1,24 +1,20 @@
-var models  = require('../models');
-var moment = require("moment");
-var validator = require("validator");
-var Op = require("sequelize").Op;
+const models  = require('../models');
+const moment = require("moment");
+const validator = require("validator");
+const Op = require("sequelize").Op;
 
-exports.getEmails = function(mode, project, callback){
-
-	var whereClause = { administrator: {[Op.not]: '1'}};
-	var usersString = 'test';
-	var models  = require('../models')(project);  
-	models.user.findFetchFull(models, whereClause, function(users){
-		users.forEach(function(user){
-			var add;
-			if (user.email && validator.isEmail(user.email) && (mode === 'all' || user.isActive())) {
-				usersString += user.email + ',';
-			} 
+exports.getEmails = function(mode){
+	var usersString = '';
+	return models.user.findFetchFull(models, { administrator: {[Op.not]: '1'}})
+		.then(users => {
+			users.forEach(function(user){
+				var add;
+				if (user.email && validator.isEmail(user.email) && (mode === 'all' || user.isActive())) {
+					usersString += user.email + ',';
+				} 
+			});
+			return usersString;
 		});
-		callback(usersString);
-	});
-	
-
 };
 
 

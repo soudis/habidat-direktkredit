@@ -1,9 +1,0 @@
-{
-  "http": "true",
-  "https": "$HABIDAT_DK_HTTPS",
-  "sslcert": "$HABIDAT_DK_SSL_CERT",
-  "sslkey": "$HABIDAT_DK_SSL_KEY",
-  "porthttps": "$HABIDAT_DK_PORT_HTTPS",
-  "porthttp": "$HABIDAT_DK_PORT_HTTP",
-  "reverseproxy": "false"
-}

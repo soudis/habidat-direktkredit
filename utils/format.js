@@ -1,5 +1,5 @@
-var numeral = require('numeral');
-var moment = require('moment');
+const numeral = require('numeral');
+const moment = require('moment');
 
 numeral.register('locale', 'de', {
     delimiters: {

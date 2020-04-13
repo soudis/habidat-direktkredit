@@ -1,8 +1,10 @@
-var security = require('../utils/security');
-var moment = require("moment");
-var statistics = require('../utils/statistics');
-var utils = require('../utils')
-var router = require('express').Router();
+const security = require('../utils/security');
+const moment = require("moment");
+const statistics = require('../utils/statistics');
+const utils = require('../utils')
+const router = require('express').Router();
+const models  = require('../models');
+
 
 module.exports = function(app){
 
@@ -10,17 +12,15 @@ module.exports = function(app){
 		res.render('statistics/downloads', { title: 'Downloads'});
 	});
 
-	router.get('/statistics/numbers', security.isLoggedInAdmin, function(req, res) {
-		var models  = require('../models')(req.session.project);		
-		statistics.getNumbers(models, req.session.project, function(numbers) {
-			console.log("numbers: " + JSON.stringify(numbers, null, 2));
-			res.render('statistics/numbers', { title: 'Zahlen, Daten, Fakten', "numbers": numbers});
-		});
-
+	router.get('/statistics/numbers', security.isLoggedInAdmin, function(req, res, next) {
+		statistics.getNumbers()
+			.then(numbers => {
+				res.render('statistics/numbers', { title: 'Zahlen, Daten, Fakten', "numbers": numbers});
+			})
+			.catch(next);
 	});
 
 	router.get('/statistics/byrelation', security.isLoggedInAdmin, (req, res) => {
-		var models  = require('../models')(req.session.project);		
 		models.user.findAll({
 			  include:{ 
 					model: models.contract, 
@@ -38,7 +38,7 @@ module.exports = function(app){
 					byRelation[user.relationship] = 0;
 				}
 				user.contracts.forEach((contract) => {
-					byRelation[user.relationship] += contract.getAmountToDate(req.session.project, today);
+					byRelation[user.relationship] += contract.getAmountToDate(today);
 				})
 			})
 			res.setHeader('Content-Type', 'application/json');
@@ -47,7 +47,6 @@ module.exports = function(app){
 	});
 	
 	router.get('/statistics/byzip', security.isLoggedInAdmin, (req, res) => {
-		var models  = require('../models')(req.session.project);		
 		models.user.findAll({
 			  include:{ 
 					model: models.contract, 
@@ -75,7 +74,7 @@ module.exports = function(app){
 					byZip[key] = 0;
 				}
 				user.contracts.forEach((contract) => {
-					byZip[key] += contract.getAmountToDate(req.session.project, today);
+					byZip[key] += contract.getAmountToDate(today);
 				})
 			})
 			res.setHeader('Content-Type', 'application/json');
@@ -84,8 +83,6 @@ module.exports = function(app){
 	});	
 
 	router.get('/statistics/bymonth', security.isLoggedInAdmin, (req, res) => {
-		var models  = require('../models')(req.session.project);		
-
 		models.user.findAll({
 			  include:{ 
 					model: models.contract, 
@@ -107,7 +104,7 @@ module.exports = function(app){
 				sum = 0;
 				users.forEach((user) => {
 					user.contracts.forEach((contract) => {
-						var contractAmount = contract.getAmountToDate(req.session.project, month);
+						var contractAmount = contract.getAmountToDate(month);
 						//console.log("contract: " + contract.id + ", " + contractAmount);
 						sum+= contractAmount;
 
@@ -121,8 +118,6 @@ module.exports = function(app){
 	});	
 
 	router.get('/statistics/transactionsbymonth', security.isLoggedInAdmin, (req, res) => {
-		var models  = require('../models')(req.session.project);		
-
 		models.user.findAll({
 			  include:{ 
 					model: models.contract, 
@@ -159,7 +154,7 @@ module.exports = function(app){
 									}									
 								}
 							}
-							interest += transaction.interestToDate(req.session.project, contract.interest_rate, end) - transaction.interestToDate(req.session.project, contract.interest_rate, start);
+							interest += transaction.interestToDate(contract.interest_rate, end) - transaction.interestToDate(contract.interest_rate, start);
 						});
 					})
 				})
@@ -175,7 +170,6 @@ module.exports = function(app){
 
 
 	router.post('/statistics/transactionList', security.isLoggedInAdmin, function(req, res) {
-		var models  = require('../models')(req.session.project);		
 		models.user.findAll({
 			  include:{ 
 					model: models.contract, 
@@ -188,7 +182,7 @@ module.exports = function(app){
 		}).then(function(users) {
 			var transactionList = [];
 			users.forEach(function(user) {
-				user.getTransactionList(req.session.project, req.body.year).forEach( function (transaction) {
+				user.getTransactionList(req.body.year).forEach( function (transaction) {
 					transactionList.push(transaction);
 				});
 			});
@@ -218,12 +212,13 @@ module.exports = function(app){
 		});	
 	});
 
-	router.get('/statistics/german', security.isLoggedInAdmin, function(req, res) {
-		var models  = require('../models')(req.session.project);		
-		statistics.getGermanContractsByYearAndInterestRate(models, function(years) {
-			//console.log("test: " + JSON.stringify(numbers);
-			res.render('statistics/german', { title: 'Deutsche Direktkredite', years: years});
-		});
+	router.get('/statistics/german', security.isLoggedInAdmin, function(req, res, next) {
+		statistics.getGermanContractsByYearAndInterestRate()
+			.then(years => {
+				//console.log("test: " + JSON.stringify(numbers);
+				res.render('statistics/german', { title: 'Deutsche Direktkredite', years: years});
+			})
+			.catch(error => next(error));
 	});	
 
 

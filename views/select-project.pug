@@ -15,7 +15,7 @@ block content
         .col-lg-3.col-sm-6.col-xs-12
           a.project-link(href='/project/'+id)
             .card.project-card
-              img.card-img-top(src=project.logo style="height: 100px; width: auto; object-fit: contain; ")  
+              img.card-img-top(src=settings.project.get('logo') style="height: 100px; width: auto; object-fit: contain; ")  
               .card-body.text-center
-                h5.card-title=project.projectname
+                h5.card-title=settings.project.get('projectname')
           

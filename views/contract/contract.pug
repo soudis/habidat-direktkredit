@@ -1,7 +1,7 @@
 include ../transaction/transaction
 
 mixin contract(contract)
-  - interest = contract.calculateInterest(projectid)
+  - interest = contract.calculateInterest()
   .col-md-6(id="contract_" + contract.id)
     .card
       .card-header
@@ -10,7 +10,7 @@ mixin contract(contract)
           .col-md.text-right.section-actions
             a.btn.btn-light.btn-sm.sidebar-action(href='/contract/edit/'+contract.id)
               span.fa.fa-edit              
-            a.btn.btn-light.btn-sm.confirm-action(data-remove-tag='contract_'+contract.id data-link='/contract/delete/'+contract.id, data-confirmtext='Willst du den Direktkredit vom ' + moment(contract.sign_date).format('DD.MM.YYYY') + ' von ' + user.first_name + ' ' + user.last_name  + ' wirklich löschen?')                  
+            a.btn.btn-light.btn-sm.confirm-action(data-remove-tag='contract_'+contract.id data-link='/contract/delete/'+contract.id, data-confirmtext='Willst du den Direktkredit vom ' + moment(contract.sign_date).format('DD.MM.YYYY') + ' wirklich löschen?')                  
               span.fa.fa-trash
             a.btn.btn-light.btn-sm.dropdown-toggle(id='contractTemplateButton' type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false") 
               span.fa.fa-file                          
@@ -43,10 +43,10 @@ mixin contract(contract)
               td= format.formatMoney(interest.now)
             tr
               td Aushaftender Betrag
-              td= format.formatMoney(contract.getAmountToDate(projectId, moment()))    
+              td= format.formatMoney(contract.getAmountToDate( moment()))    
             tr
               td Kündigungsart
-              td= contract.getTerminationTypeFullString(project)
+              td= contract.getTerminationTypeFullString()
             if contract.termination_type == "T"
               if (contract.termination_date)
                 tr
@@ -54,7 +54,7 @@ mixin contract(contract)
                   td= moment(contract.termination_date).format('DD.MM.YYYY')
                 tr
                   td Rückzahlungsfrist
-                  td= moment(contract.getPaybackDate(project)).format('DD.MM.YYYY')
+                  td= moment(contract.getPaybackDate()).format('DD.MM.YYYY')
               else
                 tr
                   td Kündigungsdatum
@@ -62,11 +62,11 @@ mixin contract(contract)
             else if contract.termination_type=="D"
               tr
                 td Rückzahlungsdatum
-                td= moment(contract.getPaybackDate(project)).format('DD.MM.YYYY')
+                td= moment(contract.getPaybackDate()).format('DD.MM.YYYY')
             else if contract.termination_type=="P"
               tr
                 td Ende der Laufzeit:
-                td= moment(contract.getPaybackDate(project)).format('DD.MM.YYYY')
+                td= moment(contract.getPaybackDate()).format('DD.MM.YYYY')
             tr
               td Notizen
               td!= contract.notes.replace("\n", '<br/>')

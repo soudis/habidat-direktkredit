@@ -1,12 +1,11 @@
-var DocxGen = require('docxtemplater');
-var JSZipUtils = require('jszip');
-var fs = require('fs');
-var moment = require('moment');
-var projects    = require('../config/projects.json');
+const DocxGen = require('docxtemplater');
+const JSZipUtils = require('jszip');
+const fs = require('fs');
+const moment = require('moment');
 // var cloudconvert = new (require('cloudconvert'))('oqxW0tKE_7gykv8GDULnAcRTv50QTqMtIPbFBtVzgQFUQe2VridmQ7czMIGtccFwO0ZvsyMNV-6IB4qXxWSo_g');
-var converter = require('office-converter')();
+const converter = require('office-converter')();
 
-var json2csv = require('json2csv');
+const json2csv = require('json2csv');
 
 
 exports.render = (req, res, template, data, title = undefined) => {
@@ -17,11 +16,8 @@ exports.render = (req, res, template, data, title = undefined) => {
 		})
 }
 
-exports.generateDocx = function(templateFile, outputFile, data, project){
+exports.generateDocx = function(templateFile, outputFile, data){
 	var path = templateFile;
-	if (templateFile.indexOf('/') === -1) {
-		path = __dirname + '/..' +  projects[project].templates + "/" + templateFile + ".docx";
-	}
 	var file = fs.readFileSync(path, 'binary');
 		var zip = new JSZipUtils(file);
         var doc=new DocxGen();

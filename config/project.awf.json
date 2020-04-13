@@ -1,0 +1,23 @@
+
+	},
+	"autonome-wohnfabrik": {
+		"projectname": "Autonome Wohnfabrik",
+		"logo": "/public/images/wohnfabrik.png",
+	    "email" : "wohnfabrik@systemli.org",
+	    "files" : "/public/files/autonome-wohnfabrik",
+	    "templates": "/templates/autonome-wohnfabrik/docx",
+	    "usersuffix": "wohnfabrik",
+	    "db": {
+	    	"username": "dk_autonome_wohnfabrik",
+			"password": "test",
+			"database": "dk_autonome_wohnfabrik"
+	    },
+        "defaults": {
+            "termination_type": "T",
+            "termination_period": "6",
+            "termination_period_type": "M"
+        }
+	}
+
+
+}

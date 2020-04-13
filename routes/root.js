@@ -1,35 +1,31 @@
-var security = require('../utils/security');
-var moment = require("moment");
-var passport = require('passport');
-var router = require('express').Router();
-var projects = require('../config/projects.json');
-var config = require('../config/config.json');
+const security = require('../utils/security');
+const moment = require("moment");
+const passport = require('passport');
+const router = require('express').Router();
+const settings = require('../utils/settings');
+
 
 module.exports = function(app){
 
 
 	/* Welcome Site */
 	router.get('/', function(req, res, next) {
-		if (req.session.project) {
-     		res.render('index', { title: 'habiDAT', message: req.flash('loginMessage') } );  	
-     	} else {
-     		res.redirect('/project'); 
-     	}
+   		res.render('index', { title: 'habiDAT', message: req.flash('loginMessage') } );  	
 	});
 
 
-	/* Welcome Site */
+/*
 	router.get('/project', function(req, res, next) {
      	res.render('select-project', { title: 'habiDAT - Projectauswahl',projects: projects} );  	
 	});
-
+*/
 		/* Welcome Site */
-	router.get('/project/:project', function(req, res, next) {
+/*	router.get('/project/:project', function(req, res, next) {
 		req.session.project = req.params.project;
 		req.session.projectConfig = projects[req.params.project];
 		req.logout();
      	res.redirect('/');
-	});
+	});*/
 
 	router.get('/admin', security.isLoggedInAdmin, function(req, res) {
 		res.redirect('/user/list');
@@ -52,7 +48,7 @@ module.exports = function(app){
 	});
 
 	var loginStrategies = ['local-login-admin', 'local-login'];
-	if (config.adminauth == 'ldap') {
+	if (settings.config.get('auth.admin.method') == 'ldap') {
 		loginStrategies = ['ldap-login-admin', 'local-login-admin','local-login'];
 	}
 	

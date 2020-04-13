@@ -1,13 +1,13 @@
-var security = require('../utils/security');
-var moment = require("moment");
-var fs = require('fs');
-var utils = require ('../utils');
-var format = require ('../utils/format');
-var router = require('express').Router();
+const security = require('../utils/security');
+const moment = require("moment");
+const fs = require('fs');
+const utils = require ('../utils');
+const format = require ('../utils/format');
+const router = require('express').Router();
+const models  = require('../models');
 
 module.exports = function(app){
 	router.get('/docx/:id', security.isLoggedInAdmin, function(req, res) {
-		var models  = require('../models')(req.session.project);		
 		models.user.findOne({
 			where: {
 				id: req.params.id
@@ -37,7 +37,7 @@ module.exports = function(app){
 				return req.query.file;
 			}).then((template) => {
 
-				utils.generateDocx(template, user.logon_id, data, req.session.project);
+				utils.generateDocx(template, user.logon_id, data);
 				var file = fs.readFileSync("./tmp/"+ user.logon_id +".docx", 'binary');
 
 				res.setHeader('Content-Length', file.length);
@@ -50,7 +50,6 @@ module.exports = function(app){
 	});
 
 	router.get('/docx_c/:id', security.isLoggedInAdmin, function(req, res) {
-		var models  = require('../models')(req.session.project);
 		models.contract.findOne({
 			where : {
 				id: req.params.id
@@ -96,7 +95,7 @@ module.exports = function(app){
 					return req.query.file;
 				}).then((template) => {
 					try{
-						utils.generateDocx(template, user.logon_id, data, req.session.project);
+						utils.generateDocx(template, user.logon_id, data);
 					}catch(e) {
 						e.properties.errors.forEach(function(err) {
 						    console.log(err);

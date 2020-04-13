@@ -15,26 +15,13 @@ var fs = require('fs');
 var multer = require('multer');
 var mkdirp = require('mkdirp');
 var numeral = require('numeral');
+const settings = require('./utils/settings');
 const sass = require('node-sass-middleware');
-
-
-
 
 mkdirp('tmp', function(err) { });
 mkdirp('upload', function(err) { });
 
-
-
-
-var site    = require('./config/site.json');
-var config    = require('./config/config.json');
-var projects    = require('./config/projects.json');
-
-
-
 var models  = require('./models');
-
-
 
 require('./utils/security/passport')(passport); 
 
@@ -97,7 +84,7 @@ var replaceUmlaute = function (str) {
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'pug');
 
-if (site.reverseproxy === 'true') {
+if (settings.config.get('site.reverseproxy') === 'true') {
 	app.enable('trust proxy');
 }
 
@@ -120,32 +107,23 @@ app.use(session({
 app.use(passport.initialize());
 app.use(passport.session()); // persistent login sessions
 
-app.use((req, res, next) => {
-  if (req.session && req.session.project) {
-    res.locals.project = projects[req.session.project];
-    res.locals.projectId = req.session.project;
-  }
+app.use(function(req,res,next){
+  res.locals.session = req.session;
+  res.locals.settings = settings;
+  res.locals.currentUser = req.user;
+
   res.locals.moment = require('moment');
   res.locals.replaceUmlaute = replaceUmlaute;
   res.locals.format = require('./utils/format');
   res.locals.sprintf = require('sprintf').sprintf;
-  res.locals.site = site;  
+
+  var newPrevURLs = [];
+  if (req.session.prevURLs && req.session.prevURLs.length >= 1) {
+    newPrevURLs.push(req.session.prevURLs[req.session.prevURLs.length-1]);
+  }
+  newPrevURLs.push(req.originalUrl);
+  req.session.prevURLs = newPrevURLs;
   next();
-});
-
-
-app.use(function(req,res,next){
-    res.locals.session = req.session;
-    res.locals.config = config;
-    res.locals.user = req.user;
-
-    var newPrevURLs = [];
-    if (req.session.prevURLs && req.session.prevURLs.length >= 1) {
-      newPrevURLs.push(req.session.prevURLs[req.session.prevURLs.length-1]);
-    }
-    newPrevURLs.push(req.originalUrl);
-    req.session.prevURLs = newPrevURLs;
-    next();
 });
 
 require('./routes/contract')(app);
@@ -183,18 +161,18 @@ app.use(function(err, req, res, next) {
 module.exports = app;
 
 //models.sequelize.sync().then(function () {
-	if (site.https === "true") {
-	  var privateKey  = fs.readFileSync(site.sslkey, 'utf8');
-	  var certificate = fs.readFileSync(site.sslcert, 'utf8');
+	if (settings.config.get('site.https') === "true") {
+	  var privateKey  = fs.readFileSync(settings.config.get('site.sslkey'), 'utf8');
+	  var certificate = fs.readFileSync(settings.config.get('site.sslcert'), 'utf8');
 	  var credentials = {key: privateKey, cert: certificate};		
-	  console.log("starting https server on: " + site.porthttps.toString());	
+	  console.log("starting https server on: " + settings.config.get('site.porthttps').toString());	
 	  var httpsServer = https.createServer(credentials, app);
-	  httpsServer.listen(parseInt(site.porthttps));
+	  httpsServer.listen(parseInt(settings.config.get('site.porthttps')));
 	}
-	if (site.http === "true") {
-	  console.log("starting http server on: " + site.porthttp.toString());
+	if (settings.config.get('site.http') === "true") {
+	  console.log("starting http server on: " + settings.config.get('site.porthttp').toString());
 	  var httpServer = http.createServer(app);
-	  httpServer.listen(parseInt(site.porthttp));
+	  httpServer.listen(parseInt(settings.config.get('site.porthttp')));
 	}
 //	});
 }catch(e) {

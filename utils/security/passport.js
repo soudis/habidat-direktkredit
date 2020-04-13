@@ -1,10 +1,9 @@
-// config/passport.js
-
-var Sequelize = require("sequelize");
-var moment = require('moment');
-var fs = require('fs');
-var config = require('../../config/config.json');
+const Sequelize = require("sequelize");
+const moment = require('moment');
+const fs = require('fs');
+const settings = require('../../utils/settings');
 const LDAPStrategy = require('passport-ldapauth');
+const models  = require('../../models');
 
 var log_file = fs.createWriteStream(__dirname + '/../../log/access.log', {flags : 'a'});
 
@@ -34,8 +33,7 @@ module.exports = function(passport) {
     // used to deserialize the user
     passport.deserializeUser(function(sessionUser, done) {
         if (sessionUser.dn) {
-            if (!sessionUser.id && sessionUser.project) {
-               var models  = require('../../models')(sessionUser.project);                            
+            if (!sessionUser.id && sessionUser.project) {                          
                models["user"].find({
                         where : {
                             logon_id: sessionUser.cn
@@ -47,8 +45,7 @@ module.exports = function(passport) {
             } else {
                 done(null, sessionUser)                
             }
-        } else if (sessionUser.project){   
-           var models  = require('../../models')(sessionUser.project);         
+        } else if (sessionUser.project){         
       	   models["user"].findByPk(sessionUser.id).then( function(user) {
              done(null, user);
            });
@@ -73,8 +70,7 @@ module.exports = function(passport) {
 
         // find a user whose email is the same as the forms email
         // we are checking to see if the user trying to login already exists
-    	console.log('try to logon');
-        var models  = require('../../models')(req.session.project);        
+    	console.log('try to logon'); 
         models["user"].findOne({where: Sequelize.or({logon_id: userid}, {email: userid})}).then( function( user) {
 
             // if no user is found, return the message
@@ -102,9 +98,8 @@ module.exports = function(passport) {
     // =========================================================================
     // we are using named strategies since we have one for login and one for signup
     // by default, if there was no name, it would just be called 'local'
-    if (config.adminauth === "ldap") {
-        passport.use('ldap-login-admin', new LDAPStrategy(config.ldap, (req, user, done) => {
-            var models  = require('../../models')(req.session.project);  
+    if (settings.config.get('auth.admin.method') === "ldap") {
+        passport.use('ldap-login-admin', new LDAPStrategy(settings.config.get('auth.admin.ldap'), (req, user, done) => {
             models.user.findAll({         
               where: {
                 administrator: true,
@@ -144,8 +139,7 @@ module.exports = function(passport) {
 
         // find a user whose email is the same as the forms email
         // we are checking to see if the user trying to login already exists
-    	console.log('try to logon: ' + req.session.project + JSON.stringify(req.session));
-        var models  = require('../../models')(req.session.project);        
+    	//console.log('try to logon: ' + req.session.project + JSON.stringify(req.session));    
         models["user"].findOne({where: Sequelize.or({logon_id: userid}, {email: userid})}).then( function( user) {
 
             // if no user is found, return the message
