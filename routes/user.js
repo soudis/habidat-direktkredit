@@ -7,6 +7,7 @@ const utils = require('../utils');
 const Promise = require('bluebird');
 const Op = require("sequelize").Op;
 const models  = require('../models');
+const multer = require('multer');
 
 module.exports = function(app){
 
@@ -78,6 +79,30 @@ module.exports = function(app){
     		data: []
     	}
     	users.forEach(user => {
+    		if (user.contracts.length === 0) {
+    			contracts.data.push([
+    				false,
+		            { value:  user.id  },
+		            { value: user.getFullName(), order: replaceUmlaute(user.getFullName())},
+		            { value: user.getAddress(true) },
+		            { value: user.telno },
+		            { value: user.email },
+		            { value: user.IBAN },
+		            { value: user.BIC },
+		            { value: user.relationship },
+                    false,
+                    false,
+                    false,
+                    false,
+                    false,
+                    false,
+                    false,
+                    false,
+                    false,
+                    false,
+                    false,
+    				])
+    		}
     		user.contracts.forEach(contract => {
     			var interest = contract.calculateInterest()
     			contracts.data.push([
@@ -137,7 +162,7 @@ module.exports = function(app){
 			.catch(error => next(error));
 	});
 
-	router.post('/user/add', security.isLoggedInAdmin, function(req, res, next) {
+	router.post('/user/add', security.isLoggedInAdmin, multer().none(), function(req, res, next) {
 		Promise.resolve()
 			.then(() => {
 				var length = 8,
@@ -164,79 +189,11 @@ module.exports = function(app){
 			        relationship: req.body.relationship					
 				})
 			})
-			.then(user => res.redirect('/user/show/' + user.id))
+			.then(user => res.send({redirect : '/user/show/' + user.id}))
 			.catch(error => next(error));
 	});
 
-	router.get('/admin/accounts', security.isLoggedInAdmin, function(req, res, next) {
-		models.user.findFetchFull(models, {administrator: true})
-			.then(users => utils.render(req, res, 'admin/admin_accounts', {accounts: users, message: req.flash('error')}, 'Administrator*innen Accounts'))
-			.catch(error => next(error));
-	});
-
-	router.get('/admin/add_account', security.isLoggedInAdmin, function(req, res, next) {
-		utils.render(req, res, 'admin/admin_accounts_add', {})
-			.catch(error => next(error));
-	});	
-
-	router.get('/admin/delete/:id', security.isLoggedInAdmin, function(req, res, next) {
-		models.user.destroy({
-			where: {
-				id: req.params.id,
-				administrator: true
-			}
-		}).then(deleted => {
-			if(deleted > 0) {
-			 	res.json({redirect: '/admin/accounts'});
-			} else {
-				res.status(500).json({error: 'Es wurde kein Account gelöscht, das sollte nicht passieren!'});
-			}
-		}).catch(error => {
-			res.status(500).json({error: error});
-		});  
-	});
-
-
-	router.post('/admin/add', security.isLoggedInAdmin, function(req, res, next) {
-		
-		Promise.resolve()
-			.then(() => {
-
-				if (!req.body.logon_id) {
-					throw 'Login ID muss angegeben werden!';
-				} else if (!req.body.ldap && !req.body.password) {
-					throw 'Passwort fehlt!';
-				} else if (!req.body.ldap && req.body.password != req.body.password2) {
-					throw 'Passwörter sind nicht gleich!';
-				}
-
-				var length = 16,
-			    charset = "!#+?-_abcdefghijklnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789",
-			    generatedPassword = "";
-				for (var i = 0, n = charset.length; i < length; ++i) {
-					generatedPassword += charset.charAt(Math.floor(Math.random() * n));
-				}
-				var user = {
-					logon_id: req.body.logon_id,
-					administrator: true
-				}
-				if (req.body.ldap) {
-					user.ldap = true;
-					user.password = generatedPassword;
-				} else {
-					user.ldap = false;
-					user.password = req.body.password;
-				}
-				
-				return models.user.create(user);
-			})
-			.then(() => res.send({redirect: '/admin/accounts'}))
-			.catch(error => next(error))
-
-	});
-
-
-	router.post('/user/edit', security.isLoggedInAdmin, function(req, res, next) {
+	router.post('/user/edit', security.isLoggedInAdmin, multer().none(), function(req, res, next) {
 		models.user.update({
 				first_name: req.body.first_name,
 				last_name: req.body.last_name,
@@ -250,7 +207,7 @@ module.exports = function(app){
 				BIC: req.body.BIC,
 				relationship: req.body.relationship
 			}, {where: { id:req.body.id } })
-			.then(user => res.redirect('/user/show/' + req.body.id))
+			.then(() => res.send({redirect: 'reload'}))
 			.catch(error => next(error));
 	});
 

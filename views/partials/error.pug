@@ -1,0 +1,7 @@
+.alert.alert-danger.alert-dismissible.fade.show(role='alert')
+  strong Fehler! 
+  span!= error
+  button.close(type="button" data-dismiss="alert" aria-label="Close")
+    small.fa.fa-times(aria-hidden="true")
+  if error.stack && process.env.DEBUG === 'true'
+    pre=error.stack

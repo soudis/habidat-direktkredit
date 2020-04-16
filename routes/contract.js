@@ -3,6 +3,8 @@ const moment = require("moment");
 const utils = require("../utils");
 const router = require('express').Router();
 const models  = require('../models');
+const _t = require('../utils/intl')._t;
+const multer = require('multer');
 
 module.exports = function(app){
 
@@ -31,14 +33,14 @@ module.exports = function(app){
 			.catch(error => res.status(500).json({error: error}));
 	});	
 
-	router.post('/contract/add', security.isLoggedInAdmin, function(req, res, next) {		
+	router.post('/contract/add', security.isLoggedInAdmin, multer().none(), function(req, res, next) {		
 		Promise.resolve()
 			.then(() => {
 				var termination_date = null;
 				if (req.body.termination_type == "T") {
-					termination_date = req.body.termination_date_T==""?null:moment(req.body.termination_date_T, "DD.MM.YYYY");
+					termination_date = req.body.termination_date_T==""?null:moment(req.body.termination_date_T);
 				} else if (req.body.termination_type == "D") {
-					termination_date = req.body.termination_date_D==""?null:moment(req.body.termination_date_D, "DD.MM.YYYY");
+					termination_date = req.body.termination_date_D==""?null:moment(req.body.termination_date_D);
 				}
 				var termination_period_type = null, termination_period = null;
 				if (req.body.termination_type == "T") {
@@ -49,7 +51,7 @@ module.exports = function(app){
 					termination_period = req.body.termination_period_P;
 				}		
 				return models.contract.create({
-					sign_date: moment(req.body.sign_date, 'DD.MM.YYYY'),
+					sign_date: moment(req.body.sign_date),
 					termination_date: termination_date,
 					termination_type: req.body.termination_type,
 					termination_period: termination_period,
@@ -69,14 +71,15 @@ module.exports = function(app){
 			.catch(error => next(error));
 	});
 	
-	router.post('/contract/edit', security.isLoggedInAdmin, function(req, res, next) {
+	router.post('/contract/edit', security.isLoggedInAdmin, multer().none(), function(req, res, next) {
+		console.log('conid ' + req.body.id );
 		return Promise.resolve()
 			.then(() => {
 				var termination_date = null;
 				if (req.body.termination_type == "T") {
-					termination_date = req.body.termination_date_T==""?null:moment(req.body.termination_date_T, "DD.MM.YYYY");
+					termination_date = req.body.termination_date_T==""?null:moment(req.body.termination_date_T);
 				} else if (req.body.termination_type == "D") {
-					termination_date = req.body.termination_date_D==""?null:moment(req.body.termination_date_D, "DD.MM.YYYY");
+					termination_date = req.body.termination_date_D==""?null:moment(req.body.termination_date_D);
 				}
 				var termination_period_type = null, termination_period = null;
 				if (req.body.termination_type == "T") {
@@ -87,7 +90,7 @@ module.exports = function(app){
 					termination_period = req.body.termination_period_P;
 				}
 				return models.contract.update({
-					sign_date: moment(req.body.sign_date, 'DD.MM.YYYY'),
+					sign_date: moment(req.body.sign_date),
 					termination_date: termination_date,
 					termination_type: req.body.termination_type,
 					termination_period: termination_period,

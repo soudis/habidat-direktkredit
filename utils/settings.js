@@ -2,6 +2,7 @@
 const project  = require('../config/project.json');
 const jsonfile = require('jsonfile');
 const Promise  = require('bluebird');
+const path = require('path');
 
 const set = function(path, value, overwrite = true, overwriteNull = false) {
     if (value != null || overwriteNull) {
@@ -80,7 +81,7 @@ const initProject = () => {
     project.save = function() {
         var project = this;
         return new Promise((resolve, reject) => {
-            jsonfile.writeFile('../config/project.json', project, function (err) {
+            jsonfile.writeFile(path.join(__dirname,'../config/project.json'), project, function (err) {
                 if (!err) {
                     resolve(project);
                 } else {
@@ -92,8 +93,8 @@ const initProject = () => {
 
     // use environment variables as default values (do not overwrite project.json values)
     project.set('projectname',                          process.env.HABIDAT_DK_PROJECT_NAME, false); 
-    project.set('logo',                                 process.env.HABIDAT_DK_LOGO, false);
-    project.set('email',                                process.env.HABIDAT_DK_EMAIL, false);
+    project.set('logo',                                 process.env.HABIDAT_DK_PROJECT_LOGO, false);
+    project.set('email',                                process.env.HABIDAT_DK_PROJECT_EMAIL, false);
     project.set('defaults.interest_method',             process.env.HABIDAT_DK_PROJECT_DEFAULTS_INTEREST_METHOD, false);
     project.set('defaults.termination_type',            process.env.HABIDAT_DK_PROJECT_DEFAULTS_TERMINATION_TYPE, false);
     project.set('defaults.termination_period',          process.env.HABIDAT_DK_PROJECT_DEFAULTS_TERMINATION_PERIOD, false);

@@ -2,6 +2,12 @@ $theme-colors: (
   "primary": rgb(164, 0, 35)
 );
 
+$custom-file-text: (
+  de: "Durchsuchen",
+  en: "Browse",
+  es: "Elegir"
+);
+
 
 @import "node_modules/bootstrap/scss/bootstrap";
 @import "node_modules/bootstrap-multiselect/dist/scss/bootstrap-multiselect.scss";
@@ -164,6 +170,11 @@ tr.margin {
   margin-top: 10px;
 }
 
+table.margin-top {
+  margin-top: 30px;
+}
+
+
 .card {
     box-shadow: 2px 4px 10px 4px rgba(0,0,0,0.1);
 }
@@ -174,8 +185,9 @@ tr.margin {
     box-shadow: 2px 4px 10px 4px rgba(0,0,0,0.3);
 }
 
-#contracts_container > div.contract-active > .card {
-  box-shadow: 2px 4px 10px 4px rgba(164, 0, 35,0.3);
+.card.active {
+  box-shadow: 2px 4px 10px 2px rgba(0, 100, 0,0.5);
+  border: 1px solid rgba(0, 100, 0,0.5);
 }
 
 .btn-light {
@@ -198,31 +210,118 @@ tr.margin {
 
 #sidebar {
   box-shadow: 2px 4px 10px 4px rgba(0,0,0,0.1);
-  height: 100%; /* 100% Full-height */
   position: fixed; /* Stay in place */
   z-index: 100; /* Stay on top */
   top: 0; /* Stay at the top */
-  right: -100%;
+  right: 0;
   background-color: #fff; /* Black*/
-  overflow-x: hidden; /* Disable horizontal scroll */
-  padding-top: 30px; /* Place content 60px from the top */
-    -webkit-animation: slide 0.5s forwards;
-    animation: slide 0.5s forwards;
-  padding-left: 30px;
-  padding-right: 30px;
+  overflow: auto;
+  padding-top: 15px; /* Place content 60px from the top */
+  padding-left: 20px;
+  padding-right: 20px;
+  padding-bottom: 15px;  
+  max-height: calc(100% - 10px);
+  margin-top: 10px;
+
+  transition-timing-function: ease-in;
+
+  /* Quick on the way out */
+  transition: 0.3s;
+
+  /* Hide thing by pushing it outside by default */
+  transform: translateX(100%);  
+
+  border: 1px solid #dee2e6;
+  border-top-left-radius: .3rem;
+  border-bottom-left-radius: .3rem  
 }
 
+#sidebar.shown {
+  transition-timing-function: ease-out;
+
+  /* A litttttle slower on the way in */
+  transition: 0.35s;
+  
+  /* Move into place */
+  transform: translateX(0);
+}
+
+
+
 #sidebar legend {
-  margin-bottom: 30px;
+  margin-bottom: 15px;
+
+}
+
+#sidebar legend::after{
+    display: block;
+    height: 15px;
+    width: calc(100% + 40px);
+    border-bottom: 1px solid #dee2e6;
+    content: '';  
+    margin-left: -20px;
+    margin-right: -20px;
+}
+
+#sidebar .sidebar-opener-container {
+  overflow:hidden;
+}
+
+
+#sidebar-opener {
+  border-top: 1px solid #dee2e6;
+  border-left: 1px solid #dee2e6;
+  border-bottom: 1px solid #dee2e6;
+  border-top-left-radius: .3rem;
+  border-bottom-left-radius: .3rem;
+  position: fixed;
+  background-color: white;
+  width: 13px;
+  height: calc(100% - 150px);
+  top: 100px;
+  right: 0px;
+  z-index: 99;
+  box-shadow: 2px 4px 10px 4px rgba(0,0,0,0.1);  
+  cursor: pointer;
+}
+
+#sidebar-opener:hover {
+  background-color: #f8f8f8; 
+}
+
+#sidebar-opener a{
+  position: relative;
+  top: 48%;
+  left: 3px;
+  color: rgb(164, 0, 35);
+}
+
+#sidebar .sidebar-closer {
+  position: absolute;
+  right: 20px;
+  top: 12px;
+}
+
+
+#sidebar .sidebar-opener-clipper {
+  position: absolute;
+  background-color: white;
+  width: 10px;
+  height: 130px;
+  top:  calc(50% - 65px);
+  left: 0px;
+  z-index: 100;
 }
 
 
 
 @-webkit-keyframes slide {
+    0% { right: -100%; }
     100% { right: 0; }
 }
 
 @keyframes slide {
+    0% { right: -100%; }
     100% { right: 0; }
 }
 
@@ -327,4 +426,22 @@ div.dataTables_wrapper div.dataTables_filter input {
 div.dataTables_wrapper div.dataTables_filter .input-group-text,  div.dataTables_wrapper div.dataTables_length .input-group-text{
   background-color: transparent;
   color: rgba(164, 0, 35,1);
+}
+
+td.squeeze-left {
+  padding-left: 0px !important;
+  margin-left: 0px !important;
+}
+
+img.logo {
+  max-height: 100px;
+  width: auto;
+}
+
+.form-control {
+  height: inherit;
+}
+
+.close {
+  font-size: 1rem;
 }

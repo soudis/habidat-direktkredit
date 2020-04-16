@@ -15,6 +15,7 @@ var fs = require('fs');
 var multer = require('multer');
 var mkdirp = require('mkdirp');
 var numeral = require('numeral');
+const intl = require('./utils/intl');
 const settings = require('./utils/settings');
 const sass = require('node-sass-middleware');
 
@@ -94,7 +95,6 @@ app.use(logger('common'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
-app.use(multer({dest:'./upload/'}).single('file'));
 app.use(flash());
 
 
@@ -107,6 +107,14 @@ app.use(session({
 app.use(passport.initialize());
 app.use(passport.session()); // persistent login sessions
 
+const _iv = (object, key) => {
+	if (object) {
+		return object[key];
+	} else {
+		return undefined;
+	}
+}
+
 app.use(function(req,res,next){
   res.locals.session = req.session;
   res.locals.settings = settings;
@@ -116,6 +124,9 @@ app.use(function(req,res,next){
   res.locals.replaceUmlaute = replaceUmlaute;
   res.locals.format = require('./utils/format');
   res.locals.sprintf = require('sprintf').sprintf;
+  res.locals.models = models;
+  res.locals._t = intl._t;
+  res.locals._iv = _iv;
 
   var newPrevURLs = [];
   if (req.session.prevURLs && req.session.prevURLs.length >= 1) {
@@ -136,6 +147,7 @@ require('./routes/transaction')(app);
 require('./routes/user')(app);
 require('./routes/file')(app);
 require('./routes/communication')(app);
+require('./routes/admin')(app);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
@@ -151,9 +163,11 @@ app.use(function(req, res, next) {
 //if (app.get('env') === 'development') {
 app.use(function(err, req, res, next) {
   res.status(err.status || 500);
-  res.render('error', {
+  res.render('partials/error', {
     message: err.message,
     error: err
+  }, (renderError, html) => {
+  	res.json({html: html, error: err})
   });
 });
 //}

@@ -1,0 +1,134 @@
+include ../partials/forms
+
+mixin settings_form()
+  +form('/admin/settings')
+    +text('projectname')(value=settings.project.get('projectname') icon='fa-home')
+    +output_image('logo', settings.project.get('logo'))(help=settings.project.get('logo') imgClass='logo')
+    +input_group('logo_group')(icon='fa-file-image' noLabel)
+      +group_select('logo_change')
+        +option('logo_keep')
+        +option('logo_upload')
+        +option('logo_link')
+      +group_output('logo_keep')(class="form-control-plaintext logo-change-input")
+      +group_file('logo_upload')(class="d-none logo-change-input" inputId="logo_file")
+      +group_input('logo_link')(class="d-none logo-change-input" placeholder="https://...")
+    +text('email', _t('project_email'))(icon='fa-at' type='email' value=settings.project.get('email'))
+    +select('interest_method')(icon='fa-percent')
+      - var selected = settings.project.get('defaults.interest_method')
+      +option('365_compound', _t('interest_method_365_compound'))(selected=selected)
+      +option('365_nocompound', _t('interest_method_365_nocompound'))(selected=selected)
+    +select('termination_type')(icon='fa-sign-out-alt')
+      - var selected = settings.project.get('defaults.termination_type')
+      +option('T', _t('termination_type_T'))(selected=selected)
+      +option('P', _t('termination_type_P'))(selected=selected)
+      +option('D', _t('termination_type_D'))(selected=selected)
+    +input_group(_t('termination_type_T') + ' / ' + _t('termination_type_P'))(icon='fa-hourglass-half')
+      +group_input('termination_period')(type='number' step='1' value=settings.project.get('defaults.termination_period'))
+      +group_select('termination_period_type')
+        - var selected = settings.project.get('defaults.termination_period_type')
+        +option('M', _t('termination_period_type_M'))(selected=selected)
+        +option('w', _t('termination_period_type_w'))(selected=selected)
+        +option('Y', _t('termination_period_type_Y'))(selected=selected)
+    +submit_button()
+
+  script.
+
+    function urlExists (url, callback){
+      $.ajax({
+        type: 'HEAD',
+        accepts: {image: 'image/*'},
+        dataType: 'image',
+        url: url,
+        success: function(data, textStatus, request){
+          if(request.getResponseHeader('Content-Type') && request.getResponseHeader('Content-Type').startsWith('image/')) {
+            callback(true);
+          } else {
+            callback(false);
+          }
+        },
+        error: function() {
+          callback(false);
+        }
+      });
+    }
+
+    $('#logo_change').on('change', function() {
+      $('.logo-change-input').addClass('d-none');      
+      $('input.logo-change-input').removeAttr('required');      
+      $('div.logo-change-input').children('input').removeAttr('required');      
+      $('#'+this.value).removeClass('d-none');
+      var src, name;
+      if (this.value === 'logo_keep') {
+        src = $('#logo').data('src');
+        $('#logo_link').get(0).setCustomValidity('');
+      }
+      else if (this.value === 'logo_upload') {        
+        if ($('#logo').data('localsrc')) {
+          src = $('#logo').data('localsrc');
+          name = $('#logo').data('localname');
+        } else {
+          src = $('#logo').data('src');
+        }
+        $('#logo_link').get(0).setCustomValidity('');
+        $('#logo_file').attr('required', 'true');      
+      } else if (this.value === 'logo_link') {
+        if ($('#logo_link').val()) {
+          src = $('#logo_link').val()
+        } else {
+          src = $('#logo').data('src');
+        }
+        var value = $('#logo_link').val();
+        if (value && value !== "") {
+          urlExists(value, function(success) {
+            if (success) {
+              $("#logo").attr('src', value);
+              $('#logo_help').html( value);      
+              $('#logo_link').get(0).setCustomValidity('');
+            } else {
+              $("#logo").attr('src', $('#logo').data('src'));
+              $('#logo_help').html( $('#logo').data('src'));      
+              $('#logo_link').get(0).setCustomValidity('URL-Adresse nicht gefunden');
+            }
+          });
+        }  
+        $('#'+this.value).attr('required', 'true');      
+      }
+      $("#logo").attr('src', src);
+      $('#logo_help').html(name || src);      
+    }); 
+
+    $('#logo_link').on('keyup', function() {  
+      var value = this.value;
+      if (value && value !== "") {
+        urlExists(this.value, function(success) {
+          if (success) {
+            $("#logo").attr('src', value);
+            $('#logo_help').html( value);      
+            $('#logo_link').get(0).setCustomValidity('');
+          } else {
+            $("#logo").attr('src', $('#logo').data('src'));
+            $('#logo_help').html( $('#logo').data('src'));      
+            $('#logo_link').get(0).setCustomValidity('URL-Adresse nicht gefunden');
+          }
+        });
+      } else {
+        $("#logo").attr('src', $('#logo').data('src'));
+        $('#logo_help').html( $('#logo').data('src'));      
+        $('#logo_link').get(0).setCustomValidity('');      
+      }
+      
+    });
+
+    $('#logo_file').on('change', function() {      
+      if (this.files && this.files[0]) {
+        var file = this.files[0];
+        var reader = new FileReader();        
+        reader.onload = function(e) {
+          $('#logo').attr('src', e.target.result);
+          $('#logo').data('localsrc', e.target.result);
+          $('#logo_help').html(file.name);
+          $('#logo').data('localname', file.name);
+        }        
+        reader.readAsDataURL(this.files[0]); // convert to base64 string        
+      }
+    });

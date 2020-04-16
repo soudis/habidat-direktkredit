@@ -45,8 +45,9 @@ services:
       # please change:
       - HABIDAT_DK_PROJECT_ID=project
       - HABIDAT_DK_PROJECT_NAME=Projectname
-      - HABIDAT_LOGO=logo.gif
-      - HABIDAT_ADMIN_EMAIL=admin@example.com
+      - HABIDAT_DK_PROJECT_EMAIL=
+      - HABIDAT_DK_PROJECT_LOGO=logo.gif
+      - HABIDAT_DK_ADMIN_EMAIL=admin@example.com
       - HABIDAT_DK_ADMIN_USERNAME=admin
       - HABIDAT_DK_ADMIN_PASSWORD=secret
       - HABIDAT_DK_DB_PASSWORD=secret

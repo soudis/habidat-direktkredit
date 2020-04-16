@@ -3,6 +3,7 @@ const moment = require("moment");
 const router = require('express').Router();
 const utils = require('../utils');
 const models  = require('../models');
+const multer = require('multer');
 
 module.exports = function(app){
 
@@ -23,9 +24,10 @@ module.exports = function(app){
 			.catch(error => next(error));
 	});
 
-	router.post('/transaction/add', security.isLoggedInAdmin, function(req, res, next) {
+	router.post('/transaction/add', security.isLoggedInAdmin, multer().none(), function(req, res, next) {
+		console.log("contract_id: " + req.body.contract_id);
 		models.transaction.create({
-				transaction_date: moment(req.body.transaction_date, 'DD.MM.YYYY'),
+				transaction_date: moment(req.body.transaction_date),
 				amount: req.body.amount,
 				type: req.body.type, 
 				contract_id: req.body.contract_id
@@ -38,9 +40,9 @@ module.exports = function(app){
 		    .catch(error => next(error));
 	});
 	
-	router.post('/transaction/edit', security.isLoggedInAdmin, function(req, res, next) {
+	router.post('/transaction/edit', security.isLoggedInAdmin, multer().none(), function(req, res, next) {
 		models.transaction.update({
-				transaction_date: moment(req.body.transaction_date, 'DD.MM.YYYY'),
+				transaction_date: moment(req.body.transaction_date),
 				amount: req.body.amount,
 				type: req.body.type
 			}, {where:{id:req.body.id}})

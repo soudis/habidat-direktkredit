@@ -1,0 +1,96 @@
+mixin form(action, title=undefined)
+  form.form-horizontal.update-form(class=attributes.class action=action method="post" role="form" update-action=attributes.updateAction update-tag=attributes.updateTag)
+    legend=title || _t('form' + action.split('/').join('_'))
+    block
+
+mixin prepend_icon(icon)
+    .input-group-prepend
+      span.input-group-text
+        span.fa(class=icon)
+
+mixin hidden(name, value)
+  input(id=attributes.id||name class=attributes.class type='hidden' name=name value=value)
+
+mixin input_group(label)
+  .form-group(class=attributes.class id=attributes.id)
+    if !attributes.noLabel
+      label.control-label=label
+    .input-group
+      if attributes.icon
+        +prepend_icon(attributes.icon || 'fa-caret-down')
+      block
+
+mixin input(name, label=undefined )
+  .form-group(class=attributes.class)
+    label.control-label(for=attributes.id || name)=label||_t(name)
+    input.form-control(type=attributes.type||'text' step=attributes.step name=name id=attributes.id||name value=attributes.value required=attributes.required)
+
+mixin group_input(name)
+  input.form-control(name=name)&attributes(attributes)(id=attributes.id||name type=attributes.type||'text')
+
+mixin group_select(name)        
+  select.form-control(id=attributes.id||name name=name required=attributes.required)
+    block  
+
+mixin file(name, label=undefined)
+  +input_group(label||_t(name))(class=attributes.class icon=attributes.icon)
+    .custom-file
+      input.custom-file-input(type='file' name=name value=attributes.value id=attributes.id||name lang="de" required=attributes.required)    
+      label.custom-file-label(for=attributes.id||name)=_t('choose_file')
+
+mixin date(name, label=undefined)
+  +input_group(label||_t(name))(icon=attributes.icon || 'fa-calendar' class=attributes.groupClass)
+    +group_input(name)&attributes(attributes)(type='date' value=attributes.value?moment(attributes.value).format('dd.mm.yyyy'):undefined)
+
+mixin money(name, label=undefined)
+  +input_group(label||_t(name))(icon=attributes.icon || 'fa-euro-sign')
+    +group_input(name)(type='number' step="0.01")&attributes(attributes)  
+
+mixin percent(name, label=undefined)
+  +input_group(label||_t(name))(icon=attributes.icon || 'fa-percent')
+    +group_input(name)(type='number' step="0.001")&attributes(attributes)  
+
+mixin text(name, label=undefined)
+  +input_group(label||_t(name))(icon=attributes.icon class=attributes.groupClass)
+    +group_input(name)(type=type||'text')&attributes(attributes)
+
+mixin select(name, label=undefined)
+  +input_group(label||_t(name))(icon=attributes.icon || 'fa-caret-down')
+    +group_select(name)&attributes(attributes)  
+      block
+
+mixin textarea(name, label=undefined)
+  +input_group(label||_t(name))(icon=attributes.icon || 'fa-sticky-note')    
+    textarea.form-control(type='text' name=name)=attributes.value
+
+mixin group_file(name)
+  .custom-file(id=attributes.id||name class=attributes.class)
+    input.custom-file-input(type='file' name=name value=attributes.value id=attributes.inputId)    
+    label.custom-file-label(for=attributes.id||name)=_t('choose_file')
+
+mixin group_output(name)
+  input.form-control-plaintext(class=attributes.class id=attributes.id||name value=attributes.value)
+
+mixin submit_button(label=_t('save'))
+  .text-right
+    button.submit-button(type='submit' class='btn btn-primary')=label
+
+mixin checkbox(name, label=undefined)
+  .form-group
+    .form-check
+      input.form-check-input(id=attributes.id||name type="checkbox" checked=attributes.value?"checked":undefined name=name aria-describedby=name+"_help")
+      label.form-check-label(for=attributes.id||name)=label||_t(name)
+      if attributes.help
+        small.form-text.text-muted(id=name+"_help")=attributes.help
+
+mixin option(value, label=undefined) 
+  option(selected=attributes.selected && attributes.selected==value value=value)=label||_t(value)
+
+mixin output_image(name, src)
+  .form-group(class=attributes.class)
+    label.control-label(for=attributes.id || name aria-describedby=name+"_help")=_t(name)
+    .img-thumbnail
+      img(id=attributes.imgId||name src=src data-src=src height=attributes.height class=attributes.imgClass)    
+    if attributes.help
+      small.form-text.text-muted(id=name+"_help")=attributes.help
+                    

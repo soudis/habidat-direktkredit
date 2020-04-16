@@ -10,13 +10,22 @@ const toJSON = (str) => {
 
 const showSidebar = html => {
 	var sidebar = $( "#sidebar" );
-	sidebar.html(html);
+	$('#sidebar-content').html(html);
+	sidebar.addClass('shown');
 	sidebar.removeClass('d-none');
+	$('#sidebar-opener').addClass('d-none');
 }
 
 const hideSidebar = () => {
 	var sidebar = $( "#sidebar" );
-	sidebar.addClass('d-none');
+	if (sidebar.hasClass('shown')) {
+		
+		sidebar.removeClass('shown');
+		$('#sidebar-opener').removeClass('d-none');
+		$('.card.active').removeClass('active');
+			//sidebar.addClass('out');
+			//sidebar.addClass('d-none');
+	}	
 }
 
 const redirectOrReload = redirectURL => {
@@ -30,12 +39,46 @@ const redirectOrReload = redirectURL => {
 	}	
 }
 
+const errorAlert = function(error, callback=undefined) {
+	var title, message;
+	console.log(error.code);
+	if (error.code && error.code.startsWith('PUG:')) {
+		title = 'HTML Vorlagenfehler';
+		message = error.msg + ' (' + error.filename + ':' + error.line + ':' + error.column + ')';
+	}
+	bootbox.dialog({
+		title: title || "Fehler",
+	    message: message || error,
+        onEscape: true,
+	    backdrop: true,
+	    buttons: {
+	        ok: {
+	            label: 'OK',
+	            className: 'btn-primary'
+	        }
+	    },
+	    callback: callback || function() {}
+	});
+}
+
 $(document).ready(function(){
 	$(document).on("click", ".sidebar-action", function (e) {
 		e.preventDefault();
-		$.get( $(this).attr("href"), function( data ) {	  		
-	  		showSidebar(data);	  
-		});
+
+		$('.card.active').removeClass('active');
+		$(this).parents('.card').addClass('active');
+
+		$.ajax({
+		    url : $(this).attr("href"),
+		    type: "GET",
+	        success: function(data) {
+	        	showSidebar(data);	    			
+	       	},
+	       	error: function(xhr, status, error) {
+	       		var data = JSON.parse(xhr.responseText);
+	       		errorAlert(data.error);
+	       	}
+       	});				
 	});
 
 	$(document).on("click", ".confirm-action", function (e) {
@@ -77,11 +120,19 @@ $(document).ready(function(){
 		hideSidebar();	  
 	});	
 
+	$(document).on("click", "#sidebar-opener", function (e) {
+		showSidebar();	  
+	});	
+
+	$(document).on("click", ".sidebar-closer", function (e) {
+		hideSidebar();	  
+	});	
+
 
 	$(document).on("submit", "form.update-form", function (e) {
 		e.preventDefault();
 		var form = $(this);
-		hideSidebar();	  
+		form.find('.alert').remove();
 		$.ajax({
 		    url : form.attr('action'),
 		    type: "POST",
@@ -89,16 +140,26 @@ $(document).ready(function(){
 		    processData: false,
 		    contentType: false,		
 	        success: function(data) {
-	  			if (data.redirect) {
-	  				redirectOrReload(data.redirect);
-	  			}	        	
-	       		var action = form.attr('update-action');
-	       		var tag = form.attr('update-tag');
-	       		if (action == 'append') {
-	       			$('#' + tag).append(data);
-	       		} else if (action == 'replace') {
-	       			$('#' + tag).replaceWith(data);
-	       		}
+	        	if (data.error) {
+	        		console.log(data.html);
+	        		form.parent().append(data.html);
+	        	} else {
+					hideSidebar();	  
+					if (data.redirect) {
+		  				redirectOrReload(data.redirect);
+		  			}	        	
+		       		var action = form.attr('update-action');
+		       		var tag = form.attr('update-tag');
+		       		if (action == 'append') {
+		       			$('#' + tag).append(data);
+		       		} else if (action == 'replace') {
+		       			$('#' + tag).replaceWith(data);
+		       		}
+	        	}	  			
+	       	},
+	       	error: function(xhr, status, error) {
+	       		var data = JSON.parse(xhr.responseText);
+        		form.find('.submit-button').parent().before(data.html);	       		
 	       	}
        	});		
 	});		

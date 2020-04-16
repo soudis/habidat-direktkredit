@@ -11,7 +11,7 @@ mixin nav(name, id, logo, style)
           ul.nav.navbar-nav
               block
           ul.nav.navbar-nav.ml-auto
-            if (user)
+            if (currentUser)
               li.nav-item
                 a.nav-link( href="/logout" ) 
                   span.fa.fa-sign-out-alt

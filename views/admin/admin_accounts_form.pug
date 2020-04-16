@@ -1,27 +1,25 @@
+include ../partials/forms
+
 mixin add_admin_form()
-  form.form-horizontal.update-form(action="/admin/add" method="post" role="form" )
-    legend Administrator*innen Account Anlegen
-    .form-group
-      label.control-label Username
-      input.form-control(type="text"  name="logon_id" required)
+  +form('/admin/add')
+    +text('logon_id')(icon='fa-user' required)
     if (settings.config.get('auth.admin.method') === "ldap")
-      .form-group
-        .form-check
-          input.form-check-input(id="ldap_account_checkbox" type="checkbox" name="ldap" aria-describedby="ldapHelp")
-          label.form-check-label(for="ldap") LDAP Account
-          small.form-text.text-muted(id="ldapHelp") Bei LDAP Accounts muss kein Passwort eingegeben werden.
-    .form-group.ldap-disabled
-      label.control-label Passwort
-      input.form-control(type="password" name="password")
-    .form-group.ldap-disabled
-      label.control-label Passwort (Wiederholung)
-      input.form-control(type="password" name="password2")
-    .text-right
-      button(type='submit' class='btn btn-primary') Speichern
+      +checkbox("ldap")(help=_t('ldap_help') id="ldap_account_checkbox")
+      +text('password' )(type='password' groupClass='ldap-disabled' icon='fa-key' required)
+      +text('password2')(type='password' groupClass='ldap-disabled' icon='fa-key' required)
+    +submit_button()
 
   script.
 
     $('.datepicker').datepicker({'format': 'dd.mm.yyyy', 'language': 'de'});
-    $('#ldap_account_checkbox').on('change', function() {
+    $('#ldap_account_checkbox').on('change', function() {    
       $(".ldap-disabled").toggleClass("d-none");
+      console.log($('#password').attr('required'));
+      if ($('#password').attr('required')) {
+        $('#password').attr('required', false)
+        $('#password2').attr('required', false)
+      } else {
+        $('#password').attr('required', true)
+        $('#password2').attr('required', true)
+      }
     });   

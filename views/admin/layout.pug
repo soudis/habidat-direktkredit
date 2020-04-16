@@ -19,6 +19,9 @@ block content
          span.fa.fa-balance-scale
          span  Direktkredite aus Deutschland
       +nav_item_dropdown( "#" )(label="Administration" icon="fa-tools")
+        +dd_item( "/admin/settings" ) 
+          span.fa.fa-cog
+          span  Einstellungen      
         +dd_item( "/admin/accounts" ) 
           span.fa.fa-user-shield
           span  Admin Accounts
@@ -38,4 +41,13 @@ block content
                 .alert.alert-danger.alert-fadeout= message
             
           block admin-content
-  #sidebar.d-none.col-md-4
+
+  #sidebar.col-md-8.col-sm-12.col-lg-6.col-xl-4
+    #sidebar-content
+    .sidebar-closer
+      a.btn.btn-light.btn-sm
+        span.fa.fa-times
+
+  #sidebar-opener.d-none
+    a
+      span.fa.fa-caret-left

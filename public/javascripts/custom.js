@@ -25,7 +25,14 @@
         $('#transaction_amount').attr('amount_to_date', data.amountToDate);    
       }, 'json');
       $('transaction_type').change();
-    });        
+    });       
+
+    $(document).on("change", '.custom-file-input', function(e) {
+        //get the file name
+        var fileName = $(this).val().split('\\').pop();
+        //replace the "Choose a file" label
+        $(this).next('.custom-file-label').html(fileName);
+    })
 
 
      var dynamicColors = function() {

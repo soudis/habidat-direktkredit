@@ -34,7 +34,13 @@ block admin-content
           tr
             td.control.fit
             each cell, cellIndex in row
-              td(data-order=(cell.order?cell.order:undefined) class=cell.class + (contracts.columns[cellIndex].class?" "+contracts.columns[cellIndex].class:""))!=cell.value
+              if cell === false
+                td(title=_t('no_contract') class=contracts.columns[cellIndex].class?contracts.columns[cellIndex].class:"") -
+              else
+                td(data-order=(cell.order?cell.order:undefined) class=cell.class + (contracts.columns[cellIndex].class?" "+contracts.columns[cellIndex].class:""))!=cell.value
             td.fit.text-right
-              a.btn.btn-light.btn-sm(href='/user/show/'+row[1].value+'#contract_'+row[9].value) #[span.fa.fa-search-plus]
+              if row[9] === false
+                a.btn.btn-light.btn-sm(href='/user/show/'+row[1].value) #[span.fa.fa-search-plus]  
+              else
+                a.btn.btn-light.btn-sm(href='/user/show/'+row[1].value+'#show_contract_'+row[9].value) #[span.fa.fa-search-plus]
         

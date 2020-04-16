@@ -10,7 +10,7 @@ block admin-content
   script.
     $(document).ready(function(){
       var hash = $(location).attr('hash');
-      $(hash).addClass('contract-active');
+      $('#'+hash.substring(hash.indexOf('contract_'))).children('.card').addClass('active');
     })
 
               

@@ -4,6 +4,7 @@ const router = require('express').Router();
 const fs = require('fs');
 const Op = require("sequelize").Op;
 const models  = require('../models');
+const multer = require('multer');
 
 module.exports = function(app){
 
@@ -71,7 +72,7 @@ module.exports = function(app){
 
 	});	
 	
-	router.post('/file/add/user', security.isLoggedInAdmin, function(req, res, next) {
+	router.post('/file/add/user', security.isLoggedInAdmin, multer({dest:'./upload/'}).single('file'), function(req, res, next) {
 		models.file.create({
 				filename: req.file.originalname,
 				description: req.body.description,
@@ -143,7 +144,7 @@ module.exports = function(app){
 			.catch(error => next(error));
 	});
 
-	router.post('/admin/addtemplate', security.isLoggedInAdmin, function(req, res, next) {
+	router.post('/admin/addtemplate', security.isLoggedInAdmin, multer({dest:'./upload/'}).single('file'), function(req, res, next) {
 		var type = req.body.type;
 		Promise.resolve()
 			.then(() => {

@@ -1,54 +1,25 @@
 include ../country
+include ../partials/forms
+
 mixin user_form(formTitle, action, user)
-  form.form-horizontal(action=action method="post" role="form")
-    input(type="hidden" name="id" value=user.id)
-    legend= formTitle
+  +form(action)
+    if user
+      +hidden('id', user.id)
     .form-row
-      .form-group.col-md-6
-        label.control-label(for="first_name") Vorname
-        input.form-control(type="text" id="first_name" name="first_name" value=user.first_name required)
-      form-group.col-md-6
-        label.control-label(for="last_name") Nachname
-        input.form-control(type="text" id="last_name" name="last_name" value=user.last_name) 
+      +text('first_name')(value=_iv(user, 'first_name') groupClass="col" icon='fa-user' required)
+      +text('last_name')(value=_iv(user, 'last_name') groupClass="col")
+    +text('street')(value=_iv(user, 'street') icon="fa-map-marker")
     .form-row
-      .form-group.col-md-12
-        label.control-label Strasse
-        input.form-control(type="text" name="street" value=user.street)
+      +text('zip')(value=_iv(user, 'zip') icon="fa-envelope" groupClass="col-md-4")
+      +text('place')(value=_iv(user, 'place') icon="fa-city" groupClass="col-md-8")
+    +select('country')(value=_iv(user, 'country') icon="fa-globe-africa")
+      +country_select_options(_iv(user, 'country'))
+    +text('telno')(type="tel" value=_iv(user, 'telno') icon="fa-phone")
+    +text('email')(type="email" value=_iv(user, 'email') icon="fa-at" required)
     .form-row
-      .form-group.col-md-3
-        label.control-label PLZ      
-        input.form-control(type="text" name="zip" value=user.zip)    
-      .form-group.col-md-9
-        label.control-label Ort
-        input.form-control(type="text" name="place" value=user.place)    
-    .form-row
-      .form-group.col-md-12
-        label.control-label Land
-        select.form-control(name="country")            
-          +country_select_options(user.country)            
-    .form-group
-      label.control-label Telefonnummer
-      input.form-control(type="text" name="telno" value=user.telno)         
-    .form-group
-      label.control-label E-Mail
-      input.form-control(type="text" name="email" value=user.email)                                   
-    .form-group
-      label.control-label IBAN
-      input.form-control(type="text" name="IBAN" value=user.IBAN)         
-    .form-group
-      label.control-label BIC
-      input.form-control(type="text" name="BIC" value=user.BIC)
-    .form-row
-      .form-group.col-md-12
-        label.control-label Beziehung zum Projekt
-        select.form-control(name="relationship")
-          option(selected=user && user.relationship == 'Unbekannt' value='Unbekannt') Unbekannt
-          option(selected=user && user.relationship == 'Bewohner_innen' value='Bewohner_innen') Bewohner_innen
-          option(selected=user && user.relationship == 'Nutzer_innen' value='Nutzer_innen') Nutzer_innen
-          option(selected=user && user.relationship == 'Verwandte' value='Verwandte') Verwandte
-          option(selected=user && user.relationship == 'Freund_innen' value='Freund_innen') Freund_innen
-          option(selected=user && user.relationship == 'Bekannte' value='Bekannte') Bekannte
-          option(selected=user && user.relationship == 'MHS' value='MHS') Mietshäusersyndikat
-          option(selected=user && user.relationship == 'habiTAT' value='habiTAT') habiTAT            
-    .text-right
-      button(type='submit' class='btn btn-primary') Speichern
+      +text('IBAN')(value=_iv(user, 'IBAN') icon="fa-credit-card" groupClass="col-md-8")
+      +text('BIC')(value=_iv(user, 'BIC') groupClass='col-md-4')
+    +select('relationship')(icon='fa-user-friends')
+      each type in ['Unbekannt','Bewohner_innen','Nutzer_innen','Verwandte','Bekannte','MHS','habiTAT']
+        +option(type, type)(selected=_iv(user, 'relationship'))
+    +submit_button()

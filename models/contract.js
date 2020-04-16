@@ -1,5 +1,6 @@
 const moment = require('moment');
 const settings = require('../utils/settings');
+const _t = require('../utils/intl')._t
 
 module.exports = (sequelize, DataTypes) => {
 	contract = sequelize.define('contract', {
@@ -101,38 +102,19 @@ module.exports = (sequelize, DataTypes) => {
 		return this.termination_period_type || settings.project.get('defaults.termination_period_type') || 6;
 	}
 
-	contract.prototype.getTerminationTypeString = function () {
-		switch(this.getTerminationType()) {
-			case "T": 
-			return 'Kündigungsfrist';
-			case "P": 
-			return 'Laufzeit';
-			case "D":
-			return 'Enddatum';
-		}
-		return "Kündigungsfrist";
-	}
 
-	contract.prototype.getTerminationPeriodTypeString = function () {
-		switch(this.getTerminationPeriodType()) {
-			case "M": 
-			return 'Monat(e)';
-			case "w": 
-			return 'Woche(n)';
-			case "Y":
-			return 'Jahr(e)';
-		}
-		return "Monat(e)";
+	contract.getTerminationTypeFullString = function (type, period, period_type, noPeriod = false) {
+		if (type === "P") {
+			return _t('termination_type_P') + " - " + period + " " + _t('termination_period_type_' + period_type);
+		} else if (type === "D") {
+			return _t('termination_type_D');
+		} else if (type === "T") {
+			return _t('termination_type_T') + (noPeriod?"":" - " + period + " " + _t('termination_period_type_' + period_type));
+		}    
 	}
 
 	contract.prototype.getTerminationTypeFullString = function (noPeriod = false) {
-		if (this.getTerminationType() == "P") {
-			return this.getTerminationTypeString() + " - " + this.getTerminationPeriod() + " " + this.getTerminationPeriodTypeString();
-		} else if (this.getTerminationType()== "D") {
-			return this.getTerminationTypeString();
-		} else if (this.getTerminationType() == "T") {
-			return this.getTerminationTypeString() + (noPeriod?"":" - " + this.getTerminationPeriod() + " " + this.getTerminationPeriodTypeString());
-		}    
+		return contract.getTerminationTypeFullString(this.getTerminationType(), this.getTerminationPeriod(), this.getTerminationPeriodType(), noPeriod);
 	}
 
 

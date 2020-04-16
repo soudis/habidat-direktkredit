@@ -1,12 +1,7 @@
-form.form-horizontal.update-form(action="/file/add/"+type update-tag='user_files' update-action='replace' method="post" role="form" enctype="multipart/form-data")
-  input(type="hidden" name="id" value=id)
-  input(type="hidden" name="type" value=type)
-  legend Dateiupload
-  .form-group
-    label.control-label Dateiname
-    input.form-control(type="file"  name="file")
-  .form-group 
-    label.control-label Beschreibung (optional)
-    textarea.form-control(type="text" name="description")  
-  .text-right
-    button(type='submit' class='btn btn-primary') Speichern
+include ../partials/forms
++form('/file/add/user')(updateTag='user_files' updateAction='replace')
+  +hidden('id', id)
+  +hidden('type', type)
+  +file('file')(icon='fa-upload' required)
+  +text('description')(icon='fa-comment-alt')
+  +submit_button()
