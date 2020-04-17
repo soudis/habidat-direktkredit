@@ -47,63 +47,62 @@
     }
 
     var keysSorted = (data)  => {
-      var sum = Object.values(data).reduce(function(a, b) { return a + b; }, 0);
       var labels = Object.keys(data).sort(function(a,b){return data[a]-data[b]})
-      labels.forEach((label, index) => {
-        var percentage = Math.round(data[label] / sum *10000) / 100;
-        labels[index] = label + " ("+percentage +"%)";
-      });
       return labels;
     }
 
+    function loadChart(container, url, callback) {
+        $.ajax({
+            type: 'get',     
+            dataType: 'json',
+            url: url,
+            complete: function (result) {
+              var data = JSON.parse(result.responseText);
+              var ctx = $(container).get(0).getContext('2d');
+              var colors = [];
+              for (var i in data) {
+                colors.push(dynamicColors());
+              }
+              var chart = new Chart(ctx,{
+                  type: 'pie',
+                  data: {
+                    datasets: [{data: valuesSorted(data), backgroundColor: colors}],
+                    labels: keysSorted(data)
+                  }
+              }); 
+              callback(chart);
+            }
+        });     	
+    }    
+
+    var byRelationChart;
     $('#by-relation').each(() => {
-        $.ajax({
-            type: 'get',     
-            dataType: 'json',
-            url: '/statistics/byrelation',
-            complete: function (result) {
-              var data = JSON.parse(result.responseText);
-              var ctx = $("#by-relation").get(0).getContext('2d');
-              var colors = [];
-              for (var i in data) {
-                colors.push(dynamicColors());
-             }
-              var byRelationChart = new Chart(ctx,{
-                  type: 'pie',
-                  data: {
-                    datasets: [{data: valuesSorted(data), backgroundColor: colors}],
-                    labels: keysSorted(data)
-                  }
-              });              
-            }
-        }); 
+    	loadChart('#by-relation', '/statistics/byrelation', function(chart) {
+    		byRelationChart = chart;
+    	})
+    })
+ 	
+ 	var byRegionChart;
+    $('#by-region').each(function () {
+    	loadChart('#by-region', '/statistics/byregion/country', function(chart) {
+    		byRegionChart = chart;
+    	})
     })
 
-
-    $('#by-zip').each(() => {
-        $.ajax({
-            type: 'get',     
-            dataType: 'json',
-            url: '/statistics/byzip',
-            complete: function (result) {
-              var data = JSON.parse(result.responseText);
-              console.log("resulst: " + result.responseText);
-              console.log("values: " + JSON.stringify(Object.values(data)));
-              var ctx = $("#by-zip").get(0).getContext('2d');
-              var colors = [];
-              for (var i in data) {
-                colors.push(dynamicColors());
-             }
-              var byRelationChart = new Chart(ctx,{
-                  type: 'pie',
-                  data: {
-                    datasets: [{data: valuesSorted(data), backgroundColor: colors}],
-                    labels: keysSorted(data)
-                  }
-              });              
-            }
-        }); 
-    })
+	$("#by-region").click( 
+	    function(evt){
+	        var activePoints = byRegionChart.getElementsAtEvent(evt);
+	        if (activePoints && activePoints.length > 0 ) {
+	        	byRegionChart.destroy();
+				var label = byRegionChart.data.labels[activePoints[0]._index];
+				$('#by-region-level').text('PLZ (' + label.split(' ')[0] + ')')
+		        var url = '/statistics/byregion/zip-' + label.split(' ')[0];
+		    	loadChart('#by-region', url, function(chart) {
+		    		byRegionChart = chart;
+		    	})
+	        }	        
+	    }
+	);     
 
     $('#by-month').each(() => {
         $.ajax({

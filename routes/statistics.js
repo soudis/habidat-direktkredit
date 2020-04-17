@@ -4,6 +4,8 @@ const statistics = require('../utils/statistics');
 const utils = require('../utils')
 const router = require('express').Router();
 const models  = require('../models');
+const format = require('../utils/format');
+const settings = require('../utils/settings');
 
 
 module.exports = function(app){
@@ -46,7 +48,7 @@ module.exports = function(app){
 		});
 	});
 	
-	router.get('/statistics/byzip', security.isLoggedInAdmin, (req, res) => {
+	router.get('/statistics/byregion/:level', security.isLoggedInAdmin, (req, res, next) => {
 		models.user.findAll({
 			  include:{ 
 					model: models.contract, 
@@ -57,29 +59,57 @@ module.exports = function(app){
 					}
 				}
 		}).then(function(users) {
-			var byZip = {};
+			var sections = {};
+			var total = 0;
 			var today = moment();
 			users.forEach((user) => {
-				var key = "Sonstige";
-				if (user.zip) {
-					if (user.zip.length == 4) {
-						key = "AT " + user.zip.substr(0,1) + "XXX";
+				var key = "Sonstige", skip = false;				
+				var country = user.country || settings.project.get('defaults.country') || 'AT';
+				if (req.params.level === 'country') {
+					key = country;
+				} else if (req.params.level.startsWith('zip-')) {
+					var levelParts = req.params.level.split('-');
+					if (levelParts[1] != country) {
+						// skip if wrong country
+						skip = true;
+					} else {
+						if (levelParts.length === 3) {
+							if (!user.zip || !user.zip.startsWith(levelParts[2])) {
+								// skip if wrong zip region
+								skip = true;	
+							} else {
+								key = levelParts[1] + '-' + user.zip.substring(0,levelParts[2].length+1);
+							}		
+						} else {
+							if (!user.zip) {
+								skip = true
+							} else {
+								key = levelParts[1] + '-' + user.zip.substring(0,1);
+							}							
+						}
 					}
-					if (user.zip.length == 5) {
-						key = "DE"
-					}
-				} 
+				}
 				
-				if (!byZip[key]) {
-					byZip[key] = 0;
+				if (!sections[key]) {
+					sections[key] = 0;
 				}
 				user.contracts.forEach((contract) => {
-					byZip[key] += contract.getAmountToDate(today);
+					var amount = contract.getAmountToDate(today);
+					if (!skip) {
+						sections[key] += amount;
+					}					
+					total += amount;
 				})
 			})
+			var result = {};
+			Object.keys(sections).forEach((section) => {
+				var percent = 100*sections[section] / total
+				result[section + ' (' + format.format(percent, 2, '#%') + ')'] = Math.round(sections[section]*100)/100;
+			})
 			res.setHeader('Content-Type', 'application/json');
-    		res.send(JSON.stringify(byZip));
-		});
+    		res.send(JSON.stringify(result));
+		})
+		.catch(error => next(error));
 	});	
 
 	router.get('/statistics/bymonth', security.isLoggedInAdmin, (req, res) => {

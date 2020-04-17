@@ -92,8 +92,11 @@ block admin-content
       h3.underline Laufende Kredite nach Beziehung
       canvas(id="by-relation" width="400" height="400")
     .col-md-6.col-xs-12
-      h3.underline Laufende Kredite nach PLZ
-      canvas(id="by-zip" width="400" height="400")      
+      h3.underline Laufende Kredite nach 
+        span#by-region-level Land
+        span  
+        span.fa.fa-info-circle(title="Auf Region klicken um zu zoomen")
+      canvas(id="by-region" width="400" height="400")      
     .col-md-6.col-xs-12
       h3.underline Verschuldung (12 Monate)
       canvas(id="by-month" width="400" height="400")  

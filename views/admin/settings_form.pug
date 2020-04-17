@@ -1,4 +1,5 @@
 include ../partials/forms
+include ../country
 
 mixin settings_form()
   +form('/admin/settings')
@@ -29,6 +30,8 @@ mixin settings_form()
         +option('M', _t('termination_period_type_M'))(selected=selected)
         +option('w', _t('termination_period_type_w'))(selected=selected)
         +option('Y', _t('termination_period_type_Y'))(selected=selected)
+    +select('country')(value=settings.project.get('defaults.country') icon="fa-globe-africa")
+      +country_select_options(settings.project.get('defaults.country'))        
     +tags('relationships')(value=settings.project.get('defaults.relationships'))
     +submit_button()
 

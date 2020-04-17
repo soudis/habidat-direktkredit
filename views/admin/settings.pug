@@ -44,6 +44,9 @@ block admin-content
                         td.col-md-4.h6.squeeze-left Kündigungsart:
                         td.col-md-8.h6= models.contract.getTerminationTypeFullString(settings.project.get('defaults.termination_type'), settings.project.get('defaults.termination_period'), settings.project.get('defaults.termination_period_type'))
                       tr
+                        td.col-md-4.h6.squeeze-left Land (Kreditgeber*innen):
+                        td.col-md-8.h6= settings.project.get('defaults.country')
+                      tr
                         td.col-md-4.h6.squeeze-left Beziehungsarten (Kreditgeber*innen):
                         td.col-md-8.h6= settings.project.get('defaults.relationships').join(', ')
 

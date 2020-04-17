@@ -1,7 +1,7 @@
 {
     "projectname": "My Project",
     "logo": "/public/images/logo.png",
-    "email" : "project@example.com",    
+    "email" : "project@example.com",  
     "admin": {
         "email": "admin@example.com"
     },
@@ -10,6 +10,7 @@
         "termination_type": "T",
         "termination_period": "6",
         "termination_period_type": "M",
-        "relationships": ["Unbekannt","Bewohner_innen","Nutzer_innen","Verwandte","Bekannte","MHS","habiTAT"]
+        "relationships": ["Unbekannt","Bewohner_innen","Nutzer_innen","Verwandte","Bekannte","MHS","habiTAT"],
+        "country": "AT",
     }
 }
