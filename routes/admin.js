@@ -101,6 +101,7 @@ module.exports = function(app){
 				setSetting('defaults.termination_type', req.body.termination_type);
 				setSetting('defaults.termination_period', req.body.termination_period);				
 				setSetting('defaults.termination_period_type', req.body.termination_period_type);
+				setSetting('defaults.relationships', JSON.parse(req.body.relationships) || []);
 
 				if (req.body.logo_change === 'logo_link') {
 					setSetting('logo', req.body.logo_link);

@@ -63,6 +63,18 @@ mixin textarea(name, label=undefined)
   +input_group(label||_t(name))(icon=attributes.icon || 'fa-sticky-note')    
     textarea.form-control(type='text' name=name)=attributes.value
 
+mixin tags(name, label=undefined)
+  +input_group(label||_t(name))(icon=attributes.icon)
+    +hidden(name, attributes.value?JSON.stringify(attributes.value):'[]')(class='tag-input')
+    .tags-container.form-control
+      .tag.badge.badge-primary.d-none
+        span.tag-remove.fa.fa-times    
+      if attributes.value         
+        each tag in attributes.value
+          .tag.badge.badge-primary=tag
+            span.tag-remove.fa.fa-times
+      input.new-tag-input(type="text" size="1")
+
 mixin group_file(name)
   .custom-file(id=attributes.id||name class=attributes.class)
     input.custom-file-input(type='file' name=name value=attributes.value id=attributes.inputId)    

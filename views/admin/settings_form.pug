@@ -29,6 +29,7 @@ mixin settings_form()
         +option('M', _t('termination_period_type_M'))(selected=selected)
         +option('w', _t('termination_period_type_w'))(selected=selected)
         +option('Y', _t('termination_period_type_Y'))(selected=selected)
+    +tags('relationships')(value=settings.project.get('defaults.relationships'))
     +submit_button()
 
   script.
@@ -131,4 +132,44 @@ mixin settings_form()
         }        
         reader.readAsDataURL(this.files[0]); // convert to base64 string        
       }
+    });
+
+    function saveTags(container) {
+      var tags = [];
+      container.children('.tag:visible').each(function(index) {
+        tags.push($(this).text().trim());
+      })
+      container.parent().children('.tag-input').val(JSON.stringify(tags));
+    }
+
+    $(document).on("click", '.tag-remove', function(e) {
+      var container = $(this).parent().parent();
+      $(this).parent().remove();
+      saveTags(container);
+    })
+
+    function addTag(value, input) {    
+      if (value && value !== "") {
+        var tagsContainer = input.parents('.tags-container');
+        var newTag = tagsContainer.find('>:first-child').clone();
+        newTag.prepend(value);
+        newTag.removeClass('d-none')
+        tagsContainer.children('input.new-tag-input').before(newTag);
+        input.val("");
+        input.attr('size', '1');
+        saveTags(tagsContainer);
+      }
+    }
+
+    $('.new-tag-input').on('change', function(e) {
+      addTag($(this).val().trim(), $(this));
+    })    
+
+    $('.new-tag-input').on('keydown', function (e) {
+      if(event.key === 'Enter') {
+        addTag($(this).val().trim(), $(this));
+      } else {
+        $(this).attr('size', $(this).val().length);
+      }
+      return true;
     });

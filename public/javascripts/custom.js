@@ -328,6 +328,12 @@
         }
     } );
 
+	$(document).on("keydown", ":input:not(textarea)", function(event) {
+	    if (event.key == "Enter") {
+	        event.preventDefault();
+	    }
+	});    
+
 
   });
 

@@ -32,6 +32,7 @@ const texts = {
     "projectname": "Projektname",
     "project_email": "Kontakt E-Mail Adresse",
     "relationship": "Beziehung zum Projekt",
+    "relationships": "Beziehungsarten (Kreditgeber*innen)",
     "save": "Speichern",
     "contract_status": "Vertragsstatus",
     "contract_status_unknown": "Noch kein Vertrag",

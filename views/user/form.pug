@@ -20,6 +20,6 @@ mixin user_form(formTitle, action, user)
       +text('IBAN')(value=_iv(user, 'IBAN') icon="fa-credit-card" groupClass="col-md-8")
       +text('BIC')(value=_iv(user, 'BIC') groupClass='col-md-4')
     +select('relationship')(icon='fa-user-friends')
-      each type in ['Unbekannt','Bewohner_innen','Nutzer_innen','Verwandte','Bekannte','MHS','habiTAT']
+      each type in settings.project.get('defaults.relationships')
         +option(type, type)(selected=_iv(user, 'relationship'))
     +submit_button()

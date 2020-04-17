@@ -9,6 +9,7 @@
         "interest_method": "365_compound",    
         "termination_type": "T",
         "termination_period": "6",
-        "termination_period_type": "M"
+        "termination_period_type": "M",
+        "relationships": ["Unbekannt","Bewohner_innen","Nutzer_innen","Verwandte","Bekannte","MHS","habiTAT"]
     }
 }
