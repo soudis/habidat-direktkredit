@@ -13,10 +13,6 @@ RUN mkdir -p /habidat/public/images
 WORKDIR /habidat
 RUN npm install && npm install pm2 -g
 
-# RUN envsubst < /habidat/config/projects.json.sample > /habidat/config/projects.json
-# RUN envsubst < /habidat/config/config.json.sample > /habidat/config/config.json
-# RUN envsubst < /habidat/config/site.json.sample > /habidat/config/site.json
-
 COPY docker-entrypoint.sh /usr/local/bin/
 RUN chmod +x /usr/local/bin/docker-entrypoint.sh
 RUN ln -s usr/local/bin/docker-entrypoint.sh / # backwards compat

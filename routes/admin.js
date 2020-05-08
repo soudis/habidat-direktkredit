@@ -16,6 +16,12 @@ module.exports = function(app){
 			.catch(error => next(error));
 	});
 
+	router.get('/projectconfig', function(req, res, next) {
+		var project = settings.project.get(undefined);
+		res.json(project);
+	});
+
+
 	router.get('/admin/add_account', security.isLoggedInAdmin, function(req, res, next) {
 		utils.render(req, res, 'admin/admin_accounts_add', {})
 			.catch(error => next(error));
@@ -97,6 +103,7 @@ module.exports = function(app){
 
 				setSetting('projectname');
 				setSetting('email');
+				setSetting('url');
 				setSetting('defaults.interest_method', req.body.interest_method);
 				setSetting('defaults.termination_type', req.body.termination_type);
 				setSetting('defaults.termination_period', req.body.termination_period);				

@@ -31,6 +31,7 @@ const texts = {
 	"password2": "Passwort (Wiederholung)",
     "projectname": "Projektname",
     "project_email": "Kontakt E-Mail Adresse",
+    "project_url": "Webseite",
     "relationship": "Beziehung zum Projekt",
     "relationships": "Beziehungsarten (Kreditgeber*innen)",
     "save": "Speichern",

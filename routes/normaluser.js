@@ -19,12 +19,13 @@ router.get('/profile', security.isLoggedIn, function(req, res) {
 	if (req.user.dn || req.user.administrator) {
 		res.redirect('/admin');
 	} else {
-		models.user.findByIdFetchFull(models, req.user.id,function(user){
-			res.render('profile', {
-				user : user, // get the user out of session and pass to template
-				title: "Direktkreditinfo"
+		models.user.findByIdFetchFull(models, req.user.id)
+			.then((user) => {
+				res.render('profile', {
+					user : user, // get the user out of session and pass to template
+					title: "Direktkreditinfo"
+				});
 			});
-		});
 	}
 });
 

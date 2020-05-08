@@ -2,7 +2,7 @@ const moment = require('moment');
 const Op = require("sequelize").Op;
 const clonedeep = require('lodash.clonedeep');
 const settings = require('../utils/settings');
-
+const bcrypt = require('bcrypt');
 
 module.exports = (sequelize, DataTypes) => {
 	var User = sequelize.define('user', {
@@ -26,7 +26,7 @@ module.exports = (sequelize, DataTypes) => {
 		},    
 		password: {
 			type: DataTypes.STRING,
-			allowNull: false
+			allowNull: true
 		},
 		first_name: {
 			type: DataTypes.STRING,
@@ -71,28 +71,49 @@ module.exports = (sequelize, DataTypes) => {
 		relationship: {
 			type: DataTypes.STRING,
 			allowNull: true
-		}
+		},
+       	passwordHashed: {
+       		type: DataTypes.STRING,	
+       		allowNull: false
+       	},
+       	lastLogin: {
+       		type: DataTypes.DATE, 
+       		allowNull: true 
+       	},
+       	loginCount: {
+       		type: DataTypes.INTEGER, 
+       		allowNull: false, 
+       		defaultValue: 0 
+       	}
 	}, {
 		tableName: 'user',
-		freezeTableName: true,
-		hooks: {
-			beforeCreate: function (user, options) {
-				if (!user.administrator) {
-					user.logon_id = Math.abs(Math.random() * 100000000);
+		freezeTableName: true
+	});
+
+	User.beforeCreate(user => {
+		if (!user.administrator) {
+			user.logon_id = Math.abs(Math.random() * 100000000);
+		}			
+	});
+
+	User.afterCreate(user => {
+		if (!user.administrator) {
+			var id = user.id + 10000;
+			return user.update({
+				logon_id: id + '_' + settings.project.get('usersuffix')
+			}, {
+				where: {
+					id: user.id
 				}
-			},
-			afterCreate: function(user, options) {
-				if (!user.administrator) {
-					var id = user.id + 10000;
-					return user.update({
-						logon_id: id + '_' + settings.project.get('usersuffix')
-					}, {
-						where: {
-							id: user.id
-						}
-					});
-				}
-			}
+			});
+		}
+	});
+
+	User.beforeValidate(user => {
+		if (user.password && user.password !== '') {
+			var salt = bcrypt.genSaltSync(10);
+			user.passwordHashed = bcrypt.hashSync(user.password, salt);
+			user.password = '';
 		}
 	});
 
@@ -191,7 +212,7 @@ module.exports = (sequelize, DataTypes) => {
 				});
 				user.contracts = contracts;
 			});
-			return users;
+			return users.filter(user => { return user.contracts.length > 0; });
 		});
 	}
 
@@ -231,8 +252,9 @@ module.exports = (sequelize, DataTypes) => {
 		return name;
 	}
 
-
-
+	User.prototype.comparePassword = function comparePassword(candidatePassword, cb) {
+		return bcrypt.compareSync(candidatePassword, this.passwordHashed);
+	};
 
 	User.prototype.hasNotTerminatedContracts = function (date) {
 		var notTerminated = false;

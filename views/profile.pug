@@ -11,7 +11,7 @@ block content
   div(class="col-md-8 col-md-offset-2 col-xs-12")     
     .jumbotron
       h2= "Finanzstatus für " + user.first_name + ' ' + user.last_name
-      p Hier siehst du deinen aktuellen Finanzstatus und deine Stammdaten. Falls die Daten nicht stimmen, melde dich bitte unter #[a(href='mailto:#{settings.project.get('email')}') #{settings.project.get('email')}]
+      p Hier siehst du deinen aktuellen Finanzstatus und deine Stammdaten. Falls die Daten nicht stimmen, melde dich bitte unter #[a(href='mailto:#{settings.project.get("email")}') #{settings.project.get('email')}]
     
     .row
       h3 Stammdaten

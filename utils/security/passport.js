@@ -80,14 +80,20 @@ module.exports = function(passport) {
             }
 
             // if the user is found but the password is wrong
-            if (user.password != password) {
+            if (user.password && user.password !== password || !user.password && !user.comparePassword(password)) {
             	logAuthFailed(req,userid);            	
                 return done(null, false, req.flash('loginMessage', 'Falsches Passwort')); // create the loginMessage and save it to session as flashdata
             }
-
-            // all is well, return successful user
-            user.project = req.session.project;
-            return done(null, user);
+            user.lastLogin = moment();
+            user.loginCount = (user.loginCount || 0) + 1;   
+			models.user.update({
+					lastLogin: user.lastLogin,
+					loginCount: user.loginCount
+				}, {
+					where: { id: user.id } 
+				}).then(() => {
+					done(null, user);
+				})
         });
 
     }));
@@ -111,10 +117,19 @@ module.exports = function(passport) {
                     done(null, user);
                 } else {
                     // if there are LDAP users, then check if current cn exists
-                    if (users.find((dbUser) => {return dbUser.logon_id.toLowerCase() === user.cn.toLowerCase() })) {
-                        done(null, user);
+                    var user = users.find((dbUser) => {return dbUser.logon_id.toLowerCase() === user.cn.toLowerCase() });
+                    if (user) {
+			            user.lastLogin = moment();
+			            user.loginCount = (user.loginCount || 0) + 1;                    	
+						models.user.update({
+								lastLogin: user.lastLogin,
+								loginCount: user.loginCount
+							}, {
+								where: { id: user.id } 
+							}).then(() => {
+								done(null, user);
+							})
                     } else {
-                        console.log("LDAP not in list");
                         req.flash('loginMessage', "LDAP Benutzer*in nicht in Liste der Admin-Accounts");
                         done(null, false);
                     }
@@ -149,7 +164,7 @@ module.exports = function(passport) {
             }
 
             // if the user is found but the password is wrong
-            if (user.password != password) {
+            if (user.password && user.password !== password || !user.password && !user.comparePassword(password)) {
             	logAuthFailed(req,userid);            	
                 return done(null, false, req.flash('loginMessage', 'Falsches Passwort')); // create the loginMessage and save it to session as flashdata
             }
@@ -158,9 +173,18 @@ module.exports = function(passport) {
             	logAuthFailed(req,userid);            	
             	return done(null, false, null); // create the loginMessage and save it to session as flashdata
             }
+            user.lastLogin = moment();
+            user.loginCount = (user.loginCount || 0) + 1;
+			models.user.update({
+					lastLogin: user.lastLogin,
+					loginCount: user.loginCount
+				}, {
+					where: { id: user.id } 
+				}).then(() => {
+					done(null, user);
+				})
 
-            // all is well, return successful user
-            user.project = req.session.project;            
+        	
             return done(null, user);
         });
 

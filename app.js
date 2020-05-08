@@ -40,6 +40,7 @@ app.use(sass({
 var oneDay = 86400000;
 
 app.use('/public', express.static(path.join(__dirname, 'public'),  { maxAge: oneDay }));
+app.use('/favicon.ico', express.static(path.join(__dirname, 'public/favicon.png')));
 app.use('/public/datatables', express.static(path.join(__dirname, 'node_modules/datatables.net-bs4/js'),  { maxAge: oneDay }));
 app.use('/public/datatables', express.static(path.join(__dirname, 'node_modules/datatables.net-bs4/css'),  { maxAge: oneDay }));
 app.use('/public/datatables', express.static(path.join(__dirname, 'node_modules/datatables.net/js'),  { maxAge: oneDay }));

@@ -36,7 +36,7 @@ var generatePieChart = function(data, callback) {
 	  , ctx = canvas.getContext('2d')
 	  , Chart = require('nchart')
 	  , fs = require('fs');
-	
+
 	new Chart(ctx).Pie(
 		    chartData
 		);

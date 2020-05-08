@@ -44,7 +44,18 @@
               td.col-md-8.h6= user.logon_id
             tr
               td.col-md-4.h6 Passwort:
-              td.col-md-8.h6= user.password 
+              if user.password && user.password !== ''
+                td.col-md-8.h6= user.password 
+              else
+                td.col-md-8.h6
+                  i.text-secondary verschlüsselt
+            tr
+              td.col-md-4.h6 Eingeloggt:
+              if (user.loginCount || 0) == 0
+                td.col-md-8.h6 
+                  i.text-secondary Noch nie
+              else
+                td.col-md-8.h6= user.loginCount + ' mal, zuletzt am ' + moment(user.lastLogin).format('DD.MM.YYYY')
             tr
               td.col-md-4.h6 Beziehung zum Projekt:
               td.col-md-8.h6= user.relationship  	
