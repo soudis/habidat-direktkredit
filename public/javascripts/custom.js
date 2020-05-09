@@ -267,6 +267,10 @@
     	if ($('#datatable thead tr:eq(1)').length && !update || !$('#datatable thead tr:eq(1)').length && update) {
     		$('.toggle-filters').children('span').removeClass('fa-search-minus').addClass('fa-search-plus')
     		$('#datatable thead tr:eq(1)').remove();
+    		table
+			 .search( '' )
+			 .columns().search( '' )
+			 .draw();
     	} else {
     		if (update) {
     			$('#datatable thead tr:eq(1)').remove();
@@ -353,34 +357,34 @@
     $(document).on( 'keyup change', '.date-filter', function () {
     	var name = $(this).data('name');
     	var element = this;
+    	var searchValueText = $(this).val();
     	var searchValue = moment($(this).val());
     	var operator = $(this).prev().children('select').val();
     	var colIndex = table.column(name + ':name').index(false);
-    	if ($(this).val() !== '') {
 
-			$.fn.dataTable.ext.search.push(
-			    function( settings, data, dataIndex ) {
-			    	var val = moment(data[colIndex], 'DD.MM.YYYY');
+		$.fn.dataTable.ext.search.push(
+		    function( settings, data, dataIndex ) {
+		    	var val = moment(data[colIndex], 'DD.MM.YYYY');
 
-			    	if (operator === '=') {
-			    		return searchValue.isSame(val);
-			    	} else if (operator === '<') {
-			    		return searchValue.isAfter(val);
-			    	} else if (operator === '<=') {
-			    		return searchValue.isSameOrAfter(val);
-			    	} else if (operator === '>') {
-			    		return searchValue.isBefore(val);
-			    	} else if (operator === '>=') {
-			    		return searchValue.isSameOrBefore(val);
-			    	} else {
-			    		return true;
-			    	}
-			    }
-			);    	
-			table.draw();
-			$.fn.dataTable.ext.search.pop();
-
-    	}		
+		    	if (searchValue == '') {
+		    		return true;
+		    	}else if (operator === '=') {
+		    		return searchValue.isSame(val);
+		    	} else if (operator === '<') {
+		    		return searchValue.isAfter(val);
+		    	} else if (operator === '<=') {
+		    		return searchValue.isSameOrAfter(val);
+		    	} else if (operator === '>') {
+		    		return searchValue.isBefore(val);
+		    	} else if (operator === '>=') {
+		    		return searchValue.isSameOrBefore(val);
+		    	} else {
+		    		return true;
+		    	}
+		    }
+		);    	
+		table.draw();
+		$.fn.dataTable.ext.search.pop();
     } );
 
     $(document).on( 'change', '.date-filter-operator', function () {
@@ -393,31 +397,28 @@
     	var searchValue = $(this).val();
     	var operator = $(this).prev().children('select').val();
     	var colIndex = table.column(name + ':name').index(false);
-    	if ($(this).val() !== '') {
-
-			$.fn.dataTable.ext.search.push(
-			    function( settings, data, dataIndex ) {
-			    	var val = parseInt(data[colIndex].split('.').join('').split(',').join('.'));
-
-			    	if (operator === '=') {
-			    		return searchValue == val;
-			    	} else if (operator === '<') {
-			    		return searchValue > val;
-			    	} else if (operator === '<=') {
-			    		return searchValue >= val;
-			    	} else if (operator === '>') {
-			    		return searchValue < val;
-			    	} else if (operator === '>=') {
-			    		return searchValue <= val;
-			    	} else {
-			    		return true;
-			    	}
-			    }
-			);    	
-			table.draw();
-			$.fn.dataTable.ext.search.pop();
-
-    	}		
+		$.fn.dataTable.ext.search.push(
+		    function( settings, data, dataIndex ) {
+		    	var val = parseInt(data[colIndex].split('.').join('').split(',').join('.'));
+		    	if (searchValue == '') {
+		    		return true;
+		    	}else if (operator === '=') {
+		    		return searchValue == val;
+		    	} else if (operator === '<') {
+		    		return searchValue > val;
+		    	} else if (operator === '<=') {
+		    		return searchValue >= val;
+		    	} else if (operator === '>') {
+		    		return searchValue < val;
+		    	} else if (operator === '>=') {
+		    		return searchValue <= val;
+		    	} else {
+		    		return true;
+		    	}
+		    }
+		);    	
+		table.draw();
+		$.fn.dataTable.ext.search.pop();
     } );
 
     $(document).on( 'change', '.number-filter-operator', function () {
