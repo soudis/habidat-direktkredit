@@ -45,26 +45,26 @@ module.exports = function(app){
     function generateContractTable(req, res, users) {
     	contracts = {
     		columns: [
-    			{id: "contract_sign_date", label: "Vertragsdatum", priority: "2"},
-    			{id: "user_id", label: "User ID"},
-    			{id: "user_name", label: "Name", priority: "2"},
-    			{id: "user_address", label: "Adresse"},
-    			{id: "user_telno", label:"Telefon"},
-    			{id: "user_email", label:"E-Mail"},
-    			{id: "user_iban", label:"IBAN"},
-    			{id: "user_bic", label: "BIC"},
-    			{id: "user_relationship", label:"Beziehung"},
-    			{id: "contract_id", label:"Vertrag ID"},
-    			{id: "contract_amount", label: "Vertragswert", class: "text-right"},
-    			{id: "contract_interest_rate", label: "Zinssatz", class: "text-right"},
-    			{id: "contract_deposit", label: "Einzahlungen", class: "text-right"},
-    			{id: "contract_withdrawal", label: "Auszahlungen", class: "text-right"},
-    			{id: "contract_amount_to_date", label: "Aushaftend", class: "text-right"},
-    			{id: "contract_interest_to_date", label: "Zinsen", class: "text-right"},
-    			{id: "contract_termination_type", label: "Kündigungsart"},
-    			{id: "contract_termination_date", label: "Kündigungsdatum"},
-    			{id: "contract_payback_date", label: "Rückzahlungsdatum"},
-    			{id: "contract_status", label: "Status", class: "text-center", priority: "2"}
+    			{id: "contract_sign_date", label: "Vertragsdatum", priority: "2", filter: 'date'},
+    			{id: "user_id", label: "User ID", filter: 'text'},
+    			{id: "user_name", label: "Name", priority: "2", filter: 'text'},
+    			{id: "user_address", label: "Adresse", filter: 'text'},
+    			{id: "user_telno", label:"Telefon", filter: 'text'},
+    			{id: "user_email", label:"E-Mail", filter: 'text'},
+    			{id: "user_iban", label:"IBAN", filter: 'text'},
+    			{id: "user_bic", label: "BIC", filter: 'text'},
+    			{id: "user_relationship", label:"Beziehung", filter: 'list'},
+    			{id: "contract_id", label:"Vertrag ID", filter: 'text'},
+    			{id: "contract_amount", label: "Vertragswert", class: "text-right", filter: 'number'},
+    			{id: "contract_interest_rate", label: "Zinssatz", class: "text-right", filter: 'number'},
+    			{id: "contract_deposit", label: "Einzahlungen", class: "text-right", filter: 'number'},
+    			{id: "contract_withdrawal", label: "Auszahlungen", class: "text-right", filter: 'number'},
+    			{id: "contract_amount_to_date", label: "Aushaftend", class: "text-right", filter: 'number'},
+    			{id: "contract_interest_to_date", label: "Zinsen", class: "text-right", filter: 'number'},
+    			{id: "contract_termination_type", label: "Kündigungsart", filter: 'list'},
+    			{id: "contract_termination_date", label: "Kündigungsdatum", filter: 'date'},
+    			{id: "contract_payback_date", label: "Rückzahlungsdatum", filter: 'date'},
+    			{id: "contract_status", label: "Status", class: "text-center", priority: "2", filter: 'list'}
     		],
 		    setColumnsVisible: function(visibleColumns) {
 		    	this.columns.forEach(column => {
@@ -128,6 +128,17 @@ module.exports = function(app){
 		            { value: contract.getStatus() }
     			]);
     		})
+    	})
+    	contracts.columns.forEach((column, index) => {
+    		if (column.filter === 'list') {
+    			var options = [];
+    			contracts.data.forEach(row => {
+    				if (!options.includes(row[index].value || '-')) {    					
+    					options.push(row[index].value || '-');
+    				}
+    			})
+    			column.filterOptions = options;
+    		}
     	})
     	return contracts;
     }    

@@ -263,6 +263,45 @@
       }      
     });
 
+    function toggleFilters(update = false) {
+    	if ($('#datatable thead tr:eq(1)').length && !update || !$('#datatable thead tr:eq(1)').length && update) {
+    		$('.toggle-filters').children('span').removeClass('fa-search-minus').addClass('fa-search-plus')
+    		$('#datatable thead tr:eq(1)').remove();
+    	} else {
+    		if (update) {
+    			$('#datatable thead tr:eq(1)').remove();
+    		}
+    		$('.toggle-filters').children('span').removeClass('fa-search-plus').addClass('fa-search-minus')
+		 	$('#datatable thead tr').clone(true).appendTo( '#datatable thead' );
+		    $('#datatable thead tr:eq(1) th:visible').each( function (i) {
+		    	if ($(this).data('filter')) {
+		    		var filterType = $(this).data('filter');
+		    		var filterOptions = $(this).data('filter-options');
+		    		var name = $(this).data('name');
+					var title = $(this).text();
+					if (filterType === 'text') {
+			        	$(this).replaceWith( '<th data-filter=' + filterType + '><div class="input-group input-group-sm"><div class="input-group-prepend"><span class="input-group-text"><spand class="fa fa-search"></span></span></div><input class="text-filter form-control form-control-sm" data-name="' + name + '" type="text" placeholder="'+title+'" /></div></th>' );
+			        }else if (filterType === 'date') {
+			        	$(this).replaceWith( '<th data-filter=' + filterType + '><div class="input-group input-group-sm"><div class="input-group-prepend"><select class="custom-select-sm custom-select date-filter-operator"><option selected value="=">=</option><option value="<">&lt;</option><option value="<=">≤</option><option value=">">&gt;</option><option value=">=">≥</option></div></select></div><input class="form-control form-control-sm date-filter" data-name="' + name + '" type="date" placeholder="'+title+'" /></div></th>' );
+			        }else if (filterType === 'number') {
+			        	$(this).replaceWith( '<th data-filter=' + filterType + '><div class="input-group input-group-sm"><div class="input-group-prepend"><select class="custom-select-sm custom-select number-filter-operator"><option selected value="=">=</option><option value="<">&lt;</option><option value="<=">≤</option><option value=">">&gt;</option><option value=">=">≥</option></div></select></div><input class="form-control form-control-sm number-filter" data-name="' + name + '" type="number" placeholder="'+title+'" /></div></th>' );
+			        }else if (filterType === 'list') {
+						var options = '<option selected>Alle</option>';			        	
+			        	filterOptions.forEach(option => {
+			        		options += '<option>'+option+'</option>'
+			        	})
+			        	$(this).replaceWith( '<th data-filter=' + filterType + '><div class="input-group input-group-sm"><select class="custom-select custom-select-sm list-filter " data-name="' + name + '">' + options + '</select></div></th>' );			        	
+			        }
+
+		    	} else {
+		    		 $(this).replaceWith('<th></th>');
+		    	}
+
+		        
+		    } );  
+		}    	
+    }
+
     $('#column_select').multiselect({
         buttonClass: 'btn btn-light',
         enableHTML: true,
@@ -271,6 +310,7 @@
         },
         onChange: function(option, checked, select) {
             table.column($(option).val()+':name').visible(checked);
+            toggleFilters(true);
         }            
     });          
     $('.datatable-buttons').children().each(function(index) {
@@ -284,6 +324,105 @@
     $('#datatable_length').parent().removeClass('col-sm-12').removeClass('col-md-6').addClass('col-sm-3');
     $('#datatable_info').parent().removeClass('col-sm-12').removeClass('col-md-5').addClass('col-sm-5');
     $('#datatable_paginate').parent().removeClass('col-sm-12').removeClass('col-md-7').addClass('col-sm-7');
+
+    $(document).on('click', '.toggle-filters', function () {    	
+    	toggleFilters(false);
+	});  
+
+    $(document).on( 'keyup change', '.text-filter', function () {
+    	var name = $(this).data('name');
+        if ( table.column(name + ':name').search() !== this.value ) {
+            table
+                .column(name + ':name')
+                .search( this.value )
+                .draw();
+        }
+    } );	
+
+    $(document).on( 'change', '.list-filter', function () {
+    	var name = $(this).data('name');
+        if ( table.column(name + ':name').search() !== this.value ) {
+            table
+                .column(name + ':name')
+                .search( this.value!=='Alle'?this.value:'' )
+                .draw();
+        }
+    } );			
+
+
+    $(document).on( 'keyup change', '.date-filter', function () {
+    	var name = $(this).data('name');
+    	var element = this;
+    	var searchValue = moment($(this).val());
+    	var operator = $(this).prev().children('select').val();
+    	var colIndex = table.column(name + ':name').index(false);
+    	if ($(this).val() !== '') {
+
+			$.fn.dataTable.ext.search.push(
+			    function( settings, data, dataIndex ) {
+			    	var val = moment(data[colIndex], 'DD.MM.YYYY');
+
+			    	if (operator === '=') {
+			    		return searchValue.isSame(val);
+			    	} else if (operator === '<') {
+			    		return searchValue.isAfter(val);
+			    	} else if (operator === '<=') {
+			    		return searchValue.isSameOrAfter(val);
+			    	} else if (operator === '>') {
+			    		return searchValue.isBefore(val);
+			    	} else if (operator === '>=') {
+			    		return searchValue.isSameOrBefore(val);
+			    	} else {
+			    		return true;
+			    	}
+			    }
+			);    	
+			table.draw();
+			$.fn.dataTable.ext.search.pop();
+
+    	}		
+    } );
+
+    $(document).on( 'change', '.date-filter-operator', function () {
+    	$(this).parent().next().change();
+    })
+
+    $(document).on( 'keyup change', '.number-filter', function () {
+    	var name = $(this).data('name');
+    	var element = this;
+    	var searchValue = $(this).val();
+    	var operator = $(this).prev().children('select').val();
+    	var colIndex = table.column(name + ':name').index(false);
+    	if ($(this).val() !== '') {
+
+			$.fn.dataTable.ext.search.push(
+			    function( settings, data, dataIndex ) {
+			    	var val = parseInt(data[colIndex].split('.').join('').split(',').join('.'));
+
+			    	if (operator === '=') {
+			    		return searchValue == val;
+			    	} else if (operator === '<') {
+			    		return searchValue > val;
+			    	} else if (operator === '<=') {
+			    		return searchValue >= val;
+			    	} else if (operator === '>') {
+			    		return searchValue < val;
+			    	} else if (operator === '>=') {
+			    		return searchValue <= val;
+			    	} else {
+			    		return true;
+			    	}
+			    }
+			);    	
+			table.draw();
+			$.fn.dataTable.ext.search.pop();
+
+    	}		
+    } );
+
+    $(document).on( 'change', '.number-filter-operator', function () {
+    	$(this).parent().next().change();
+    })    
 
 
 //setInterval(function(){ table.columns.adjust().draw(); }, 3000);

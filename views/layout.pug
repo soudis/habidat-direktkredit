@@ -24,6 +24,8 @@ html
     script(type='text/javascript' src='/public/datatables/responsive.bootstrap4.min.js')  
     script(type='text/javascript' src='/public/moment/moment.min.js')
     script(type='text/javascript' src='/public/datepicker/bootstrap-datepicker.min.js')
+    script(type='text/javascript' src='/public/select/bootstrap-select.min.js')
+    
     script(type='text/javascript' src='/public/javascripts/locale/de.js')
     script(type='text/javascript' src='/public/bootbox/bootbox.min.js')     
     script(type='text/javascript' src='/public/chart.js/Chart.min.js')
@@ -80,7 +82,7 @@ html
 
             if success && success.length > 0
               include partials/success       
-                     
+
             block content
 
     if currentUser && currentUser.administrator

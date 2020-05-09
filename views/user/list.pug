@@ -13,6 +13,9 @@ mixin status(tooltip, status)
 block content
   .d-none(id="datatable_parent")
     .d-none.datatable-buttons(for-id="datatable_length")
+      a.datatable-button.btn.btn-light.toggle-filters(href='#' title="Filter anzeigen")
+        span.fa.fa-search-plus 
+
       select.checkbox-select(id="column_select" multiple="multiple" autocomplete="off") #[span.fa.fa-cogs]
         each column in contracts.columns
           option(value=column.id selected=column.visible?"selected":undefined)= column.label
@@ -25,8 +28,8 @@ block content
       thead
         tr
           th.control.fit.text-center(data-orderable="false")
-          each column in contracts.columns
-            th(data-name=column.id id=column.id data-visible=!column.visible class=column.class data-responsive-priority=(column.priority?column.priority:"100"))= column.label
+          each column, columnIndex in contracts.columns
+            th(data-name=column.id id=column.id data-visible=!column.visible class=column.class data-responsive-priority=(column.priority?column.priority:"100") data-filter=column.filter data-filter-options=column.filterOptions?column.filterOptions:undefined)= column.label
           th(data-orderable="false" data-responsive-priority="1").fit.text-center 
             span.fa.fa-cogs
       tbody

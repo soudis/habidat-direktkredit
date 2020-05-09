@@ -49,6 +49,7 @@ app.use('/public/jquery', express.static(path.join(__dirname, 'node_modules/jque
 app.use('/public/moment', express.static(path.join(__dirname, 'node_modules/moment/min'),  { maxAge: oneDay }));
 app.use('/public/datepicker', express.static(path.join(__dirname, 'node_modules/bootstrap-datepicker/dist/js'),  { maxAge: oneDay }));
 app.use('/public/datepicker', express.static(path.join(__dirname, 'node_modules/bootstrap-datepicker/dist/css'),  { maxAge: oneDay }));
+app.use('/public/select', express.static(path.join(__dirname, 'node_modules/bootstrap-select/dist/js'),  { maxAge: oneDay }));
 app.use('/public/bootbox', express.static(path.join(__dirname, 'node_modules/bootbox/dist'),  { maxAge: oneDay }));
 app.use('/public/chart.js', express.static(path.join(__dirname, 'node_modules/chart.js/dist'),  { maxAge: oneDay }));
 app.use('/public/popper', express.static(path.join(__dirname, 'node_modules/@popperjs/core/dist/umd'),  { maxAge: oneDay }));
@@ -57,6 +58,8 @@ app.use('/public/multiselect', express.static(path.join(__dirname, 'node_modules
 app.use('/public/datatables', express.static(path.join(__dirname, 'node_modules/datatables.net-responsive/js'), { maxAge: 31557600000 }));
 app.use('/public/datatables', express.static(path.join(__dirname, 'node_modules/datatables.net-responsive-bs4/js'), { maxAge: 31557600000 }));
 app.use('/public/datatables', express.static(path.join(__dirname, 'node_modules/datatables.net-responsive-bs4/css'), { maxAge: 31557600000 }));
+
+
 
 
 const umlautMap = {

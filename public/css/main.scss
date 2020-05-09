@@ -11,6 +11,7 @@ $custom-file-text: (
 
 @import "node_modules/bootstrap/scss/bootstrap";
 @import "node_modules/bootstrap-multiselect/dist/scss/bootstrap-multiselect.scss";
+@import "node_modules/bootstrap-select/sass/bootstrap-select.scss";
 @import "node_modules/@fortawesome/fontawesome-free/scss/fontawesome";
 @import "node_modules/@fortawesome/fontawesome-free/scss/brands";
 @import "node_modules/@fortawesome/fontawesome-free/scss/regular";
@@ -448,4 +449,31 @@ img.logo {
 
 .password-help, .password-error {
   margin-top: 10px;
+}
+
+.custom-select {
+  -webkit-appearance:none;
+  -moz-appearance:none;
+}
+
+.number-filter {
+  -webkit-appearance:none;
+  -moz-appearance:textfield;
+}
+
+select.filter-select {
+  font-family: 'Font Awesome 5 Free';
+  display: inline-block;
+  font-style: normal;
+  font-variant: normal;
+  text-rendering: auto;
+  line-height: 1;  
+}
+
+input.number-filter {
+  text-align: right;
+}
+
+.list-filter {
+  text-align: center;
 }

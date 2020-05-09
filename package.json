@@ -15,6 +15,7 @@
     "bootstrap": "^4.4.1",
     "bootstrap-datepicker": "^1.9.0",
     "bootstrap-multiselect": "^0.9.15",
+    "bootstrap-select": "^1.13.17",
     "canvas": "^1.6.13",
     "chart.js": "^2.9.3",
     "connect-flash": "~0.1.1",
