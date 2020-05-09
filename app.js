@@ -119,7 +119,9 @@ const _iv = (object, key) => {
 app.use(function(req,res,next){
   res.locals.session = req.session;
   res.locals.settings = settings;
-  res.locals.currentUser = req.user;
+  if (req.user) {
+	res.locals.currentUser = req.user;
+  }  
 
   res.locals.moment = require('moment');
   res.locals.replaceUmlaute = replaceUmlaute;

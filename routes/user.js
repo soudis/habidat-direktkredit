@@ -142,7 +142,7 @@ module.exports = function(app){
 	
 	router.get('/user/list', security.isLoggedInAdmin, function(req, res, next) {
 		models.user.findFetchFull(models, { administrator: {[Op.not]: '1'}})
-			.then(users => utils.render(req, res, 'user/list', {contracts: generateContractTable(req, res, users).setColumnsVisible(columnsVisible)}, 'Kreditliste'))
+			.then(users => utils.render(req, res, 'user/list', {success: req.flash('success'), contracts: generateContractTable(req, res, users).setColumnsVisible(columnsVisible)}, 'Kreditliste'))
 			.catch(error => next(error));
 	});
 

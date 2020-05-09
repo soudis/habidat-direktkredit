@@ -1,67 +1,58 @@
 extends layout
 block content
-  +nav(settings.project.get('projectname') + ' Kreditinformation', "dropdown_menu", settings.project.get('logo'))
-    +nav_item( "profile" ) 
-      span.fa.fa-info
-      span  Finanzstatus
-    +nav_item( "files" ) 
-      span.fa.fa-download
-      span  Dateien
-    +nav_item( "/procrastinate") #[span.fa.fa-clock]    
-  div(class="col-md-8 col-md-offset-2 col-xs-12")     
-    .jumbotron
-      h2= "Finanzstatus für " + user.first_name + ' ' + user.last_name
-      p Hier siehst du deinen aktuellen Finanzstatus und deine Stammdaten. Falls die Daten nicht stimmen, melde dich bitte unter #[a(href='mailto:#{settings.project.get("email")}') #{settings.project.get('email')}]
+  .jumbotron
+    h2= "Finanzstatus für " + user.first_name + ' ' + user.last_name
+    p Hier siehst du deinen aktuellen Finanzstatus und deine Stammdaten. Falls die Daten nicht stimmen, melde dich bitte unter #[a(href='mailto:#{settings.project.get("email")}') #{settings.project.get('email')}]
+  
+  .row
+    h3 Stammdaten
+  .row
+    .col-md-4 Name:
+    .col-md-8= user.getFullName()
+  .row
+    .col-md-4 Adresse:
+    .col-md-8!= user.getAddress(true)
+  .row
+    .col-md-4 Telefonnummer:
+    .col-md-8= user.telno
+  .row
+    .col-md-4 E-Mail Adresse:
+    .col-md-8= user.email
+  .row
+    .col-md-4 IBAN:
+    .col-md-8= user.IBAN    
+  .row
+    .col-md-4 BIC:
+    .col-md-8= user.BIC
+  .row
+    h3 Direktkredite
+  each contract in user.contracts
+    - interest = contract.calculateInterest() 
+    .row
+      h4 Direktkredit vom #{moment(contract.sign_date).format('DD.MM.YYYY')}
+    .row
+      .col-md-4 Status:
+      .col-md-8 #{contract.getStatus()} 
+    .row
+      .col-md-4 Betrag (Vertrag):
+      .col-md-8= format.formatMoney(contract.amount )
+    .row
+      .col-md-4 Zinssatz:
+      .col-md-8 #{format.formatNumber(contract.interest_rate,3)}%
+    .row 
+      .col-md-4 Zinsertrag (bis heute):
+      .col-md-8= format.formatMoney(interest.now)
+    .row
+      .col-md-4 Zinsertrag (für #{interest.last_year_no}):
+      .col-md-8= format.formatMoney(interest.last_year)
+    .row
+      .col-md-12
+        h5 Zahlungen
+        each transaction in contract.transactions
+          .row
+            .col-md-1 
+            .col-md-3 #{moment(transaction.transaction_date).format('DD.MM.YYYY')}
+            .col-md-3 #{transaction.getTypeText()}
+            .col-md-3.text-right=format.formatMoney(transaction.amount )
+        
     
-    .row
-      h3 Stammdaten
-    .row
-      .col-md-4 Name:
-      .col-md-8= user.getFullName()
-    .row
-      .col-md-4 Adresse:
-      .col-md-8!= user.getAddress(true)
-    .row
-      .col-md-4 Telefonnummer:
-      .col-md-8= user.telno
-    .row
-      .col-md-4 E-Mail Adresse:
-      .col-md-8= user.email
-    .row
-      .col-md-4 IBAN:
-      .col-md-8= user.IBAN    
-    .row
-      .col-md-4 BIC:
-      .col-md-8= user.BIC
-    .row
-      h3 Direktkredite
-    each contract in user.contracts
-      - interest = contract.calculateInterest() 
-      .row
-        h4 Direktkredit vom #{moment(contract.sign_date).format('DD.MM.YYYY')}
-      .row
-        .col-md-4 Status:
-        .col-md-8 #{contract.getStatus()} 
-      .row
-        .col-md-4 Betrag (Vertrag):
-        .col-md-8= format.formatMoney(contract.amount )
-      .row
-        .col-md-4 Zinssatz:
-        .col-md-8 #{format.formatNumber(contract.interest_rate,3)}%
-      .row 
-        .col-md-4 Zinsertrag (bis heute):
-        .col-md-8= format.formatMoney(interest.now)
-      .row
-        .col-md-4 Zinsertrag (für #{interest.last_year_no}):
-        .col-md-8= format.formatMoney(interest.last_year)
-      .row
-        .col-md-12
-          h5 Zahlungen
-          each transaction in contract.transactions
-            .row
-              .col-md-1 
-              .col-md-3 #{moment(transaction.transaction_date).format('DD.MM.YYYY')}
-              .col-md-3 #{transaction.getTypeText()}
-              .col-md-3.text-right=format.formatMoney(transaction.amount )
-          
-      

@@ -1,18 +1,9 @@
 extends layout
 
 block content
-  +nav(settings.project.get('projectname') + ' Kreditportal', "dropdown_menu", settings.project.get('logo')) 
-    +nav_item('/project') 
-      span.fa.fa-th-large
-      span  Projekt auswählen    
-  .container-fluid(id="root-container" class="col-xl-8 col-xl-offset-2 col-lg-12")  
-    .jumbotron
-      h2= settings.project.get('projectname') + " @ habiDAT"
-      p.lead Bitte melde dich mit deinen Zugangsdaten an. Die Daten wurden dir nach Vertragsabschluss per Post zugesandt oder persönlich übergeben. Falls du die Zugangsdaten nicht bekommen hast oder verloren hast, dann melde dich bitte unter #[a(href='mailto:#{settings.project.get("email")}') #{settings.project.get('email')}] 
-    
-    if message && message.length > 0
-      div(class="alert alert-danger") 
-        p.message= message
-
-    .col-md-5.col-xs-12.col-sm-6.col-lg-4
-      +logon_form("logon")
+  .jumbotron
+    h2= "Willkommen beim " + settings.project.get('projectname') + " Kreditportal!"
+    p.lead Hier bekommst du alle Informationen zu deinem Direktkredit bei uns. Bitte melde dich mit deinen Zugangsdaten an, falls du die Zugangsdaten nicht bekommen oder verloren hast, dann klicke #[a(href="/getpassword") hier]. Bei Problemen melde dich gerne unter #[a(href='mailto:#{settings.project.get("email")}') #{settings.project.get('email')}] bei uns!
+  
+  .col-md-5.col-xs-12.col-sm-6.col-lg-4
+    +logon_form("logon")

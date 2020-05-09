@@ -16,6 +16,19 @@ exports.render = (req, res, template, data, title = undefined) => {
 		})
 }
 
+exports.renderToText = (req, res, template, data, title = undefined) => {
+	return new Promise((resolve, reject) => {
+		data.title = title;
+		res.render(template, data, (error, html) => {
+			if (error) {
+				reject(error);
+			} else {
+				resolve(html);
+			}			
+		});
+	});
+}
+
 exports.generateDocx = function(templateFile, outputFile, data){
 	var path = templateFile;
 	var file = fs.readFileSync(path, 'binary');

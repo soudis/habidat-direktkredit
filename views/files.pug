@@ -1,34 +1,28 @@
 extends layout
 block content
-  +nav(settings.project.get('projectname'), "dropdown_menu")
-    +nav_item( "profile" ) Finanzstatus
-    +nav_item( "files" ) Dateien
-    +nav_item( "/procrastinate") #[span.glyphicon.glyphicon-time]    
-    +nav_item( "logout" ) Abmelden
-  div(class="col-md-8 col-md-offset-2 col-xs-12")  
-    .jumbotron
-      h2 Dateien
-      p Hier findest du alle wichtigen Informationsblätter für Direktkredite. Außerdem stellen wir jährlich unsere Bilanz hier online, damit du einen Einblick in die Verwendung deines Geldes bekommst. 
-    .col-md-6.col-xs-12
-      h4 Kontomitteilung (für Steuererklärung):    
-      form.form-horizontal(action="/accountnotification" method="post" role="form")
-        .list-group
-          .list-group-item
-            .input-group
-              span.input-group-addon Jahr
-              input.form-control(type="number" step="1" name="year" required="true" min="2015" max=moment().get('year') value=moment().subtract(1, 'year').get('year'))
-              .input-group-btn
-                button(type='submit' ).btn.btn-default
-                  a.glyphicon.glyphicon-download
-    .row
-    each group, group_id in groups      
-      if (group.files && group.files.length > 0)
-        .col-md-6.col-xs-12
-          h4= group.title + ":"
-          .list-group        
-            each file in group.files
-              a.list-group-item.list-group-item-action(href='/file/getpublic/' + file.id download=file.filename)
-                span.glyphicon.glyphicon-file(style="color: green")
-                span &nbsp;
-                span= file.description 
-      
+  .jumbotron
+    h2 Dateien
+    p Hier findest du alle wichtigen Informationsblätter für Direktkredite. Außerdem stellen wir jährlich unsere Bilanz hier online, damit du einen Einblick in die Verwendung deines Geldes bekommst. 
+  .col-md-6.col-xs-12
+    h4 Kontomitteilung (für Steuererklärung):    
+    form.form-horizontal(action="/accountnotification" method="post" role="form")
+      .list-group
+        .list-group-item
+          .input-group
+            span.input-group-addon Jahr
+            input.form-control(type="number" step="1" name="year" required="true" min="2015" max=moment().get('year') value=moment().subtract(1, 'year').get('year'))
+            .input-group-btn
+              button(type='submit' ).btn.btn-default
+                a.glyphicon.glyphicon-download
+  .row
+  each group, group_id in groups      
+    if (group.files && group.files.length > 0)
+      .col-md-6.col-xs-12
+        h4= group.title + ":"
+        .list-group        
+          each file in group.files
+            a.list-group-item.list-group-item-action(href='/file/getpublic/' + file.id download=file.filename)
+              span.glyphicon.glyphicon-file(style="color: green")
+              span &nbsp;
+              span= file.description 
+    

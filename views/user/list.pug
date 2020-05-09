@@ -1,4 +1,4 @@
-extends ../admin/layout
+extends ../layout
 
 mixin status(tooltip, status)
   td.text-center(data-order=status)
@@ -10,7 +10,7 @@ mixin status(tooltip, status)
       else if status == 1
         span.fa.fa-question-circle.text-warning 
 
-block admin-content
+block content
   .d-none(id="datatable_parent")
     .d-none.datatable-buttons(for-id="datatable_length")
       select.checkbox-select(id="column_select" multiple="multiple" autocomplete="off") #[span.fa.fa-cogs]

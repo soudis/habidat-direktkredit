@@ -23,7 +23,8 @@ router.get('/profile', security.isLoggedIn, function(req, res) {
 			.then((user) => {
 				res.render('profile', {
 					user : user, // get the user out of session and pass to template
-					title: "Direktkreditinfo"
+					title: "Direktkreditinfo",
+					success: req.flash('success')
 				});
 			});
 	}

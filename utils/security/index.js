@@ -8,7 +8,7 @@ const url = 	require('url');
 		return next();
 	// 	if they aren't redirect them to the home page
 	req.session.returnTo = req.url; 
-	res.redirect('/');
+	res.redirect('/login');
 };
 
 //route middleware to make sure a user is logged in
@@ -22,7 +22,7 @@ exports.isLoggedInAdmin = function(req, res, next) {
 		res.redirect('/profile');
 	} else {
 		req.session.returnTo = req.url; 
-		res.redirect('/');		
+		res.redirect('/login');		
 	}
 };
 

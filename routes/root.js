@@ -3,16 +3,105 @@ const moment = require("moment");
 const passport = require('passport');
 const router = require('express').Router();
 const settings = require('../utils/settings');
-
+const nodemailer = require('nodemailer');
+const crypto = require('crypto');
+const models  = require('../models');
+const utils = require('../utils');
 
 module.exports = function(app){
 
 
 	/* Welcome Site */
-	router.get('/', function(req, res, next) {
-   		res.render('index', { title: 'habiDAT', message: req.flash('loginMessage') } );  	
+	router.get('/', security.isLoggedInAdmin, function(req, res, next) {
+   		res.redirect('/user/list');
 	});
 
+	/* Welcome Site */
+	router.get('/login', function(req, res, next) {
+   		res.render('index', { title: 'Login', error: req.flash('loginMessage'), success: req.flash('success') } );  	
+	});
+
+	router.get('/getpassword', function(req, res, next) {
+   		res.render('getpassword', { title: 'Passwort setzen', error: req.flash('error') } );  	
+	});
+
+	router.get('/setpassword', security.isLoggedIn, function(req, res, next) {
+   		res.render('setpassword', { user: req.user, title: 'Passwort ändern', error: req.flash('error') } );  	
+	});
+
+
+	router.get('/getpassword/:token', function(req, res, next) {
+		models.user.findByToken(req.params.token)
+			.then(user => {
+				res.render('setpassword', {token: req.params.token, user: user, title: 'Passwort setzen', error: req.flash('error')});
+			})
+			.catch(error => {
+				req.flash('error', error);
+				res.redirect('/getpassword');
+			})
+	});	
+
+	router.post('/setpassword', function(req, res, next) {
+		if (!req.body.password || req.body.password === '') {
+			req.flash('error', 'Passwort darf nicht leer sein!');
+			res.redirect('/getpassword/' + req.body.token);
+		} else if(req.body.password !== req.body.passwordRepeat) {
+			req.flash('error', 'Passwörter müssen übereinstimmen');
+			res.redirect('/getpassword/' + req.body.token);
+		} else {
+			models.user.update({ password: req.body.password, passwordHashed: req.body.password, passwordResetToken: null, passwordResetExpires: null }, {where: { id:req.body.id } })
+				.then(() => {
+					if (req.body.token) {
+						req.flash('success', 'Dein Passwort wurde gesetzt, logge dich jetzt ein');
+					} else {
+						req.flash('success', 'Dein Passwort wurde geändert');
+					}
+					res.redirect('/');
+				})
+		}
+		
+	});
+
+	router.post('/getpassword', function(req, res, next) {
+
+		models.user.findOne({where: { email: req.body.email }})
+			.then(user => {
+				if (!user) {
+					return;
+				} else {
+					user.passwordResetToken = crypto.randomBytes(16).toString('hex');
+			      	user.passwordResetExpires = Date.now() + 3600000 * 3; // 3 hours
+			      	return user.save()
+						.then(user => {
+							return utils.renderToText(req, res, 'email/setpassword', {link: 'https://'+req.headers.host+'/getpassword/'+user.passwordResetToken});
+						})
+						.then(emailBody => {
+							var transporter = nodemailer.createTransport({
+						      service: 'SendGrid',
+						      auth: {
+						        user: process.env.SENDGRID_USER,
+						        pass: process.env.SENDGRID_PASSWORD
+						      }
+						    });
+						    const mailOptions = {
+							    to: user.email,
+							    from: 'no-reply@'+req.headers.host,
+							    subject: 'Setze dein Passwort für die ' + settings.project.get('projectname') + ' Direktkreditplattform',
+							    html: emailBody
+							};
+							return transporter.sendMail(mailOptions);
+						})		
+				}		      	
+			})
+			.then(() => {
+				req.flash('success', 'Falls dein Account gefunden wurde, hast du ein E-Mail mit einem Link bekommen');
+				res.redirect('/');
+			})
+			.catch(error => {
+				req.flash('error', 'E-Mail konnte nicht versandt werden: ' + error);
+				res.redirect('/getpassword');
+			})
+	});
 
 /*
 	router.get('/project', function(req, res, next) {

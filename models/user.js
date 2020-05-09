@@ -84,6 +84,14 @@ module.exports = (sequelize, DataTypes) => {
        		type: DataTypes.INTEGER, 
        		allowNull: false, 
        		defaultValue: 0 
+       	},
+       	passwordResetToken: {
+       		type:  DataTypes.STRING,	
+       		allowNull: true
+       	},
+       	passwordResetExpires: {
+       		type: DataTypes.DATE, 
+       		allowNull: true 
        	}
 	}, {
 		tableName: 'user',
@@ -214,6 +222,18 @@ module.exports = (sequelize, DataTypes) => {
 			});
 			return users.filter(user => { return user.contracts.length > 0; });
 		});
+	}
+
+	User.findByToken = function (token) {
+		return User.findOne({where: { passwordResetToken: token }})
+			.then(user => {
+				console.log('now: ' + moment() + ', expires: ' + moment(user.passwordResetExpires))
+				if (!user || moment().isAfter(moment(user.passwordResetExpires))) {
+					throw 'Der Link ist abgelaufen, bitte versuche es noch einmal'
+				} else {
+					return user;
+				}
+			})
 	}
 
 	User.prototype.getAddress = function (lineBreak=false) {

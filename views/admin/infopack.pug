@@ -1,4 +1,4 @@
-extends ../admin/layout
+extends ../layout
 include ./template_form
 
 mixin group(title, files, type)
@@ -32,7 +32,7 @@ mixin group(title, files, type)
                   span.fa.fa-trash 
 
 
-block admin-content 
+block content 
   .jumbotron
     h2 Dateien für Kreditgeber*innen
     p.lead Hier können Dateien hochgeladen werden, die Kreditgeber*innen nach dem Login zum Download zur Verfügung stehen, z.B. aktuelle Jahresabschlüsse, rechtliche Informationsdokumente oder sonstige Updates aus deinem Projekt.

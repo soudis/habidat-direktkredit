@@ -1,8 +1,8 @@
-extends ../admin/layout
+extends ../layout
 
 include ../file/files
 
-block admin-content
+block content
   include ./show_user 
   +files_show(user.files, 'user', user.id, addFile)  
   include ../contract/show_contracts

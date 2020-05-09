@@ -1,3 +1,18 @@
+mixin dd_item(href, active)
+    a.dropdown-item(class=active href=href )
+        block        
+ 
+mixin nav_item_dropdown(href, active)
+    li.nav-item.dropdown
+        a.nav-link.dropdown-toggle( href='#', data-toggle="dropdown", role="button", aria-expanded="false" )
+          if (attributes.icon)
+            span.fa(class=attributes.icon)
+            span  
+          span= attributes.label
+        ul.dropdown-menu(class=attributes.dropDownMenuClass role="menu" )
+            block
+ 
+
 mixin nav(name, id, logo, style)
   .navbar.navbar-expand-lg.navbar-default
       if logo
@@ -10,12 +25,15 @@ mixin nav(name, id, logo, style)
       .collapse.navbar-collapse( id=id )
           ul.nav.navbar-nav
               block
-          ul.nav.navbar-nav.ml-auto
+          ul.nav.navbar-nav.ml-auto.navbar-right
             if (currentUser)
-              li.nav-item
-                a.nav-link( href="/logout" ) 
+              +nav_item_dropdown( "#" )(label=currentUser.first_name || currentUser.logon_id icon="fa-user" dropDownMenuClass='dropdown-menu-right')
+                +dd_item('/setpassword')
+                  span.fa.fa-lock
+                  span  Passwort ändern            
+                +dd_item('/logout')
                   span.fa.fa-sign-out-alt
-                  span  Abmelden                          
+                  span  Abmelden
             else
               li.nav-item
                 a.nav-link( href="/login" ) 
@@ -27,20 +45,7 @@ mixin nav_item(href, active)
     li.nav-item(class=active): a.nav-link( href=href )
         block
 
-mixin dd_item(href, active)
-    a.dropdown-item(class=active href=href )
-        block        
- 
-mixin nav_item_dropdown(href, active)
-    li.nav-item.dropdown
-        a.nav-link.dropdown-toggle( href='#', data-toggle="dropdown", role="button", aria-expanded="false" )
-          if (attributes.icon)
-            span.fa(class=attributes.icon)
-            span  
-          span= attributes.label
-        ul.dropdown-menu( role="menu" )
-            block
- 
+
 mixin nav_divider
     li.divider
  
@@ -49,12 +54,132 @@ mixin nav_header
         block
 
 mixin logon_form(action)        
-  form(action=action method="post")
-    .form-group
+  form.logon-form(action=action method="post")
+    .form-group.row
       label Benutzername / E-Mail Adresse
-      input(type="text" class="form-control" name="userid")
-    .form-group
+      .input-group
+        span.input-group-prepend
+          span.input-group-text
+            span.fa.fa-user      
+        input(type="text" class="form-control" name="userid")
+    .form-group.row
       label Passwort
-      input(type="password" class="form-control" name="password")
-    button(type='submit' class='btn btn-primary btn-lg') Einloggen
+      .input-group
+        span.input-group-prepend
+          span.input-group-text
+            span.fa.fa-lock      
+        input(type="password" class="form-control" name="password")
+    .form-group.row
+      button.btn(type='submit' class='btn btn-primary btn-lg') Einloggen
+    .form-group.row   
+      a(href="/getpassword") Noch kein Passwort oder Passwort vergessen?
+    
+
+mixin getpassword_form(action)        
+  form.logon-form(action=action method="post")
+    .form-group.row
+      label E-Mail Adresse
+      .input-group
+        span.input-group-prepend
+          span.input-group-text
+            span.fa.fa-at      
+        input(type="email" class="form-control" name="email")
+    .form-group.row
+      button.btn(type='submit' class='btn btn-primary btn-lg') Senden
+    
+
+mixin setpassword_form(action)        
+  form.password-form(action=action method="post")
+    input(type="hidden" name="id" value=user.id)
+    if token
+      input(type="hidden" name="token" value=token)
+    .form-group.row
+      label Passwort    
+      .input-group
+        span.input-group-prepend
+          span.input-group-text
+            span.fa.fa-lock
+        input.form-control(type="password" autocomplete="off" data-toggle="tooltip"  required=required id="password" name="password")
+    .form-group.row
+      label Passwort (Wiederholung)
+      .input-group
+        span.input-group-prepend
+          span.input-group-text
+            span.fa.fa-lock
+        input.form-control(type="password" autocomplete="off" id="passwordRepeat" name="passwordRepeat"  data-rule-equalTo="#password" required=required) 
+    .form-group.row
+      button.btn(type='submit' class='btn btn-primary btn-lg') Passwort setzen
+  script(type='text/javascript' src='/public/javascripts/zxcvbn.js')    
+  script.
+    var checkPasswordMatch = function() {
+        $('.password-error').remove();
+        if ($('#password').val() != $('#passwordRepeat').val() && $('#passwordRepeat').val() != "") {
+            $('#passwordRepeat').parent('.input-group').parent().append('<span class="help-block password-error" id="helpPasswordError" style="color:red;"><b>Passwörter müssen übereinstimmen</b>'); 
+        } 
+    }    
+
+    var checkPassword = function(password)  {     
+        $('.password-help').remove();
+        if (password.length > 0 ) {
+
+            var result = zxcvbn(password);
+            $('#password').attr('security-level', result.score);
+            if (result.score == 0) {
+                $('#passwordRepeat').parent('.input-group').parent().append('<span class="help-block password-help" id="helpPasswordSuggestion" style="color:red;"><b>Sicherheitsstufe (0/4)</b> Dieses Passwort ist sehr unsicher (mind. 3/4)</span>');
+            } else if (result.score == 1) {
+                $('#passwordRepeat').parent('.input-group').parent().append('<span class="help-block password-help" id="helpPasswordSuggestion" style="color:red;"><b>Sicherheitsstufe (1/4)</b> Dieses Passwort ist unsicher (mind. 3/4)</span>');
+            } else if (result.score == 2) {
+                $('#passwordRepeat').parent('.input-group').parent().append('<span class="help-block password-help" id="helpPasswordSuggestion" style="color:orange;"><b>Sicherheitsstufe (2/4)</b> Dieses Passwort reicht noch nicht ganz (mind. 3/4)</span>');
+            } else if (result.score == 3) {
+                $('#passwordRepeat').parent('.input-group').parent().append('<span class="help-block password-help" id="helpPasswordSuggestion" style="color:green;"><b>Sicherheitsstufe (3/4)</b> Dieses Passwort ist ausreichend sicher</span>');
+            } else if (result.score == 4) {
+                $('#passwordRepeat').parent('.input-group').parent().append('<span class="help-block password-help" id="helpPasswordSuggestion" style="color:green;"><b>Sicherheitsstufe (4/4)</b> Dieses Passwort ist sehr sicher</span>');                
+            }
+            if (result.feedback && result.feedback.warning && result.feedback.warning != "") {
+                $('#passwordRepeat').parent('.input-group').parent().append('<span class="help-block password-help" id="helpPasswordWarning" style="color:orange;"><b>Warnung</b> ' + result.feedback.warning + '</span>');
+            }
+            if (result.feedback && result.feedback.suggestions && result.feedback.suggestions != "") {
+                $('#passwordRepeat').parent('.input-group').parent().append('<span class="help-block password-help" id="helpPasswordSuggestion" style="color:grey;"><b>Vorschlag</b> ' + result.feedback.suggestions + '</span>');                    
+            }                 
+
+        }
+        checkPasswordMatch();
+        
+    }
+
+    $('#passwordRepeat').keyup(checkPasswordMatch);
+
+    var checkPasswordQueue;
+    $('#password').keyup(function (event){
+        checkPasswordQueue = $('#password').val();        
+    });
+
+    function passwordCheckTimer() {
+        if (checkPasswordQueue) {
+            console.log('check');
+            var password =checkPasswordQueue;
+            checkPasswordQueue = undefined;    
+            checkPassword(password);
+        }   
+    }
+
+    setInterval(passwordCheckTimer, 200);
+
+    $('#password').change(function(event) {
+        var password = $('#password').val();
+        checkPassword(password);  
+    });  
+
+    $('.password-form').submit(function(event) {
+        if ($('#password').length && ($('#password').attr('security-level') != '3' && $('#password').attr('security-level') != '4' && $('#password').val() != "")) {
+            $('#password').focus();
+            event.preventDefault();
+        }
+        else if ($('#password').length && $('#password').val() != $('#passwordRepeat').val()) {
+            $('#passwordRepeat').focus();
+            event.preventDefault();
+        }    
+    });
+    
+
         
