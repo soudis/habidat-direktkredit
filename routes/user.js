@@ -106,7 +106,7 @@ module.exports = function(app){
     		user.contracts.forEach(contract => {
     			var interest = contract.calculateInterest()
     			contracts.data.push([
-    				{ value: moment(contract.sign_date).format('DD.MM.YYYY'), order: moment(contract.sign_date) },
+    				{ value: moment(contract.sign_date).format('DD.MM.YYYY'), order: moment(contract.sign_date).format('YYYY/MM/DD') },
 		            { value:  user.id  },
 		            { value: user.getFullName(), order: replaceUmlaute(user.getFullName())},
 		            { value: user.getAddress(true) },
@@ -123,8 +123,8 @@ module.exports = function(app){
 		            { value: format.formatMoney(contract.getAmountToDate(moment())), order: contract.getAmountToDate(moment()) },
 		            { value: format.formatMoney(interest.now), order: interest.now},
 		            { value: contract.getTerminationTypeFullString()},
-		            { value: contract.termination_date?moment(contract.termination_date).format('DD.MM.YYYY'):"", order: contract.termination_date?moment(contract.termination_date):""},
-		            { value: contract.getPaybackDate()?moment(contract.getPaybackDate()).format('DD.MM.YYYY'):"", order: contract.getPaybackDate()?moment(contract.getPaybackDate()):""},
+		            { value: contract.termination_date?moment(contract.termination_date).format('DD.MM.YYYY'):"", order: contract.termination_date?moment(contract.termination_date).format('YYYY/MM/DD'):""},
+		            { value: contract.getPaybackDate()?moment(contract.getPaybackDate()).format('DD.MM.YYYY'):"", order: contract.getPaybackDate()?moment(contract.getPaybackDate()).format('YYYY/MM/DD'):""},
 		            { value: contract.getStatus() }
     			]);
     		})
@@ -189,7 +189,7 @@ module.exports = function(app){
 				user.savedViews = JSON.stringify(views);
 				req.user.savedViews = user.savedViews;
 				return user.save().then(() => {
-					res.send({id: req.body.id})
+					res.send({id: req.params.id})
 				});
 			})
 			.catch(error => next);

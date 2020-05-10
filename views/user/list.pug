@@ -19,7 +19,7 @@ block content
           .input-group-text
             span.fa.fa-glasses
         select.custom-select(id="saved_views" title="Gespeicherte Ansichten" autocomplete="off" data-views=currentUser.savedViews || "[]")
-          option(value="default") -
+          option(value="default") Standardansicht
           each view, index in JSON.parse(currentUser.savedViews || "[]")
             option(value=index)=view.name
         .input-group-append
@@ -66,9 +66,9 @@ block content
             td.control.fit
             each cell, cellIndex in row
               if cell === false
-                td(title=_t('no_contract') class=contracts.columns[cellIndex].class?contracts.columns[cellIndex].class:"") -
+                td(title=_t('no_contract') data-order='' class=contracts.columns[cellIndex].class?contracts.columns[cellIndex].class:"") -
               else
-                td(data-order=(cell.order?cell.order:undefined) class=cell.class + (contracts.columns[cellIndex].class?" "+contracts.columns[cellIndex].class:""))!=cell.value
+                td(data-order=(cell.order?cell.order:cell.value) class=cell.class + (contracts.columns[cellIndex].class?" "+contracts.columns[cellIndex].class:""))!=cell.value
             td.fit.text-right
               if row[9] === false
                 a.btn.btn-light.btn-sm(href='/user/show/'+row[1].value) #[span.fa.fa-search-plus]  
