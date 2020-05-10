@@ -442,5 +442,22 @@ $(document).ready(function(){
         }
     })
 
+    $(document).on( 'click', '.export-data', function () {    
+        var fields = $('#column_select').val();
+        var users = []
+        table.column('user_id:name', { search:'applied' }).data().each((value) => users.push(value));
+        var contracts = [];
+        table.column('contract_id:name', { search:'applied' }).data().each((value) => contracts.push(value));;
+        console.log('huhu');
+        
+        $('<form action="/user/export" method="POST"></form>')
+            .append('<input name="fields" value="' + fields + '" />')
+            .append('<input name="users" value="' + users + '" />')
+            .append('<input name="contracts" value="' +contracts + '" />')
+            .appendTo('body')
+            .submit()     
+            .remove();   
+    });      
+
 
 });

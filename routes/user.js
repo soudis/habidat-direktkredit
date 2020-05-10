@@ -8,6 +8,7 @@ const Promise = require('bluebird');
 const Op = require("sequelize").Op;
 const models  = require('../models');
 const multer = require('multer');
+const exceljs = require('exceljs');
 
 module.exports = function(app){
 
@@ -42,30 +43,83 @@ module.exports = function(app){
 			})
     }
 
+    const contractTableColumns = [
+			{id: "contract_sign_date", label: "Vertragsdatum", priority: "2", filter: 'date'},
+			{id: "user_id", label: "User ID", filter: 'text'},
+			{id: "user_name", label: "Name", priority: "2", filter: 'text'},
+			{id: "user_address", label: "Adresse", filter: 'text'},
+			{id: "user_telno", label:"Telefon", filter: 'text'},
+			{id: "user_email", label:"E-Mail", filter: 'text'},
+			{id: "user_iban", label:"IBAN", filter: 'text'},
+			{id: "user_bic", label: "BIC", filter: 'text'},
+			{id: "user_relationship", label:"Beziehung", filter: 'list'},
+			{id: "contract_id", label:"Vertrag ID", filter: 'text'},
+			{id: "contract_amount", label: "Vertragswert", class: "text-right", filter: 'number'},
+			{id: "contract_interest_rate", label: "Zinssatz", class: "text-right", filter: 'number'},
+			{id: "contract_deposit", label: "Einzahlungen", class: "text-right", filter: 'number'},
+			{id: "contract_withdrawal", label: "Auszahlungen", class: "text-right", filter: 'number'},
+			{id: "contract_amount_to_date", label: "Aushaftend", class: "text-right", filter: 'number'},
+			{id: "contract_interest_to_date", label: "Zinsen", class: "text-right", filter: 'number'},
+			{id: "contract_termination_type", label: "Kündigungsart", filter: 'list'},
+			{id: "contract_termination_date", label: "Kündigungsdatum", filter: 'date'},
+			{id: "contract_payback_date", label: "Rückzahlungsdatum", filter: 'date'},
+			{id: "contract_status", label: "Status", class: "text-center", priority: "2", filter: 'list'}
+		]
+
+	const contractTableRow = function(user, contract = undefined) {
+		if (contract) {
+			var interest = contract.calculateInterest();
+			return [
+    				{ valueRaw: contract.sign_date, value: moment(contract.sign_date).format('DD.MM.YYYY'), order: moment(contract.sign_date).format('YYYY/MM/DD') },
+		            { valueRaw: user.id, value:  user.id  },
+		            { valueRaw: user.getFullName(), value: user.getFullName(), order: replaceUmlaute(user.getFullName())},
+		            { valueRaw: user.getAddress(true), value: user.getAddress(true) },
+		            { valueRaw: user.telno, value: user.telno },
+		            { valueRaw: user.email, value: user.email },
+		            { valueRaw: user.IBAN, value: user.IBAN },
+		            { valueRaw: user.BIC, value: user.BIC },
+		            { valueRaw: user.relationship, value: user.relationship },
+		            { valueRaw: contract.id, value: contract.id },
+		            { valueRaw: contract.amount, value: format.formatMoney(contract.amount,2), order: contract.amount},
+		            { valueRaw: contract.interest_rate, value: format.formatPercent(contract.interest_rate,3), order: contract.interest_rate},
+		            { valueRaw: contract.getDepositAmount(), value: format.formatMoney(contract.getDepositAmount(), 2), order: contract.getDepositAmount(), class: contract.getDepositAmount()>0?"text-success":""},
+		            { valueRaw: contract.getWithdrawalAmount(), value: format.formatMoney(contract.getWithdrawalAmount(), 2), order: contract.getWithdrawalAmount(), class: contract.getWithdrawalAmount()<0?"text-danger":"" },
+		            { valueRaw: contract.getAmountToDate(moment()), value: format.formatMoney(contract.getAmountToDate(moment())), order: contract.getAmountToDate(moment()) },
+		            { valueRaw: interest.now, value: format.formatMoney(interest.now), order: interest.now},
+		            { valueRaw: contract.getTerminationTypeFullString(), value: contract.getTerminationTypeFullString()},
+		            { valueRaw: contract.termination_date?contract.termination_date:"", value: contract.termination_date?moment(contract.termination_date).format('DD.MM.YYYY'):"", order: contract.termination_date?moment(contract.termination_date).format('YYYY/MM/DD'):""},
+		            { valueRaw: contract.getPaybackDate()?contract.getPaybackDate().format('YYYY-MM-DD'):"", value: contract.getPaybackDate()?moment(contract.getPaybackDate()).format('DD.MM.YYYY'):"", order: contract.getPaybackDate()?moment(contract.getPaybackDate()).format('YYYY/MM/DD'):""},
+		            { valueRaw: contract.getStatus(), value: contract.getStatus() }
+    			];		
+		} else {
+			return [
+					false,
+		            { valueRaw: user.id, value:  user.id  },
+		            { valueRaw: user.getFullName(), value: user.getFullName(), order: replaceUmlaute(user.getFullName())},
+		            { valueRaw: user.getAddress(true), value: user.getAddress(true) },
+		            { valueRaw: user.telno, value: user.telno },
+		            { valueRaw: user.email, value: user.email },
+		            { valueRaw: user.IBAN, value: user.IBAN },
+		            { valueRaw: user.BIC, value: user.BIC },
+		            { valueRaw: user.relationship, value: user.relationship },
+	                false,
+	                false,
+	                false,
+	                false,
+	                false,
+	                false,
+	                false,
+	                false,
+	                false,
+	                false,
+	                false,
+				];
+		}
+	}
+
     function generateContractTable(req, res, users) {
     	contracts = {
-    		columns: [
-    			{id: "contract_sign_date", label: "Vertragsdatum", priority: "2", filter: 'date'},
-    			{id: "user_id", label: "User ID", filter: 'text'},
-    			{id: "user_name", label: "Name", priority: "2", filter: 'text'},
-    			{id: "user_address", label: "Adresse", filter: 'text'},
-    			{id: "user_telno", label:"Telefon", filter: 'text'},
-    			{id: "user_email", label:"E-Mail", filter: 'text'},
-    			{id: "user_iban", label:"IBAN", filter: 'text'},
-    			{id: "user_bic", label: "BIC", filter: 'text'},
-    			{id: "user_relationship", label:"Beziehung", filter: 'list'},
-    			{id: "contract_id", label:"Vertrag ID", filter: 'text'},
-    			{id: "contract_amount", label: "Vertragswert", class: "text-right", filter: 'number'},
-    			{id: "contract_interest_rate", label: "Zinssatz", class: "text-right", filter: 'number'},
-    			{id: "contract_deposit", label: "Einzahlungen", class: "text-right", filter: 'number'},
-    			{id: "contract_withdrawal", label: "Auszahlungen", class: "text-right", filter: 'number'},
-    			{id: "contract_amount_to_date", label: "Aushaftend", class: "text-right", filter: 'number'},
-    			{id: "contract_interest_to_date", label: "Zinsen", class: "text-right", filter: 'number'},
-    			{id: "contract_termination_type", label: "Kündigungsart", filter: 'list'},
-    			{id: "contract_termination_date", label: "Kündigungsdatum", filter: 'date'},
-    			{id: "contract_payback_date", label: "Rückzahlungsdatum", filter: 'date'},
-    			{id: "contract_status", label: "Status", class: "text-center", priority: "2", filter: 'list'}
-    		],
+    		columns: contractTableColumns,
 		    setColumnsVisible: function(visibleColumns) {
 		    	this.columns.forEach(column => {
 		    		if (visibleColumns.includes(column.id)) {
@@ -80,53 +134,10 @@ module.exports = function(app){
     	}
     	users.forEach(user => {
     		if (user.contracts.length === 0) {
-    			contracts.data.push([
-    				false,
-		            { value:  user.id  },
-		            { value: user.getFullName(), order: replaceUmlaute(user.getFullName())},
-		            { value: user.getAddress(true) },
-		            { value: user.telno },
-		            { value: user.email },
-		            { value: user.IBAN },
-		            { value: user.BIC },
-		            { value: user.relationship },
-                    false,
-                    false,
-                    false,
-                    false,
-                    false,
-                    false,
-                    false,
-                    false,
-                    false,
-                    false,
-                    false,
-    				])
+    			contracts.data.push(contractTableRow(user))
     		}
     		user.contracts.forEach(contract => {
-    			var interest = contract.calculateInterest()
-    			contracts.data.push([
-    				{ value: moment(contract.sign_date).format('DD.MM.YYYY'), order: moment(contract.sign_date).format('YYYY/MM/DD') },
-		            { value:  user.id  },
-		            { value: user.getFullName(), order: replaceUmlaute(user.getFullName())},
-		            { value: user.getAddress(true) },
-		            { value: user.telno },
-		            { value: user.email },
-		            { value: user.IBAN },
-		            { value: user.BIC },
-		            { value: user.relationship },
-		            { value: contract.id },
-		            { value: format.formatMoney(contract.amount,2), order: contract.amount},
-		            { value: format.formatPercent(contract.interest_rate,3), order: contract.interest_rate},
-		            { value: format.formatMoney(contract.getDepositAmount(), 2), order: contract.getDepositAmount(), class: contract.getDepositAmount()>0?"text-success":""},
-		            { value: format.formatMoney(contract.getWithdrawalAmount(), 2), order: contract.getWithdrawalAmount(), class: contract.getWithdrawalAmount()<0?"text-danger":"" },
-		            { value: format.formatMoney(contract.getAmountToDate(moment())), order: contract.getAmountToDate(moment()) },
-		            { value: format.formatMoney(interest.now), order: interest.now},
-		            { value: contract.getTerminationTypeFullString()},
-		            { value: contract.termination_date?moment(contract.termination_date).format('DD.MM.YYYY'):"", order: contract.termination_date?moment(contract.termination_date).format('YYYY/MM/DD'):""},
-		            { value: contract.getPaybackDate()?moment(contract.getPaybackDate()).format('DD.MM.YYYY'):"", order: contract.getPaybackDate()?moment(contract.getPaybackDate()).format('YYYY/MM/DD'):""},
-		            { value: contract.getStatus() }
-    			]);
+    			contracts.data.push(contractTableRow(user, contract));
     		})
     	})
     	contracts.columns.forEach((column, index) => {
@@ -291,6 +302,68 @@ module.exports = function(app){
 				res.json({error: 'Direktkreditgeber*in konnte nicht gelöscht werden, überprüfe bitte ob noch Verträge oder Dateien bestehen'})
 			});  
 	});
+
+	const generateDatasheetRow = function(fields, contractTableRow) {
+		var row = [];
+		contractTableColumns.forEach((column, index) => {
+			if (fields === 'all' || fields.includes(column.id)) {
+				console.log(contractTableRow[index].valueRaw);
+				row.push(contractTableRow[index].valueRaw);
+			}
+		})		
+		return row;
+	}
+
+	router.post('/user/export', security.isLoggedInAdmin, function(req, res, next) {
+		var userIds = req.body.users.split(',');
+		var fields = req.body.fields.split(',');
+		var contractIds = req.body.contracts.split(',');
+		
+		
+
+		var workbook = new exceljs.Workbook();
+		workbook.creator = 'DK Plattform';
+		workbook.created = new Date();
+
+		var dataWorksheet = workbook.addWorksheet('Daten');
+
+		dataWorkSheetColumns = [];
+		contractTableColumns.forEach((column, index) => {
+			if (fields === 'all' || fields.includes(column.id)) {
+				dataWorkSheetColumns.push({header: column.label, key: column.id, width: 20})				
+			}
+		})
+		dataWorksheet.columns = dataWorkSheetColumns;
+		models.user.findFetchFull(models, { administrator: {[Op.not]: '1'}})
+			.then(users => {
+				users.forEach(user => {
+		    		if (userIds.includes(user.id.toString())) {
+		    			console.log('user acc');
+		    			var contractsCount = 0;
+		    			if (user.contracts) {
+		    				user.contracts.forEach(contract => {
+				    			if (contractIds.includes(contract.id.toString())) {
+				    				console.log('contract acc');
+				    				contractsCount ++;
+				    				dataWorksheet.addRow(generateDatasheetRow(fields, contractTableRow(user, contract)));
+				    			}	    			
+				    		})
+		    			}
+			    		
+			    		if (contractsCount === 0) {
+			    			dataWorksheet.addRow(generateDatasheetRow(fields, contractTableRow(user)));
+			    		}    		
+			    	}
+		    	})	
+
+		    	res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+		        res.setHeader('Content-Disposition', 'attachment; filename=direktkredite_' + moment().format('YYYYMMDDHHmmss') + ".xlsx");
+		        return workbook.xlsx.write(res)
+		            .then(() => res.end());
+				
+			})
+    	
+	});	
 
 	app.use('/', router);
 
