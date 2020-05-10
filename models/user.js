@@ -92,7 +92,12 @@ module.exports = (sequelize, DataTypes) => {
        	passwordResetExpires: {
        		type: DataTypes.DATE, 
        		allowNull: true 
-       	}
+       	},
+		savedViews: {
+			type:  DataTypes.TEXT, 
+			allowNull: true, 
+			defaultValue: '[]'
+		}       	
 	}, {
 		tableName: 'user',
 		freezeTableName: true

@@ -13,17 +13,45 @@ mixin status(tooltip, status)
 block content
   .d-none(id="datatable_parent")
     .d-none.datatable-buttons(for-id="datatable_length")
-      a.datatable-button.btn.btn-light.toggle-filters(href='#' title="Filter anzeigen")
-        span.fa.fa-search-plus 
 
-      select.checkbox-select(id="column_select" multiple="multiple" autocomplete="off") #[span.fa.fa-cogs]
-        each column in contracts.columns
-          option(value=column.id selected=column.visible?"selected":undefined)= column.label
+      .input-group.datatable-button
+        .input-group-prepend
+          .input-group-text
+            span.fa.fa-glasses
+        select.custom-select(id="saved_views" title="Gespeicherte Ansichten" autocomplete="off" data-views=currentUser.savedViews || "[]")
+          option(value="default") -
+          each view, index in JSON.parse(currentUser.savedViews || "[]")
+            option(value=index)=view.name
+        .input-group-append
+          button.form-control.datatable-button.btn.btn-light.dropdown-button(title="Ansichtsaktionen" id="view_actions" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false")
+            span.fa.fa-cogs
+          .dropdown-menu( aria-labelledby="view_actions")
+            a.dropdown-item.create-view(href='#')
+              span.fa.fa-plus    
+              span  Ansicht erstellen        
+            a.dropdown-item.save-view(href='#')
+              span.fa.fa-save
+              span  Ansicht speichern
+            a.dropdown-item.delete-view(href='#')
+              span.fa.fa-trash
+              span  Ansicht löschen         
+        button.form-control.datatable-button.btn.btn-light.delete-view.d-none(title="Ansicht löschen")
+          span.fa.fa-trash              
 
-      a.datatable-button.btn.btn-light.sidebar-action(href='/user/add' title="Kreditgeber*in Hinzufügen")
-        span.fa.fa-plus 
-        span  
-        span.fa.fa-id-card
+      .datatable-button
+        a.datatable-button.btn.btn-light.toggle-filters(href='#' title="Filter anzeigen")
+          span.fa.fa-search-plus 
+
+      .datatable-button
+        select.checkbox-select(id="column_select" multiple="multiple" autocomplete="off") #[span.fa.fa-cogs]
+          each column in contracts.columns
+            option(value=column.id selected=column.visible?"selected":undefined)= column.label
+
+      .datatable-button        
+        a.datatable-button.btn.btn-light.sidebar-action(href='/user/add' title="Kreditgeber*in Hinzufügen")
+          span.fa.fa-plus 
+          span  
+          span.fa.fa-id-card
     table.table.table-striped(id="datatable" data-auto-width="false")
       thead
         tr
@@ -46,4 +74,4 @@ block content
                 a.btn.btn-light.btn-sm(href='/user/show/'+row[1].value) #[span.fa.fa-search-plus]  
               else
                 a.btn.btn-light.btn-sm(href='/user/show/'+row[1].value+'#show_contract_'+row[9].value) #[span.fa.fa-search-plus]
-        
+  script(type='text/javascript' src='/public/javascripts/contractlist.js')          

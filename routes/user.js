@@ -157,6 +157,63 @@ module.exports = function(app){
 			.catch(error => next(error));
 	});
 
+	router.post('/user/saveview', security.isLoggedInAdmin, function(req, res, next) {
+		models.user.findByPk(req.user.id)
+			.then(user => {
+				var views;
+				if (user.savedViews) {
+					views = JSON.parse(user.savedViews);	
+				} else {
+					views = [];
+				}
+				views.push(req.body.view)
+				user.savedViews = JSON.stringify(views);
+				req.user.savedViews = user.savedViews;
+				return user.save().then(() => {
+					res.send({id: views.length - 1})
+				});
+			})
+			.catch(error => next);
+	});
+
+	router.post('/user/saveview/:id', security.isLoggedInAdmin, function(req, res, next) {
+		models.user.findByPk(req.user.id)
+			.then(user => {
+				var views;
+				if (user.savedViews) {
+					views = JSON.parse(user.savedViews);	
+				} else {
+					views = [];
+				}
+				views.splice(req.params.id, 1, req.body.view)
+				user.savedViews = JSON.stringify(views);
+				req.user.savedViews = user.savedViews;
+				return user.save().then(() => {
+					res.send({id: req.body.id})
+				});
+			})
+			.catch(error => next);
+	});	
+
+	router.get('/user/deleteview/:id', security.isLoggedInAdmin, function(req, res, next) {
+		models.user.findByPk(req.user.id)
+			.then(user => {
+				var views;
+				if (user.savedViews) {
+					views = JSON.parse(user.savedViews);	
+				} else {
+					views = [];
+				}
+				views.splice(req.params.id, 1)
+				user.savedViews = JSON.stringify(views);
+				req.user.savedViews = user.savedViews;
+				return user.save().then(() => {
+					res.send({id: req.body.id})
+				});
+			})
+			.catch(error => next);
+	});	
+
 	router.get('/user/add', security.isLoggedInAdmin, function(req, res, next) {
 	  res.render('user/add');
 	});
