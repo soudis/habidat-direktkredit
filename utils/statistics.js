@@ -125,6 +125,7 @@ exports.getNumbers = function() {
 	var contractHelper = [];
 
 	var numbers = {
+			firstContractDate: moment(),
 			total : {
 				amount : 0,
 				contractAmount: 0,
@@ -220,6 +221,10 @@ exports.getNumbers = function() {
 						interest = 0,
 						notReclaimed = 0,
 						lastTransaction;
+
+					if (numbers.firstContractDate.isAfter(moment(contract.sign_date))) {
+						numbers.firstContractDate = moment(contract.sign_date);
+					}
 
 					contract.transactions.forEach(function (transaction) {
 

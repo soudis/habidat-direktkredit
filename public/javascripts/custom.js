@@ -38,6 +38,7 @@ var dataTableLanguange = {
   }
 }
 
+moment.locale('de');
 
   $(document).ready(function(){
 

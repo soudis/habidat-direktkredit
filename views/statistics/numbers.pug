@@ -88,20 +88,42 @@ block content
             td -
             td #{format.format(numbers.cancelled.avgDaysToRepay ,2, '# Tage')}
             td -
-    .col-md-6.col-xs-12
-      h3.underline Laufende Kredite nach Beziehung
+    - var months = Math.abs(moment(numbers.firstContractDate).startOf('month').diff(moment().endOf('month'), 'months'));
+    .col-md-6.col-xs-12.chart-container
+      h3.underline 
+        span Laufende Kredite nach Beziehung
+        span  
+        span.slider-info.h5.float-right
+      .daterange-slider
+        input(type="text" name="relationslider" id="relationslider" data-provide="slider" data-slider-handle="square" data-slider-range='true' data-start=moment(numbers.firstContractDate).startOf('month') data-slider-min=0 data-slider-max=months data-slider-value=0)
       canvas(id="by-relation" width="400" height="400")
-    .col-md-6.col-xs-12
+    .col-md-6.col-xs-12.chart-container
       h3.underline Laufende Kredite nach 
         span#by-region-level Land
         span  
         span.fa.fa-info-circle(title="Auf Region klicken um zu zoomen")
+        span  
+        span.slider-info.h5.float-right
+      .daterange-slider
+        input(type="text" name="regionslider" id="regionslider" data-provide="slider" data-slider-handle="square" data-slider-range='true' data-start=moment(numbers.firstContractDate).startOf('month') data-slider-min=0 data-slider-max=months data-slider-value=0)
       canvas(id="by-region" width="400" height="400")      
-    .col-md-6.col-xs-12
-      h3.underline Verschuldung (12 Monate)
+    .col-md-6.col-xs-12.chart-container
+      h3.underline 
+        span Verschuldung
+        span  
+        span.slider-info.h5.float-right
+      .daterange-slider
+        input(type="text" name="debtslider" id="debtslider" data-provide="slider" data-slider-handle="square" data-slider-range='true' data-start=moment(numbers.firstContractDate).startOf('month') data-slider-min=0 data-slider-max=months data-slider-value=months-11)
       canvas(id="by-month" width="400" height="400")  
-    .col-md-6.col-xs-12
-      h3.underline Transaktionen (12 Monate)
+    .col-md-6.col-xs-12.chart-container
+      h3.underline
+        span Transaktionen
+        span  
+        span.slider-info.h5.float-right
+      .daterange-slider
+        input(type="text" name="transactionslider" id="transactionslider" data-provide="slider" data-slider-handle="square" data-slider-range='true' data-start=moment(numbers.firstContractDate).startOf('month') data-slider-min=0 data-slider-max=months data-slider-value=months-11)
       canvas(id="transactions-by-month" width="400" height="400")        
         //img(width="600" src="data:image/png;base64,"+numbers.charts.byRelationship)
+
+  script(type='text/javascript' src='/public/slider/bootstrap-slider.min.js')           
   script(type='text/javascript' src='/public/javascripts/statistics.js')           

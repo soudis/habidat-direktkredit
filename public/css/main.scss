@@ -12,6 +12,7 @@ $custom-file-text: (
 @import "node_modules/bootstrap/scss/bootstrap";
 @import "node_modules/bootstrap-multiselect/dist/scss/bootstrap-multiselect.scss";
 @import "node_modules/bootstrap-select/sass/bootstrap-select.scss";
+@import "node_modules/bootstrap-slider/src/sass/bootstrap-slider.scss";
 @import "node_modules/@fortawesome/fontawesome-free/scss/fontawesome";
 @import "node_modules/@fortawesome/fontawesome-free/scss/brands";
 @import "node_modules/@fortawesome/fontawesome-free/scss/regular";
@@ -488,4 +489,16 @@ input.number-filter {
 
 #saved_views {
   min-width: 200px;
+}
+
+.slider.slider-horizontal {
+  width: 100%;
+}
+
+.slider-handle {
+    background-image: linear-gradient(to bottom, rgb(164, 0, 35), rgb(144, 0, 25));
+}
+
+.slider-info {
+  padding-top: 8px;
 }
