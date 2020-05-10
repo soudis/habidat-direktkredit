@@ -46,7 +46,8 @@
         var begin = moment(slider.data('start'));
         var start = moment(begin).add(sliderValue[0], 'months');
         var end = moment(begin).add(sliderValue[1], 'months');
-        return {start: start.format('DD.MM.YYYY'), end: end.format('DD.MM.YYYY')};
+        var months = sliderValue[1]-sliderValue[0]+1
+        return {start: start.format('DD.MM.YYYY'), end: end.format('DD.MM.YYYY'), months: months};
     }
 
     var transactionsChart;
@@ -78,8 +79,8 @@
                 options: {
                   responsive: true,
                   title: {
-                    display: true,
-                    text: 'Letzte 12 Monate'
+                    display: false,
+                    text: range.months + ' Monate'
                   },
                   scales: {
                     xAxes: [{
@@ -131,8 +132,8 @@
                 options: {
                   responsive: true,
                   title: {
-                    display: true,
-                    text: 'Letzte 12 Monate'
+                    display: false,
+                    text: range.months + ' Monate'
                   },
                   scales: {
                     xAxes: [{
