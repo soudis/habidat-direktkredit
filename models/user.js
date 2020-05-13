@@ -4,6 +4,7 @@ const Op = require("sequelize").Op;
 const clonedeep = require('lodash.clonedeep');
 const settings = require('../utils/settings');
 const bcrypt = require('bcrypt');
+const crypto = require('crypto');
 
 module.exports = (sequelize, DataTypes) => {
 	var User = sequelize.define('user', {
@@ -281,6 +282,11 @@ module.exports = (sequelize, DataTypes) => {
 	User.prototype.comparePassword = function comparePassword(candidatePassword, cb) {
 		return bcrypt.compareSync(candidatePassword, this.passwordHashed);
 	};
+
+	User.prototype.setPasswordResetToken = function() {
+		this.passwordResetToken = crypto.randomBytes(16).toString('hex');
+		this.passwordResetExpires = Date.now() + 3600000 * 3; // 3 hours
+	}
 
 	User.prototype.hasNotTerminatedContracts = function (date) {
 		var notTerminated = false;

@@ -4,10 +4,9 @@ const moment = require("moment");
 const passport = require('passport');
 const router = require('express').Router();
 const settings = require('../utils/settings');
-const nodemailer = require('nodemailer');
-const crypto = require('crypto');
 const models  = require('../models');
 const utils = require('../utils');
+const email = require('../utils/email');
 
 module.exports = function(app){
 
@@ -70,28 +69,9 @@ module.exports = function(app){
 				if (!user) {
 					return;
 				} else {
-					user.passwordResetToken = crypto.randomBytes(16).toString('hex');
-					user.passwordResetExpires = Date.now() + 3600000 * 3; // 3 hours
+					user.setPasswordResetToken();
 					return user.save()
-						.then(user => {
-							return utils.renderToText(req, res, 'email/setpassword', {link: 'https://'+req.headers.host+'/getpassword/'+user.passwordResetToken});
-						})
-						.then(emailBody => {
-							var transporter = nodemailer.createTransport({
-						      service: 'SendGrid',
-						      auth: {
-						        user: process.env.SENDGRID_USER,
-						        pass: process.env.SENDGRID_PASSWORD
-						      }
-						    });
-						    const mailOptions = {
-							    to: user.email,
-							    from: 'no-reply@'+req.headers.host,
-							    subject: 'Setze dein Passwort für die ' + settings.project.get('projectname') + ' Direktkreditplattform',
-							    html: emailBody
-							};
-							return transporter.sendMail(mailOptions);
-						});
+						.then(user => email.sendPasswordMail(req,res,user));
 				}
 			})
 			.then(() => {

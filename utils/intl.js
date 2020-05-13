@@ -48,6 +48,8 @@ const texts = {
 	"payback_date": "Rückzahlungsdatum",
 	"place": "Ort",
 	"red": "Rot",
+	"send_password_link": "E-Mail senden",
+	"send_password_link_help": "Eine E-Mail mit einem Link zum Setzen des Passworts senden?",
 	"sign_date": "Vertragsdatum",
 	"street": "Strasse, Hausnummer",
 	"telno": "Telefonnummer",

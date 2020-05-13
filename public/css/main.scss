@@ -50,7 +50,7 @@ h4.underline {
 }
 
 .navbar-default {
-  background-color: $primary-color;
+  background-image: linear-gradient(to right, $primary-color , $primary-light);
   border-color: $primary-color;
   border-radius: 0px;
 }
@@ -59,7 +59,7 @@ h4.underline {
 }
 .navbar-default .navbar-brand:hover,
 .navbar-default .navbar-brand:focus {
-  color: #ecdbff;
+  color: lighten($primary-color,90);
 }
 .navbar-default .navbar-text {
   color: #ecf0f1;
@@ -69,18 +69,18 @@ h4.underline {
 }
 .navbar-default .navbar-nav > li > a:hover,
 .navbar-default .navbar-nav > li > a:focus {
-  color: #ecdbff;
+  color: lighten($primary-color,90);
 }
 .navbar-default .navbar-nav > .active > a,
 .navbar-default .navbar-nav > .active > a:hover,
 .navbar-default .navbar-nav > .active > a:focus {
-  color: #ecdbff;
+  color: lighten($primary-color,90);
   background-color: $primary-light;
 }
 .navbar-default .navbar-nav > .open > a,
 .navbar-default .navbar-nav > .open > a:hover,
 .navbar-default .navbar-nav > .open > a:focus {
-  color: #ecdbff;
+  color: lighten($primary-color,90);
   background-color: $primary-light;
 }
 .navbar-default .navbar-toggle {
@@ -101,7 +101,7 @@ h4.underline {
   color: #ecf0f1;
 }
 .navbar-default .navbar-link:hover {
-  color: #ecdbff;
+  color: lighten($primary-color,90);
 }
 
 @media (max-width: 767px) {
@@ -110,12 +110,12 @@ h4.underline {
   }
   .navbar-default .navbar-nav .open .dropdown-menu > li > a:hover,
   .navbar-default .navbar-nav .open .dropdown-menu > li > a:focus {
-    color: #ecdbff;
+    color: lighten($primary-color,90);
   }
   .navbar-default .navbar-nav .open .dropdown-menu > .active > a,
   .navbar-default .navbar-nav .open .dropdown-menu > .active > a:hover,
   .navbar-default .navbar-nav .open .dropdown-menu > .active > a:focus {
-    color: #ecdbff;
+    color: lighten($primary-color,90);
     background-color: $primary-light;
   }
 }
@@ -262,8 +262,7 @@ table.margin-top {
 
   /* Hide thing by pushing it outside by default */
   transform: translateX(100%);  
-
-  border: 1px solid #dee2e6;
+  border: 1px solid rgba(0,0,0,0.4);
   border-top-left-radius: .3rem;
   border-bottom-left-radius: .3rem  
 }

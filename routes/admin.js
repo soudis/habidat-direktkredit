@@ -8,6 +8,7 @@ const models  = require('../models');
 const settings = require('../utils/settings');
 const fs = require('fs');
 const multer = require('multer');
+const email = require('../utils/email');
 
 module.exports = function(app){
 
@@ -53,10 +54,8 @@ module.exports = function(app){
 
 				if (!req.body.logon_id) {
 					throw 'Login ID muss angegeben werden!';
-				} else if (!req.body.ldap && !req.body.password) {
-					throw 'Passwort fehlt!';
-				} else if (!req.body.ldap && req.body.password != req.body.password2) {
-					throw 'Passwörter sind nicht gleich!';
+				} else if (!req.body.email) {
+					throw 'E-Mailadresse muss angegeben werden!';
 				}
 
 				var length = 16,
@@ -67,17 +66,27 @@ module.exports = function(app){
 				}
 				var user = {
 					logon_id: req.body.logon_id,
-					administrator: true
+					email: req.body.email,
+					administrator: true,
+					password: generatedPassword
 				};
 				if (req.body.ldap) {
 					user.ldap = true;
-					user.password = generatedPassword;
+
 				} else {
 					user.ldap = false;
-					user.password = req.body.password;
 				}
 
-				return models.user.create(user);
+				return models.user.build(user);
+			})
+			.then(user => {
+				if (req.body.send_password_link) {
+					user.setPasswordResetToken();
+					return user.save()
+						.then(() => email.sendPasswordMail(req,res,user));
+				} else {
+					return user.save();
+				}
 			})
 			.then(() => res.send({redirect: '/admin/accounts'}))
 			.catch(error => next(error));

@@ -8,12 +8,14 @@ block content
       thead
         tr
           th Login ID
+          th=_t('email')
           th Typ
           th Aktionen
       tbody
         each account in accounts
           tr
             td=account.logon_id
+            td=account.email
             td=(account.ldap?"LDAP":"Lokal")
             td.fit.text-right
                 a.btn.btn-light.btn-sm.confirm-action(data-link='/admin/delete/'+account.id data-confirmtext='Willst du den Administrator*innen Account ' +account.logon_id + ' wirklich löschen?')
