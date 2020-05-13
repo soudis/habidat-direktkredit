@@ -1,22 +1,23 @@
+/* jshint esversion: 8 */
 $(document).ready(function(){
     table = $('#datatable').DataTable({
     	pageLength: 25,
       language: dataTableLanguange,
-      order: [[ 1, 'desc' ]],      
+      order: [[ 1, 'desc' ]],
       responsive: {
         details: {
           type: "column"
         }
       },
-      initComplete: function(settings, json) {       
-        
+      initComplete: function(settings, json) {
 
-      }      
+
+      }
     });
 
     function toggleFilters(update = false) {
     	if ($('#datatable thead tr:eq(1)').length && !update || !$('#datatable thead tr:eq(1)').length && update) {
-    		$('.toggle-filters').children('span').removeClass('fa-search-minus').addClass('fa-search-plus')
+    		$('.toggle-filters').children('span').removeClass('fa-search-minus').addClass('fa-search-plus');
     		$('#datatable thead tr:eq(1)').remove();
     		table
 			 .columns().search( '' )
@@ -25,7 +26,7 @@ $(document).ready(function(){
     		if (update) {
     			$('#datatable thead tr:eq(1)').remove();
     		}
-    		$('.toggle-filters').children('span').removeClass('fa-search-plus').addClass('fa-search-minus')
+    		$('.toggle-filters').children('span').removeClass('fa-search-plus').addClass('fa-search-minus');
 		 	$('#datatable thead tr').clone(true).appendTo( '#datatable thead' );
 		    $('#datatable thead tr:eq(1) th:visible').each( function (i) {
 		    	if ($(this).data('filter')) {
@@ -40,20 +41,20 @@ $(document).ready(function(){
 			        }else if (filterType === 'number') {
 			        	$(this).replaceWith( '<th data-filter=' + filterType + ' data-name="' + name + '"><div class="input-group input-group-sm"><div class="input-group-prepend"><select class="custom-select-sm custom-select number-filter-operator"><option selected value="=">=</option><option value="<">&lt;</option><option value="<=">≤</option><option value=">">&gt;</option><option value=">=">≥</option></div></select></div><input class="form-control form-control-sm number-filter" data-name="' + name + '" type="number" placeholder="'+title+'" /></div></th>' );
 			        }else if (filterType === 'list') {
-						var options = '<option selected>Alle</option>';			        	
+						var options = '<option selected>Alle</option>';
 			        	filterOptions.forEach(option => {
-			        		options += '<option>'+option+'</option>'
-			        	})
-			        	$(this).replaceWith( '<th data-filter=' + filterType + ' data-name="' + name + '"><div class="input-group input-group-sm"><select class="custom-select custom-select-sm list-filter " data-name="' + name + '">' + options + '</select></div></th>' );			        	
+			        		options += '<option>'+option+'</option>';
+			        	});
+			        	$(this).replaceWith( '<th data-filter=' + filterType + ' data-name="' + name + '"><div class="input-group input-group-sm"><select class="custom-select custom-select-sm list-filter " data-name="' + name + '">' + options + '</select></div></th>' );
 			        }
 
 		    	} else {
 		    		 $(this).replaceWith('<th></th>');
 		    	}
 
-		        
-		    } );  
-		}    	
+
+		    } );
+		}
     }
 
     $('#column_select').multiselect({
@@ -65,13 +66,13 @@ $(document).ready(function(){
         onChange: function(option, checked, select) {
             table.column($(option).val()+':name').visible(checked);
             toggleFilters(true);
-        }            
-    });          
+        }
+    });
     $('.datatable-buttons').children().each(function(index) {
       var forId = $(this).parent().attr('for-id');
       $(this).detach().prependTo($('#'+forId));
-    });        
-    $("#datatable_parent").removeClass("d-none");           
+    });
+    $("#datatable_parent").removeClass("d-none");
     table.responsive.recalc();
     $("#datatable_pagelength").parent().detach().prependTo($('#datatable_filter'));
     $('#datatable_filter').parent().removeClass('col-sm-12').removeClass('col-md-6').addClass('col-sm-5');
@@ -79,9 +80,9 @@ $(document).ready(function(){
     $('#datatable_info').parent().removeClass('col-sm-12').removeClass('col-md-5').addClass('col-sm-5');
     $('#datatable_paginate').parent().removeClass('col-sm-12').removeClass('col-md-7').addClass('col-sm-7');
 
-    $(document).on('click', '.toggle-filters', function () {    	
+    $(document).on('click', '.toggle-filters', function () {
     	toggleFilters(false);
-	});  
+	});
 
     $(document).on( 'keyup change', '.text-filter', function () {
     	var name = $(this).data('name');
@@ -89,9 +90,9 @@ $(document).ready(function(){
             table
                 .column(name + ':name')
                 .search( this.value );
-            updateCustomFilters();                
+            updateCustomFilters();
         }
-    } );	
+    } );
 
     $(document).on( 'change', '.list-filter', function () {
     	var name = $(this).data('name');
@@ -101,21 +102,21 @@ $(document).ready(function(){
                 .search( this.value!=='Alle'?this.value:'' );
             updateCustomFilters();
         }
-    } );	
+    } );
 
     function popCustomFilters(count) {
         for (var i=0; i<count; i++) {
             $.fn.dataTable.ext.search.pop();
-        }        
-    }		
+        }
+    }
 
     var orderTriggerDisabled = false;
     $('#datatable').on( 'order.dt', function () {
         // This will show: "Ordering on column 1 (asc)", for example
         if (!orderTriggerDisabled) {
             updateCustomFilters();
-        }        
-    });    
+        }
+    });
 
     function reDrawTable() {
         orderTriggerDisabled = true;
@@ -129,8 +130,8 @@ $(document).ready(function(){
             var filterType = $(this).data('filter');
             var name = $(this).data('name');
             if (filterType === 'date') {
-                var element = $(this).find('input.date-filter')
-                var name = element.data('name');
+                var element = $(this).find('input.date-filter');
+                name = element.data('name');
                 var searchValueText = element.val();
                 var searchValue = moment(element.val());
                 var operator = element.prev().children('select').val();
@@ -156,10 +157,10 @@ $(document).ready(function(){
                             return true;
                         }
                     }
-                );                       
+                );
             } else if (filterType === 'number') {
                 var element = $(this).find('input.number-filter');
-                var name = element.data('name');
+                name = element.data('name');
                 var searchValue = element.val();
                 var operator = element.prev().children('select').val();
                 var colIndex = table.column(name + ':name').index(false);
@@ -183,20 +184,20 @@ $(document).ready(function(){
                             return true;
                         }
                     }
-                );      
-                     
+                );
+
             }
-        });  
+        });
         if (pop) {
             reDrawTable();
             popCustomFilters(customFilterCount);
-        } 
+        }
         return customFilterCount;
     }
 
     $(document).on( 'change keyup', '#datatable_filter input', function () {
         updateCustomFilters();
-    } );    
+    } );
 
     $(document).on( 'keyup change', '.date-filter', function () {
     	updateCustomFilters();
@@ -204,7 +205,7 @@ $(document).ready(function(){
 
     $(document).on( 'change', '.date-filter-operator', function () {
     	$(this).parent().next().change();
-    })
+    });
 
     $(document).on( 'keyup change', '.number-filter', function () {
     	updateCustomFilters();
@@ -212,7 +213,7 @@ $(document).ready(function(){
 
     $(document).on( 'change', '.number-filter-operator', function () {
     	$(this).parent().next().change();
-    })    
+    });
 
     function getCurrentView() {
         var view = {
@@ -222,7 +223,7 @@ $(document).ready(function(){
             order: table.order(),
             columnFilters: [],
             columnFiltersEnabled: false
-        }
+        };
         $('#datatable thead tr:eq(1) th:visible').each(function(i)  {
             view.columnFiltersEnabled = true;
             var filterType = $(this).data('filter');
@@ -232,41 +233,41 @@ $(document).ready(function(){
                     name: name,
                     type: filterType,
                     value: $(this).find('input.text-filter').val()
-                })
+                });
             } else if (filterType === 'date' && $(this).find('input.date-filter').val() != '') {
                 view.columnFilters.push({
                     name: name,
                     type: filterType,
                     value: $(this).find('input.date-filter').val(),
                     operator: $(this).find('select.date-filter-operator').val()
-                })                        
+                });
             } else if (filterType === 'number' && $(this).find('input.number-filter').val() != '') {
                 view.columnFilters.push({
                     name: name,
                     type: filterType,
                     value: $(this).find('input.number-filter').val(),
                     operator: $(this).find('select.number-filter-operator').val()
-                })                        
+                });
             } else if (filterType === 'list' && $(this).children('select.list-filter').val() != '') {
                 view.columnFilters.push({
                     name: name,
                     type: filterType,
                     value: $(this).find('select.list-filter').val()
-                })                        
+                });
             }
-        });        
+        });
         return view;
     }
 
     function setColumnsSelected(columnsSelected) {
         $('#column_select').val().forEach(column => {
             table.column(column + ':name').visible(false);
-        })
+        });
         $('#column_select').multiselect('deselectAll', false);
         columnsSelected.forEach(column => {
             $('#column_select').multiselect('select', column);
             table.column(column+':name').visible(true);
-        })        
+        });
     }
 
     function restoreView(view) {
@@ -274,14 +275,14 @@ $(document).ready(function(){
 
         if (view.tableSearch) {
             table.search(view.tableSearch);
-        } 
+        }
         if (view.pageLength) {
             $('#datatable_pagelength select').val(view.pageLength);
-        } 
+        }
         if (view.columnsSelected) {
             setColumnsSelected(view.columnsSelected);
             reDrawTable();
-        } 
+        }
         var customFilterCount = 0;
         if (view.columnFiltersEnabled) {
             if (!$('#datatable thead tr:eq(1) th:visible').length) {
@@ -301,28 +302,28 @@ $(document).ready(function(){
                         $(this).find('input.text-filter').change();
                     } else if (filterType === 'date' && columnFilter.value != '') {
                         $(this).find('input.date-filter').val(columnFilter.value);
-                        $(this).find('select.date-filter-operator').val(columnFilter.operator)     ;        
+                        $(this).find('select.date-filter-operator').val(columnFilter.operator)     ;
                     } else if (filterType === 'number' && columnFilter.value != '') {
                         $(this).find('input.number-filter').val(columnFilter.value);
-                        $(this).find('select.number-filter-operator').val(columnFilter.operator) ;    
+                        $(this).find('select.number-filter-operator').val(columnFilter.operator) ;
                     } else if (filterType === 'list' && columnFilter.value != '') {
                         $(this).find('select.list-filter').val(columnFilter.value);
                         $(this).find('select.list-filter').change();
                     }
-                } 
+                }
 
-            }); 
+            });
             customFilterCount= updateCustomFilters(false);
         } else {
             if ($('#datatable thead tr:eq(1) th:visible').length) {
                 toggleFilters();
             }
-        }   
+        }
         if (view.order) {
             orderTriggerDisabled = true;
             table.order(view.order);
             orderTriggerDisabled = false;
-        }        
+        }
         reDrawTable();
         popCustomFilters(customFilterCount);
     }
@@ -344,8 +345,8 @@ $(document).ready(function(){
                     $('#saved_views').append($('<option>', {
                         text: view.name,
                         value: response.id
-                    })); 
-                }                
+                    }));
+                }
                 console.log(response.id);
                 $('#saved_views').val(response.id);
                 bootbox.alert('Ansicht ' + view.name + ' gespeichert!');
@@ -354,19 +355,19 @@ $(document).ready(function(){
                 var data = JSON.parse(xhr.responseText);
                 errorAlert(data.error);
             }
-        });  
+        });
     }
 
     $(document).on( 'click', '.create-view', function () {
         bootbox.prompt({
             size: "small",
             placeholder: "Name der Ansicht",
-            title: "Ansicht speichern", 
+            title: "Ansicht speichern",
             callback: function(result){
-                
+
                 var view = getCurrentView();
                 view.name = result;
-                saveView(view);                             
+                saveView(view);
 
             },
             buttons: {
@@ -378,11 +379,11 @@ $(document).ready(function(){
                     label: 'Abbrechen',
                     className: 'btn-danger'
                 }
-            },            
-        })
-    })    
+            },
+        });
+    });
 
-    $(document).on( 'click', '.save-view', function () {    
+    $(document).on( 'click', '.save-view', function () {
         var view = getCurrentView();
         var id = parseInt($('#saved_views').val());
         var views = $('#saved_views').data('views');
@@ -390,10 +391,10 @@ $(document).ready(function(){
         saveView(view, id);
     });
 
-    $(document).on( 'click', '.delete-view', function () {    
+    $(document).on( 'click', '.delete-view', function () {
         var id = $('#saved_views').val();
         var views = $('#saved_views').data('views');
-        view = views[id];        
+        view = views[id];
         $.ajax({
             url : '/user/deleteview/'+id,
             type: "GET",
@@ -406,9 +407,9 @@ $(document).ready(function(){
                     $(this).replaceWith($('<option>', {
                         text: views[index].name,
                         value: index
-                    })); 
+                    }));
                     index ++;
-                })
+                });
                 $('#saved_views option:eq(' + id+1 + ')').remove();
                 $('#saved_views').data('views', views);
                 $('#saved_views').val('default');
@@ -418,11 +419,11 @@ $(document).ready(function(){
                 var data = JSON.parse(xhr.responseText);
                 errorAlert(data.error);
             }
-        });          
-    });    
+        });
+    });
 
     $('#saved_views').data('default', getCurrentView());
-    $(document).on( 'change', '#saved_views', function () { 
+    $(document).on( 'change', '#saved_views', function () {
         var views = $('#saved_views').data('views');
         var id = $(this).val();
         var view;
@@ -430,34 +431,34 @@ $(document).ready(function(){
             view = $('#saved_views').data('default');
         }
         else {
-            view = views[id];    
-        }        
+            view = views[id];
+        }
         if (!view) {
             table
                 .search('')
                 .columns().search( '' )
-                .draw();                
+                .draw();
         } else {
             restoreView(view);
         }
-    })
+    });
 
-    $(document).on( 'click', '.export-data', function () {    
+    $(document).on( 'click', '.export-data', function () {
         var fields = $('#column_select').val();
-        var users = []
+        var users = [];
         table.column('user_id:name', { search:'applied' }).data().each((value) => users.push(value));
         var contracts = [];
-        table.column('contract_id:name', { search:'applied' }).data().each((value) => contracts.push(value));;
+        table.column('contract_id:name', { search:'applied' }).data().each((value) => contracts.push(value));
         console.log('huhu');
-        
+
         $('<form action="/user/export" method="POST"></form>')
             .append('<input name="fields" value="' + fields + '" />')
             .append('<input name="users" value="' + users + '" />')
             .append('<input name="contracts" value="' +contracts + '" />')
             .appendTo('body')
-            .submit()     
-            .remove();   
-    });      
+            .submit()
+            .remove();
+    });
 
 
 });

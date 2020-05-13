@@ -1,3 +1,4 @@
+/* jshint esversion: 8 */
 const security = require('../utils/security');
 const moment = require("moment");
 const utils = require("../utils");
@@ -31,9 +32,9 @@ module.exports = function(app){
 		models.contract.findByIdFetchFull(models, req.params.contract_id)
 			.then(contract => res.json({amountToDate: contract.getAmountToDate(moment(req.params.date, 'DD.MM.YYYY'), req.params.transaction_id)}))
 			.catch(error => res.status(500).json({error: error}));
-	});	
+	});
 
-	router.post('/contract/add', security.isLoggedInAdmin, multer().none(), function(req, res, next) {		
+	router.post('/contract/add', security.isLoggedInAdmin, multer().none(), function(req, res, next) {
 		Promise.resolve()
 			.then(() => {
 				var termination_date = null;
@@ -49,7 +50,7 @@ module.exports = function(app){
 				} else if (req.body.termination_type == "P") {
 					termination_period_type = req.body.termination_period_type_P;
 					termination_period = req.body.termination_period_P;
-				}		
+				}
 				return models.contract.create({
 					sign_date: moment(req.body.sign_date),
 					termination_date: termination_date,
@@ -61,16 +62,16 @@ module.exports = function(app){
 					user_id: req.body.user_id,
 					status: req.body.status,
 					notes: req.body.notes
-				})
+				});
 			})
 			.then(contract => models.contract.findOne({ where : { id: contract.id }, include: [{model: models.transaction, as: "transactions"}]}))
 			.then(contract => {
 				return models.file.getContractTemplates()
-					.then(templates => utils.render(req, res, 'contract/show', {templates_contract: templates, contract:contract}))
+					.then(templates => utils.render(req, res, 'contract/show', {templates_contract: templates, contract:contract}));
 			})
 			.catch(error => next(error));
 	});
-	
+
 	router.post('/contract/edit', security.isLoggedInAdmin, multer().none(), function(req, res, next) {
 		console.log('conid ' + req.body.id );
 		return Promise.resolve()
@@ -99,13 +100,13 @@ module.exports = function(app){
 					interest_rate: req.body.interest_rate,
 					status: req.body.status,
 					notes: req.body.notes
-				}, {where:{id:req.body.id}})
+				}, {where:{id:req.body.id}});
 			})
-		
+
 			.then(() => models.contract.findByIdFetchFull(models, req.body.id))
 			.then(contract => {
 				return models.file.getContractTemplates()
-					.then(templates => utils.render(req, res, 'contract/show', {templates_contract: templates, contract:contract}))				
+					.then(templates => utils.render(req, res, 'contract/show', {templates_contract: templates, contract:contract}));
 			})
 			.catch(error => next(error));
 	});
@@ -114,14 +115,14 @@ module.exports = function(app){
 		models.contract.destroy({ where: { id: req.params.id } })
 			.then(deleted => {
 				if(deleted > 0) {
-				 	res.json({});
+					res.json({});
 				} else {
 					res.json({'error': 'Vertrag konnte nicht gelöscht werden, überprüfe bitte ob noch Zahlungen bestehen'});
 				}
 			}).catch(error => {
 				res.status(500).json({error: error});
-			});  
+			});
 	});
-	
+
 	app.use('/', router);
 };

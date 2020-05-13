@@ -1,3 +1,4 @@
+/* jshint esversion: 8 */
 const security = require('../utils/security');
 const utils = require('../utils');
 const router = require('express').Router();
@@ -13,7 +14,7 @@ module.exports = function(app){
 		utils.render(req, res, 'file/add', { id: req.params.id, type: 'user' })
 			.catch(error => next(error));
 	});
-	
+
 	router.get('/file/get/:id', security.isLoggedInAdmin, function(req, res, next) {
 		models.file.findByPk(req.params.id)
 			.then(file => {
@@ -23,7 +24,7 @@ module.exports = function(app){
 				res.setHeader('Content-Type', file.mime);
 				res.setHeader('Content-Disposition', 'inline; filename="' + file.filename + '"');
 				res.write(fileData, 'binary');
-				res.end();			
+				res.end();
 			})
 			.catch(error => next(error));
 
@@ -39,22 +40,22 @@ module.exports = function(app){
 					res.setHeader('Content-Type', file.mime);
 					res.setHeader('Content-Disposition', 'inline; filename="' + file.filename + '"');
 					res.write(fileData, 'binary');
-					res.end();			
+					res.end();
 
 				} else {
 					res.send(404);
 				}
 			})
 			.catch(error => next(error));
-	});	
-	
+	});
+
 	router.get('/file/delete/user/:id', security.isLoggedInAdmin, function(req, res, next) {
 		models.file.findByPk(req.params.id)
 			.then(function(file) {
-				fs.unlinkSync(file.path);  
+				fs.unlinkSync(file.path);
 				file.destroy();
 				return models.file.getFilesFor('user', file.ref_id)
-					.then(files => utils.render(req,res,'file/show', {files: files, type: 'user', id: req.params.id}))
+					.then(files => utils.render(req,res,'file/show', {files: files, type: 'user', id: req.params.id}));
 			})
 			.catch(error => next(error));
 
@@ -63,15 +64,15 @@ module.exports = function(app){
 	router.get('/file/delete/:id', security.isLoggedInAdmin, function(req, res, next) {
 		models.file.findByPk(req.params.id)
 			.then(function(file) {
-				fs.unlinkSync(file.path);  
+				fs.unlinkSync(file.path);
 				return file.destroy();
-				
+
 			})
 			.then(() => res.send({redirect: 'reload'}))
 			.catch(error => next(error));
 
-	});	
-	
+	});
+
 	router.post('/file/add/user', security.isLoggedInAdmin, multer({dest:'./upload/'}).single('file'), function(req, res, next) {
 		models.file.create({
 				filename: req.file.originalname,
@@ -90,12 +91,12 @@ module.exports = function(app){
 		models.file.findAll({
 			where: {
 				ref_table: {
-			      [Op.like]: "template_%"
-			    }
+					[Op.like]: "template_%"
+				}
 			}
 		}).then(function(templates) {
 			res.render('admin/templates', { title: 'Vorlagen', templates:templates });
-		});	
+		});
 	});
 
 	router.get('/admin/infopack', security.isLoggedInAdmin, function(req, res, next) {
@@ -119,16 +120,16 @@ module.exports = function(app){
 					title: "Sonstige Dateien",
 					files: []
 				}
-			}
+			};
 			files.map((file => {
 				var group = file.ref_table.split("_")[1];
 				file.group = group;
 				if (groups[group]) {
 					groups[group].files.push(file);
-				} 
-			}))
+				}
+			}));
 			res.render('admin/infopack', { title: 'Downloads für Direktkreditgeber*innen', groups: groups });
-		});	
+		});
 	});
 
 	router.get('/admin/addtemplate/:type', security.isLoggedInAdmin, function(req, res, next) {
@@ -139,7 +140,7 @@ module.exports = function(app){
 			template_account_notification: "Vorlage für Buchhaltungsbestätigung überschreiben",
 			template_user: "Vorlage für Kreditgeber*innen hochladen",
 			template_contract: "Vorlage für Kredite hochladen"
-		}
+		};
 		utils.render(req, res, 'admin/template_add', {type: req.params.type, formTitle: titles[req.params.type]})
 			.catch(error => next(error));
 	});
@@ -152,12 +153,12 @@ module.exports = function(app){
 				    return models.file.findOne({ where: { ref_table: "template_account_notification"	}})
 				    	.then(function(file) {
 							if (file && file.path) {
-								fs.unlinkSync(file.path);  
-								return file.destroy();				
+								fs.unlinkSync(file.path);
+								return file.destroy();
 							} else {
 								return;
 							}
-						});				
+						});
 				} else {
 					return;
 				}
@@ -172,7 +173,7 @@ module.exports = function(app){
 						}))
 			.then(() => res.json({redirect: 'reload'}))
 			.catch(error => res.status(500).json({error: error}));
-	});	
+	});
 
 	app.use('/', router);
 };

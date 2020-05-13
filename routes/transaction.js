@@ -1,3 +1,4 @@
+/* jshint esversion: 8 */
 const security = require('../utils/security');
 const moment = require("moment");
 const router = require('express').Router();
@@ -12,7 +13,7 @@ module.exports = function(app){
 		models.transaction.findByPk(req.params.id)
 			.then(transaction => {
 				return models.contract.findByIdFetchFull(models, transaction.contract_id)
-					.then(contract => utils.render(req, res, 'transaction/edit', {contract: contract, transaction: transaction}))
+					.then(contract => utils.render(req, res, 'transaction/edit', {contract: contract, transaction: transaction}));
 			})
 			.catch(error => next(error));
 	});
@@ -29,17 +30,17 @@ module.exports = function(app){
 		models.transaction.create({
 				transaction_date: moment(req.body.transaction_date),
 				amount: req.body.amount,
-				type: req.body.type, 
+				type: req.body.type,
 				contract_id: req.body.contract_id
 			})
 			.then(() => models.contract.findByIdFetchFull(models, req.body.contract_id))
 			.then(contract => {
 				return models.file.getContractTemplates()
-					.then(templates => utils.render(req, res, 'contract/show', {templates_contract: templates, contract:contract}))
-			})
-		    .catch(error => next(error));
+					.then(templates => utils.render(req, res, 'contract/show', {templates_contract: templates, contract:contract}));
+				})
+			.catch(error => next(error));
 	});
-	
+
 	router.post('/transaction/edit', security.isLoggedInAdmin, multer().none(), function(req, res, next) {
 		models.transaction.update({
 				transaction_date: moment(req.body.transaction_date),
@@ -49,9 +50,9 @@ module.exports = function(app){
 			.then(() => models.contract.findByIdFetchFull(models, req.body.contract_id))
 			.then(contract => {
 				return models.file.getContractTemplates()
-					.then(templates => utils.render(req, res, 'contract/show', {templates_contract: templates, contract:contract}))		
+				.then(templates => utils.render(req, res, 'contract/show', {templates_contract: templates, contract:contract}));
 			})
-		    .catch(error => next(error));
+			.catch(error => next(error));
 	});
 
 
@@ -62,8 +63,8 @@ module.exports = function(app){
 					.then(() => models.contract.findByIdFetchFull(models, transaction.contract_id))
 					.then(contract => {
 						return models.file.getContractTemplates()
-							.then(templates => utils.render(req, res, 'contract/show', {templates_contract: templates, contract:contract}))				
-							})		
+							.then(templates => utils.render(req, res, 'contract/show', {templates_contract: templates, contract:contract}));
+							});
 			})
 			.catch(error => next(error));
 	});

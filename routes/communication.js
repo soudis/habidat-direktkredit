@@ -1,3 +1,4 @@
+/* jshint esversion: 8 */
 const models  = require('../models');
 const security = require('../utils/security');
 const communication = require('../utils/communication');
@@ -7,7 +8,7 @@ const moment = require("moment");
 const json2csv = require('json2csv');
 
 module.exports = function(app){
-	
+
 	router.post('/communication/email', security.isLoggedInAdmin, function(req, res) {
 		communication.getEmails(req.body.mode)
 			.then(emails => {
@@ -15,7 +16,7 @@ module.exports = function(app){
 				res.setHeader('Content-Type', 'text/text');
 				res.setHeader('Content-Disposition', 'inline; filename=emailaddresses.txt');
 				res.write(emails);
-				res.end();		
+				res.end();
 			});
 	});
 

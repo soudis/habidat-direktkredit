@@ -1,3 +1,4 @@
+/* jshint esversion: 8 */
 const models  = require('../models');
 const moment = require("moment");
 const validator = require("validator");
@@ -11,7 +12,7 @@ exports.getEmails = function(mode){
 				var add;
 				if (user.email && validator.isEmail(user.email) && (mode === 'all' || user.isActive())) {
 					usersString += user.email + ',';
-				} 
+				}
 			});
 			return usersString;
 		});

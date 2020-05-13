@@ -1,3 +1,4 @@
+/* jshint esversion: 8 */
 const moment = require('moment');
 const Op = require("sequelize").Op;
 const clonedeep = require('lodash.clonedeep');
@@ -15,7 +16,7 @@ module.exports = (sequelize, DataTypes) => {
 		logon_id: {
 			type: DataTypes.STRING,
 			allowNull: false
-		},    
+		},
 		administrator: {
 			type: DataTypes.BOOLEAN,
 			alowNull: true
@@ -23,7 +24,7 @@ module.exports = (sequelize, DataTypes) => {
 		ldap: {
 			type: DataTypes.BOOLEAN,
 			alowNull: true
-		},    
+		},
 		password: {
 			type: DataTypes.STRING,
 			allowNull: true
@@ -73,31 +74,31 @@ module.exports = (sequelize, DataTypes) => {
 			allowNull: true
 		},
        	passwordHashed: {
-       		type: DataTypes.STRING,	
+       		type: DataTypes.STRING,
        		allowNull: false
        	},
        	lastLogin: {
-       		type: DataTypes.DATE, 
-       		allowNull: true 
+       		type: DataTypes.DATE,
+       		allowNull: true
        	},
        	loginCount: {
-       		type: DataTypes.INTEGER, 
-       		allowNull: false, 
-       		defaultValue: 0 
+       		type: DataTypes.INTEGER,
+       		allowNull: false,
+       		defaultValue: 0
        	},
        	passwordResetToken: {
-       		type:  DataTypes.STRING,	
+       		type:  DataTypes.STRING,
        		allowNull: true
        	},
        	passwordResetExpires: {
-       		type: DataTypes.DATE, 
-       		allowNull: true 
+       		type: DataTypes.DATE,
+       		allowNull: true
        	},
 		savedViews: {
-			type:  DataTypes.TEXT, 
-			allowNull: true, 
+			type:  DataTypes.TEXT,
+			allowNull: true,
 			defaultValue: '[]'
-		}       	
+		}
 	}, {
 		tableName: 'user',
 		freezeTableName: true
@@ -106,7 +107,7 @@ module.exports = (sequelize, DataTypes) => {
 	User.beforeCreate(user => {
 		if (!user.administrator) {
 			user.logon_id = Math.abs(Math.random() * 100000000);
-		}			
+		}
 	});
 
 	User.afterCreate(user => {
@@ -141,62 +142,62 @@ module.exports = (sequelize, DataTypes) => {
 				ref_table: 'user'
 			}
 		});
-	}
+	};
 
 	User.findByIdFetchFull = function (models, id) {
 		return models.user.findOne({
 			where: {
 				id: id
-			}, 
-			include:[{ 
-				model: models.contract, 
-				as: 'contracts', 
-				include : { 
-					model: models.transaction, 
+			},
+			include:[{
+				model: models.contract,
+				as: 'contracts',
+				include : {
+					model: models.transaction,
 					as: 'transactions'
 				}},{
 					model: models.file,
 					as: 'files',
 				}
 				],
-				order:[[{ 
-					model: models.contract, 
-					as: 'contracts'}, 
+				order:[[{
+					model: models.contract,
+					as: 'contracts'},
 					'sign_date'],[{
-						model: models.contract, 
-						as: 'contracts'         
+						model: models.contract,
+						as: 'contracts'
 					},{
-						model: models.transaction, 
+						model: models.transaction,
 						as: 'transactions'
-					}, 
+					},
 					'transaction_date']]
 				});
-	}
+	};
 
 	User.findFetchFull = function (models, whereClause) {
-		return models.user.findAll({         
+		return models.user.findAll({
 			where: whereClause,
-			include:{ 
-				model: models.contract, 
-				as: 'contracts', 
-				include : { 
-					model: models.transaction, 
+			include:{
+				model: models.contract,
+				as: 'contracts',
+				include : {
+					model: models.transaction,
 					as: 'transactions'
 				}
 			},
-			order:[['last_name'], ['first_name'],[{ 
-				model: models.contract, 
-				as: 'contracts'}, 
+			order:[['last_name'], ['first_name'],[{
+				model: models.contract,
+				as: 'contracts'},
 				'sign_date'],[{
-					model: models.contract, 
-					as: 'contracts'         
+					model: models.contract,
+					as: 'contracts'
 				},{
-					model: models.transaction, 
+					model: models.transaction,
 					as: 'transactions'
-				}, 
+				},
 				'transaction_date']]
 			});
-	}
+	};
 
 	User.getUsers = function (models, mode, date) {
 		var activeUsers = [];
@@ -209,9 +210,9 @@ module.exports = (sequelize, DataTypes) => {
 			});
 			return activeUsers;
 		});
-	}
+	};
 
-	User.cancelledAndNotRepaid = function (models, whereClause) {      
+	User.cancelledAndNotRepaid = function (models, whereClause) {
 		return models.user.findFetchFull(models, whereClause)
 		.then(users => {
 			var usersCancelled = [];
@@ -227,19 +228,19 @@ module.exports = (sequelize, DataTypes) => {
 			});
 			return users.filter(user => { return user.contracts.length > 0; });
 		});
-	}
+	};
 
 	User.findByToken = function (token) {
 		return User.findOne({where: { passwordResetToken: token }})
 			.then(user => {
-				console.log('now: ' + moment() + ', expires: ' + moment(user.passwordResetExpires))
+				console.log('now: ' + moment() + ', expires: ' + moment(user.passwordResetExpires));
 				if (!user || moment().isAfter(moment(user.passwordResetExpires))) {
-					throw 'Der Link ist abgelaufen, bitte versuche es noch einmal'
+					throw 'Der Link ist abgelaufen, bitte versuche es noch einmal';
 				} else {
 					return user;
 				}
-			})
-	}
+			});
+	};
 
 	User.prototype.getAddress = function (lineBreak=false) {
 		var address = "";
@@ -254,20 +255,20 @@ module.exports = (sequelize, DataTypes) => {
 		if (this.country) {
 			address += this.country;
 			if (this.zip) {
-				address += "-"
+				address += "-";
 			}
 		}
 		if (this.zip) {
-			address += this.zip
+			address += this.zip;
 		}
 		if (this.place) {
 			if (address != "") {
 				address += " ";
-			} 
-			address += this.place      
+			}
+			address += this.place;
 		}
 		return address;
-	}
+	};
 
 	User.prototype.getFullName = function () {
 		var name = this.first_name;
@@ -275,7 +276,7 @@ module.exports = (sequelize, DataTypes) => {
 			name = this.last_name.toUpperCase() + " " + name;
 		}
 		return name;
-	}
+	};
 
 	User.prototype.comparePassword = function comparePassword(candidatePassword, cb) {
 		return bcrypt.compareSync(candidatePassword, this.passwordHashed);
@@ -289,7 +290,7 @@ module.exports = (sequelize, DataTypes) => {
 			}
 		});
 		return notTerminated;
-	}
+	};
 
 
 	User.prototype.isActive = function () {
@@ -300,13 +301,13 @@ module.exports = (sequelize, DataTypes) => {
 			}
 		});
 		return active;
-	}
+	};
 
 	User.prototype.isAdmin = function () {
 		if (this.administrator) {
 			return true;
 		}
-	}
+	};
 
 	User.prototype.getTransactionList = function (year) {
 		var transactionList = [];
@@ -316,11 +317,11 @@ module.exports = (sequelize, DataTypes) => {
 		this.contracts.forEach(function(contract) {
 			var sums = {
 				begin : {
-					amount: 0, 
+					amount: 0,
 					interest:0
-				}, 
+				},
 				end : {
-					amount: 0, 
+					amount: 0,
 					interest: 0},
 					transactions : 0
 			};
@@ -345,7 +346,7 @@ module.exports = (sequelize, DataTypes) => {
 							interest: ""
 						};
 						if (transaction.type === 'notreclaimed') {
-							trans.type = "Nicht rückgefordert"
+							trans.type = "Nicht rückgefordert";
 						}
 						transactionList.push(trans);
 						sums.transactions++;
@@ -353,7 +354,7 @@ module.exports = (sequelize, DataTypes) => {
 						sums.end.amount += transaction.amount;
 						sums.end.interest += + transaction.interestToDate(contract.interest_rate, firstDayNextYear);
 
-					}       
+					}
 				});
 				sums.begin.interest = Math.ceil(sums.begin.interest*100) / 100;
 				sums.end.interest = Math.ceil(sums.end.interest*100) / 100;
@@ -404,7 +405,7 @@ module.exports = (sequelize, DataTypes) => {
 			}
 		});
 		return transactionList;
-	}
+	};
 
 	return User;
 };

@@ -7,7 +7,7 @@ const env       	= process.env.NODE_ENV || "database";
 const settings  	= require('../utils/settings');
 const Umzug 		= require('umzug');
 
-var createdb = function() { 
+var createdb = function() {
 
 	// defining database connection
 	var dbURI = settings.config.get('database.uri');
@@ -15,10 +15,10 @@ var createdb = function() {
 		dbURI = settings.config.get('database.dialect')+ '://' + settings.config.get('database.username') + ':' + encodeURIComponent(settings.config.get('database.password')) + '@' + settings.config.get('database.host') + '/' + settings.config.get('database.database');
 	}
 	var sequelize = new Sequelize(dbURI, {
-		logging: false, 
+		logging: false,
 		pool: {
 			idle: 30000,
-			min: 1, 
+			min: 1,
 			max: 1
 		},
 		dialectOptions: {
@@ -26,7 +26,7 @@ var createdb = function() {
 		}
 	});
 	if (dbURI.startsWith('mysql://')) {
-		sequelize.query('SET FOREIGN_KEY_CHECKS = 0', {raw: true}).catch(console.log);  
+		sequelize.query('SET FOREIGN_KEY_CHECKS = 0', {raw: true}).catch(console.log);
 	}
 
 	// create database structure or applying pending database modifications

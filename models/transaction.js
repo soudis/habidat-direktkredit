@@ -1,3 +1,5 @@
+/* jshint esversion: 8 */
+
 const moment = require('moment');
 const settings = require('../utils/settings');
 
@@ -54,13 +56,13 @@ module.exports = (sequelize, DataTypes) => {
 			onDelete: "CASCADE",
 			foreignKey: 'contract_id'
 		});
-	}  
+	};
 
 	transaction.prototype.getTypeText = function () {
 		switch(this.type) {
-			case "initial": 
+			case "initial":
 			return 'Einzahlung';
-			case "deposit": 
+			case "deposit":
 			return 'Zusatzzahlung';
 			case "withdrawal":
 			return 'Teilauszahlung';
@@ -71,9 +73,9 @@ module.exports = (sequelize, DataTypes) => {
 		}
 
 		return "Unbekannt";
-	}
+	};
 
-	transaction.prototype.interestToDate = function (rate, toDate) {      
+	transaction.prototype.interestToDate = function (rate, toDate) {
 		if (rate > 0 && moment(toDate).diff(this.transaction_date) >= 0) {
 			var method = settings.project.get('defaults.interest_method') || '365_compound';
 			var method_days = 365;
@@ -103,14 +105,14 @@ module.exports = (sequelize, DataTypes) => {
 	        	if (method === '365_nocompound') {
 	        		amountWithInterest += this.amount * rate / 100 * moment(toDate).diff(endOfYear.add(years, 'years'),'days') / method_days;
 	        	} else {
-	        		amountWithInterest += amountWithInterest * rate / 100 * moment(toDate).diff(endOfYear.add(years, 'years'),'days') / method_days;            
+	        		amountWithInterest += amountWithInterest * rate / 100 * moment(toDate).diff(endOfYear.add(years, 'years'),'days') / method_days;
 	        	}
 	    	}
 	    	return amountWithInterest - this.amount;
 		} else {
 			return 0;
 		}
-	}
+	};
 
 	return transaction;
 };

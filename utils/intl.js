@@ -1,4 +1,5 @@
-const texts = {	
+/* jshint esversion: 8 */
+const texts = {
 	"amount": "Betrag",
 	"BIC": "BIC",
 	"choose_file": "Datei auswählen..",
@@ -52,7 +53,7 @@ const texts = {
     "termination_type_T": "Kündigungsfrist",
     "termination_type_P": "Laufzeit",
     "termination_type_D": "Enddatum",
-    "termination_period_type_M": "Monat(e)",    
+    "termination_period_type_M": "Monat(e)",
     "termination_period_type_w": "Woche(n)",
     "termination_period_type_Y": "Jahr(e)",
     "transaction_date": "Datum",
@@ -69,12 +70,12 @@ const texts = {
     "interest_method_hint_365_nocompound": "Bei ACT/365 werden die Zinstage eines Jahres kalendergenau berechnet, allerdings hat das Basis-Zinsjahr immer 365 Zinstage, unabhängig von einem möglichen Schaltjahr",
     "zip": "PLZ"
 
-}
+};
 
 exports._t = function(key, strings = undefined) {
-    if(texts[key]) {
-        return texts[key];
-    } else {
-        return '!' + key + '!';
-    }
+	if(texts[key]) {
+		return texts[key];
+	} else {
+		return '!' + key + '!';
+	}
 };

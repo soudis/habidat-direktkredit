@@ -1,6 +1,8 @@
+/* jshint esversion: 8 */
+
 const moment = require('moment');
 const settings = require('../utils/settings');
-const _t = require('../utils/intl')._t
+const _t = require('../utils/intl')._t;
 
 module.exports = (sequelize, DataTypes) => {
 	contract = sequelize.define('contract', {
@@ -17,7 +19,7 @@ module.exports = (sequelize, DataTypes) => {
 					model: 'user',
 					key: 'id'
 				}
-			},      
+			},
 			sign_date: {
 				type: DataTypes.DATE,
 				allowNull: true
@@ -37,7 +39,7 @@ module.exports = (sequelize, DataTypes) => {
 			termination_period_type: {
 				type: DataTypes.STRING,
 				allowNull: true
-			},      
+			},
 			amount: {
 				type: DataTypes.DECIMAL,
 				allowNull: true
@@ -69,14 +71,14 @@ module.exports = (sequelize, DataTypes) => {
 			onDelete: "CASCADE",
 			foreignKey: 'user_id'
 		});
-	}
+	};
 
 	contract.findByIdFetchFull = function (models, id) {
 		return models.contract.findOne({ where : { id: id }, include: [{model: models.transaction, as: "transactions"}]});
-	}    
+	};
 
 	contract.prototype.isTerminated = function (date) {
-		// check if all money was paid back until given date      
+		// check if all money was paid back until given date
 		var sum = 0;
 		var count = 0;
 		var toDate = date;
@@ -87,21 +89,20 @@ module.exports = (sequelize, DataTypes) => {
 			}
 		});
 		return count > 1 && sum <= 0;
-	}
+	};
 
 
 	contract.prototype.getTerminationType = function () {
-		return this.termination_type || settings.project.get('defaults.termination_type') || 'T';  	
-	}
+		return this.termination_type || settings.project.get('defaults.termination_type') || 'T';
+	};
 
 	contract.prototype.getTerminationPeriod = function () {
 		return this.termination_period || settings.project.get('defaults.termination_period') || 6;
-	}
+	};
 
 	contract.prototype.getTerminationPeriodType = function () {
 		return this.termination_period_type || settings.project.get('defaults.termination_period_type') || 6;
-	}
-
+	};
 
 	contract.getTerminationTypeFullString = function (type, period, period_type, noPeriod = false) {
 		if (type === "P") {
@@ -110,27 +111,26 @@ module.exports = (sequelize, DataTypes) => {
 			return _t('termination_type_D');
 		} else if (type === "T") {
 			return _t('termination_type_T') + (noPeriod?"":" - " + period + " " + _t('termination_period_type_' + period_type));
-		}    
-	}
+		}
+	};
 
 	contract.prototype.getTerminationTypeFullString = function (noPeriod = false) {
 		return contract.getTerminationTypeFullString(this.getTerminationType(), this.getTerminationPeriod(), this.getTerminationPeriodType(), noPeriod);
-	}
-
+	};
 
 	contract.prototype.getPaybackDate = function () {
 		if (this.getTerminationType() == "P") {
 			return moment(this.sign_date).add(this.getTerminationPeriod(), this.getTerminationPeriodType());
 		} else if (this.getTerminationType() == "D") {
-			return moment(this.termination_date); 
+			return moment(this.termination_date);
 		} else if (this.getTerminationType() == "T") {
 			if (this.termination_date) {
 				return moment(this.termination_date).add(this.getTerminationPeriod(), this.getTerminationPeriodType());
 			} else {
 				return null;
-			}      
-		}    
-	}  
+			}
+		}
+	};
 
 	contract.prototype.calculateInterest = function () {
 		var interest = {"now": 0.00, "last_year": 0.00, "termination": 0.00};
@@ -152,7 +152,7 @@ module.exports = (sequelize, DataTypes) => {
 					interest.last_year += transaction.interestToDate(contract.interest_rate, last_year_end);
 					interest.last_year -= transaction.interestToDate(contract.interest_rate, last_year_begin);
 				}
-			});  	
+			});
 			interest.now = Math.abs(interest.now);
 			interest.last_year = Math.abs(interest.last_year);
 		} else {
@@ -168,21 +168,21 @@ module.exports = (sequelize, DataTypes) => {
 			interest.termination = Math.ceil(interest.termination*100) / 100;
 		}
 		return interest;
-	}
+	};
 
 	contract.prototype.getFetchedTransactions = function () {
 		return this.transactions;
-	}
+	};
 
 	contract.prototype.getStatus = function () {
 		return this.isTerminated(moment())? "Zurückbezahlt" : (this.transactions.length == 0 ? "Noch nicht eingezahlt":"Laufend");
-	}
+	};
 
 	contract.prototype.getStatusText = function() {
 		switch(this.status) {
-			case "unknown": 
+			case "unknown":
 			return 'Noch kein Vertrag';
-			case "sign": 
+			case "sign":
 			return 'Vertrag ist zu unterschreiben';
 			case "sent":
 			return 'Vertrag ist verschickt';
@@ -190,7 +190,7 @@ module.exports = (sequelize, DataTypes) => {
 			return 'Vertrag abgeschlossen ';
 		}
 		return "Unbekannt";
-	}
+	};
 
 
 	contract.prototype.sortTransactions = function () {
@@ -202,13 +202,13 @@ module.exports = (sequelize, DataTypes) => {
 			else
 				return 0;
 		});
-	}
+	};
 
-	contract.prototype.getAmountToDate = function (date, currentTransactionId) {    
+	contract.prototype.getAmountToDate = function (date, currentTransactionId) {
 		var sum = 0;
 		var contract = this;
 		this.transactions.forEach(function(transaction) {
-			if (moment(date).diff(transaction.transaction_date) >= 0 && transaction.id != currentTransactionId) {        
+			if (moment(date).diff(transaction.transaction_date) >= 0 && transaction.id != currentTransactionId) {
 				sum += transaction.amount + transaction.interestToDate(contract.interest_rate, date);
 			}
 		});
@@ -216,42 +216,42 @@ module.exports = (sequelize, DataTypes) => {
 			return sum;
 		} else {
 			return 0;
-		}      
-	}
+		}
+	};
 
-	contract.prototype.getTransactionsAmount = function () {    
+	contract.prototype.getTransactionsAmount = function () {
 		var sum = 0;
 		var contract = this;
 		this.transactions.forEach(function(transaction) {
 			sum += transaction.amount;
 		});
 		return sum;
-	}
+	};
 
-	contract.prototype.getDepositAmount = function () {    
+	contract.prototype.getDepositAmount = function () {
 		var sum = 0;
 		var contract = this;
 		this.transactions.forEach(function(transaction) {
 			if (transaction.amount > 0) {
-				sum += transaction.amount;        
+				sum += transaction.amount;
 			}
 		});
 		return sum;
-	}  
+	};
 
-	contract.prototype.getWithdrawalAmount = function () {    
+	contract.prototype.getWithdrawalAmount = function () {
 		var sum = 0;
 		var contract = this;
 		this.transactions.forEach(function(transaction) {
 			if (transaction.amount < 0) {
-				sum += transaction.amount;        
+				sum += transaction.amount;
 			}
 		});
 		return sum;
-	}  
+	};
 
 	contract.prototype.isCancelledAndNotRepaid = function (date) {
-	    // check if all money was paid back until given date      
+	    // check if all money was paid back until given date
 	    var sum = 0;
 	    var count = 0;
 	    var toDate = date;
@@ -267,7 +267,7 @@ module.exports = (sequelize, DataTypes) => {
 	    	terminated = true;
 	    }
 	    return sum > 0 && terminated;
-	}
+	};
 
 	return contract;
 };

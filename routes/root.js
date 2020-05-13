@@ -1,3 +1,4 @@
+/* jshint esversion: 8 */
 const security = require('../utils/security');
 const moment = require("moment");
 const passport = require('passport');
@@ -13,20 +14,20 @@ module.exports = function(app){
 
 	/* Welcome Site */
 	router.get('/', security.isLoggedInAdmin, function(req, res, next) {
-   		res.redirect('/user/list');
+		res.redirect('/user/list');
 	});
 
 	/* Welcome Site */
 	router.get('/login', function(req, res, next) {
-   		res.render('index', { title: 'Login', error: req.flash('loginMessage'), success: req.flash('success') } );  	
+		res.render('index', { title: 'Login', error: req.flash('loginMessage'), success: req.flash('success') } );
 	});
 
 	router.get('/getpassword', function(req, res, next) {
-   		res.render('getpassword', { title: 'Passwort setzen', error: req.flash('error') } );  	
+		res.render('getpassword', { title: 'Passwort setzen', error: req.flash('error') } );
 	});
 
 	router.get('/setpassword', security.isLoggedIn, function(req, res, next) {
-   		res.render('setpassword', { user: req.user, title: 'Passwort ändern', error: req.flash('error') } );  	
+   		res.render('setpassword', { user: req.user, title: 'Passwort ändern', error: req.flash('error') } );
 	});
 
 
@@ -38,8 +39,8 @@ module.exports = function(app){
 			.catch(error => {
 				req.flash('error', error);
 				res.redirect('/getpassword');
-			})
-	});	
+			});
+	});
 
 	router.post('/setpassword', function(req, res, next) {
 		if (!req.body.password || req.body.password === '') {
@@ -57,9 +58,9 @@ module.exports = function(app){
 						req.flash('success', 'Dein Passwort wurde geändert');
 					}
 					res.redirect('/');
-				})
+				});
 		}
-		
+
 	});
 
 	router.post('/getpassword', function(req, res, next) {
@@ -70,8 +71,8 @@ module.exports = function(app){
 					return;
 				} else {
 					user.passwordResetToken = crypto.randomBytes(16).toString('hex');
-			      	user.passwordResetExpires = Date.now() + 3600000 * 3; // 3 hours
-			      	return user.save()
+					user.passwordResetExpires = Date.now() + 3600000 * 3; // 3 hours
+					return user.save()
 						.then(user => {
 							return utils.renderToText(req, res, 'email/setpassword', {link: 'https://'+req.headers.host+'/getpassword/'+user.passwordResetToken});
 						})
@@ -90,8 +91,8 @@ module.exports = function(app){
 							    html: emailBody
 							};
 							return transporter.sendMail(mailOptions);
-						})		
-				}		      	
+						});
+				}
 			})
 			.then(() => {
 				req.flash('success', 'Falls dein Account gefunden wurde, hast du ein E-Mail mit einem Link bekommen');
@@ -100,12 +101,12 @@ module.exports = function(app){
 			.catch(error => {
 				req.flash('error', 'E-Mail konnte nicht versandt werden: ' + error);
 				res.redirect('/getpassword');
-			})
+			});
 	});
 
 /*
 	router.get('/project', function(req, res, next) {
-     	res.render('select-project', { title: 'habiDAT - Projectauswahl',projects: projects} );  	
+     	res.render('select-project', { title: 'habiDAT - Projectauswahl',projects: projects} );
 	});
 */
 		/* Welcome Site */
@@ -124,27 +125,27 @@ module.exports = function(app){
 	// LOGOUT ==============================
 	// =====================================
 	router.get('/logout', function(req, res) {
-	    req.logout();
-	    res.redirect('/');
+		req.logout();
+		res.redirect('/');
 	});
 
 	//=====================================
 	//LOGOUT ==============================
 	//=====================================
 	router.get('/admin-logout', function(req, res) {
-	 req.logout();
-	 res.redirect('/');
+		req.logout();
+		res.redirect('/');
 	});
 
 	var loginStrategies = ['local-login-admin', 'local-login'];
 	if (settings.config.get('auth.admin.method') == 'ldap') {
 		loginStrategies = ['ldap-login-admin', 'local-login-admin','local-login'];
 	}
-	
+
 	router.post('/logon', passport.authenticate(loginStrategies, {
-	    successReturnToOrRedirect : '/profile', // redirect to the secure profile section
-	    failureRedirect : '/', // redirect back to the signup page if there is an error
-	    failureFlash : true // allow flash messages
+		successReturnToOrRedirect : '/profile', // redirect to the secure profile section
+		failureRedirect : '/', // redirect back to the signup page if there is an error
+		failureFlash : true // allow flash messages
 	}));
 
 

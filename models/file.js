@@ -1,9 +1,10 @@
+/* jshint esversion: 8 */
+
 var moment = require('moment');
 
-
 module.exports = (sequelize, DataTypes) => {
-  file = sequelize.define('file',
-	    	{
+	file = sequelize.define('file',
+	{
 		id: {
 			type: DataTypes.INTEGER(11),
 			primaryKey: true,
@@ -34,44 +35,44 @@ module.exports = (sequelize, DataTypes) => {
 			type: DataTypes.STRING,
 			allowNull: false
 		}
-	
+
 	}, {
-    tableName: 'file',
-    freezeTableName: true,
-  });
+		tableName: 'file',
+		freezeTableName: true,
+	});
 
-  file.associate = function (db) {
-	db.file.belongsTo(db.user, {
-          onDelete: "CASCADE",
-          foreignKey: 'ref_id'
-        });
-  }
+	file.associate = function (db) {
+		db.file.belongsTo(db.user, {
+			onDelete: "CASCADE",
+			foreignKey: 'ref_id'
+		});
+	};
 
-  file.getContractTemplates = function(){
-	return this.findAll({
-		where: {
-			ref_table: "template_contract"
-		}
-	});	
-  };
+	file.getContractTemplates = function(){
+		return this.findAll({
+			where: {
+				ref_table: "template_contract"
+			}
+		});
+	};
 
-  file.getUserTemplates = function(){
-	return this.findAll({
-		where: {
-			ref_table: "template_user"
-		}
-	});	
-  };
+	file.getUserTemplates = function(){
+		return this.findAll({
+			where: {
+				ref_table: "template_user"
+			}
+		});
+	};
 
-  file.getFilesFor = function (ref_table, ref_id) {
-  	return this.findAll({
-  		where: {
-  			ref_table: ref_table,
-  			ref_id: ref_id
-  		}
-  	});
-  }
+	file.getFilesFor = function (ref_table, ref_id) {
+		return this.findAll({
+			where: {
+				ref_table: ref_table,
+				ref_id: ref_id
+			}
+		});
+	};
 
 
-  return file;
+	return file;
 };

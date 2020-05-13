@@ -1,10 +1,9 @@
+/* jshint esversion: 8 */
 const DocxGen = require('docxtemplater');
 const JSZipUtils = require('jszip');
 const fs = require('fs');
 const moment = require('moment');
-// var cloudconvert = new (require('cloudconvert'))('oqxW0tKE_7gykv8GDULnAcRTv50QTqMtIPbFBtVzgQFUQe2VridmQ7czMIGtccFwO0ZvsyMNV-6IB4qXxWSo_g');
 const converter = require('office-converter')();
-
 const json2csv = require('json2csv');
 
 
@@ -13,8 +12,8 @@ exports.render = (req, res, template, data, title = undefined) => {
 		.then(() => {
 			data.title = title;
 			res.render(template, data);
-		})
-}
+		});
+};
 
 exports.renderToText = (req, res, template, data, title = undefined) => {
 	return new Promise((resolve, reject) => {
@@ -24,26 +23,26 @@ exports.renderToText = (req, res, template, data, title = undefined) => {
 				reject(error);
 			} else {
 				resolve(html);
-			}			
+			}
 		});
 	});
-}
+};
 
 exports.generateDocx = function(templateFile, outputFile, data){
 	var path = templateFile;
 	var file = fs.readFileSync(path, 'binary');
-		var zip = new JSZipUtils(file);
-        var doc=new DocxGen();
-        doc.loadZip(zip);
-        doc.setData(data); 
-        doc.render();
-        var out=doc.getZip().generate({type:"nodebuffer"});
-        fs.writeFileSync("./tmp/"+ outputFile +".docx", out);
-        console.log("done");
+	var zip = new JSZipUtils(file);
+	var doc=new DocxGen();
+	doc.loadZip(zip);
+	doc.setData(data);
+	doc.render();
+	var out=doc.getZip().generate({type:"nodebuffer"});
+	fs.writeFileSync("./tmp/"+ outputFile +".docx", out);
+	console.log("done");
 };
 
 exports.convertToPdf = function(file, callback){
-	
+
 	converter.generatePdf('./tmp/' + file + '.docx', function(err, result) {
 		// Process result if no error
 		if (result && result.status === 0) {

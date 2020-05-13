@@ -1,12 +1,12 @@
+/* jshint esversion: 8 */
 const security = require('../utils/security');
 const moment = require("moment");
 const statistics = require('../utils/statistics');
-const utils = require('../utils')
+const utils = require('../utils');
 const router = require('express').Router();
 const models  = require('../models');
 const format = require('../utils/format');
 const settings = require('../utils/settings');
-
 
 module.exports = function(app){
 
@@ -24,17 +24,17 @@ module.exports = function(app){
 
 	router.get('/statistics/byrelation/:start/:end', security.isLoggedInAdmin, (req, res) => {
 		models.user.findAll({
-			  include:{ 
-					model: models.contract, 
-					as: 'contracts', 
-					include : { 
-						model: models.transaction, 
+			  include:{
+					model: models.contract,
+					as: 'contracts',
+					include : {
+						model: models.transaction,
 						as: 'transactions'
 					}
 				}
 		}).then(function(users) {
 			var endDate = moment(req.params.end, 'DD.MM.YYYY').endOf('month');
-			var startDate = moment(req.params.start, 'DD.MM.YYYY');				
+			var startDate = moment(req.params.start, 'DD.MM.YYYY');
 			var byRelation = {};
 			var today = moment();
 			users.forEach((user) => {
@@ -45,34 +45,34 @@ module.exports = function(app){
 					if (moment(contract.sign_date).isBetween(startDate, endDate)) {
 						byRelation[user.relationship] += contract.getAmountToDate(endDate);
 					}
-				})
-			})
+				});
+			});
 			Object.keys(byRelation).forEach(key => {
 				byRelation[key] = Math.round(byRelation[key]*100)/100;
-			})
+			});
 			res.setHeader('Content-Type', 'application/json');
-    		res.send(JSON.stringify(byRelation));
+			res.send(JSON.stringify(byRelation));
 		});
 	});
-	
+
 	router.get('/statistics/byregion/:level/:start/:end', security.isLoggedInAdmin, (req, res, next) => {
 		models.user.findAll({
-			  include:{ 
-					model: models.contract, 
-					as: 'contracts', 
-					include : { 
-						model: models.transaction, 
+			  include:{
+					model: models.contract,
+					as: 'contracts',
+					include : {
+						model: models.transaction,
 						as: 'transactions'
 					}
 				}
 		}).then(function(users) {
 			var endDate = moment(req.params.end, 'DD.MM.YYYY').endOf('month');
-			var startDate = moment(req.params.start, 'DD.MM.YYYY');			
+			var startDate = moment(req.params.start, 'DD.MM.YYYY');
 			var sections = {};
 			var total = 0;
 			var today = moment();
 			users.forEach((user) => {
-				var key = "Sonstige", skip = false;				
+				var key = "Sonstige", skip = false;
 				var country = user.country || settings.project.get('defaults.country') || 'AT';
 				if (req.params.level === 'country') {
 					key = country;
@@ -85,20 +85,20 @@ module.exports = function(app){
 						if (levelParts.length === 3) {
 							if (!user.zip || !user.zip.startsWith(levelParts[2])) {
 								// skip if wrong zip region
-								skip = true;	
+								skip = true;
 							} else {
 								key = levelParts[1] + '-' + user.zip.substring(0,levelParts[2].length+1);
-							}		
+							}
 						} else {
 							if (!user.zip) {
-								skip = true
+								skip = true;
 							} else {
 								key = levelParts[1] + '-' + user.zip.substring(0,1);
-							}							
+							}
 						}
 					}
 				}
-				
+
 				if (!sections[key]) {
 					sections[key] = 0;
 				}
@@ -107,32 +107,32 @@ module.exports = function(app){
 						var amount = contract.getAmountToDate(endDate);
 						if (!skip) {
 							sections[key] += amount;
-						}					
+						}
 						total += amount;
 					}
-				})
-			})
+				});
+			});
 			var result = {};
 			Object.keys(sections).forEach((section) => {
-				var percent = 100*sections[section] / total
+				var percent = 100*sections[section] / total;
 				result[section + ' (' + format.format(percent, 2, '#%') + ')'] = Math.round(sections[section]*100)/100;
-			})
+			});
 			res.setHeader('Content-Type', 'application/json');
-    		res.send(JSON.stringify(result));
+			res.send(JSON.stringify(result));
 		})
 		.catch(error => next(error));
-	});	
+	});
 
 	router.get('/statistics/bymonth/:start/:end', security.isLoggedInAdmin, (req, res) => {
 		models.user.findAll({
-			  include:{ 
-					model: models.contract, 
-					as: 'contracts', 
-					include : { 
-						model: models.transaction, 
-						as: 'transactions'
-					}
+			include:{
+				model: models.contract,
+				as: 'contracts',
+				include : {
+					model: models.transaction,
+					as: 'transactions'
 				}
+			}
 		}).then(function(users) {
 			var endDate = moment(req.params.end, 'DD.MM.YYYY');
 			var startDate = moment(req.params.start, 'DD.MM.YYYY');
@@ -150,25 +150,25 @@ module.exports = function(app){
 						//console.log("contract: " + contract.id + ", " + contractAmount);
 						sum+= contractAmount;
 
-					})
-				})
+					});
+				});
 				byMonth[month.format('MM YYYY')]  = Math.round(sum*100)/100;
-			})			
+			});
 			res.setHeader('Content-Type', 'application/json');
-    		res.send(JSON.stringify(byMonth));
+			res.send(JSON.stringify(byMonth));
 		});
-	});	
+	});
 
 	router.get('/statistics/transactionsbymonth/:start/:end', security.isLoggedInAdmin, (req, res) => {
 		models.user.findAll({
-			  include:{ 
-					model: models.contract, 
-					as: 'contracts', 
-					include : { 
-						model: models.transaction, 
-						as: 'transactions'
-					}
+			include:{
+				model: models.contract,
+				as: 'contracts',
+				include : {
+					model: models.transaction,
+					as: 'transactions'
 				}
+			}
 		}).then(function(users) {
 			var endDate = moment(req.params.end, 'DD.MM.YYYY');
 			var startDate = moment(req.params.start, 'DD.MM.YYYY');
@@ -194,34 +194,34 @@ module.exports = function(app){
 										notReclaimed += transaction.amount;
 									} else {
 										withdrawals += transaction.amount;
-									}									
+									}
 								}
 							}
 							interest += transaction.interestToDate(contract.interest_rate, end) - transaction.interestToDate(contract.interest_rate, start);
 						});
-					})
-				})
+					});
+				});
 				byMonth.deposits[month.format('MM YYYY')]  = Math.round(deposits*100)/100;
 				byMonth.withdrawals[month.format('MM YYYY')]  = Math.round(-withdrawals*100)/100;
 				byMonth.notReclaimed[month.format('MM YYYY')]  = Math.round(-notReclaimed*100)/100;
 				byMonth.interest[month.format('MM YYYY')]  = Math.round(interest*100)/100;
-			})			
+			});
 			res.setHeader('Content-Type', 'application/json');
     		res.send(JSON.stringify(byMonth));
 		});
-	});	
+	});
 
 
 	router.post('/statistics/transactionList', security.isLoggedInAdmin, function(req, res) {
 		models.user.findAll({
-			  include:{ 
-					model: models.contract, 
-					as: 'contracts', 
-					include : { 
-						model: models.transaction, 
-						as: 'transactions'
-					}
+			include:{
+				model: models.contract,
+				as: 'contracts',
+				include : {
+					model: models.transaction,
+					as: 'transactions'
 				}
+			}
 		}).then(function(users) {
 			var transactionList = [];
 			users.forEach(function(user) {
@@ -243,7 +243,7 @@ module.exports = function(app){
 					}
 				}
 			});
-			var filename = "./tmp/Jahresliste_"+ req.body.year +".csv"
+			var filename = "./tmp/Jahresliste_"+ req.body.year +".csv";
 			file = utils.generateTransactionList(transactionList, filename);
 
 			res.setHeader('Content-Length', (new Buffer(file)).length);
@@ -252,7 +252,7 @@ module.exports = function(app){
 			res.write(file);
 			res.end();
 
-		});	
+		});
 	});
 
 	router.get('/statistics/german', security.isLoggedInAdmin, function(req, res, next) {
@@ -262,7 +262,7 @@ module.exports = function(app){
 				res.render('statistics/german', { title: 'Deutsche Direktkredite', years: years});
 			})
 			.catch(error => next(error));
-	});	
+	});
 
 
 	app.use('/', router);

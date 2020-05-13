@@ -1,3 +1,4 @@
+/* jshint esversion: 8 */
 const security = require('../utils/security');
 const moment = require("moment");
 const utils = require('../utils');
@@ -51,38 +52,38 @@ router.get('/files', security.isLoggedIn, function(req, res) {
 				title: "Sonstige Dateien",
 				files: []
 			}
-		}
+		};
 		files.map((file => {
 			var group = file.ref_table.split("_")[1];
 			file.group = group;
 			if (groups[group]) {
 				groups[group].files.push(file);
-			} 
-		}))
+			}
+		}));
 		res.render('files', { title: 'Dateien und Informationen zum Projekt', groups: groups });
-	});		
+	});
 });
 
 
 router.post('/accountnotification', security.isLoggedIn, function(req, res) {
 	models.user.findByIdFetchFull(models, req.user.id,function(user){
 		var transactionList = user.getTransactionList(req.body.year);
-		
+
 		transactionList.sort(function(a,b) {
 			if (a.contract_id > b.contract_id)
 				return 1;
 			else if (b.contract_id > a.contract_id)
 				return -1;
-			else {	
+			else {
 				if (a.date.diff(b.date) > 0)
 					return 1;
 				else if(b.date.diff(a.date) > 0)
 					return -1;
-				else 
+				else
 					return 0;
 			}
 		});
-		
+
 		var interestTotal = 0;
 		transactionList.forEach(function(transaction){
 			if (transaction.type.startsWith("Zinsertrag")) {
@@ -93,7 +94,7 @@ router.post('/accountnotification', security.isLoggedIn, function(req, res) {
 			transaction.interest_rate = format.formatPercent(transaction.interest_rate);
 
 		});
-		
+
 		var data = {
 				"id": user.id,
 				"first_name": user.first_name?user.first_name:"",
@@ -105,7 +106,7 @@ router.post('/accountnotification', security.isLoggedIn, function(req, res) {
 				"telno": user.telno,
 				"email": user.email,
 				"IBAN": user.IBAN,
-				"BIC": user.BIC,				
+				"BIC": user.BIC,
 				"year": req.body.year,
 				"current_date": format.formatDate(moment()),
 				"transactionList": transactionList,
@@ -115,7 +116,7 @@ router.post('/accountnotification', security.isLoggedIn, function(req, res) {
 			where: {
 				ref_table: "template_account_notification"
 		}}).then(function(file) {
-			return file.path;		
+			return file.path;
 		}).catch((error) => {
 			return "account_notification";
 		}).then((template) => {
@@ -130,9 +131,8 @@ router.post('/accountnotification', security.isLoggedIn, function(req, res) {
 					res.setHeader('Content-Type', 'application/pdf');
 					res.setHeader('Content-Disposition', 'inline; filename=' + filename + '.pdf');
 					res.write(file, 'binary');
-					res.end();			
+					res.end();
 				} else {
-					console.log("Error generating PDF: ", err)
 					file = fs.readFileSync("./tmp/"+ filename +".docx", 'binary');
 
 					res.setHeader('Content-Length', file.length);
@@ -142,7 +142,7 @@ router.post('/accountnotification', security.isLoggedIn, function(req, res) {
 					res.end();
 				}
 			});
-		});		
+		});
 
 
 	});

@@ -1,3 +1,4 @@
+/* jshint esversion: 8 */
 const security = require('../utils/security');
 const moment = require("moment");
 const fs = require('fs');
@@ -14,9 +15,9 @@ module.exports = function(app){
 			}
 		}).then(function(user) {
 			var data = {
-				"first_name": user.first_name, 
-				"last_name": user.last_name, 
-				"logon_id": user.logon_id, 
+				"first_name": user.first_name,
+				"last_name": user.last_name,
+				"logon_id": user.logon_id,
 				"password": user.password,
 				"street": user.street,
 				"zip": user.zip,
@@ -32,7 +33,7 @@ module.exports = function(app){
 				where: {
 					id: req.query.fileid
 			}}).then(function(file) {
-				return file.path;		
+				return file.path;
 			}).catch((error) => {
 				return req.query.file;
 			}).then((template) => {
@@ -46,7 +47,7 @@ module.exports = function(app){
 				res.write(file, 'binary');
 				res.end();
 			});
-		});	
+		});
 	});
 
 	router.get('/docx_c/:id', security.isLoggedInAdmin, function(req, res) {
@@ -54,16 +55,16 @@ module.exports = function(app){
 			where : {
 				id: req.params.id
 			},
-			include: { 
-				model: models.transaction, 
+			include: {
+				model: models.transaction,
 				as: 'transactions'
-			}			
+			}
 		}).then(function(contract) {
 			models.user.findByIdFetchFull(models, contract.user_id,function(user){
 				var data = {
-					"first_name": user.first_name, 
-					"last_name": user.last_name, 
-					"logon_id": user.logon_id, 
+					"first_name": user.first_name,
+					"last_name": user.last_name,
+					"logon_id": user.logon_id,
 					"password": user.password,
 					"street": user.street,
 					"zip": user.zip,
@@ -90,7 +91,7 @@ module.exports = function(app){
 					where: {
 						id: req.query.fileid
 				}}).then(function(file) {
-					return file.path;		
+					return file.path;
 				}).catch((error) => {
 					return req.query.file;
 				}).then((template) => {
@@ -109,7 +110,7 @@ module.exports = function(app){
 					res.write(file, 'binary');
 					res.end();
 				});
-			});	
+			});
 		});
 	});
 

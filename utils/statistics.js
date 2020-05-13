@@ -1,3 +1,4 @@
+/* jshint esversion: 8 */
 const moment = require("moment");
 const sequelize = require("sequelize");
 const Op = require("sequelize").Op;
@@ -18,7 +19,7 @@ const chartColors = [
 	"#ffff99",
 	"#b15928"
 ];
-	
+
 var generatePieChart = function(data, callback) {
 	var chartData = [];
 	var index = 0;
@@ -30,12 +31,12 @@ var generatePieChart = function(data, callback) {
 		index++;
 
 	}
-	
-	var Canvas = require('canvas')
-	  , canvas = new Canvas(800, 800)
-	  , ctx = canvas.getContext('2d')
-	  , Chart = require('nchart')
-	  , fs = require('fs');
+
+	var Canvas = require('canvas'),
+		canvas = new Canvas(800, 800),
+	  	ctx = canvas.getContext('2d'),
+	  	Chart = require('nchart'),
+	  	fs = require('fs');
 
 	new Chart(ctx).Pie(
 		    chartData
@@ -46,7 +47,7 @@ var generatePieChart = function(data, callback) {
 exports.getGermanContractsByYearAndInterestRate = function() {
 
 	// find all german contracts (NOTE: distinction is just by
-    // length of ZIP code > 4)
+	// length of ZIP code > 4)
 	return models.user.findAll({
 		  where: { country: 'DE' },
 		  include:{
@@ -73,14 +74,14 @@ exports.getGermanContractsByYearAndInterestRate = function() {
 		var years = Math.ceil(Math.abs(moment().diff(first,'days')/365));
 		for(var i = 0; i<years;i++) {
 			result.push({
-				year: i+1, 
-				from: moment(first).add(i, 'years'), 
-				to: moment(first).add(i+1, 'years').add(-1,'days'), 
+				year: i+1,
+				from: moment(first).add(i, 'years'),
+				to: moment(first).add(i+1, 'years').add(-1,'days'),
 				rates: []});
 		}
 
-        // iterate all contracts and push contracts in
-        // right year and right intest rate array
+		// iterate all contracts and push contracts in
+		// right year and right intest rate array
 		users.forEach(function(user) {
 			user.contracts.forEach(function(contract) {
 				var year;
@@ -97,14 +98,14 @@ exports.getGermanContractsByYearAndInterestRate = function() {
 						if (rates[i].interest_rate === rate) {
 							found = i;
 						}
-					};
+					}
 					return found;
 				};
 
 				// see if rate already exists and push it if not
 				var rateIndex = findRate(result[year].rates, rate);
 				if (rateIndex === -1) {
-					result[year].rates.push({interest_rate: rate, total_amount: 0, contracts : []});					
+					result[year].rates.push({interest_rate: rate, total_amount: 0, contracts : []});
 					rateIndex = result[year].rates.length-1;
 				}
 
@@ -113,8 +114,8 @@ exports.getGermanContractsByYearAndInterestRate = function() {
 				contract.user=user;
 				result[year].rates[rateIndex].contracts.push(contract);
 			});
-		});		
-		
+		});
+
 		return result;
 
 	});
@@ -151,7 +152,7 @@ exports.getNumbers = function() {
 				contractAmount: 0,
 				deposits: 0,
 				withdrawals: 0,
-				notReclaimed: 0,				
+				notReclaimed: 0,
 				outstandingAmount: 0,
 				interestToDate : 0,
 				avgAmount : 0,
@@ -199,8 +200,8 @@ exports.getNumbers = function() {
 	var now = moment();
 
 	return models.user.findAll({
-		  where: { administrator: {[Op.not]: '1'}},
-		  include:{
+			where: { administrator: {[Op.not]: '1'}},
+			include:{
 				model: models.contract,
 				as: 'contracts',
 				include : {
@@ -238,7 +239,7 @@ exports.getNumbers = function() {
 							withdrawals += transaction.amount;
 							if (transaction.type === 'notreclaimed') {
 								notReclaimed += transaction.amount;
-							}							
+							}
 						}
 
 						// last month statistics
@@ -282,7 +283,7 @@ exports.getNumbers = function() {
 						numbers.cancelled.deposits += deposits;
 						numbers.cancelled.withdrawals -= withdrawals - notReclaimed;
 						numbers.cancelled.notReclaimed -= notReclaimed;
-						numbers.cancelled.interestPaid -= deposits + withdrawals - notReclaimed;	
+						numbers.cancelled.interestPaid -= deposits + withdrawals - notReclaimed;
 						if (lastTransaction && contract.termination_date && (!contract.termination_type || contract.termination_type == "T")) {
 							var daysToRepay = moment(lastTransaction).diff(moment(contract.termination_date), 'days');
 							if (daysToRepay > 0) {
@@ -317,7 +318,7 @@ exports.getNumbers = function() {
 						numbers.total.outstandingAmount += deposits + withdrawals + interest;
 						numbers.total.interestToDate += interest;
 					}
-					
+
 					if(numbers.byRelationship[user.relationhip]) {
 						numbers.byRelationship[user.relationship] += contract.amount;
 					} else {
@@ -381,11 +382,6 @@ exports.getNumbers = function() {
 		numbers.running.avgAmount = numbers.running.contractAmount / numbers.running.count;
 
 		numbers.cancelled.avgDaysToRepay = numbers.cancelled.avgDaysToRepay / numbers.cancelled.avgDaysToRepayCount;
-		
-/*		generatePieChart(numbers.byRelationship, function(chart) {
-			numbers.charts.byRelationship = chart;
-		});*/
-
 		return numbers;
 	});
 
