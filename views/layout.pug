@@ -9,7 +9,7 @@ html
     link(rel="stylesheet" href="/public/datatables/dataTables.bootstrap4.min.css")
     link(rel="stylesheet" href="/public/datatables/responsive.bootstrap4.min.css")
 
-    link(rel="stylesheet" href="/public/css/main.css")
+    link(rel="stylesheet" href="/public/css/" + (settings.project.get('theme')||red) + ".css")
     link(rel="stylesheet" href="/public/datepicker/bootstrap-datepicker.min.css")
     
     link(rel="stylesheet" href="/public/chart.js/Chart.min.css")
@@ -75,16 +75,14 @@ html
             span.fa.fa-download
             span  Dateien      
         +nav_item( "/procrastinate") #[span.fa.fa-clock]
-      .row
-        .col-xl-8.mx-auto(id="root-container")    
-          .col-md-12
-            if error && error.length > 0
-              include partials/error
+      .col-xl-12.col-lg-12.mx-auto(id="root-container")              
+          if error && error.length > 0
+            include partials/error
 
-            if success && success.length > 0
-              include partials/success       
+          if success && success.length > 0
+            include partials/success       
 
-            block content
+          block content
 
     if currentUser && currentUser.administrator
 

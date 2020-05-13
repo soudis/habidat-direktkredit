@@ -10,7 +10,7 @@ upload
 templates
 public/files
 public/images
-public/css/main.css
+public/css/*.css
 docker-compose.yml
 
 # Compiled source #

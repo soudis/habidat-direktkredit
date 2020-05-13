@@ -2,7 +2,7 @@ include ../transaction/transaction
 
 mixin contract(contract)
   - interest = contract.calculateInterest()
-  .col-md-6(id="contract_" + contract.id)
+  .col-md-12(id="contract_" + contract.id)
     .card
       .card-header
         .row
@@ -24,52 +24,53 @@ mixin contract(contract)
         table.table
           tbody
             tr
-              td.label Betrag (Vertrag)
+              td.label: b Betrag (Vertrag)
               td= format.formatMoney(contract.amount)
             tr
-              td Zinssatz
+              td: b Zinssatz
               td= format.formatPercent(contract.interest_rate,3)                        
             tr
-              td Status
+              td: b Status
               td= contract.getStatus()
-            tr
-              td Einzahlungen
-              td= format.formatMoney(contract.getDepositAmount())
-            tr
-              td Auszahlungen
-              td= format.formatMoney(contract.getWithdrawalAmount())
-            tr
-              td Zinsen bis heute
-              td= format.formatMoney(interest.now)
-            tr
-              td Aushaftender Betrag
-              td= format.formatMoney(contract.getAmountToDate( moment()))    
-            tr
-              td Kündigungsart
+            tr.divider
+              td: b Kündigungsart
               td= contract.getTerminationTypeFullString()
             if contract.termination_type == "T"
               if (contract.termination_date)
                 tr
-                  td Kündigungsdatum
+                  td: b Kündigungsdatum
                   td= moment(contract.termination_date).format('DD.MM.YYYY')
                 tr
-                  td Rückzahlungsfrist
+                  td: b Rückzahlungsfrist
                   td= moment(contract.getPaybackDate()).format('DD.MM.YYYY')
               else
                 tr
-                  td Kündigungsdatum
-                  td nicht gekündigt
+                  td: b Kündigungsdatum
+                  td: i.text-secondary nicht gekündigt
             else if contract.termination_type=="D"
               tr
-                td Rückzahlungsdatum
+                td: b Rückzahlungsdatum
                 td= moment(contract.getPaybackDate()).format('DD.MM.YYYY')
             else if contract.termination_type=="P"
               tr
-                td Ende der Laufzeit:
-                td= moment(contract.getPaybackDate()).format('DD.MM.YYYY')
+                td: b Ende der Laufzeit:
+                td= moment(contract.getPaybackDate()).format('DD.MM.YYYY')              
+            tr.divider
+              td: b Einzahlungen
+              td= format.formatMoney(contract.getDepositAmount())
             tr
-              td Notizen
-              td!= contract.notes.replace("\n", '<br/>')
+              td: b Auszahlungen
+              td= format.formatMoney(contract.getWithdrawalAmount())
+            tr
+              td: b Zinsen bis heute
+              td= format.formatMoney(interest.now)
+            tr
+              td: b Aushaftender Betrag
+              td= format.formatMoney(contract.getAmountToDate( moment()))    
+            if (contract.notes && contract.notes.trim() !== '')      
+              tr.divider
+                td: b Notizen
+                td!= contract.notes.replace("\n", '<br/>')
         table.table
           thead
             tr

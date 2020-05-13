@@ -35,8 +35,8 @@ const set = function(path, value, overwrite = true, overwriteNull = false) {
 const get = function(path) {
 	cursor = this;
 	if (path) {
-		for (var i=0, pathSplitted=path.split('.'), len=path.length; i<len; i++){
-			cursor = cursor[pathSplitted[i]];
+		for (var i=0, path=path.split('.'), len=path.length; i<len; i++){
+			cursor = cursor[path[i]];
 		}
 	}
 	return cursor;
@@ -98,6 +98,7 @@ const initProject = () => {
 	project.set('logo',                                 process.env.HABIDAT_DK_PROJECT_LOGO, false);
 	project.set('email',                                process.env.HABIDAT_DK_PROJECT_EMAIL, false);
 	project.set('url',                                  process.env.HABIDAT_DK_PROJECT_URL, false);
+	project.set('theme',                                process.env.HABIDAT_DK_PROJECT_THEME || 'red', false);
 	project.set('defaults.interest_method',             process.env.HABIDAT_DK_PROJECT_DEFAULTS_INTEREST_METHOD, false);
 	project.set('defaults.termination_type',            process.env.HABIDAT_DK_PROJECT_DEFAULTS_TERMINATION_TYPE, false);
 	project.set('defaults.termination_period',          process.env.HABIDAT_DK_PROJECT_DEFAULTS_TERMINATION_PERIOD, false);

@@ -33,6 +33,13 @@ block content
                   b=_t('project_url')
                 td.col-md-8.h6= settings.project.get('url')
               tr
+                td.col-md-4.h6 
+                  b=_t('theme')
+                td.col-md-8.h6
+                  span.fa.fa-square-full.text-primary
+                  span  
+                  span= _t(settings.project.get('theme'))
+              tr
                 td.col-md-3.h6 
                   b Standardwerte / Voreinstellungen:
                 td.col-md-9.h6

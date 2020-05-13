@@ -1,7 +1,7 @@
 include ./contract
 .row
   .col-md-12
-    .card
+    .card.no-shadow
       h4.card-header 
         span Direktkredite
         span.float-right
@@ -10,6 +10,6 @@ include ./contract
       .card-body
         #contracts_container.row
           if (user.contracts.length == 0)
-            .col-md-12 Keine Direktkredite vorhanden
+            .col-md-12.empty-container-message Keine Direktkredite vorhanden
           each contract in user.contracts
             +contract(contract)

@@ -1,5 +1,6 @@
+
 $theme-colors: (
-  "primary": rgb(164, 0, 35)
+  "primary": $primary-color
 );
 
 $custom-file-text: (
@@ -25,7 +26,7 @@ body {
 }
 
 a {
-  color: #00B7FF;
+  color: $link-color;
 }
 
 .row.no-gutter {
@@ -49,8 +50,8 @@ h4.underline {
 }
 
 .navbar-default {
-  background-color: #a40023;
-  border-color: #a40023;
+  background-color: $primary-color;
+  border-color: $primary-color;
   border-radius: 0px;
 }
 .navbar-default .navbar-brand {
@@ -74,20 +75,20 @@ h4.underline {
 .navbar-default .navbar-nav > .active > a:hover,
 .navbar-default .navbar-nav > .active > a:focus {
   color: #ecdbff;
-  background-color: #e50031;
+  background-color: $primary-light;
 }
 .navbar-default .navbar-nav > .open > a,
 .navbar-default .navbar-nav > .open > a:hover,
 .navbar-default .navbar-nav > .open > a:focus {
   color: #ecdbff;
-  background-color: #e50031;
+  background-color: $primary-light;
 }
 .navbar-default .navbar-toggle {
-  border-color: #e50031;
+  border-color: $primary-light;
 }
 .navbar-default .navbar-toggle:hover,
 .navbar-default .navbar-toggle:focus {
-  background-color: #e50031;
+  background-color: $primary-light;
 }
 .navbar-default .navbar-toggle .icon-bar {
   background-color: #ecf0f1;
@@ -115,7 +116,7 @@ h4.underline {
   .navbar-default .navbar-nav .open .dropdown-menu > .active > a:hover,
   .navbar-default .navbar-nav .open .dropdown-menu > .active > a:focus {
     color: #ecdbff;
-    background-color: #e50031;
+    background-color: $primary-light;
   }
 }
 
@@ -132,13 +133,34 @@ h4.underline {
   margin-top: 20px;
 }
 
+@media (min-width: 1500px) {
+  #root-container {
+    flex: 0 0 83.33333%;
+    max-width: 83.33333%;
+  }
+}
+
+@media (min-width: 2000px) {
+  #root-container {
+    flex: 0 0 73.33333%;
+    max-width: 73.33333%;
+  }
+}
+
+@media (min-width: 3000px) {
+  #root-container {
+    flex: 0 0 63.33333%;
+    max-width: 63.33333%;
+  }
+}
+
 .jumbotron {
 
     padding: 1.5rem 0rem;
     margin-bottom: 2rem;
     background-color: inherit;
     border-radius: 0.3rem;
-    border-bottom: 1px dashed rgb(164, 0, 35);
+    border-bottom: 1px dashed $primary-color;
 
 }
 
@@ -146,14 +168,23 @@ h4.underline {
     border-top: 0px;
 }
 
+
 .details-control:hover {
   cursor: pointer;
+}
+
+.empty-container-message:not(:only-child) {
+  display: none;
 }
 
 .card-body .table td {
     padding: 0.25rem 0.75rem 0.25rem 0.75rem;
     vertical-align: middle;
     border-top: 1px solid #dee2e6;
+}
+.card-body .table tr.divider > td {
+  padding: 1rem 0.75rem 0.25rem 0.75rem;
+  border-top: 0px;
 }
 
 .card-body .table tbody tr:first-child td {
@@ -168,6 +199,10 @@ h4.underline {
   margin-bottom: 20px;
 }
 
+.card div:last-child > .card {
+  margin-bottom: 0px;
+}
+
 tr.margin {
   margin-top: 10px;
 }
@@ -176,19 +211,16 @@ table.margin-top {
   margin-top: 30px;
 }
 
+.card:not(.no-shadow) {
+  border-color: rgba(0,0,0,0.4);
+}
 
-.card {
+.card:not(.no-shadow) {
     box-shadow: 2px 4px 10px 4px rgba(0,0,0,0.1);
 }
 
-
-.card .card {
-    border: 1px solid rgba(0, 0, 0, 0.225);
-    box-shadow: 2px 4px 10px 4px rgba(0,0,0,0.3);
-}
-
-.card.active {
-  box-shadow: 2px 4px 10px 2px rgba(0, 100, 0,0.5);
+.card.active:not(.no-shadow) {
+  box-shadow: 2px 2px 6px 2px rgba(0, 100, 0,0.3);
   border: 1px solid rgba(0, 100, 0,0.5);
 }
 
@@ -207,8 +239,6 @@ table.margin-top {
 .section-actions {
   white-space:nowrap;
 }
-
-
 
 #sidebar {
   box-shadow: 2px 4px 10px 4px rgba(0,0,0,0.1);
@@ -295,7 +325,7 @@ table.margin-top {
   position: relative;
   top: 48%;
   left: 3px;
-  color: rgb(164, 0, 35);
+  color: $primary-color;
 }
 
 #sidebar .sidebar-closer {
@@ -332,7 +362,7 @@ table.margin-top {
 }
 
 .btn-light span.fa, .details-control span.fa {
-  color: rgb(164, 0, 35);
+  color: $primary-color;
 }
 
 
@@ -354,7 +384,7 @@ table.margin-top {
 }
 
 .project-card:hover {
-    box-shadow: 2px 4px 10px 4px rgba(164, 0, 35,0.3);
+    box-shadow: 2px 4px 10px 4px $primary-color;
 }
 
 a.project-link:hover {
@@ -399,7 +429,7 @@ table.dataTable.dtr-column > tbody > tr > td.control::before, table.dataTable.dt
   content: "\f0da";
   border-radius: 0.2rem;
   width: max-content;
-  color: rgba(164, 0, 35, 1);
+  color: $primary-color;
 }
 
 table.dataTable.dtr-column > tbody > tr.parent td.control::before, table.dataTable.dtr-column > tbody > tr.parent th.control::before {
@@ -427,7 +457,7 @@ div.dataTables_wrapper div.dataTables_filter input {
 
 div.dataTables_wrapper div.dataTables_filter .input-group-text,  div.dataTables_wrapper div.dataTables_length .input-group-text{
   background-color: transparent;
-  color: rgba(164, 0, 35,1);
+  color: $primary-color;
 }
 
 td.squeeze-left {
@@ -496,7 +526,8 @@ input.number-filter {
 }
 
 .slider-handle {
-    background-image: linear-gradient(to bottom, rgb(164, 0, 35), rgb(144, 0, 25));
+    background-image: linear-gradient(to bottom, $primary-color, $primary-dark);
+    box-shadow: 2px 4px 10px 4px rgba(0,0,0,0.1)
 }
 
 .slider-info {

@@ -105,6 +105,7 @@ module.exports = function(app){
 				setSetting('projectname');
 				setSetting('email');
 				setSetting('url');
+				setSetting('theme');
 				setSetting('defaults.interest_method', req.body.interest_method);
 				setSetting('defaults.termination_type', req.body.termination_type);
 				setSetting('defaults.termination_period', req.body.termination_period);

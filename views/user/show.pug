@@ -3,9 +3,12 @@ extends ../layout
 include ../file/files
 
 block content
-  include ./show_user 
-  +files_show(user.files, 'user', user.id, addFile)  
-  include ../contract/show_contracts
+  .row
+    .col-xl-6.col-md-12
+      include ./show_user 
+      +files_show(user.files, 'user', user.id, addFile)  
+    .col-xl-6.col-md-12
+      include ../contract/show_contracts
 
   script.
     $(document).ready(function(){

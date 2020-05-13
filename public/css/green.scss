@@ -1,0 +1,7 @@
+$primary-color: rgb(30, 126, 52);
+$primary-dark: darken($primary-color,10);
+$primary-light: lighten($primary-color,10);
+$highlight-color: rgba(0, 100, 0,0.3);
+$link-color: rgb(0, 183, 255);
+
+@import "./main.scss"
