@@ -315,6 +315,21 @@ module.exports = function(app){
 		return row;
 	};
 
+
+	router.get('/user/loginas/:id', security.isLoggedInAdmin, function(req, res, next) {
+		models.user.findByPk(req.params.id)
+			.then(user => {
+				req.logIn(user, error => {
+					if (error) {
+						next(error);
+					} else {
+						res.redirect('/');
+					}
+				});
+			})
+			.catch(error => next);
+	});
+
 	router.post('/user/export', security.isLoggedInAdmin, function(req, res, next) {
 		var userIds = req.body.users.split(',');
 		var fields = req.body.fields.split(',');
