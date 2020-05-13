@@ -5,6 +5,7 @@ const fs = require('fs');
 const moment = require('moment');
 const converter = require('office-converter')();
 const json2csv = require('json2csv');
+const exceljs = require('exceljs');
 
 
 exports.render = (req, res, template, data, title = undefined) => {
@@ -55,14 +56,35 @@ exports.convertToPdf = function(file, callback){
 
 };
 
-exports.generateTransactionList = function(transactionList, outputFile){
+exports.generateTransactionList = function(transactionList){
+	return Promise.resolve()
+		.then(() => {
+			var workbook = new exceljs.Workbook();
+			workbook.creator = 'DK Plattform';
+			workbook.created = new Date();
 
-	var fieldNames = ["Nummer", "Nachname", "Vorname", "Vertragsnummer", "Vorgang", "Datum", "Betrag", "Zinssatz", "Zinsbetrag"];
-	var fieldList = ['id', 'last_name', 'first_name','contract_id', 'type', 'date', 'amount', 'interest_rate', 'interest'];
-	var csvRet;
-	json2csv({ data: transactionList, fieldNames: fieldNames, fields: fieldList }, function(err, csv) {
-		  if (err) console.log(err);
-		  csvRet = csv;
-		});
-	return csvRet;
+			var dataWorksheet = workbook.addWorksheet('Jahresliste');
+
+			var fieldNames = ["Nummer", "Nachname", "Vorname", "Vertragsnummer", "Vorgang", "Datum", "Betrag", "Zinssatz", "Zinsbetrag"];
+			var fieldList = ['id', 'last_name', 'first_name','contract_id', 'type', 'date', 'amount', 'interest_rate', 'interest'];
+
+			dataWorkSheetColumns = [];
+			fieldList.forEach((column, index) => {
+				dataWorkSheetColumns.push({header: fieldNames[index], key: column, width: 20});
+			});
+			dataWorksheet.columns = dataWorkSheetColumns;
+			transactionList.forEach(transaction => {
+				var row = [];
+				fieldList.forEach(field => {
+					if (field === 'date') {
+						row.push(transaction[field].toDate());
+					} else {
+						row.push(transaction[field]);
+					}
+
+				})
+				dataWorksheet.addRow(row);
+			});
+			return workbook;
+		})
 };

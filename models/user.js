@@ -347,13 +347,10 @@ module.exports = (sequelize, DataTypes) => {
 							contract_id: contract.id,
 							interest_rate: contract.interest_rate,
 							date: moment(transaction.transaction_date),
-							type: "Zahlung",
+							type: transaction.getTypeText(),
 							amount: transaction.amount,
 							interest: ""
 						};
-						if (transaction.type === 'notreclaimed') {
-							trans.type = "Nicht rückgefordert";
-						}
 						transactionList.push(trans);
 						sums.transactions++;
 						lastTransaction = transaction.transaction_date;
@@ -375,7 +372,7 @@ module.exports = (sequelize, DataTypes) => {
 						contract_id: contract.id,
 						interest_rate: contract.interest_rate,
 						date: firstDayNextYear,
-						type: 'Kontostand',
+						type: 'Kontostand Jahresende',
 						amount: sums.end.amount + sums.end.interest,
 						interest: sums.end.interest
 					};
@@ -389,7 +386,7 @@ module.exports = (sequelize, DataTypes) => {
 						contract_id: contract.id,
 						interest_rate: contract.interest_rate,
 						date: firstDay,
-						type: 'Kontostand',
+						type: 'Kontostand Jahresbeginn',
 						amount: sums.begin.amount + sums.begin.interest,
 						interest: sums.begin.interest
 					};
@@ -404,7 +401,7 @@ module.exports = (sequelize, DataTypes) => {
 					interest_rate: contract.interest_rate,
 					date: (contract.isTerminated(firstDayNextYear)&&lastTransaction?moment(lastTransaction):moment(firstDayNextYear).subtract(1, 'days')),
 					type: 'Zinsertrag ' + year,
-					amount: sums.end.interest - sums.begin.interest,
+					amount: Math.round((sums.end.interest - sums.begin.interest) * 100)/100,
 					interest: ""
 				};
 				transactionList.push(interest);

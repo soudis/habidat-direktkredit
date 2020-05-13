@@ -7,6 +7,7 @@ const router = require('express').Router();
 const models  = require('../models');
 const format = require('../utils/format');
 const settings = require('../utils/settings');
+const Op = require("sequelize").Op;
 
 module.exports = function(app){
 
@@ -212,47 +213,40 @@ module.exports = function(app){
 	});
 
 
-	router.post('/statistics/transactionList', security.isLoggedInAdmin, function(req, res) {
-		models.user.findAll({
-			include:{
-				model: models.contract,
-				as: 'contracts',
-				include : {
-					model: models.transaction,
-					as: 'transactions'
-				}
-			}
-		}).then(function(users) {
-			var transactionList = [];
-			users.forEach(function(user) {
-				user.getTransactionList(req.body.year).forEach( function (transaction) {
-					transactionList.push(transaction);
+	router.post('/statistics/transactionList', security.isLoggedInAdmin, function(req, res, next) {
+		models.user.findFetchFull(models, { administrator: {[Op.not]: '1'}})
+			.then(users => {
+				var transactionList = [];
+				users.forEach(function(user) {
+					user.getTransactionList(req.body.year).forEach( function (transaction) {
+						transactionList.push(transaction);
+					});
 				});
-			});
-			transactionList.sort(function(a,b) {
-				if (a.date.diff(b.date) > 0)
-					return 1;
-				else if(b.date.diff(a.date) > 0)
-					return -1;
-				else {
-					var comp = new String(a.last_name).localeCompare(b.last_name);
-					if (comp === 0)	{
-						return new String(a.first_name).localeCompare(b.first_name);
-					} else {
-						return comp;
+				transactionList.sort(function(a,b) {
+					if (a.date.diff(b.date) > 0)
+						return 1;
+					else if(b.date.diff(a.date) > 0)
+						return -1;
+					else {
+						var comp = new String(a.last_name).localeCompare(b.last_name);
+						if (comp === 0)	{
+							return new String(a.first_name).localeCompare(b.first_name);
+						} else {
+							return comp;
+						}
 					}
-				}
-			});
-			var filename = "./tmp/Jahresliste_"+ req.body.year +".csv";
-			file = utils.generateTransactionList(transactionList, filename);
+				});
 
-			res.setHeader('Content-Length', (new Buffer(file)).length);
-			res.setHeader('Content-Type', 'text/csv');
-			res.setHeader('Content-Disposition', 'inline; filename=Jahresliste_'+ req.body.year +'.csv');
-			res.write(file);
-			res.end();
-
-		});
+				return transactionList;
+			})
+			.then(transactionList => utils.generateTransactionList(transactionList))
+			.then(workbook => {
+				res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+				res.setHeader('Content-Disposition', 'attachment; filename=Jahresliste_'+ req.body.year +'.xlsx');
+				return workbook.xlsx.write(res)
+					.then(() => res.end());
+			})
+			.catch(error => next)
 	});
 
 	router.get('/statistics/german', security.isLoggedInAdmin, function(req, res, next) {
