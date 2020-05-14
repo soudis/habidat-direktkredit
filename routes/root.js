@@ -10,6 +10,10 @@ const email = require('../utils/email');
 
 module.exports = function(app){
 
+	router.get('/projectconfig', function(req, res, next) {
+		var project = settings.project.get(undefined);
+		res.json(project);
+	});
 
 	/* Welcome Site */
 	router.get('/', security.isLoggedInAdmin, function(req, res, next) {
@@ -28,7 +32,6 @@ module.exports = function(app){
 	router.get('/setpassword', security.isLoggedIn, function(req, res, next) {
    		res.render('setpassword', { user: req.user, title: 'Passwort ändern', error: req.flash('error') } );
 	});
-
 
 	router.get('/getpassword/:token', function(req, res, next) {
 		models.user.findByToken(req.params.token)
