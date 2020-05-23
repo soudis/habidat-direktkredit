@@ -75,6 +75,14 @@ module.exports = (sequelize, DataTypes) => {
 		return "Unbekannt";
 	};
 
+	transaction.prototype.getLink = function () {
+		return `<a href="/user/show/${this.contract.user.id}#show_transaction_${this.id}">${moment(this.transaction_date).format('DD.MM.YYYY')}</a>`;
+	}
+
+	transaction.prototype.getDescriptor = function (models) {
+		return `Zahlung vom ${this.getLink()} für den Vertrag vom ${this.contract.getLink()} von ${this.contract.user.getLink()}`;
+	};
+
 	transaction.prototype.interestToDate = function (rate, toDate) {
 		if (rate > 0 && moment(toDate).diff(this.transaction_date) >= 0) {
 			var method = settings.project.get('defaults.interest_method') || '365_compound';

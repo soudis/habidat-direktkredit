@@ -6,6 +6,7 @@ const Sequelize 	= require("sequelize");
 const env       	= process.env.NODE_ENV || "database";
 const settings  	= require('../utils/settings');
 const Umzug 		= require('umzug');
+const tracker       = require('../utils/tracker');
 
 var createdb = function() {
 
@@ -74,6 +75,7 @@ var createdb = function() {
 		if ("associate" in db[modelName]) {
 			db[modelName].associate(db);
 		}
+		db[modelName + 'Log'] = tracker(db[modelName], sequelize, {userModel: db.user, persistant: true,  changes: ['update', 'create', 'delete']});
 	});
 
 	// return models as object
@@ -82,4 +84,5 @@ var createdb = function() {
 };
 
 module.exports = createdb();
+
 

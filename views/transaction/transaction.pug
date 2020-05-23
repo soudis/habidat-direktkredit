@@ -3,8 +3,9 @@ mixin transaction(contract, transaction)
     td= moment(transaction.transaction_date).format('DD.MM.YYYY')
     td= transaction.getTypeText()
     td.text-right= format.formatMoney(transaction.amount)
-    td.text-right
-      a.btn.btn-light.btn-sm.sidebar-action(href='/transaction/edit/'+transaction.id)
-        span.fa.fa-edit
-      a.btn.btn-light.btn-sm.confirm-action(data-update-tag="contract_"+contract.id data-link='/transaction/delete/'+transaction.id, data-confirmtext='Willst du die Zahlung von ' + sprintf('%.2f', contract.amount) +  ' EUR vom ' + moment(transaction.transaction_date).format('DD.MM.YYYY') + ' wirklich löschen?')   
-        span.fa.fa-trash
+    if admin
+      td.text-right
+        a.btn.btn-light.btn-sm.sidebar-action(href='/transaction/edit/'+transaction.id)
+          span.fa.fa-edit
+        a.btn.btn-light.btn-sm.confirm-action(data-update-tag="contract_"+contract.id data-link='/transaction/delete/'+transaction.id, data-confirmtext='Willst du die Zahlung von ' + sprintf('%.2f', contract.amount) +  ' EUR vom ' + moment(transaction.transaction_date).format('DD.MM.YYYY') + ' wirklich löschen?')   
+          span.fa.fa-trash

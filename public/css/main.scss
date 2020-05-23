@@ -3,6 +3,8 @@ $theme-colors: (
   "primary": $primary-color
 );
 
+$primary-glow: change-color($primary-color, $alpha: 0.2);
+
 $custom-file-text: (
   de: "Durchsuchen",
   en: "Browse",
@@ -39,6 +41,10 @@ tr td.fit{
   white-space:nowrap;
   padding-top: 0.25rem;
   padding-bottom: 0.25rem;
+}
+
+tr td.slim{
+  width: 1%;
 }
 
 h3.underline {
@@ -224,6 +230,14 @@ table.margin-top {
   border: 1px solid rgba(0, 100, 0,0.5);
 }
 
+tr.active > td:first-child:before {
+    content: "\f30b";
+    padding-right: 10px;
+    color: rgb(0, 100, 0);
+    font-family: 'Font Awesome 5 Free';
+    font-weight: 900;
+}
+
 .btn-light {
   background-color: inherit;
 }
@@ -383,7 +397,7 @@ table.margin-top {
 }
 
 .project-card:hover {
-    box-shadow: 2px 4px 10px 4px $primary-color;
+    box-shadow: 2px 4px 10px 4px $primary-glow;
 }
 
 a.project-link:hover {
@@ -531,4 +545,12 @@ input.number-filter {
 
 .slider-info {
   padding-top: 8px;
+}
+
+#details-table tr.shown + tr td, #details-table tr.shown + tr th {
+  background-color: white;
+}
+
+.file-list {
+  margin-top: 30px;
 }

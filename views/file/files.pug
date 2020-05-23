@@ -14,7 +14,7 @@ mixin files_show(files, type, id, addFile)
                 tr
                   td Keine Dateien hochgeladen
               each file in files
-                tr
+                tr(id='file_' + file.id)
                   td.col-md-4 
                     a(href='/file/get/' + file.id).btn.btn-sm.btn-light
                       span.fa.fa-download

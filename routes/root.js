@@ -52,7 +52,7 @@ module.exports = function(app){
 			req.flash('error', 'Passwörter müssen übereinstimmen');
 			res.redirect('/getpassword/' + req.body.token);
 		} else {
-			models.user.update({ password: req.body.password, passwordHashed: req.body.password, passwordResetToken: null, passwordResetExpires: null }, {where: { id:req.body.id } })
+			models.user.update({ password: req.body.password, passwordHashed: req.body.password, passwordResetToken: null, passwordResetExpires: null }, {where: { id:req.body.id }, trackOptions: utils.getTrackOptions(true) })
 				.then(() => {
 					if (req.body.token) {
 						req.flash('success', 'Dein Passwort wurde gesetzt, logge dich jetzt ein');

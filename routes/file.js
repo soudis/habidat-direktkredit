@@ -53,7 +53,7 @@ module.exports = function(app){
 		models.file.findByPk(req.params.id)
 			.then(function(file) {
 				fs.unlinkSync(file.path);
-				file.destroy();
+				file.destroy({trackOptions: utils.getTrackOptions(req.user, true)});
 				return models.file.getFilesFor('user', file.ref_id)
 					.then(files => utils.render(req,res,'file/show', {files: files, type: 'user', id: req.params.id}));
 			})
@@ -65,7 +65,7 @@ module.exports = function(app){
 		models.file.findByPk(req.params.id)
 			.then(function(file) {
 				fs.unlinkSync(file.path);
-				return file.destroy();
+				return file.destroy({trackOptions: utils.getTrackOptions(req.user, true)});
 
 			})
 			.then(() => res.send({redirect: 'reload'}))
@@ -81,7 +81,7 @@ module.exports = function(app){
 				path: req.file.path,
 				ref_id: req.body.id,
 				ref_table: req.body.type
-			})
+			}, { trackOptions: utils.getTrackOptions(req.user, true) })
 			.then(() => models.file.getFilesFor('user', req.body.id))
 			.then(files => utils.render(req, res, 'file/show', {files: files, type: 'user', id: req.body.id}))
 			.catch(error => next(error));

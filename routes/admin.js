@@ -9,11 +9,15 @@ const settings = require('../utils/settings');
 const fs = require('fs');
 const multer = require('multer');
 const email = require('../utils/email');
+const moment = require('moment');
 
 module.exports = function(app){
 
 	router.get('/admin/accounts', security.isLoggedInAdmin, function(req, res, next) {
 		models.user.findFetchFull(models, {administrator: true})
+			.then(users => {
+				return users.doeesnotexist;
+			})
 			.then(users => utils.render(req, res, 'admin/admin_accounts', {accounts: users, message: req.flash('error')}, 'Administrator*innen Accounts'))
 		.catch(error => next(error));
 	});
@@ -28,7 +32,7 @@ module.exports = function(app){
 			where: {
 				id: req.params.id,
 				administrator: true
-			}
+			}, trackOptions: utils.getTrackOptions(req.user, true)
 		}).then(deleted => {
 			if(deleted > 0) {
 				res.json({redirect: '/admin/accounts'});
@@ -207,8 +211,12 @@ module.exports = function(app){
 				    return models.file.findOne({ where: { ref_table: "template_account_notification"	}})
 				    	.then(function(file) {
 							if (file && file.path) {
-								fs.unlinkSync(file.path);
-								return file.destroy();
+								try {
+									fs.unlinkSync(file.path);
+								}catch(error) {
+
+								}
+								return file.destroy({trackOptions: utils.getTrackOptions(req.user, true)});
 							} else {
 								return;
 							}
@@ -224,12 +232,37 @@ module.exports = function(app){
 							path: req.file.path,
 							ref_id: 1,
 							ref_table: type
-						}))
+						}, { trackOptions: utils.getTrackOptions(req.user, true) }))
 			.then(() => res.json({redirect: 'reload'}))
 			.catch(error => res.status(500).json({error: error}));
 	});
 
+	router.get('/admin/auditlog/:timeframe', security.isLoggedInAdmin, function(req,res,next) {
+			var where = {
+			    timestamp: {
+      				[Op.gte]: moment().subtract(req.params.timeframe.substr(0,req.params.timeframe.length-1), req.params.timeframe.substr(req.params.timeframe.length -1, 1)).toDate()
+    			}
+			}
+		Promise.join(
+			models.userLog.findAll({where: where, include: {all:true}}),
+			models.contractLog.findAll({where: where, include: [{model: models.user, as: 'user'},{model: models.contract, as: 'target', include: {model: models.user, as: 'user'}}]} ),
+			models.transactionLog.findAll({where: where, include: [{model: models.user, as: 'user'},{model: models.transaction, as: 'target', include: {model: models.contract, as: 'contract', include: {model: models.user, as: 'user'}}}]}),
+			models.fileLog.findAll({where: where, include: [{model: models.user, as: 'user'},{model: models.file, as: 'target', include: {model: models.user, as: 'user'}}]} ),
+			function(userLog, contractLog, transactionLog, fileLog) {
+				const addType = function(list, type) {
+					list.forEach(entry => {
+						entry.type = type;
+					})
+					return list;
+				}
+				var auditLog = addType(userLog, 'user').concat(addType(contractLog, 'contract'), addType(transactionLog, 'transaction'), addType(fileLog, 'file'));
+				auditLog.sort((a,b) => {
+					return moment(a.timestamp).isAfter(moment(b.timestamp));
+				})
+	 			res.render('admin/auditlog', {timeframe: req.params.timeframe, auditLog: auditLog, title: 'Änderungsprotokoll'});
 
+			})
+	})
 	app.use('/', router);
 
 };

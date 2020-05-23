@@ -151,6 +151,8 @@ try{
 	require('./routes/communication')(app);
 	require('./routes/admin')(app);
 
+
+
 	// catch 404 and forward to error handler
 	app.use(function(req, res, next) {
 		var err = new Error('Not Found');
@@ -159,13 +161,21 @@ try{
 	});
 
 	app.use(function(err, req, res, next) {
-		res.status(err.status || 500);
-		res.render('partials/error', {
-			message: err.message,
-			error: err
-		}, (renderError, html) => {
-			res.json({html: html, error: err});
-		});
+		if (settings.config.get('debug')) {
+			console.log(err);
+		}
+		if (req.xhr || req.headers.accept.indexOf('json') > -1) {
+			res.status(err.status || 500);
+			res.render('partials/error', {
+				message: err.message,
+				error: err
+			}, (renderError, html) => {
+				res.json({html: html, error: err});
+			});
+		} else {
+		  res.render('error', {message: err.message, error: err, title: 'Uups..'});
+		}
+
 	});
 
 	module.exports = app;

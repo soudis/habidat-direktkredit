@@ -38,8 +38,7 @@ module.exports = function(app){
 				return req.query.file;
 			}).then((template) => {
 
-				utils.generateDocx(template, user.logon_id, data);
-				var file = fs.readFileSync("./tmp/"+ user.logon_id +".docx", 'binary');
+				var file = utils.generateDocx(template, data);
 
 				res.setHeader('Content-Length', file.length);
 				res.setHeader('Content-Type', 'application/msword');
@@ -96,15 +95,8 @@ module.exports = function(app){
 					}).catch((error) => {
 						return req.query.file;
 					}).then((template) => {
-						try{
-							utils.generateDocx(template, user.logon_id, data);
-						}catch(e) {
-							e.properties.errors.forEach(function(err) {
-							    console.log(err);
-							});
-						}
-						var file = fs.readFileSync("./tmp/"+ user.logon_id +".docx", 'binary');
-
+						var stream;
+						file = utils.generateDocx(template, data);
 						res.setHeader('Content-Length', file.length);
 						res.setHeader('Content-Type', 'application/msword');
 						res.setHeader('Content-Disposition', 'inline; filename=' + user.logon_id + '_' + contract.id + '.docx');

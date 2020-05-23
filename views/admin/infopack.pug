@@ -20,7 +20,7 @@ mixin group(title, files, type)
             tr
               td(colspan="3") Keine Dateien vorhanden              
           each file in files
-            tr
+            tr(id="file_"+file.id)
               td.col-md-6
                 a(href='/file/get/' + file.id).btn.btn-sm.btn-light
                   span.fa.fa-download
@@ -38,3 +38,10 @@ block content
     p.lead Hier können Dateien hochgeladen werden, die Kreditgeber*innen nach dem Login zum Download zur Verfügung stehen, z.B. aktuelle Jahresabschlüsse, rechtliche Informationsdokumente oder sonstige Updates aus deinem Projekt.
   each group, group_id in groups
     +group(group.title, group.files, 'infopack_' + group_id)
+  script.
+    $(document).ready(function(){
+      var hash = $(location).attr('hash');
+      if (hash.includes ('file_')) {
+        $('#'+hash.substring(hash.indexOf('file_'))).addClass('active').parents('.card').addClass('active');
+      }
+    })

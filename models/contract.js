@@ -192,6 +192,13 @@ module.exports = (sequelize, DataTypes) => {
 		return "Unbekannt";
 	};
 
+	contract.prototype.getLink = function () {
+		return `<a href="/user/show/${this.user.id}#show_contract_${this.id}">${moment(this.sign_date).format('DD.MM.YYYY')}</a>`;
+	}
+
+	contract.prototype.getDescriptor = function (models) {
+		return `Vertrag vom ${this.getLink()} von ${this.user.getLink()}`;
+	};
 
 	contract.prototype.sortTransactions = function () {
 		this.transactions.sort(function(a,b) {

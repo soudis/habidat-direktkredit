@@ -1,19 +1,31 @@
 extends ../layout
 
 include ../file/files
+include ../contract/contract
+include user
 
 block content
   .row
     .col-xl-6.col-md-12
-      include ./show_user 
+      .row
+        .col-md-12
+          +user(user, templates_user, true)
       +files_show(user.files, 'user', user.id, addFile)  
     .col-xl-6.col-md-12
-      include ../contract/show_contracts
+      +contracts(user, templates_contract, true)
 
   script.
     $(document).ready(function(){
       var hash = $(location).attr('hash');
-      $('#'+hash.substring(hash.indexOf('contract_'))).children('.card').addClass('active');
+      if (hash.includes ('contract_')) {
+        $('#'+hash.substring(hash.indexOf('contract_'))).children('.card').addClass('active');
+      } else if (hash.includes ('transaction_')) {
+        $('#'+hash.substring(hash.indexOf('transaction_'))).addClass('active').parents('.card').addClass('active');
+      } else if (hash.includes ('file_')) {
+        $('#'+hash.substring(hash.indexOf('file_'))).addClass('active').parents('.card').addClass('active');
+      }
+
+      
     })
 
               

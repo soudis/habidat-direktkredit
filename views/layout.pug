@@ -67,6 +67,9 @@ html
             +dd_item( "/admin/infopack" ) 
               span.fa.fa-file-download
               span  Unterlagen für Kreditgeber*innen     
+          +nav_item( "/admin/auditlog/30d" )
+            span.fa.fa-history
+            span  Logbuch              
         else if currentUser
           +nav_item( "profile" ) 
             span.fa.fa-info

@@ -26,13 +26,12 @@ module.exports = function(app){
 	});
 
 	router.post('/transaction/add', security.isLoggedInAdmin, multer().none(), function(req, res, next) {
-		console.log("contract_id: " + req.body.contract_id);
 		models.transaction.create({
-				transaction_date: moment(req.body.transaction_date),
+				transaction_date: moment(req.body.transaction_date).format('YYYY-MM-DD'),
 				amount: req.body.amount,
 				type: req.body.type,
 				contract_id: req.body.contract_id
-			})
+			}, { trackOptions: utils.getTrackOptions(req.user, true) })
 			.then(() => models.contract.findByIdFetchFull(models, req.body.contract_id))
 			.then(contract => {
 				return models.file.getContractTemplates()
@@ -44,9 +43,9 @@ module.exports = function(app){
 	router.post('/transaction/edit', security.isLoggedInAdmin, multer().none(), function(req, res, next) {
 		models.transaction.update({
 				transaction_date: moment(req.body.transaction_date),
-				amount: req.body.amount,
+				amount: parseFloat(req.body.amount),
 				type: req.body.type
-			}, {where:{id:req.body.id}})
+			}, {where:{id:req.body.id}, trackOptions: utils.getTrackOptions(req.user, true)})
 			.then(() => models.contract.findByIdFetchFull(models, req.body.contract_id))
 			.then(contract => {
 				return models.file.getContractTemplates()
@@ -59,7 +58,7 @@ module.exports = function(app){
 	router.get('/transaction/delete/:id', security.isLoggedInAdmin, function(req, res, next) {
 		models.transaction.findByPk( req.params.id)
 			.then(transaction =>  {
-				transaction.destroy()
+				transaction.destroy({trackOptions: utils.getTrackOptions(req.user, true)})
 					.then(() => models.contract.findByIdFetchFull(models, transaction.contract_id))
 					.then(contract => {
 						return models.file.getContractTemplates()

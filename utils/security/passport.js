@@ -5,7 +5,7 @@ const fs = require('fs');
 const settings = require('../../utils/settings');
 const LDAPStrategy = require('passport-ldapauth');
 const models  = require('../../models');
-
+const utils = require('..');
 var log_file = fs.createWriteStream(__dirname + '/../../log/access.log', {flags : 'a'});
 
 // load all the things we need
@@ -33,26 +33,11 @@ module.exports = function(passport) {
 
     // used to deserialize the user
     passport.deserializeUser(function(sessionUser, done) {
-    	if (sessionUser.dn) {
-    		if (!sessionUser.id && sessionUser.project) {
-    			models.user.find({
-    				where : {
-    					logon_id: sessionUser.cn
-    				}
-    			}).then( function(user) {
-    				sessionUser.id = user.id;
-    				done(null, sessionUser);
-    			});
-    		} else {
-    			done(null, sessionUser);
-    		}
-    	} else if (sessionUser.project){
-    		models.user.findByPk(sessionUser.id).then( function(user) {
-    			done(null, user);
-    		});
-    	} else {
-    		done(null, sessionUser);
-    	}
+
+		models.user.findByPk(sessionUser.id).then( function(user) {
+			done(null, user);
+		});
+
     });
 
     // =========================================================================
@@ -71,7 +56,6 @@ module.exports = function(passport) {
 
 		// find a user whose email is the same as the forms email
 		// we are checking to see if the user trying to login already exists
-		console.log('try to logon');
 		models.user.findOne({where: Sequelize.or({logon_id: userid}, {email: userid})}).then( function( user) {
 
 			// if no user is found, return the message
@@ -91,8 +75,7 @@ module.exports = function(passport) {
 					lastLogin: user.lastLogin,
 					loginCount: user.loginCount
 				}, {
-					where: { id: user.id }
-				})
+					where: { id: user.id }, trackOptions: utils.getTrackOptions(user, false) })
 				.then(() => {
 					done(null, user);
 				});
@@ -127,7 +110,7 @@ module.exports = function(passport) {
 								lastLogin: user.lastLogin,
 								loginCount: user.loginCount
 							}, {
-								where: { id: user.id }
+								where: { id: user.id }, trackOptions: utils.getTrackOptions(user, false)
 							})
 							.then(() => {
 								done(null, user);
@@ -179,7 +162,7 @@ module.exports = function(passport) {
 					lastLogin: user.lastLogin,
 					loginCount: user.loginCount
 				}, {
-					where: { id: user.id }
+					where: { id: user.id }, trackOptions: utils.getTrackOptions(user, false)
 				})
 				.then(() => {
 					done(null, user);

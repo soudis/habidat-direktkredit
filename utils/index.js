@@ -3,7 +3,7 @@ const DocxGen = require('docxtemplater');
 const JSZipUtils = require('jszip');
 const fs = require('fs');
 const moment = require('moment');
-const converter = require('office-converter')();
+const converter = require('libreoffice-convert');
 const json2csv = require('json2csv');
 const exceljs = require('exceljs');
 
@@ -29,7 +29,11 @@ exports.renderToText = (req, res, template, data, title = undefined) => {
 	});
 };
 
-exports.generateDocx = function(templateFile, outputFile, data){
+exports.getTrackOptions = function(user, track) {
+	return{ track: track, user_id: user.id };
+}
+
+exports.generateDocx = function(templateFile, data){
 	var path = templateFile;
 	var file = fs.readFileSync(path, 'binary');
 	var zip = new JSZipUtils(file);
@@ -37,22 +41,20 @@ exports.generateDocx = function(templateFile, outputFile, data){
 	doc.loadZip(zip);
 	doc.setData(data);
 	doc.render();
-	var out=doc.getZip().generate({type:"nodebuffer"});
-	fs.writeFileSync("./tmp/"+ outputFile +".docx", out);
-	console.log("done");
+	return doc.getZip().generate({type:"nodebuffer"});
 };
 
-exports.convertToPdf = function(file, callback){
+exports.convertToPdf = function(stream){
 
-	converter.generatePdf('./tmp/' + file + '.docx', function(err, result) {
-		// Process result if no error
-		if (result && result.status === 0) {
-		  console.log('Output File located at ' + result.outputFile);
-		  callback(null);
-		} else {
-		  callback('Error converting PDF: ' + err);
-		}
+	return new Promise((resolve, reject) => {
+		converter.convert(stream, '.pdf', undefined, (err, result) => {
+		    if (err) {
+		      reject(err);
+		    }
+		    resolve(result);
+		});
 	});
+
 
 };
 

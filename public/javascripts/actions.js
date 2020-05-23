@@ -24,6 +24,7 @@ const hideSidebar = () => {
 		sidebar.removeClass('shown');
 		$('#sidebar-opener').removeClass('d-none');
 		$('.card.active').removeClass('active');
+		$('tr.active').removeClass('active');
 			//sidebar.addClass('out');
 			//sidebar.addClass('d-none');
 	}

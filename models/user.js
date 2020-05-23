@@ -5,6 +5,7 @@ const clonedeep = require('lodash.clonedeep');
 const settings = require('../utils/settings');
 const bcrypt = require('bcrypt');
 const crypto = require('crypto');
+const utils = require('../utils');
 
 module.exports = (sequelize, DataTypes) => {
 	var User = sequelize.define('user', {
@@ -119,7 +120,8 @@ module.exports = (sequelize, DataTypes) => {
 			}, {
 				where: {
 					id: user.id
-				}
+				},
+				trackOptions: utils.getTrackOptions(user, false)
 			});
 		}
 	});
@@ -271,12 +273,31 @@ module.exports = (sequelize, DataTypes) => {
 		return address;
 	};
 
+	User.prototype.getOldestContract = function () {
+		var oldest;
+		this.contracts.forEach(contract => {
+			if (!oldest || moment(oldest.sign_date).isAfter(contract.sign_date)) {
+				oldest = contract;
+			}
+		})
+		return oldest;;
+	};
+
+
 	User.prototype.getFullName = function () {
 		var name = this.first_name;
 		if (this.last_name) {
 			name = this.last_name.toUpperCase() + " " + name;
 		}
 		return name;
+	};
+
+	User.prototype.getLink = function () {
+		return `<a href="/user/show/${this.id}">${this.getFullName()}</a>`
+	}
+
+	User.prototype.getDescriptor = function (models) {
+		return `Stammdaten von ${this.getLink()}`
 	};
 
 	User.prototype.comparePassword = function comparePassword(candidatePassword, cb) {

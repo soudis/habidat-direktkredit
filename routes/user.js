@@ -181,7 +181,7 @@ module.exports = function(app){
 				views.push(req.body.view);
 				user.savedViews = JSON.stringify(views);
 				req.user.savedViews = user.savedViews;
-				return user.save().then(() => {
+				return user.save({trackOptions: utils.getTrackOptions(req.user, false)}).then(() => {
 					res.send({id: views.length - 1});
 				});
 			})
@@ -200,7 +200,7 @@ module.exports = function(app){
 				views.splice(req.params.id, 1, req.body.view);
 				user.savedViews = JSON.stringify(views);
 				req.user.savedViews = user.savedViews;
-				return user.save().then(() => {
+				return user.save({trackOptions: utils.getTrackOptions(req.user, false)}).then(() => {
 					res.send({id: req.params.id});
 				});
 			})
@@ -219,7 +219,7 @@ module.exports = function(app){
 				views.splice(req.params.id, 1);
 				user.savedViews = JSON.stringify(views);
 				req.user.savedViews = user.savedViews;
-				return user.save().then(() => {
+				return user.save({trackOptions: utils.getTrackOptions(req.user, false)}).then(() => {
 					res.send({id: req.body.id});
 				});
 			})
@@ -267,13 +267,14 @@ module.exports = function(app){
 					administrator:false,
 					ldap: false,
 					relationship: req.body.relationship
-				});
+				}, { trackOptions: utils.getTrackOptions(req.user, true) });
 			})
 			.then(user => res.send({redirect : '/user/show/' + user.id}))
 			.catch(error => next(error));
 	});
 
 	router.post('/user/edit', security.isLoggedInAdmin, multer().none(), function(req, res, next) {
+		console.log(JSON.stringify(req.user));
 		models.user.update({
 				first_name: req.body.first_name,
 				last_name: req.body.last_name,
@@ -286,13 +287,13 @@ module.exports = function(app){
 				IBAN: req.body.IBAN,
 				BIC: req.body.BIC,
 				relationship: req.body.relationship
-			}, {where: { id:req.body.id } })
+			}, {where: { id:req.body.id }, trackOptions: utils.getTrackOptions(req.user, true) })
 			.then(() => res.send({redirect: 'reload'}))
 			.catch(error => next(error));
 	});
 
 	router.get('/user/delete/:id', security.isLoggedInAdmin, function(req, res, next) {
-		models.user.destroy({ where: { id: req.params.id }})
+		models.user.destroy({ where: { id: req.params.id }, trackOptions: utils.getTrackOptions(req.user, true)})
 			.then(function(deleted) {
 				if(deleted > 0) {
 				 	res.json({redirect: '/user/list'});

@@ -62,7 +62,7 @@ module.exports = function(app){
 					user_id: req.body.user_id,
 					status: req.body.status,
 					notes: req.body.notes
-				});
+				}, { trackOptions: utils.getTrackOptions(req.user, true) });
 			})
 			.then(contract => models.contract.findOne({ where : { id: contract.id }, include: [{model: models.transaction, as: "transactions"}]}))
 			.then(contract => {
@@ -73,14 +73,14 @@ module.exports = function(app){
 	});
 
 	router.post('/contract/edit', security.isLoggedInAdmin, multer().none(), function(req, res, next) {
-		console.log('conid ' + req.body.id );
+
 		return Promise.resolve()
 			.then(() => {
 				var termination_date = null;
 				if (req.body.termination_type == "T") {
-					termination_date = req.body.termination_date_T==""?null:moment(req.body.termination_date_T);
+					termination_date = req.body.termination_date_T==""?null:moment(req.body.termination_date_T).format('YYYY-MM-DD');
 				} else if (req.body.termination_type == "D") {
-					termination_date = req.body.termination_date_D==""?null:moment(req.body.termination_date_D);
+					termination_date = req.body.termination_date_D==""?null:moment(req.body.termination_date_D).format('YYYY-MM-DD');
 				}
 				var termination_period_type = null, termination_period = null;
 				if (req.body.termination_type == "T") {
@@ -91,16 +91,16 @@ module.exports = function(app){
 					termination_period = req.body.termination_period_P;
 				}
 				return models.contract.update({
-					sign_date: moment(req.body.sign_date),
+					sign_date: moment(req.body.sign_date).toDate(),
 					termination_date: termination_date,
 					termination_type: req.body.termination_type,
-					termination_period: termination_period,
+					termination_period: parseFloat(termination_period),
 					termination_period_type: termination_period_type,
-					amount: req.body.amount,
-					interest_rate: req.body.interest_rate,
+					amount: parseFloat(req.body.amount),
+					interest_rate: parseFloat(req.body.interest_rate),
 					status: req.body.status,
 					notes: req.body.notes
-				}, {where:{id:req.body.id}});
+				}, {where:{id:req.body.id}, trackOptions: utils.getTrackOptions(req.user, true)});
 			})
 
 			.then(() => models.contract.findByIdFetchFull(models, req.body.id))
@@ -112,7 +112,7 @@ module.exports = function(app){
 	});
 
 	router.get('/contract/delete/:id', security.isLoggedInAdmin, function(req, res, next) {
-		models.contract.destroy({ where: { id: req.params.id } })
+		models.contract.destroy({ where: { id: req.params.id }, trackOptions: utils.getTrackOptions(req.user, true) })
 			.then(deleted => {
 				if(deleted > 0) {
 					res.json({});

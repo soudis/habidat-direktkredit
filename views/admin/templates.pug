@@ -11,7 +11,7 @@ mixin template_table(templates, type, description, replace)
       tbody
         each template in templates
           if (template.ref_table == type)
-            tr
+            tr(id="file_"+template.id)
               td.col-md-6
                 a(href='/file/get/' + template.id).btn.btn-sm.btn-light
                   span.fa.fa-download
@@ -76,3 +76,10 @@ block content
           span vertrag.docx
       hr
       +template_table(templates, 'template_contract', 'Direktkreditvorlage', false)
+  script.
+    $(document).ready(function(){
+      var hash = $(location).attr('hash');
+      if (hash.includes ('file_')) {
+        $('#'+hash.substring(hash.indexOf('file_'))).addClass('active').parents('.card').addClass('active');
+      }
+    })
