@@ -64,7 +64,7 @@ const initConfig = () => {
 	config.set('auth.admin.ldap.searchBase',       process.env.HABIDAT_DK_LDAP_BASE);
 	config.set('auth.admin.ldap.searchFilter',     process.env.HABIDAT_DK_LDAP_SEARCHFILTER);
 
-	config.set('debug',          process.env.HABIDAT_DK_DEBUG || false);
+	config.set('debug',               process.env.HABIDAT_DK_DEBUG || false);
 	config.set('site.https',          process.env.HABIDAT_DK_HTTPS);
 	config.set('site.sslcert',        process.env.HABIDAT_DK_SSL_CERT);
 	config.set('site.sslkey',         process.env.HABIDAT_DK_SSL_KEY);

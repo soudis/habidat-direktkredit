@@ -92,7 +92,7 @@ var createdb = function() {
 					});
 			}
 			return;
-		}
+		})
 		.catch(error => {
 			console.error('Error migrating database: ', error);
 		})
