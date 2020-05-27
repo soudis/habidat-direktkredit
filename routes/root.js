@@ -70,6 +70,7 @@ module.exports = function(app){
 		models.user.findOne({where: { email: req.body.email }})
 			.then(user => {
 				if (!user) {
+					console.log('Password request: account not found:', req.body.email);
 					return;
 				} else {
 					user.setPasswordResetToken();
