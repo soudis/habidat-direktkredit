@@ -7,6 +7,7 @@ const env       	= process.env.NODE_ENV || "database";
 const settings  	= require('../utils/settings');
 const Umzug 		= require('umzug');
 const tracker       = require('../utils/tracker');
+const crypto 		= require('crypto');
 
 var createdb = function() {
 
@@ -29,30 +30,6 @@ var createdb = function() {
 	if (dbURI.startsWith('mysql://')) {
 		sequelize.query('SET FOREIGN_KEY_CHECKS = 0', {raw: true}).catch(console.log);
 	}
-
-	// create database structure or applying pending database modifications
-	const umzug = new Umzug({
-		migrations: {
-			path: path.join(__dirname, './migrations'),
-			params: [
-				sequelize.getQueryInterface()
-			]
-		},
-		storage: 'sequelize',
-		storageOptions: {
-			sequelize: sequelize
-		},
-		logging: console.log
-	});
-
-	(async () => {
-		try {
-			await umzug.up();
-			console.info('All migrations performed successfully');
-		} catch (error) {
-			console.error('Error migrating database: ', error);
-		}
-	})();
 
 	// define sequelize models
 	var db = {};
@@ -77,6 +54,48 @@ var createdb = function() {
 		}
 		db[modelName + 'Log'] = tracker(db[modelName], sequelize, {userModel: db.user, persistant: true,  changes: ['update', 'create', 'delete']});
 	});
+
+
+	// create database structure or applying pending database modifications
+	const umzug = new Umzug({
+		migrations: {
+			path: path.join(__dirname, './migrations'),
+			params: [
+				sequelize.getQueryInterface()
+			]
+		},
+		storage: 'sequelize',
+		storageOptions: {
+			sequelize: sequelize
+		},
+		logging: console.log
+	});
+
+	umzug.up()
+		.then(() => {
+			console.log.info('All migrations performed successfully');
+			// insert admin user if environment variables are set
+			if (process.env.HABIDAT_DK_ADMIN_EMAIL && process.env.HABIDAT_DK_ADMIN_USERNAME) {
+				return db[user].count()
+					.then(count => {
+						if (count === 0) {
+							return db[user].create({
+									email: process.env.HABIDAT_DK_ADMIN_EMAIL,
+									logon_id: process.env.HABIDAT_DK_ADMIN_USERNAME,
+									password: crypto.randomBytes(16).toString('hex'),
+									administrator:true,
+									ldap: false
+								}, { trackOptions: { track: false, user_id: -1 } })
+								.then(() => console.log('Admin user ', process.env.HABIDAT_DK_ADMIN_USERNAME, ' with e-mail address ', process.env.HABIDAT_DK_ADMIN_EMAIL, ' created'));
+						}
+						return;
+					});
+			}
+			return;
+		}
+		.catch(error => {
+			console.error('Error migrating database: ', error);
+		})
 
 	// return models as object
 	db.sequelize = sequelize;
