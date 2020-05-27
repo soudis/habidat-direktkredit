@@ -1,6 +1,6 @@
 {
     "projectname": "My Project",
-    "logo": "/public/images/logo.png",
+    "logo": "/public/logo.png",
     "email" : "project@example.com",  
     "url" : "https://example.com",
     "usersuffix": "direktkredit",

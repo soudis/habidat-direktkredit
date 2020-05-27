@@ -73,7 +73,7 @@ module.exports = function(app){
 					return;
 				} else {
 					user.setPasswordResetToken();
-					return user.save()
+					return user.save({trackOptions: utils.getTrackOptions(req.user, false)})
 						.then(user => email.sendPasswordMail(req,res,user));
 				}
 			})

@@ -30,7 +30,7 @@ exports.renderToText = (req, res, template, data, title = undefined) => {
 };
 
 exports.getTrackOptions = function(user, track) {
-	return{ track: track, user_id: user.id };
+	return{ track: track, user_id: user?user.id:-1 };
 }
 
 exports.generateDocx = function(templateFile, data){
