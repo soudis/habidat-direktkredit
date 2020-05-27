@@ -73,20 +73,20 @@ var createdb = function() {
 
 	umzug.up()
 		.then(() => {
-			console.log.info('All migrations performed successfully');
+			console.info('All migrations performed successfully');
 			// insert admin user if environment variables are set
 			if (process.env.HABIDAT_DK_ADMIN_EMAIL && process.env.HABIDAT_DK_ADMIN_USERNAME) {
-				return db[user].count()
+				return db.user.count()
 					.then(count => {
 						if (count === 0) {
-							return db[user].create({
+							return db.user.create({
 									email: process.env.HABIDAT_DK_ADMIN_EMAIL,
 									logon_id: process.env.HABIDAT_DK_ADMIN_USERNAME,
 									password: crypto.randomBytes(16).toString('hex'),
 									administrator:true,
 									ldap: false
 								}, { trackOptions: { track: false, user_id: -1 } })
-								.then(() => console.log('Admin user ', process.env.HABIDAT_DK_ADMIN_USERNAME, ' with e-mail address ', process.env.HABIDAT_DK_ADMIN_EMAIL, ' created'));
+								.then(() => console.info('Admin user', process.env.HABIDAT_DK_ADMIN_USERNAME, 'with e-mail address', process.env.HABIDAT_DK_ADMIN_EMAIL, 'created'));
 						}
 						return;
 					});
