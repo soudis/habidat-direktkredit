@@ -42,7 +42,10 @@ block content
         each entry in auditLog
           tr
             td(data-order=entry.timestamp)= moment(entry.timestamp).format('DD.MM.YYYY HH:mm')
-            td= entry.user.getFullName() || entry.user.logon_id || entry.user_id
+            if entry.user
+              td= entry.user.getFullName() || entry.user.logon_id || 'System'
+            else 
+              td System
             if entry.action === 'delete' || !entry.target
               td #{_t(entry.type)} #{entry.target_id} #{_t('log_'+entry.action)}
             else 

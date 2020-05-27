@@ -25,6 +25,7 @@ module.exports = function(app){
 
 	router.get('/statistics/byrelation/:start/:end', security.isLoggedInAdmin, (req, res) => {
 		models.user.findAll({
+			  where: { administrator: {[Op.not]: '1'}},
 			  include:{
 					model: models.contract,
 					as: 'contracts',
@@ -58,7 +59,8 @@ module.exports = function(app){
 
 	router.get('/statistics/byregion/:level/:start/:end', security.isLoggedInAdmin, (req, res, next) => {
 		models.user.findAll({
-			  include:{
+				where: { administrator: {[Op.not]: '1'}},
+			  	include:{
 					model: models.contract,
 					as: 'contracts',
 					include : {
@@ -126,6 +128,7 @@ module.exports = function(app){
 
 	router.get('/statistics/bymonth/:start/:end', security.isLoggedInAdmin, (req, res) => {
 		models.user.findAll({
+			where: { administrator: {[Op.not]: '1'}},
 			include:{
 				model: models.contract,
 				as: 'contracts',
@@ -162,6 +165,7 @@ module.exports = function(app){
 
 	router.get('/statistics/transactionsbymonth/:start/:end', security.isLoggedInAdmin, (req, res) => {
 		models.user.findAll({
+			where: { administrator: {[Op.not]: '1'}},
 			include:{
 				model: models.contract,
 				as: 'contracts',

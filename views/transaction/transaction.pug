@@ -1,4 +1,4 @@
-mixin transaction(contract, transaction)
+mixin transaction(contract, transaction, admin)
   tr(id="transaction_" + transaction.id)
     td= moment(transaction.transaction_date).format('DD.MM.YYYY')
     td= transaction.getTypeText()

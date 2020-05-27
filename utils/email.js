@@ -26,14 +26,15 @@ exports.sendPasswordMail = function(req, res, user) {
 			        pass: process.env.HABIDAT_DK_SENDGRID_PASSWORD
 			      }
 			    });
-			    const mailOptions = {
-				    to: user.email,
-				    from: 'no-reply@'+req.headers.host,
-				    subject: 'Setze dein Passwort für die ' + settings.project.get('projectname') + ' Direktkreditplattform',
-				    html: emailBody
-				};
+			} else {
+				throw "No mail settings found (neither SMTP nor SENDGRID)";
 			}
-
+		    const mailOptions = {
+			    to: user.email,
+			    from: 'no-reply@'+req.headers.host,
+			    subject: 'Setze dein Passwort für die ' + settings.project.get('projectname') + ' Direktkreditplattform',
+			    html: emailBody
+			};
 			return transporter.sendMail(mailOptions);
 		});
 }

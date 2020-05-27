@@ -12,8 +12,8 @@ mixin user_form(formTitle, action, user)
     .form-row
       +text('zip')(value=_iv(user, 'zip') icon="fa-envelope" groupClass="col-md-4")
       +text('place')(value=_iv(user, 'place') icon="fa-city" groupClass="col-md-8")
-    +select('country')(value=_iv(user, 'country') icon="fa-globe-africa")
-      +country_select_options(_iv(user, 'country'))
+    +select('country')(value=_iv(user, 'country')||settings.project.get('defaults.country') icon="fa-globe-africa")
+      +country_select_options(_iv(user, 'country')||settings.project.get('defaults.country'))
     +text('telno')(type="tel" value=_iv(user, 'telno') icon="fa-phone")
     +text('email')(type="email" value=_iv(user, 'email') icon="fa-at" required)
     .form-row

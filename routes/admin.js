@@ -15,9 +15,6 @@ module.exports = function(app){
 
 	router.get('/admin/accounts', security.isLoggedInAdmin, function(req, res, next) {
 		models.user.findFetchFull(models, {administrator: true})
-			.then(users => {
-				return users.doeesnotexist;
-			})
 			.then(users => utils.render(req, res, 'admin/admin_accounts', {accounts: users, message: req.flash('error')}, 'Administrator*innen Accounts'))
 		.catch(error => next(error));
 	});
