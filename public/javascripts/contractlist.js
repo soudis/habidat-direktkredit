@@ -330,13 +330,13 @@ $(document).ready(function(){
 
     function saveView(view, id=undefined) {
         $.ajax({
-            url : '/user/saveview' + (id?('/'+id):''),
+            url : '/user/saveview' + (id!==undefined?('/'+id):''),
             type: "POST",
             contentType: 'application/json',
             data: JSON.stringify({view: view}),
             success: function(response) {
                 var views = $('#saved_views').data('views');
-                if (id) {
+                if (id !== undefined) {
                     views.splice(id, 1, view);
                     $('#saved_views').data('views', views);
                 } else {
@@ -347,7 +347,6 @@ $(document).ready(function(){
                         value: response.id
                     }));
                 }
-                console.log(response.id);
                 $('#saved_views').val(response.id);
                 bootbox.alert('Ansicht ' + view.name + ' gespeichert!');
             },
@@ -365,9 +364,11 @@ $(document).ready(function(){
             title: "Ansicht speichern",
             callback: function(result){
 
-                var view = getCurrentView();
-                view.name = result;
-                saveView(view);
+            	if (result) {
+	                var view = getCurrentView();
+	                view.name = result;
+	                saveView(view);
+            	}
 
             },
             buttons: {
@@ -385,41 +386,55 @@ $(document).ready(function(){
 
     $(document).on( 'click', '.save-view', function () {
         var view = getCurrentView();
-        var id = parseInt($('#saved_views').val());
-        var views = $('#saved_views').data('views');
-        view.name = views[id].name;
-        saveView(view, id);
+        var id = $('#saved_views').val();
+        if (id === 'default') {
+        	errorAlert("Standardansicht kann nicht überschrieben werden");
+        } else {
+        	id = parseInt(id);
+    		var views = $('#saved_views').data('views');
+        	view.name = views[id].name;
+        	saveView(view, id);
+        }
     });
 
     $(document).on( 'click', '.delete-view', function () {
         var id = $('#saved_views').val();
-        var views = $('#saved_views').data('views');
-        view = views[id];
-        $.ajax({
-            url : '/user/deleteview/'+id,
-            type: "GET",
-            contentType: 'application/json',
-            success: function(response) {
-                var views = $('#saved_views').data('views');
-                views.splice(id, 1);
-                var index = id;
-                $('#saved_views option:eq(' + id+1 + ')').nextAll().each(function(i) {
-                    $(this).replaceWith($('<option>', {
-                        text: views[index].name,
-                        value: index
-                    }));
-                    index ++;
-                });
-                $('#saved_views option:eq(' + id+1 + ')').remove();
-                $('#saved_views').data('views', views);
-                $('#saved_views').val('default');
-                bootbox.alert('Ansicht ' + view.name + ' gelöscht!');
-            },
-            error: function(xhr, status, error) {
-                var data = JSON.parse(xhr.responseText);
-                errorAlert(data.error);
-            }
-        });
+        if (id === 'default') {
+        	errorAlert("Standardansicht kann nicht gelöscht werden");
+        } else {
+        	id = parseInt(id);
+			var views = $('#saved_views').data('views');
+	        view = views[id];
+	        $.ajax({
+	            url : '/user/deleteview/'+id,
+	            type: "GET",
+	            contentType: 'application/json',
+	            success: function(response) {
+	                var views = $('#saved_views').data('views');
+	                views.splice(id, 1);
+	                var index = id;
+	                $('#saved_views option:eq(' + (id+1) + ')').nextAll().each(function(i) {
+	                	console.log('replace', index);
+	                    $(this).replaceWith($('<option>', {
+	                        text: views[index].name,
+	                        value: index
+	                    }));
+	                    index ++;
+	                });
+	                	console.log('remove', id+1);
+
+	                $('#saved_views option:eq(' + (id+1) + ')').remove();
+	                $('#saved_views').data('views', views);
+	                $('#saved_views').val('default');
+	                bootbox.alert('Ansicht ' + view.name + ' gelöscht!');
+	            },
+	            error: function(xhr, status, error) {
+	                var data = JSON.parse(xhr.responseText);
+	                errorAlert(data.error);
+	            }
+	        });
+        }
+
     });
 
     $('#saved_views').data('default', getCurrentView());
