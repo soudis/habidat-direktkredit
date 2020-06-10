@@ -77,10 +77,10 @@ module.exports = function(app){
 			.then(user => {
 				if (req.body.send_password_link) {
 					user.setPasswordResetToken();
-					return user.save()
+					return user.save({trackOptions: utils.getTrackOptions(req.user, false)})
 						.then(() => email.sendPasswordMail(req,res,user));
 				} else {
-					return user.save();
+					return user.save({trackOptions: utils.getTrackOptions(req.user, false)});
 				}
 			})
 			.then(() => res.send({redirect: '/admin/accounts'}))
