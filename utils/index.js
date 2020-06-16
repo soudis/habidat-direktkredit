@@ -96,7 +96,6 @@ exports.generateTransactionList = function(transactionList){
 exports.generateUrl = function(req, url) {
 	var url_parts = urlUtil.parse(req.url);
 	var projectId = settings.project.get('projectid');
-	console.log('req.addPath: ', req.addPath, ', req.url', req.url, ', url_parts: ', JSON.stringify(url_parts), ' ,pathname: ', url_parts.pathname, ', projectId: ', projectId, ', url: ', url);
 	if (req.addPath && url.startsWith('/')) {
 		return req.addPath+url;
 	} else {

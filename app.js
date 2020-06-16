@@ -33,11 +33,7 @@ try{
 
 	var app = express();
 
-	app.use(sass({
-		src: path.join(__dirname, '/'),
-		dest: path.join(__dirname, '/'),
-		debug: true
-	}));
+
 
 	var router = express.Router();
 
@@ -158,6 +154,12 @@ try{
 	require('./routes/communication')(router);
 	require('./routes/admin')(router);
 
+	app.use(sass({
+		src: path.join(__dirname, '/'),
+		dest: path.join(__dirname, '/'),
+		debug: true
+	}));
+
 	app.use('/', router);
 	var projectId = settings.project.get('projectid');
 	if (projectId) {
@@ -166,6 +168,12 @@ try{
 			next();
 		})
 		app.use('/'+projectId, router);
+		app.use(sass({
+			src: path.join(__dirname, '/'),
+			dest: path.join(__dirname, '/'),
+			prefix: '/'+projectId,
+			debug: true
+		}));
 	}
 
 	// catch 404 and forward to error handler
