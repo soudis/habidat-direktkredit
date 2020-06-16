@@ -70,6 +70,6 @@ block content
                         +value(change.field, change.value)
   script.
     $(document).on('change', '#timeframe', function () {
-      $(location).attr("href", "/admin/auditlog/" + $(this).val());
+      $(location).attr("href", _url("/admin/auditlog/" + $(this).val()));
     });
 

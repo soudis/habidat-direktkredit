@@ -1,9 +1,9 @@
 extends ../layout
 
 block content
-  +nav(settings.project.get('projectname'), "dropdown_menu", settings.project.get('logo')) 
-    +nav_item('/project') Projekt auswählen  
-    +nav_item("/admin-logon") Einloggen
+  +nav(settings.project.get('projectname'), "dropdown_menu", _url(settings.project.get('logo'))) 
+    +nav_item(_url('/project')) Projekt auswählen  
+    +nav_item(_url("/admin-logon")) Einloggen
 
   .jumbotron
     h2= settings.project.get('projectname') + " @ habiDAT"
@@ -14,4 +14,4 @@ block content
       p.message= message
   
   .col-md-5.col-xs-12.col-sm-6.col-lg-4
-    +logon_form("/admin-logon")
+    +logon_form(_url("/admin-logon"))

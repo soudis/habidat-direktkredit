@@ -4,7 +4,7 @@ block content
   .jumbotron
     h2 Downloads
     p.lead Hier gibt's exportierte Datensätze und automatisch generierte Dokumente für die Buchhaltung, für sonstige Hausverwaltungsaufgaben und für die Kommunikation mit den Kreditgeber*innen. 
-  form.form-horizontal(action="/statistics/transactionList" method="post" role="form")
+  form.form-horizontal(action=_url("/statistics/transactionList") method="post" role="form")
     .form-group.row
       label.col-md-8 
         h4 Jahresliste (Buchhaltung)
@@ -16,7 +16,7 @@ block content
           .input.group-btn
              button(type='submit' class='btn btn-primary')
                span.fa.fa-download
-  form.form-horizontal(action="/communication/email" method="post" role="form") 
+  form.form-horizontal(action=_url("/communication/email") method="post" role="form") 
     .form-group.row
       label.col-md-8 
         h4 E-Mail Adressen Download
@@ -31,7 +31,7 @@ block content
              button(type='submit' class='btn btn-primary')
                span.fa.fa-download              
 
-  form.form-horizontal(action="/communication/addresses" method="post" role="form")
+  form.form-horizontal(action=_url("/communication/addresses") method="post" role="form")
     .form-group.row
       label.col-md-8 
         h4 Adressen Download

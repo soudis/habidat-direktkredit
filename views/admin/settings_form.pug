@@ -14,7 +14,7 @@ mixin settings_form()
       +group_file('logo_upload')(class="d-none logo-change-input" inputId="logo_file")
       +group_input('logo_link')(class="d-none logo-change-input" placeholder="https://...")
     +text('email', _t('project_email'))(icon='fa-at' type='email' value=settings.project.get('email'))
-    +text('url', _t('project_url'))(icon='fa-link' type='url' value=settings.project.get('url'))
+    +text('url', _t('project_url'))(icon='fa-link' type='url' value=_url(settings.project.get('url')))
     +select('theme')(icon='fa-paint-brush')
       - var selected = settings.project.get('theme') || 'red'
       +option('red')(selected=selected)

@@ -1,5 +1,5 @@
 mixin form(action, title=undefined)
-  form.form-horizontal.update-form(class=attributes.class action=action method="post" role="form" update-action=attributes.updateAction update-tag=attributes.updateTag)
+  form.form-horizontal.update-form(class=attributes.class action=_url(action) method="post" role="form" update-action=attributes.updateAction update-tag=attributes.updateTag)
     legend=title || _t('form' + action.split('/').join('_'))
     block
 

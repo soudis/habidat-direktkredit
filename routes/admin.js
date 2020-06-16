@@ -32,7 +32,7 @@ module.exports = function(app){
 			}, trackOptions: utils.getTrackOptions(req.user, true)
 		}).then(deleted => {
 			if(deleted > 0) {
-				res.json({redirect: '/admin/accounts'});
+				res.json({redirect: utils.generateUrl(req, '/admin/accounts')});
 			} else {
 				res.status(500).json({error: 'Es wurde kein Account gelöscht, das sollte nicht passieren!'});
 			}
@@ -83,7 +83,7 @@ module.exports = function(app){
 					return user.save({trackOptions: utils.getTrackOptions(req.user, false)});
 				}
 			})
-			.then(() => res.send({redirect: '/admin/accounts'}))
+			.then(() => res.send({redirect: utils.generateUrl(req, '/admin/accounts')}))
 			.catch(error => next(error));
 
 	});
@@ -125,7 +125,7 @@ module.exports = function(app){
 
 				return settings.project.save();
 			})
-			.then(() => res.send({redirect: '/admin/settings'}))
+			.then(() => res.send({redirect: utils.generateUrl(req, '/admin/settings')}))
 			.catch(error => next(error));
 
 	});

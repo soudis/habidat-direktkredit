@@ -5,7 +5,7 @@ mixin transaction(contract, transaction, admin)
     td.text-right= format.formatMoney(transaction.amount)
     if admin
       td.text-right
-        a.btn.btn-light.btn-sm.sidebar-action(href='/transaction/edit/'+transaction.id)
+        a.btn.btn-light.btn-sm.sidebar-action(href=_url('/transaction/edit/'+transaction.id))
           span.fa.fa-edit
-        a.btn.btn-light.btn-sm.confirm-action(data-update-tag="contract_"+contract.id data-link='/transaction/delete/'+transaction.id, data-confirmtext='Willst du die Zahlung von ' + sprintf('%.2f', contract.amount) +  ' EUR vom ' + moment(transaction.transaction_date).format('DD.MM.YYYY') + ' wirklich löschen?')   
+        a.btn.btn-light.btn-sm.confirm-action(data-update-tag="contract_"+contract.id data-link=_url('/transaction/delete/'+transaction.id), data-confirmtext='Willst du die Zahlung von ' + sprintf('%.2f', contract.amount) +  ' EUR vom ' + moment(transaction.transaction_date).format('DD.MM.YYYY') + ' wirklich löschen?')   
           span.fa.fa-trash

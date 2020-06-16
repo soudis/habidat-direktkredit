@@ -9,16 +9,16 @@ mixin contract(contract, templates_contract, admin)
           .h5.section-title.col-md-auto Direktkredit vom #{moment(contract.sign_date).format('DD.MM.YYYY')}
           if admin
             .col-md.text-right.section-actions
-              a.btn.btn-light.btn-sm.sidebar-action(href='/contract/edit/'+contract.id)
+              a.btn.btn-light.btn-sm.sidebar-action(href=_url('/contract/edit/'+contract.id))
                 span.fa.fa-edit              
-              a.btn.btn-light.btn-sm.confirm-action(data-remove-tag='contract_'+contract.id data-link='/contract/delete/'+contract.id, data-confirmtext='Willst du den Direktkredit vom ' + moment(contract.sign_date).format('DD.MM.YYYY') + ' wirklich löschen?')                  
+              a.btn.btn-light.btn-sm.confirm-action(data-remove-tag='contract_'+contract.id data-link=_url('/contract/delete/'+contract.id) data-confirmtext='Willst du den Direktkredit vom ' + moment(contract.sign_date).format('DD.MM.YYYY') + ' wirklich löschen?')                  
                 span.fa.fa-trash
               if templates_contract && templates_contract.length > 0
                 a.btn.btn-light.btn-sm.dropdown-toggle(id='contractTemplateButton' type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false") 
                   span.fa.fa-file                          
                 .dropdown-menu.dropdown-menu-right( aria-labelledby="contractTemplateButton")
                   each template in templates_contract
-                    a.dropdown-item(href='/docx_c/'+contract.id+'?fileid='+template.id)
+                    a.dropdown-item(href=_url('/docx_c/'+contract.id+'?fileid='+template.id))
                       span.fa.fa-file-download
                       span  
                       span= template.description                          
@@ -90,7 +90,7 @@ mixin contract(contract, templates_contract, admin)
                     b Zahlungen
                   if admin
                     .col-md-2.text-right.section-actions
-                      a.btn.btn-light.btn-sm.sidebar-action(href='/transaction/add/'+contract.id)
+                      a.btn.btn-light.btn-sm.sidebar-action(href=_url('/transaction/add/'+contract.id))
                         span.fa.fa-plus
           tbody
             if contract.transactions.length == 0
@@ -107,7 +107,7 @@ mixin contracts(user, templates_contract, admin)
           span Direktkredite
           if admin
             span.float-right
-              a.btn.btn-light.btn-sm.sidebar-action(href='/contract/add/'+user.id)
+              a.btn.btn-light.btn-sm.sidebar-action(href=_url('/contract/add/'+user.id))
                 span.fa.fa-plus
         .card-body
           #contracts_container.row

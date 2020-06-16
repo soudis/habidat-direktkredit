@@ -17,6 +17,7 @@ try{
 	var mkdirp = require('mkdirp');
 	var numeral = require('numeral');
 	const intl = require('./utils/intl');
+	const utils = require('./utils');
 	const settings = require('./utils/settings');
 	const sass = require('node-sass-middleware');
 
@@ -38,29 +39,31 @@ try{
 		debug: true
 	}));
 
+	var router = express.Router();
+
 	var oneDay = 86400000;
 
-	app.use('/public', express.static(path.join(__dirname, 'public'),  { maxAge: oneDay }));
-	app.use('/favicon.ico', express.static(path.join(__dirname, 'public/favicon.png')));
-	app.use('/public/datatables', express.static(path.join(__dirname, 'node_modules/datatables.net-bs4/js'),  { maxAge: oneDay }));
-	app.use('/public/datatables', express.static(path.join(__dirname, 'node_modules/datatables.net-bs4/css'),  { maxAge: oneDay }));
-	app.use('/public/datatables', express.static(path.join(__dirname, 'node_modules/datatables.net/js'),  { maxAge: oneDay }));
-	app.use('/public/bootstrap', express.static(path.join(__dirname, 'node_modules/bootstrap/dist/js'),  { maxAge: oneDay }));
-	app.use('/public/jquery', express.static(path.join(__dirname, 'node_modules/jquery/dist'),  { maxAge: oneDay }));
-	app.use('/public/moment', express.static(path.join(__dirname, 'node_modules/moment/min'),  { maxAge: oneDay }));
-	app.use('/public/moment/locale', express.static(path.join(__dirname, 'node_modules/moment/locale'),  { maxAge: oneDay }));
-	app.use('/public/datepicker', express.static(path.join(__dirname, 'node_modules/bootstrap-datepicker/dist/js'),  { maxAge: oneDay }));
-	app.use('/public/datepicker', express.static(path.join(__dirname, 'node_modules/bootstrap-datepicker/dist/css'),  { maxAge: oneDay }));
-	app.use('/public/select', express.static(path.join(__dirname, 'node_modules/bootstrap-select/dist/js'),  { maxAge: oneDay }));
-	app.use('/public/bootbox', express.static(path.join(__dirname, 'node_modules/bootbox/dist'),  { maxAge: oneDay }));
-	app.use('/public/chart.js', express.static(path.join(__dirname, 'node_modules/chart.js/dist'),  { maxAge: oneDay }));
-	app.use('/public/popper', express.static(path.join(__dirname, 'node_modules/@popperjs/core/dist/umd'),  { maxAge: oneDay }));
-	app.use('/public/webfonts', express.static(path.join(__dirname, 'node_modules/@fortawesome/fontawesome-free/webfonts'), { maxAge: oneDay }));
-	app.use('/public/multiselect', express.static(path.join(__dirname, 'node_modules/bootstrap-multiselect/dist/js'), { maxAge: oneDay }));
-	app.use('/public/datatables', express.static(path.join(__dirname, 'node_modules/datatables.net-responsive/js'), { maxAge: oneDay }));
-	app.use('/public/datatables', express.static(path.join(__dirname, 'node_modules/datatables.net-responsive-bs4/js'), { maxAge: oneDay }));
-	app.use('/public/datatables', express.static(path.join(__dirname, 'node_modules/datatables.net-responsive-bs4/css'), { maxAge: oneDay }));
-	app.use('/public/slider', express.static(path.join(__dirname, 'node_modules/bootstrap-slider/dist'),  { maxAge: oneDay }));
+	router.use('/public', express.static(path.join(__dirname, 'public'),  { maxAge: oneDay }));
+	router.use('/favicon.ico', express.static(path.join(__dirname, 'public/favicon.png')));
+	router.use('/public/datatables', express.static(path.join(__dirname, 'node_modules/datatables.net-bs4/js'),  { maxAge: oneDay }));
+	router.use('/public/datatables', express.static(path.join(__dirname, 'node_modules/datatables.net-bs4/css'),  { maxAge: oneDay }));
+	router.use('/public/datatables', express.static(path.join(__dirname, 'node_modules/datatables.net/js'),  { maxAge: oneDay }));
+	router.use('/public/bootstrap', express.static(path.join(__dirname, 'node_modules/bootstrap/dist/js'),  { maxAge: oneDay }));
+	router.use('/public/jquery', express.static(path.join(__dirname, 'node_modules/jquery/dist'),  { maxAge: oneDay }));
+	router.use('/public/moment', express.static(path.join(__dirname, 'node_modules/moment/min'),  { maxAge: oneDay }));
+	router.use('/public/moment/locale', express.static(path.join(__dirname, 'node_modules/moment/locale'),  { maxAge: oneDay }));
+	router.use('/public/datepicker', express.static(path.join(__dirname, 'node_modules/bootstrap-datepicker/dist/js'),  { maxAge: oneDay }));
+	router.use('/public/datepicker', express.static(path.join(__dirname, 'node_modules/bootstrap-datepicker/dist/css'),  { maxAge: oneDay }));
+	router.use('/public/select', express.static(path.join(__dirname, 'node_modules/bootstrap-select/dist/js'),  { maxAge: oneDay }));
+	router.use('/public/bootbox', express.static(path.join(__dirname, 'node_modules/bootbox/dist'),  { maxAge: oneDay }));
+	router.use('/public/chart.js', express.static(path.join(__dirname, 'node_modules/chart.js/dist'),  { maxAge: oneDay }));
+	router.use('/public/popper', express.static(path.join(__dirname, 'node_modules/@popperjs/core/dist/umd'),  { maxAge: oneDay }));
+	router.use('/public/webfonts', express.static(path.join(__dirname, 'node_modules/@fortawesome/fontawesome-free/webfonts'), { maxAge: oneDay }));
+	router.use('/public/multiselect', express.static(path.join(__dirname, 'node_modules/bootstrap-multiselect/dist/js'), { maxAge: oneDay }));
+	router.use('/public/datatables', express.static(path.join(__dirname, 'node_modules/datatables.net-responsive/js'), { maxAge: oneDay }));
+	router.use('/public/datatables', express.static(path.join(__dirname, 'node_modules/datatables.net-responsive-bs4/js'), { maxAge: oneDay }));
+	router.use('/public/datatables', express.static(path.join(__dirname, 'node_modules/datatables.net-responsive-bs4/css'), { maxAge: oneDay }));
+	router.use('/public/slider', express.static(path.join(__dirname, 'node_modules/bootstrap-slider/dist'),  { maxAge: oneDay }));
 
 	const umlautMap = {
 		'\u00dc': 'UE',
@@ -123,6 +126,9 @@ try{
 		}
 
 		res.locals.moment = require('moment');
+		res.locals._url = function(url) {
+			return utils.generateUrl(req,url);
+		}
 		res.locals.replaceUmlaute = replaceUmlaute;
 		res.locals.format = require('./utils/format');
 		res.locals.sprintf = require('sprintf').sprintf;
@@ -139,19 +145,28 @@ try{
 		next();
 	});
 
-	require('./routes/contract')(app);
-	require('./routes/normaluser')(app);
-	require('./routes/other')(app);
-	require('./routes/procrastinate')(app);
-	require('./routes/root')(app);
-	require('./routes/statistics')(app);
-	require('./routes/transaction')(app);
-	require('./routes/user')(app);
-	require('./routes/file')(app);
-	require('./routes/communication')(app);
-	require('./routes/admin')(app);
 
+	require('./routes/contract')(router);
+	require('./routes/normaluser')(router);
+	require('./routes/other')(router);
+	require('./routes/procrastinate')(router);
+	require('./routes/root')(router);
+	require('./routes/statistics')(router);
+	require('./routes/transaction')(router);
+	require('./routes/user')(router);
+	require('./routes/file')(router);
+	require('./routes/communication')(router);
+	require('./routes/admin')(router);
 
+	app.use('/', router);
+	var projectId = settings.project.get('projectid');
+	if (projectId) {
+		app.use('/'+projectId, (req,res,next) => {
+			req.addPath = '/'+projectId;
+			next();
+		})
+		app.use('/'+projectId, router);
+	}
 
 	// catch 404 and forward to error handler
 	app.use(function(req, res, next) {

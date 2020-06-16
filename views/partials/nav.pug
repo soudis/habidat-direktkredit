@@ -28,15 +28,15 @@ mixin nav(name, id, logo, style)
           ul.nav.navbar-nav.ml-auto.navbar-right
             if (currentUser)
               +nav_item_dropdown( "#" )(label=currentUser.first_name || currentUser.logon_id icon="fa-user" dropDownMenuClass='dropdown-menu-right')
-                +dd_item('/setpassword')
+                +dd_item(_url('/setpassword'))
                   span.fa.fa-lock
                   span  Passwort ändern            
-                +dd_item('/logout')
+                +dd_item(_url('/logout'))
                   span.fa.fa-sign-out-alt
                   span  Abmelden
             else
               li.nav-item
-                a.nav-link( href="/login" ) 
+                a.nav-link(href=_url("/login"))
                   span.fa.fa-sign-in-alt
                   span  Anmelden                 
 
@@ -72,7 +72,7 @@ mixin logon_form(action)
     .form-group.row
       button.btn(type='submit' class='btn btn-primary btn-lg') Einloggen
     .form-group.row   
-      a(href="/getpassword") Noch kein Passwort oder Passwort vergessen?
+      a(href=_url("/getpassword")) Noch kein Passwort oder Passwort vergessen?
     
 
 mixin getpassword_form(action)        

@@ -123,7 +123,6 @@ block content
       .daterange-slider
         input(type="text" name="transactionslider" id="transactionslider" data-provide="slider" data-slider-handle="square" data-slider-range='true' data-start=moment(numbers.firstContractDate).startOf('month') data-slider-min=0 data-slider-max=months data-slider-value=months-11)
       canvas(id="transactions-by-month" width="400" height="400")        
-        //img(width="600" src="data:image/png;base64,"+numbers.charts.byRelationship)
 
-  script(type='text/javascript' src='/public/slider/bootstrap-slider.min.js')           
-  script(type='text/javascript' src='/public/javascripts/statistics.js')           
+  script(type='text/javascript' src=_url('/public/slider/bootstrap-slider.min.js'))           
+  script(type='text/javascript' src=_url('/public/javascripts/statistics.js'))          

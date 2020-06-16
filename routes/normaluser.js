@@ -18,7 +18,7 @@ module.exports = function(app){
 	// we will use route middleware to verify this (the isLoggedIn function)
 	router.get('/profile', security.isLoggedIn, function(req, res, next) {
 		if (req.user.dn || req.user.administrator) {
-			res.redirect('/admin');
+			res.redirect(utils.generateUrl('/admin'));
 		} else {
 			models.user.findByIdFetchFull(models, req.user.id)
 				.then((user) => {

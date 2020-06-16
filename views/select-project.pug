@@ -2,7 +2,7 @@ extends layout
 
 block content
   +nav("Direktkrediteportal", "dropdown_menu") 
-    +nav_item("/project") 
+    +nav_item(_url("/project"))
       span.fa.fa-th-large
       span  Projekt auswählen
   .container-fluid(id="root-container" class="col-xl-8 col-xl-offset-2 col-lg-12") 
@@ -13,7 +13,7 @@ block content
     .row
       each project, id in projects
         .col-lg-3.col-sm-6.col-xs-12
-          a.project-link(href='/project/'+id)
+          a.project-link(href=_url('/project/'+id))
             .card.project-card
               img.card-img-top(src=settings.project.get('logo') style="height: 100px; width: auto; object-fit: contain; ")  
               .card-body.text-center

@@ -95,6 +95,7 @@ const initProject = () => {
 	};
 
 	// use environment variables as default values (do not overwrite project.json values)
+	project.set('projectid',                            process.env.HABIDAT_DK_PROJECT_ID, true);
 	project.set('projectname',                          process.env.HABIDAT_DK_PROJECT_NAME, false);
 	project.set('logo',                                 process.env.HABIDAT_DK_PROJECT_LOGO, false);
 	project.set('email',                                process.env.HABIDAT_DK_PROJECT_EMAIL, false);

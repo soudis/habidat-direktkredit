@@ -20,10 +20,10 @@ mixin template_table(templates, type, description, replace)
               td.col-md-6=template.description
               td.fit.text-right
                 if replace
-                  a.btn.btn-light.btn-sm.sidebar-action(href='/admin/addtemplate/template_account_notification' title="Vorlage Überschreiben")
+                  a.btn.btn-light.btn-sm.sidebar-action(href=_url('/admin/addtemplate/template_account_notification') title="Vorlage Überschreiben")
                     span.fa.fa-upload 
                 else
-                  a.btn.btn-light.btn-sm.confirm-action(data-link='/file/delete/'+template.id data-confirmtext='Willst du die ' + description + ' ' +template.description + ' wirklich löschen?' title="Vorlage Löschen") 
+                  a.btn.btn-light.btn-sm.confirm-action(data-link=_url('/file/delete/'+template.id) data-confirmtext='Willst du die ' + description + ' ' +template.description + ' wirklich löschen?' title="Vorlage Löschen") 
                     span.fa.fa-trash 
 
 
@@ -35,12 +35,12 @@ block content
     h5.card-header 
       span Vorlage für die Buchhaltungsbestätigung für Kreditgeber*innen
       span.float-right
-        a.btn.btn-light.btn-sm.sidebar-action(href='/admin/addtemplate/template_account_notification' title="Vorlage Überschreiben")
+        a.btn.btn-light.btn-sm.sidebar-action(href=_url('/admin/addtemplate/template_account_notification') title="Vorlage Überschreiben")
           span.fa.fa-upload
     .card-body
       h6 
         span Beispielvorlage: 
-        a.btn.btn-sm.btn-light(href='/public/templates/buchhaltung.docx')
+        a.btn.btn-sm.btn-light(href=_url('/public/templates/buchhaltung.docx'))
           span.fa.fa-download
           span  
           span buchhaltung.docx
@@ -50,12 +50,12 @@ block content
     h5.card-header 
       span Vorlagen für Direktkreditgeber*in
       span.float-right
-        a.btn.btn-light.btn-sm.sidebar-action(href='/admin/addtemplate/template_user' title="Vorlage Hinzufügen")
+        a.btn.btn-light.btn-sm.sidebar-action(href=_url('/admin/addtemplate/template_user') title="Vorlage Hinzufügen")
           span.fa.fa-upload
     .card-body
       h6 
         span Beispielvorlage: 
-        a.btn.btn-sm.btn-light(href='/public/templates/dankesschreiben.docx')
+        a.btn.btn-sm.btn-light(href=_url('/public/templates/dankesschreiben.docx'))
           span.fa.fa-download
           span  
           span dankesschreiben.docx
@@ -65,12 +65,12 @@ block content
     h5.card-header 
       span Vorlagen für Kredite
       span.float-right
-        a.btn.btn-light.btn-sm.sidebar-action(href='/admin/addtemplate/template_contract' title="Vorlage Hinzufügen")
+        a.btn.btn-light.btn-sm.sidebar-action(href=_url('/admin/addtemplate/template_contract') title="Vorlage Hinzufügen")
           span.fa.fa-upload
     .card-body
       h6
         span Beispielvorlage: 
-        a.btn.btn-sm.btn-light(href='/public/templates/vertrag.docx')
+        a.btn.btn-sm.btn-light(href=_url('/public/templates/vertrag.docx'))
           span.fa.fa-download
           span  
           span vertrag.docx

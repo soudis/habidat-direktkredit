@@ -6,6 +6,8 @@ const moment = require('moment');
 const converter = require('libreoffice-convert');
 const json2csv = require('json2csv');
 const exceljs = require('exceljs');
+const urlUtil = require('url');
+const settings = require('./settings');
 
 
 exports.render = (req, res, template, data, title = undefined) => {
@@ -90,3 +92,14 @@ exports.generateTransactionList = function(transactionList){
 			return workbook;
 		})
 };
+
+exports.generateUrl = function(req, url) {
+	var url_parts = urlUtil.parse(req.url);
+	var projectId = settings.project.get('projectid');
+	console.log('req.addPath: ', req.addPath, ', req.url', req.url, ', url_parts: ', JSON.stringify(url_parts), ' ,pathname: ', url_parts.pathname, ', projectId: ', projectId, ', url: ', url);
+	if (req.addPath && url.startsWith('/')) {
+		return req.addPath+url;
+	} else {
+		return url;
+	}
+}

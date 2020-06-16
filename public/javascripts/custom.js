@@ -38,9 +38,23 @@ var dataTableLanguange = {
 	}
 };
 
+var projectId = '';
+
+function _url(url) {
+	var path = window.location.pathname;
+	if (projectId && projectId !== '' && path.startsWith('/'+projectId) && url.startsWith('/')) {
+		return '/'+projectId+url;
+	} else {
+		return url;
+	}
+
+}
+
 moment.locale('de');
 
 $(document).ready(function(){
+
+	projectId = $('body').data('projectid');
 
 	$(document).on("change", '#transaction_type', function(e) {
 		var transactionsAmount = parseFloat($('#transaction_amount').attr('transactions-amount'));
@@ -62,7 +76,7 @@ $(document).ready(function(){
 		if ($('#transaction_id').length > 0) {
 			transactionId = $('#transaction_id').val();
 		}
-		$.get('/contract/amount_to_date/'+contractId+'/' + transactionId + '/' +transactionDate, function( data ) {
+		$.get(_url('/contract/amount_to_date/'+contractId+'/' + transactionId + '/' +transactionDate), function( data ) {
 			$('#transaction_amount').attr('amount_to_date', data.amountToDate);
 		}, 'json');
 		$('transaction_type').change();

@@ -6,7 +6,7 @@ mixin group(title, files, type)
     h5.card-header 
       span= title
       span.float-right
-        a.btn.btn-light.btn-sm.sidebar-action(href='/admin/addtemplate/'+type title="Datei Hochladen")
+        a.btn.btn-light.btn-sm.sidebar-action(href=_url('/admin/addtemplate/'+type) title="Datei Hochladen")
           span.fa.fa-upload
     .card-body
       table.table.table
@@ -28,7 +28,7 @@ mixin group(title, files, type)
                   span= file.filename                
               td.col-md-6=file.description
               td.fit.text-right
-                a.btn.btn-light.btn-sm.confirm-action(data-link='/file/delete/'+file.id data-confirmtext='Willst du Datei ' +file.description + ' wirklich löschen?' title="Datei Löschen") 
+                a.btn.btn-light.btn-sm.confirm-action(data-link=_url('/file/delete/'+file.id) data-confirmtext='Willst du Datei ' +file.description + ' wirklich löschen?' title="Datei Löschen") 
                   span.fa.fa-trash 
 
 

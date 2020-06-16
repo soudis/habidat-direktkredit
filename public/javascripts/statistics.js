@@ -57,7 +57,7 @@ $(document).ready(function(){
 		$.ajax({
 			type: 'get',
 			dataType: 'json',
-			url: '/statistics/transactionsbymonth/' + range.start + '/' + range.end,
+			url: _url('/statistics/transactionsbymonth/' + range.start + '/' + range.end),
 			complete: function (result) {
 				var data = JSON.parse(result.responseText);
 				var dataCombined = Object.values(data.deposits).concat(Object.values(data.withdrawals)).concat(Object.values(data.interest));
@@ -115,7 +115,7 @@ $(document).ready(function(){
 		$.ajax({
 			type: 'get',
 			dataType: 'json',
-			url: '/statistics/bymonth/' + range.start + '/' + range.end,
+			url: _url('/statistics/bymonth/' + range.start + '/' + range.end),
 			complete: function (result) {
 				var data = JSON.parse(result.responseText);
 				var min = Math.min.apply(Math, Object.values(data));
@@ -168,14 +168,14 @@ $(document).ready(function(){
 		if (byRelationChart) {
 			byRelationChart.destroy();
 		}
-		loadChart('#by-relation', '/statistics/byrelation/' + range.start + '/' + range.end, function(chart) {
+		loadChart('#by-relation', _url('/statistics/byrelation/' + range.start + '/' + range.end), function(chart) {
 			byRelationChart = chart;
 		});
 	};
 
 
 	var byRegionChart;
-	var byRegionURL = '/statistics/byregion/country';
+	var byRegionURL = _url('/statistics/byregion/country');
 	var updateByRegionChart = function () {
 		var range = getSliderDateRange('regionslider');
 		if (byRegionChart) {
@@ -192,7 +192,7 @@ $(document).ready(function(){
 			if (activePoints && activePoints.length > 0 ) {
 				var label = byRegionChart.data.labels[activePoints[0]._index];
 				$('#by-region-level').text('PLZ (' + label.split(' ')[0] + ')');
-				byRegionURL = '/statistics/byregion/zip-' + label.split(' ')[0];
+				byRegionURL = _url('/statistics/byregion/zip-' + label.split(' ')[0]);
 				var range = getSliderDateRange('regionslider');
 				byRegionChart.destroy();
 				loadChart('#by-region', byRegionURL +'/' + range.start + '/' + range.end, function(chart) {

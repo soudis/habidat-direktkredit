@@ -18,12 +18,12 @@ block content
             td=account.email
             td=(account.ldap?"LDAP":"Lokal")
             td.fit.text-right
-                a.btn.btn-light.btn-sm.confirm-action(data-link='/admin/delete/'+account.id data-confirmtext='Willst du den Administrator*innen Account ' +account.logon_id + ' wirklich löschen?')
+                a.btn.btn-light.btn-sm.confirm-action(data-link=_url('/admin/delete/'+account.id) data-confirmtext='Willst du den Administrator*innen Account ' +account.logon_id + ' wirklich löschen?')
                   span.fa.fa-trash
   .col-md-12
     hr
   .col-md-12
-    a.datatable-button.btn.btn-primary.btn-sm.sidebar-action(href='/admin/add_account')
+    a.datatable-button.btn.btn-primary.btn-sm.sidebar-action(href=_url('/admin/add_account'))
       span.fa.fa-plus 
       span  Account   
               

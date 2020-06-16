@@ -4,11 +4,11 @@ mixin user(user, templates_user, admin)
       span Stammdaten 
       span.float-right
         if admin
-          a.btn.btn-light.btn-sm(href='/user/loginas/'+user.id title="Als Direktkreditgeber*in einloggen") 
+          a.btn.btn-light.btn-sm(href=_url('/user/loginas/'+user.id) title="Als Direktkreditgeber*in einloggen") 
             span.fa.fa-sign-in-alt
-          a.btn.btn-light.btn-sm.sidebar-action(href='/user/edit/'+user.id title="Direktkreditgeber*in bearbeiten") 
+          a.btn.btn-light.btn-sm.sidebar-action(href=_url('/user/edit/'+user.id) title="Direktkreditgeber*in bearbeiten") 
             span.fa.fa-edit
-          a.btn.btn-light.btn-sm.confirm-action(data-link='/user/delete/'+user.id title="Direktkreditgeber*in löschen" data-confirmtext='Willst du Direktkreditgeber*in ' + user.first_name + ' ' + user.last_name  + ' wirklich löschen?') 
+          a.btn.btn-light.btn-sm.confirm-action(data-link=_url('/user/delete/'+user.id) title="Direktkreditgeber*in löschen" data-confirmtext='Willst du Direktkreditgeber*in ' + user.first_name + ' ' + user.last_name  + ' wirklich löschen?') 
             span.fa.fa-trash
           if (templates_user && templates_user.length > 0)
             .btn-group.dropdown
@@ -16,7 +16,7 @@ mixin user(user, templates_user, admin)
                 span.fa.fa-file
               .dropdown-menu.float-right.dropdown-menu-right( aria-labelledby="userTemplateButton")
                 each template in templates_user
-                  a.dropdown-item(href='/docx/'+user.id+'?fileid='+template.id)
+                  a.dropdown-item(href=_url('/docx/'+user.id+'?fileid='+template.id))
                     span.fa.fa-file-download
                     span  
                     span= template.description

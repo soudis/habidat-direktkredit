@@ -269,7 +269,7 @@ module.exports = function(app){
 					relationship: req.body.relationship
 				}, { trackOptions: utils.getTrackOptions(req.user, true) });
 			})
-			.then(user => res.send({redirect : '/user/show/' + user.id}))
+			.then(user => res.send({redirect : utils.generateUrl(req, '/user/show/' + user.id)}))
 			.catch(error => next(error));
 	});
 
@@ -296,7 +296,7 @@ module.exports = function(app){
 		models.user.destroy({ where: { id: req.params.id }, trackOptions: utils.getTrackOptions(req.user, true)})
 			.then(function(deleted) {
 				if(deleted > 0) {
-				 	res.json({redirect: '/user/list'});
+				 	res.json({redirect: utils.generateUrl(req, '/user/list')});
 				} else {
 					res.json({error: 'Direktkreditgeber*in konnte nicht gelöscht werden, überprüfe bitte ob noch Verträge oder Dateien bestehen'});
 				}
@@ -324,7 +324,7 @@ module.exports = function(app){
 					if (error) {
 						next(error);
 					} else {
-						res.redirect('/');
+						res.redirect(utils.generateUrl(req, '/'));
 					}
 				});
 			})

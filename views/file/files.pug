@@ -5,7 +5,7 @@ mixin files_show(files, type, id, addFile)
         h4.card-header 
           span Dokumente
           span.float-right
-            a.btn.btn-light.btn-sm.sidebar-action(href='/file/add/' + type + '/'+id) 
+            a.btn.btn-light.btn-sm.sidebar-action(href=_url('/file/add/' + type + '/'+id))
               span.fa.fa-upload
         .card-body
           table.table
@@ -16,13 +16,13 @@ mixin files_show(files, type, id, addFile)
               each file in files
                 tr(id='file_' + file.id)
                   td.col-md-4 
-                    a(href='/file/get/' + file.id).btn.btn-sm.btn-light
+                    a(href=_url('/file/get/' + file.id)).btn.btn-sm.btn-light
                       span.fa.fa-download
                       span  
                       span= file.filename
                   td.col-md-7= file.description
                   td.col-md-1.text-right 
-                    a.btn.btn-light.btn-sm.confirm-action(data-update-tag=type + '_files' data-link='/file/delete/' + type + '/' +file.id, data-confirmtext='Willst du die Datei ' + file.filename + ' wirklich löschen?') 
+                    a.btn.btn-light.btn-sm.confirm-action(data-update-tag=type + '_files' data-link=_url('/file/delete/' + type + '/' +file.id), data-confirmtext='Willst du die Datei ' + file.filename + ' wirklich löschen?') 
                      span.fa.fa-trash
               if addFile && addFile === type
                 +files_add(type,id)

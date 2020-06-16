@@ -79,6 +79,7 @@ const texts = {
 	"termination_period": "Kündigungsfrist",
 	"termination_period_type": "Kündigungsfrist (Typ)",
 	"theme": "Farbschema",
+	"transaction": "Zahlung",
 	"transaction_date": "Datum",
 	"transaction_type": "Zahlungsart",
 	"transaction_type_initial": "Einzahlung",

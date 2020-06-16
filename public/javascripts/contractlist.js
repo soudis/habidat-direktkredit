@@ -330,7 +330,7 @@ $(document).ready(function(){
 
     function saveView(view, id=undefined) {
         $.ajax({
-            url : '/user/saveview' + (id!==undefined?('/'+id):''),
+            url : _url('/user/saveview' + (id!==undefined?('/'+id):'')),
             type: "POST",
             contentType: 'application/json',
             data: JSON.stringify({view: view}),
@@ -406,7 +406,7 @@ $(document).ready(function(){
 			var views = $('#saved_views').data('views');
 	        view = views[id];
 	        $.ajax({
-	            url : '/user/deleteview/'+id,
+	            url : _url('/user/deleteview/'+id),
 	            type: "GET",
 	            contentType: 'application/json',
 	            success: function(response) {
@@ -465,8 +465,8 @@ $(document).ready(function(){
         var contracts = [];
         table.column('contract_id:name', { search:'applied' }).data().each((value) => contracts.push(value));
         console.log('huhu');
-
-        $('<form action="/user/export" method="POST"></form>')
+        var action = _url('/user/export');
+        $('<form action="' + action + '" method="POST"></form>')
             .append('<input name="fields" value="' + fields + '" />')
             .append('<input name="users" value="' + users + '" />')
             .append('<input name="contracts" value="' +contracts + '" />')
