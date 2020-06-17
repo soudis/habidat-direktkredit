@@ -52,22 +52,25 @@ block content
               td!=  entry.target.getDescriptor(models) + ' ' + _t('log_'+entry.action)
             td.md-auto.details-control.text-right
               span.fa.fa-plus-circle
-            td.d-none.table-row-details              
-              table.table.display.compact.col-md-6.col-sm-12
-                thead
-                  tr
-                    th Datenbankfeld
-                    th.text-right Alter Wert
-                    th.slim
-                    th Neuer Wert
-                tbody
-                  each change in JSON.parse(entry.changes)
-                    if !['savedViews'].includes(change.field) && (change.value !== "" || change.previousValue !== "")
-                      tr
-                        td= _t(change.field)
-                        +value(change.field, change.previousValue)(class='text-right')
-                        td.slim: span.fa.fa-long-arrow-alt-right
-                        +value(change.field, change.value)
+            td.d-none.table-row-details       
+              if entry.action === 'email'
+                div!=entry.changes
+              else
+                table.table.display.compact.col-md-6.col-sm-12
+                  thead
+                    tr
+                      th Datenbankfeld
+                      th.text-right Alter Wert
+                      th.slim
+                      th Neuer Wert
+                  tbody
+                    each change in JSON.parse(entry.changes)
+                      if !['savedViews'].includes(change.field) && (change.value !== "" || change.previousValue !== "")
+                        tr
+                          td= _t(change.field)
+                          +value(change.field, change.previousValue)(class='text-right')
+                          td.slim: span.fa.fa-long-arrow-alt-right
+                          +value(change.field, change.value)
   script.
     $(document).on('change', '#timeframe', function () {
       $(location).attr("href", _url("/admin/auditlog/" + $(this).val()));

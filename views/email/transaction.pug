@@ -1,0 +1,31 @@
+h1=settings.project.get('projectname')
+  |  Direktkreditplattform
+h3 Eine Zahlung für deinen Direktkredit wurde vermerkt: 
+  table(style="margin-top:20px; margin-bottom:20px")
+    thead
+      tr
+        th(style="text-align:left; padding-left: 10px; padding-right: 10px; border-bottom: 1px solid #ddd;") 
+          h3 Datum
+        th(style="text-align:left; padding-left: 10px; padding-right: 10px; border-bottom: 1px solid #ddd;") 
+          h3 Zahlungsart
+        th(style="text-align:right; padding-left: 10px; padding-right: 10px; border-bottom: 1px solid #ddd;") 
+          h3 Betrag
+    tbody
+      tr
+        td(style="text-align:left; padding-left: 10px; padding-right: 10px; padding-top:20px;")
+          h4= moment(transaction.transaction_date).format('DD.MM.YYYY')
+        td(style="text-align:left; padding-left: 10px; padding-right: 10px; padding-top:20px;")
+          h4= _t('transaction_type_' + transaction.type)
+        td(style="text-align:right; padding-left: 10px; padding-right: 10px; padding-top:20px;")
+          h4= format.formatMoney(parseFloat(transaction.amount))
+h3 
+  span Dein neuer Kontostand beträgt somit 
+  span: b(style="color:rgb(30, 126, 52);")=format.formatMoney(contract.getAmountToDate(moment()))
+h3 Du kannst deine Daten jederzeit unter 
+  a(style="color: #00b7ff; font-style:none; text-decoration:none;" href=siteurl)
+    b= siteurl
+  span  einsehen. 
+  br
+  span Falls die Angaben nicht stimmen oder du Fragen hast melde dich gerne bei uns:        
+  a(href='mailto:' + settings.project.get('email') style="color:#00b7ff; font-style:none; text-decoration:none;")
+    b= settings.project.get('email')

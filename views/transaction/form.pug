@@ -13,6 +13,7 @@ mixin transaction_form( action, updateAction, updateTag, contract, transaction)
     +select('payment_type')(icon='fa-money-bill')
       each type in ['bank', 'cash', 'other']
         +option(type, _t('payment_type_'+type))(selected = _iv(transaction, 'payment_type'))      
+    +checkbox("send_transaction_email")(help=_t('send_transaction_email_help'))           
     +submit_button()
   script.
 

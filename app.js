@@ -125,6 +125,8 @@ try{
 		res.locals._url = function(url) {
 			return utils.generateUrl(req,url);
 		}
+		res.locals.siteurl = 'https://' + req.host + utils.generateUrl(req, '/');
+		res.locals.siteurl = res.locals.siteurl.substring(0, res.locals.siteurl.length - 1);
 		res.locals.replaceUmlaute = replaceUmlaute;
 		res.locals.format = require('./utils/format');
 		res.locals.sprintf = require('sprintf').sprintf;

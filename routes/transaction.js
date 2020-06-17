@@ -5,6 +5,7 @@ const router = require('express').Router();
 const utils = require('../utils');
 const models  = require('../models');
 const multer = require('multer');
+const email = require('../utils/email');
 
 module.exports = function(app){
 
@@ -26,14 +27,28 @@ module.exports = function(app){
 	});
 
 	router.post('/transaction/add', security.isLoggedInAdmin, multer().none(), function(req, res, next) {
-		models.transaction.create({
+		var transaction = {
 				transaction_date: moment(req.body.transaction_date).format('YYYY-MM-DD'),
 				amount: req.body.amount,
 				type: req.body.type,
 				contract_id: req.body.contract_id,
 				payment_type: req.body.payment_type
-			}, { trackOptions: utils.getTrackOptions(req.user, true) })
-			.then(() => models.contract.findByIdFetchFull(models, req.body.contract_id))
+			}
+		models.transaction.create(transaction, { trackOptions: utils.getTrackOptions(req.user, true) })
+			.then(transaction => {
+				return models.contract.findByIdFetchFull(models, req.body.contract_id)
+					.then(contract => {
+						if (req.body.send_transaction_email) {
+							return models.user.findByPk(contract.user_id)
+								.then(user => email.sendTransactionEmail(req, res, transaction, contract, user))
+								.then(() => {
+									return contract;
+								});
+						} else {
+							return contract;
+						}
+					});
+			})
 			.then(contract => {
 				return models.file.getContractTemplates()
 					.then(templates => utils.render(req, res, 'contract/show', {templates_contract: templates, contract:contract}));
