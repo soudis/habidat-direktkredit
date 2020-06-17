@@ -143,7 +143,6 @@ $(document).ready(function(){
 		    contentType: false,
 	        success: function(data) {
 	        	if (data.error) {
-	        		console.log(data.html);
 	        		form.parent().append(data.html);
 	        	} else {
 					hideSidebar();
@@ -162,6 +161,9 @@ $(document).ready(function(){
 	       	error: function(xhr, status, error) {
 	       		var data = JSON.parse(xhr.responseText);
         		form.find('.submit-button').parent().before(data.html);
+        		if (data.error.name === 'Warning') {
+        			form.append('<input type="hidden" name="ignore_warning" value="true" />')
+        		}
 	       	}
        	});
 	});

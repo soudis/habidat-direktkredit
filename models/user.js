@@ -245,6 +245,13 @@ module.exports = (sequelize, DataTypes) => {
 			});
 	};
 
+	User.emailAddressTaken = function (email) {
+		return User.count({where: { email: email }})
+			.then(count => {
+				return count !== 0;
+			});
+	};
+
 	User.prototype.getAddress = function (lineBreak=false) {
 		var address = "";
 		if (this.street) {

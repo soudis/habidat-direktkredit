@@ -17,7 +17,7 @@ mixin user_form(formTitle, action, user)
     +select('country')(value=_iv(user, 'country')||settings.project.get('defaults.country') icon="fa-globe-africa")
       +country_select_options(_iv(user, 'country')||settings.project.get('defaults.country'))
     +text('telno')(type="tel" value=_iv(user, 'telno') icon="fa-phone")
-    +text('email')(type="email" value=_iv(user, 'email') icon="fa-at" required)
+    +text('email')(type="email" value=_iv(user, 'email') icon="fa-at")
     .form-row
       +text('IBAN')(value=_iv(user, 'IBAN') icon="fa-credit-card" groupClass="col-md-8")
       +text('BIC')(value=_iv(user, 'BIC') groupClass='col-md-4')

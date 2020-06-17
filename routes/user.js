@@ -245,6 +245,24 @@ module.exports = function(app){
 	router.post('/user/add', security.isLoggedInAdmin, multer().none(), function(req, res, next) {
 		Promise.resolve()
 			.then(() => {
+				if (!req.body.email || req.body.email === '') {
+					if (!req.body.ignore_warning) {
+						throw new utils.Warning('Ohne E-Mailadresse kann sich der*die Kreditgeber*in nicht einloggen');
+					} else {
+						return;
+					}
+				} else {
+					return models.user.emailAddressTaken(req.body.email)
+						.then(taken => {
+							if (taken) {
+								throw "E-Mailadresse wird bereits verwendet";
+							} else {
+								return ;
+							}
+						})
+				}
+			})
+			.then(() => {
 				var length = 8,
 			    charset = "!#+?-_abcdefghijklnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789",
 			    password = "";

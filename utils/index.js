@@ -102,3 +102,8 @@ exports.generateUrl = function(req, url) {
 		return url;
 	}
 }
+
+exports.Warning = function(message) {
+   this.message = message;
+   this.name = 'Warning';
+}
