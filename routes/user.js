@@ -252,6 +252,7 @@ module.exports = function(app){
 					password += charset.charAt(Math.floor(Math.random() * n));
 				}
 				return models.user.create({
+					id: req.body.id,
 					first_name: req.body.first_name,
 					last_name: req.body.last_name,
 					street: req.body.street,

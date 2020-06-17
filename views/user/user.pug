@@ -23,42 +23,46 @@ mixin user(user, templates_user, admin)
     .card-body
       table.table
         tbody
+          if admin
+            tr
+              td.col-md-4.h6: b User ID
+              td.col-md-8.h6= user.id
           tr
-            td.col-md-4.h6 Name:
+            td.col-md-4.h6: b Name
             td.col-md-8.h6= user.getFullName()
           tr
-            td.col-md-4.h6 Adresse:
+            td.col-md-4.h6: b Adresse
             td.col-md-8.h6!= user.getAddress(true)
           tr
-            td.col-md-4.h6 Telefonnummer:
+            td.col-md-4.h6: b Telefonnummer
             td.col-md-8.h6= user.telno
           tr
-            td.col-md-4.h6 E-Mail Adresse:
+            td.col-md-4.h6: b E-Mail Adresse
             td.col-md-8.h6 #[a(href='mailto:'+user.email)= user.email]
           tr
-            td.col-md-4.h6 IBAN:
+            td.col-md-4.h6: b IBAN
             td.col-md-8.h6= user.IBAN    
           tr
-            td.col-md-4.h6 BIC:
+            td.col-md-4.h6: b BIC
             td.col-md-8.h6= user.BIC
           tr
-            td.col-md-4.h6 Login Name:
+            td.col-md-4.h6: b Login Name
             td.col-md-8.h6= user.logon_id
           if admin
             tr
-              td.col-md-4.h6 Passwort:
+              td.col-md-4.h6: b Passwort
               if user.password && user.password !== ''
                 td.col-md-8.h6= user.password 
               else
                 td.col-md-8.h6
                   i.text-secondary verschlüsselt
             tr
-              td.col-md-4.h6 Eingeloggt:
+              td.col-md-4.h6: b Eingeloggt
               if (user.loginCount || 0) == 0
                 td.col-md-8.h6 
                   i.text-secondary Noch nie
               else
                 td.col-md-8.h6= user.loginCount + ' mal, zuletzt am ' + moment(user.lastLogin).format('DD.MM.YYYY')
             tr
-              td.col-md-4.h6 Beziehung zum Projekt:
+              td.col-md-4.h6: b Beziehung zum Projekt
               td.col-md-8.h6= user.relationship  	

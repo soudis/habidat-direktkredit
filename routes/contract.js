@@ -52,6 +52,7 @@ module.exports = function(app){
 					termination_period = req.body.termination_period_P;
 				}
 				return models.contract.create({
+					id: req.body.id,
 					sign_date: moment(req.body.sign_date),
 					termination_date: termination_date,
 					termination_type: req.body.termination_type,

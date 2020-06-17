@@ -5,6 +5,8 @@ mixin contract_form(action, updateAction, updateTag, editContract)
     +hidden('user_id', user.id)
     if editContract
       +hidden('id', editContract.id)
+    else
+      +id('id', _t('contract_id'))(placeholder='Automatisch')        
     - var termination_type = editContract?editContract.getTerminationType():settings.project.get('defaults.termination_type');
     - var termination_period = editContract?editContract.getTerminationPeriod():settings.project.get('defaults.termination_period');
     - var termination_period_type = editContract?editContract.getTerminationPeriodType():settings.project.get('defaults.termination_period_type');

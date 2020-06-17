@@ -46,6 +46,11 @@ mixin money(name, label=undefined)
   +input_group(label||_t(name))(icon=attributes.icon || 'fa-euro-sign')
     +group_input(name)(type='number' step="0.01")&attributes(attributes)  
 
+mixin id(name, label=undefined)
+  +input_group(label||_t(name))(icon=attributes.icon || 'fa-sort-numeric-down')
+    +group_input(name)(type='number' step="1")&attributes(attributes)  
+
+
 mixin percent(name, label=undefined)
   +input_group(label||_t(name))(icon=attributes.icon || 'fa-percent')
     +group_input(name)(type='number' step="0.001")&attributes(attributes)  

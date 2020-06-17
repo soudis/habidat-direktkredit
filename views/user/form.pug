@@ -5,6 +5,8 @@ mixin user_form(formTitle, action, user)
   +form(action)
     if user
       +hidden('id', user.id)
+    else
+      +id('id', _t('user_id'))(placeholder='Automatisch')  
     .form-row
       +text('first_name')(value=_iv(user, 'first_name') groupClass="col" icon='fa-user' required)
       +text('last_name')(value=_iv(user, 'last_name') groupClass="col")

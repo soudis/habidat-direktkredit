@@ -26,6 +26,9 @@ mixin contract(contract, templates_contract, admin)
         table.table
           tbody
             tr
+              td.label: b Kreditnummer
+              td= contract.id
+            tr
               td.label: b Betrag (Vertrag)
               td= format.formatMoney(contract.amount)
             tr
