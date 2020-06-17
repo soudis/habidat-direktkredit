@@ -3,7 +3,7 @@ const settings = require('../utils/settings');
 const utils = require('./');
 
 exports.sendPasswordMail = function(req, res, user) {
-	return utils.renderToText(req, res, 'email/setpassword', {link: 'https://'+req.headers.host+'/getpassword/'+user.passwordResetToken})
+	return utils.renderToText(req, res, 'email/setpassword', {link: 'https://'+req.headers.host+utils.generateUrl(req, '/getpassword/'+user.passwordResetToken)})
 		.then(emailBody => {
 			var transporter;
 			if (process.env.HABIDAT_DK_SMTP_HOST) {

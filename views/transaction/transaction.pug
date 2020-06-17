@@ -3,6 +3,15 @@ mixin transaction(contract, transaction, admin)
     td= moment(transaction.transaction_date).format('DD.MM.YYYY')
     td= transaction.getTypeText()
     td.text-right= format.formatMoney(transaction.amount)
+    td.text-right
+      if transaction.payment_type === 'bank'
+        span.fa.fa-money-check-alt(title=_t('payment_type') + ': ' + transaction.getPaymentTypeText())
+      else if transaction.payment_type === 'cash'
+        span.fa.fa-money-bill-wave(title=_t('payment_type') + ': ' + transaction.getPaymentTypeText())
+      else if transaction.payment_type === 'other'
+        span.fa.fa-piggy-bank(title=_t('payment_type') + ': ' + transaction.getPaymentTypeText())
+      else
+        span.fa.fa-minus
     if admin
       td.text-right
         a.btn.btn-light.btn-sm.sidebar-action(href=_url('/transaction/edit/'+transaction.id))

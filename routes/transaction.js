@@ -30,7 +30,8 @@ module.exports = function(app){
 				transaction_date: moment(req.body.transaction_date).format('YYYY-MM-DD'),
 				amount: req.body.amount,
 				type: req.body.type,
-				contract_id: req.body.contract_id
+				contract_id: req.body.contract_id,
+				payment_type: req.body.payment_type
 			}, { trackOptions: utils.getTrackOptions(req.user, true) })
 			.then(() => models.contract.findByIdFetchFull(models, req.body.contract_id))
 			.then(contract => {
@@ -44,7 +45,8 @@ module.exports = function(app){
 		models.transaction.update({
 				transaction_date: moment(req.body.transaction_date),
 				amount: parseFloat(req.body.amount),
-				type: req.body.type
+				type: req.body.type,
+				payment_type: req.body.payment_type
 			}, {where:{id:req.body.id}, trackOptions: utils.getTrackOptions(req.user, true)})
 			.then(() => models.contract.findByIdFetchFull(models, req.body.contract_id))
 			.then(contract => {

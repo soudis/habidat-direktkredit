@@ -2,6 +2,7 @@
 
 const moment = require('moment');
 const settings = require('../utils/settings');
+const intl = require('../utils/intl');
 
 module.exports = (sequelize, DataTypes) => {
 		transaction = sequelize.define('transaction', {
@@ -44,7 +45,11 @@ module.exports = (sequelize, DataTypes) => {
 		    		  	}
 	    			}
 	    		}
-	    	}
+	    	},
+	    	payment_type: {
+				type: DataTypes.TEXT,
+				allowNull: true
+			}
 		}, {
 			tableName: 'transaction',
 			freezeTableName: true
@@ -74,6 +79,15 @@ module.exports = (sequelize, DataTypes) => {
 
 		return "Unbekannt";
 	};
+
+	transaction.prototype.getPaymentTypeText = function () {
+		if (this.payment_type && this.payment_type !== null) {
+			return intl._t('payment_type_' + this.payment_type)
+		} else {
+			return '-';
+		}
+	};
+
 
 	transaction.prototype.getLink = function () {
 		return `<a href="/user/show/${this.contract.user.id}#show_transaction_${this.id}">${moment(this.transaction_date).format('DD.MM.YYYY')}</a>`;
