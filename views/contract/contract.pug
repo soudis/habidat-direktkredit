@@ -35,6 +35,9 @@ mixin contract(contract, templates_contract, admin)
               td: b Zinssatz
               td= format.formatPercent(contract.interest_rate,3)                        
             tr
+              td: b= _t('interest_payment_type')
+              td= _t('interest_payment_type_' + (contract.interest_payment_type || settings.project.get('defaults.interest_payment_type')))
+            tr
               td: b Status
               td= contract.getStatus()
             tr.divider

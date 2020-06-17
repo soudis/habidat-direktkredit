@@ -10,9 +10,13 @@ mixin contract_form(action, updateAction, updateTag, editContract)
     - var termination_type = editContract?editContract.getTerminationType():settings.project.get('defaults.termination_type');
     - var termination_period = editContract?editContract.getTerminationPeriod():settings.project.get('defaults.termination_period');
     - var termination_period_type = editContract?editContract.getTerminationPeriodType():settings.project.get('defaults.termination_period_type');
+    - var interest_payment_type = editContract?editContract.getInterestPaymentType():settings.project.get('defaults.interest_payment_type');
     +date('sign_date')(value=_iv(editContract, 'sign_date') required)
     +money('amount')(value=_iv(editContract, 'amount') required)
     +percent('interest_rate')(min="0" max="10" value=_iv(editContract, 'interest_rate') required)
+    +select('interest_payment_type')(icon='fa-reply')
+      +option('end', _t('interest_payment_type_end'))(selected=interest_payment_type)
+      +option('yearly', _t('interest_payment_type_yearly'))(selected=interest_payment_type)    
     +select('termination_type')(icon='fa-sign-out-alt' required)
       each type in ['T', 'P', 'D']
         +option(type, _t('termination_type_'+type))(selected=termination_type)

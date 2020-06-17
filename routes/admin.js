@@ -111,6 +111,7 @@ module.exports = function(app){
 				setSetting('url');
 				setSetting('theme');
 				setSetting('defaults.interest_method', req.body.interest_method);
+				setSetting('defaults.interest_payment_type', req.body.interest_payment_type);
 				setSetting('defaults.termination_type', req.body.termination_type);
 				setSetting('defaults.termination_period', req.body.termination_period);
 				setSetting('defaults.termination_period_type', req.body.termination_period_type);

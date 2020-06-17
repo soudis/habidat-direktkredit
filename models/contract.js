@@ -24,6 +24,10 @@ module.exports = (sequelize, DataTypes) => {
 				type: DataTypes.DATE,
 				allowNull: true
 			},
+			interest_payment_type: {
+				type: DataTypes.STRING,
+				allowNull: true
+			},
 			termination_type : {
 				type: DataTypes.STRING,
 				allowNull: true
@@ -103,6 +107,11 @@ module.exports = (sequelize, DataTypes) => {
 	contract.prototype.getTerminationPeriodType = function () {
 		return this.termination_period_type || settings.project.get('defaults.termination_period_type') || 6;
 	};
+
+	contract.prototype.getInterestPaymentType = function () {
+		return this.interest_payment_type || settings.project.get('defaults.interest_payment_type') || 'end';
+	};
+
 
 	contract.getTerminationTypeFullString = function (type, period, period_type, noPeriod = false) {
 		if (type === "P") {

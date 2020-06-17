@@ -52,6 +52,10 @@ block content
                           span  
                           span.fa.fa-info-circle(title=_t('interest_method_hint_' + settings.project.get('defaults.interest_method')))
                       tr
+                        td.col-md-4.h6.squeeze-left=_t('interest_payment_type')+':'
+                        td.col-md-8.h6= _t('interest_payment_type_' + settings.project.get('defaults.interest_payment_type'))
+
+                      tr
                         td.col-md-4.h6.squeeze-left Kündigungsart:
                         td.col-md-8.h6= models.contract.getTerminationTypeFullString(settings.project.get('defaults.termination_type'), settings.project.get('defaults.termination_period'), settings.project.get('defaults.termination_period_type'))
                       tr

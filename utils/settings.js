@@ -102,6 +102,7 @@ const initProject = () => {
 	project.set('url',                                  process.env.HABIDAT_DK_PROJECT_URL, false);
 	project.set('theme',                                process.env.HABIDAT_DK_PROJECT_THEME || 'red', false);
 	project.set('defaults.interest_method',             process.env.HABIDAT_DK_PROJECT_DEFAULTS_INTEREST_METHOD, false);
+	project.set('defaults.interest_payment_type',       process.env.HABIDAT_DK_PROJECT_DEFAULTS_INTEREST_PAYMENT_TYPE, false);
 	project.set('defaults.termination_type',            process.env.HABIDAT_DK_PROJECT_DEFAULTS_TERMINATION_TYPE, false);
 	project.set('defaults.termination_period',          process.env.HABIDAT_DK_PROJECT_DEFAULTS_TERMINATION_PERIOD, false);
 	project.set('defaults.termination_period_type',     process.env.HABIDAT_DK_PROJECT_DEFAULTS_TERMINATION_PERIOD_TYPE, false);

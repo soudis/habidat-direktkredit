@@ -54,6 +54,7 @@ module.exports = function(app){
 				return models.contract.create({
 					id: req.body.id,
 					sign_date: moment(req.body.sign_date),
+					interest_payment_type: req.body.interest_payment_type,
 					termination_date: termination_date,
 					termination_type: req.body.termination_type,
 					termination_period: termination_period,
@@ -94,6 +95,7 @@ module.exports = function(app){
 				return models.contract.update({
 					sign_date: moment(req.body.sign_date).toDate(),
 					termination_date: termination_date,
+					interest_payment_type: req.body.interest_payment_type,
 					termination_type: req.body.termination_type,
 					termination_period: parseFloat(termination_period),
 					termination_period_type: termination_period_type,
