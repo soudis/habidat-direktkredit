@@ -97,37 +97,81 @@ module.exports = (sequelize, DataTypes) => {
 		return `Zahlung vom ${this.getLink()} für den Vertrag vom ${this.contract.getLink()} von ${this.contract.user.getLink()}`;
 	};
 
+
 	transaction.prototype.interestToDate = function (rate, toDate) {
+
 		if (rate > 0 && moment(toDate).diff(this.transaction_date) >= 0) {
-			var method = settings.project.get('defaults.interest_method') || '365_compound';
-			var method_days = 365;
+			var methodString = settings.project.get('defaults.interest_method') || '365_compound';
+			var method = methodString.split('_')[0];
+			var methodCompound = methodString.split('_')[1];
+
+			var getBaseDays = function(date) {
+				if (method === 'ACT') {
+					return moment(date).endOf('year').dayOfYear();
+				} else if (method === '30E360') {
+					return 360;
+				} else {
+					return parseInt(method);
+				}
+			}
+
+			//var method_days = 365;
 			var amountWithInterest = this.amount;
-			var fromDate = this.transaction_date;
+			var fromDate = moment(this.transaction_date);
 			var endOfYear = moment(fromDate).endOf('year');
 	      	// if toDate is before end of year
 	      	if (endOfYear.diff(toDate) >= 0) {
 	        	// calculation interest until toDate
-	        	amountWithInterest += amountWithInterest * rate / 100 * moment(toDate).diff(fromDate, 'days') / method_days;
+	        	var interestDays = 0;
+	        	if (method === '30E360') {
+	        		var endOfMonth = fromDate.endOf('month');
+	        		if (endOfMonth.diff(toDate) >= 0) {
+	        			interestDays = moment(toDate).diff(fromDate, 'days');
+	        		} else {
+	        			interestDays = 30 - fromDate.date();
+	        			var months = moment(toDate).diff(endOfMonth, 'months');
+	        			interestDays += months * 30 + moment(toDate).date();
+	        		}
+	        	} else {
+	        		interestDays = moment(toDate).diff(fromDate, 'days');
+	        	}
+	        	amountWithInterest += amountWithInterest * rate / 100 * interestDays / getBaseDays(fromDate);
 	      	// if toDate is after end of year
 	  		} else {
 	        	// calculation interest until end of first year
-	        	amountWithInterest += amountWithInterest * rate / 100 * endOfYear.diff(fromDate, 'days') / method_days;
 
+	        	var interestDays = 0;
+	        	if (method === '30E360') {
+	       			interestDays = 30 - fromDate.date();
+	        		var months = 12 - fromDate.month() - 1;
+	        		interestDays += months * 30;
+	        	} else {
+	        		interestDays = endOfYear.diff(fromDate, 'days');
+	        	}
+	        	amountWithInterest += amountWithInterest * rate / 100 * interestDays / getBaseDays(fromDate);
 	        	// calculation interest for all full years
 	        	var years = moment(toDate).diff(endOfYear, 'years');
 	        	if (years > 0) {
-	        		if (method === '365_nocompound') {
+	        		if (methodCompound === 'nocompound') {
 	        			amountWithInterest += this.amount * rate / 100 * years;
 	        		} else {
 	        			amountWithInterest = amountWithInterest * Math.pow(1+rate/100, years);
 	        		}
 	        	}
 
-	        	//calculate interest for remaining days in last year
-	        	if (method === '365_nocompound') {
-	        		amountWithInterest += this.amount * rate / 100 * moment(toDate).diff(endOfYear.add(years, 'years'),'days') / method_days;
+	        	if (method === '30E360') {
+	       			interestDays = moment(toDate).date();
+	        		var months = moment(toDate).month();
+	        		interestDays += months * 30;
 	        	} else {
-	        		amountWithInterest += amountWithInterest * rate / 100 * moment(toDate).diff(endOfYear.add(years, 'years'),'days') / method_days;
+	        		interestDays = moment(toDate).diff(endOfYear.add(years, 'years'),'days');
+	        	}
+
+	        	//calculate interest for remaining days in last year
+	        	if (methodCompound === 'nocompound') {
+	        		amountWithInterest += this.amount * rate / 100 * interestDays / getBaseDays(toDate);
+	        	} else {
+	        		amountWithInterest += amountWithInterest * rate / 100 * interestDays / getBaseDays(toDate);
 	        	}
 	    	}
 	    	return amountWithInterest - this.amount;
