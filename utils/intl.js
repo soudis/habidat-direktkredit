@@ -21,6 +21,7 @@ const texts = {
 	"form_contract_edit": "Kredit ändern",
 	"form_contract_add": "Kredit hinzufügen",
 	"form_file_add_user": "Dokument hinzufügen",
+	"form_process_startinterestpayment": "Jährliche Zinsauszahlungen eintragen",
 	"form_transaction_add": "Zahlung anlegen",
 	"form_transaction_edit": "Zahlung bearbeiten",
 	"form_user_edit": "Kreditgeber*in bearbeiten",

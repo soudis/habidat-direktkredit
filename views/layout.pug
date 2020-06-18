@@ -54,6 +54,9 @@ html
            +dd_item(_url("/statistics/german"))
              span.fa.fa-balance-scale
              span  Direktkredite aus Deutschland
+           +dd_item(_url("/process/interestpayment/" + moment().subtract(1,'years').year()))
+             span.fa.fa-calendar-check
+             span  Jährliche Zinszahlungen
           +nav_item_dropdown( "#" )(label="Administration" icon="fa-tools")
             +dd_item(_url("/admin/settings"))
               span.fa.fa-cog

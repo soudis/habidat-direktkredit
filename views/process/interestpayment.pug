@@ -1,0 +1,5 @@
+extends ../layout
+include ../partials/contractlist
+
+block content
+  +contractlist(contracts)(fnExport=true fnFilter=true fnColumns=true fnProcessInterestPayment=true fnViews=false fnSelectable=true years=years year=year)

@@ -177,7 +177,7 @@ module.exports = (sequelize, DataTypes) => {
 				});
 	};
 
-	User.findFetchFull = function (models, whereClause) {
+	User.findFetchFull = function (models, whereClause, contractFilter = undefined) {
 		return models.user.findAll({
 			where: whereClause,
 			include:{
@@ -199,6 +199,22 @@ module.exports = (sequelize, DataTypes) => {
 					as: 'transactions'
 				},
 				'transaction_date']]
+			})
+			.then(users => {
+				if (contractFilter) {
+					users.forEach(function(user){
+						var contracts = [];
+						user.contracts.forEach(function(contract){
+							if (contractFilter(user, contract)) {
+								contracts.push(contract);
+							}
+						});
+						user.contracts = contracts;
+					});
+					return users.filter(user => { return user.contracts.length > 0; });
+				} else {
+					return users;
+				}
 			});
 	};
 

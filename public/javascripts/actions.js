@@ -43,7 +43,6 @@ const redirectOrReload = redirectURL => {
 
 const errorAlert = function(error, callback=undefined) {
 	var title, message;
-	console.log(error.code);
 	if (error.code && error.code.startsWith('PUG:')) {
 		title = 'HTML Vorlagenfehler';
 		message = error.msg + ' (' + error.filename + ':' + error.line + ':' + error.column + ')';
@@ -63,6 +62,22 @@ const errorAlert = function(error, callback=undefined) {
 	});
 };
 
+const infoAlert = function(message, callback=undefined) {
+	bootbox.dialog({
+		title: 'Information',
+	    message: message,
+        onEscape: true,
+	    backdrop: true,
+	    buttons: {
+	        ok: {
+	            label: 'OK',
+	            className: 'btn-primary'
+	        }
+	    },
+	    callback: callback || function() {}
+	});
+};
+
 $(document).ready(function(){
 	$(document).on("click", ".sidebar-action", function (e) {
 		e.preventDefault();
@@ -70,8 +85,14 @@ $(document).ready(function(){
 		$('.card.active').removeClass('active');
 		$(this).parents('.card').addClass('active');
 
+		var url = $(this).attr("href");
+
+	    if ($(this).data('parameters')) {
+	    	url += '/' + $(this).data('parameters');
+	    }
+
 		$.ajax({
-		    url : $(this).attr("href"),
+		    url : url,
 		    type: "GET",
 	        success: function(data) {
 	        	showSidebar(data);
@@ -148,6 +169,8 @@ $(document).ready(function(){
 					hideSidebar();
 					if (data.redirect) {
 		  				redirectOrReload(data.redirect);
+		  			} else if (data.message) {
+		  				infoAlert(data.message);
 		  			}
 		       		var action = form.attr('update-action');
 		       		var tag = form.attr('update-tag');

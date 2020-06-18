@@ -1,7 +1,6 @@
 include ../transaction/transaction
 
 mixin contract(contract, templates_contract, admin)
-  - interest = contract.calculateInterest()
   .col-md-12(id="contract_" + contract.id)
     .card
       .card-header
@@ -71,7 +70,7 @@ mixin contract(contract, templates_contract, admin)
               td= format.formatMoney(contract.getWithdrawalAmount())
             tr
               td: b Zinsen bis heute
-              td= format.formatMoney(interest.now)
+              td= format.formatMoney(contract.getInterestToDate())
             tr.divider
               if admin
                 td: b Aushaftender Betrag

@@ -1,9 +1,13 @@
 /* jshint esversion: 8 */
 $(document).ready(function(){
+	var orderBy = 1;
+	if ($('.dataTable').hasClass('selectable')) {
+		orderBy = 2;
+	}
     table = $('#datatable').DataTable({
     	pageLength: 25,
       language: dataTableLanguange,
-      order: [[ 1, 'desc' ]],
+      order: [[ orderBy, 'desc' ]],
       responsive: {
         details: {
           type: "column"
@@ -459,21 +463,78 @@ $(document).ready(function(){
     });
 
     $(document).on( 'click', '.export-data', function () {
+    	var interest_year = $('.dataTable').data('interest-year');
         var fields = $('#column_select').val();
         var users = [];
         table.column('user_id:name', { search:'applied' }).data().each((value) => users.push(value));
         var contracts = [];
         table.column('contract_id:name', { search:'applied' }).data().each((value) => contracts.push(value));
-        console.log('huhu');
+        if (table.rows('.selected').data() === 0) {
+        	errorAlert('Keine Einträge ausgewählt');
+        	return false;
+        }
+        if ($('.dataTable').hasClass('selectable')) {
+	       var selected = [];
+	       $.each(table.rows('.selected').data(), function() {
+	       	console.log(this);
+	           	selected.push(this[11].display);
+	       });
+	       contracts = contracts.filter(contract => { return selected.includes(contract);});
+	       selected = [];
+	       $.each(table.rows('.selected').data(), function() {
+	       	console.log(this);
+	           	selected.push(this[3].display);
+	       });
+	       users = users.filter(users => { return selected.includes(users);});
+        }
         var action = _url('/user/export');
         $('<form action="' + action + '" method="POST"></form>')
             .append('<input name="fields" value="' + fields + '" />')
             .append('<input name="users" value="' + users + '" />')
+            .append('<input name="interest_year" value="' + interest_year + '" />')
             .append('<input name="contracts" value="' +contracts + '" />')
             .appendTo('body')
             .submit()
             .remove();
     });
+
+    var updateSelected = function() {
+       var contracts = [];
+       $.each(table.rows('.selected').data(), function() {
+           	contracts.push(this[11].display);
+       });
+       $('#process_interest_payment').data('parameters', encodeURIComponent(contracts.join(',')));
+    }
+
+    $(document).on( 'change', '#interest_year', function () {
+      $(location).attr("href", _url("/process/interestpayment/" + $(this).val()));
+    });
+
+    $(document).on( 'click', '.dataTable.selectable td.selectable', function () {
+        $(this).parent().toggleClass('selected');
+        $(this).parent().find('td.selector span').toggleClass('d-none');
+        updateSelected();
+    } );
+
+    $(document).on( 'click', '.dataTable.selectable th.selector', function () {
+    	if ($(this).hasClass('selected')) {
+    		$(this).removeClass('selected');
+    		$(this).children('span.selected').addClass('d-none');
+    		$(this).children('span.not-selected').removeClass('d-none');
+    		$(this).parents('table').find('tbody tr').removeClass('selected');
+        	$(this).parents('table').find('tbody td.selector span.selected').addClass('d-none');
+        	$(this).parents('table').find('tbody td.selector span.not-selected').removeClass('d-none');
+    	} else {
+    		$(this).addClass('selected');
+    		$(this).children('span.selected').removeClass('d-none');
+    		$(this).children('span.not-selected').addClass('d-none');
+    		$(this).parents('table').find('tbody tr').addClass('selected');
+        	$(this).parents('table').find('tbody td.selector span.selected').removeClass('d-none');
+        	$(this).parents('table').find('tbody td.selector span.not-selected').addClass('d-none');
+    	}
+		updateSelected();
+
+    } );
 
 
 });

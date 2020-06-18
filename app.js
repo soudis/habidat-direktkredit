@@ -155,6 +155,7 @@ try{
 	require('./routes/file')(router);
 	require('./routes/communication')(router);
 	require('./routes/admin')(router);
+	require('./routes/process')(router);
 
 	app.use(sass({
 		src: path.join(__dirname, '/'),
@@ -195,7 +196,7 @@ try{
 				message: err.message,
 				error: err
 			}, (renderError, html) => {
-				res.json({html: html, error: err});
+				res.json({html: html, error: err.message?err.message:err});
 			});
 		} else {
 		  res.render('error', {message: err.message, error: err, title: 'Uups..'});

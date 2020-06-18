@@ -103,6 +103,11 @@ mixin checkbox(name, label=undefined)
 mixin option(value, label=undefined) 
   option(selected=attributes.selected && attributes.selected==value value=value)=label||_t(value)
 
+mixin output(name, label=undefined)
+  .form-group(class=attributes.class)
+    label.control-label(for=attributes.id || name)=label||_t(name)
+    +group_output(name)&attributes(attributes)  
+
 mixin output_image(name, src)
   .form-group(class=attributes.class)
     label.control-label(for=attributes.id || name aria-describedby=name+"_help")=_t(name)

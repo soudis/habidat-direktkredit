@@ -530,6 +530,14 @@ input.number-filter {
   display: inline-flex;
 }
 
+.dataTable td.selector span {
+  padding-top: 8px;
+}
+
+.dataTable td.selector span.selected, .dataTable th.selector span.selected {
+  color: $highlight-color-full;
+}
+
 #saved_views {
   min-width: 200px;
 }

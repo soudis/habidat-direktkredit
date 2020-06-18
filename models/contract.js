@@ -141,44 +141,6 @@ module.exports = (sequelize, DataTypes) => {
 		}
 	};
 
-	contract.prototype.calculateInterest = function () {
-		var interest = {"now": 0.00, "last_year": 0.00, "termination": 0.00};
-		var last_year_end = moment().startOf("year");
-		var last_year_begin = moment().subtract(1, "years").startOf("year");
-		var now = moment();
-
-		var contract = this;
-		interest.last_year_no = last_year_begin.year();
-
-		var terminatedLastYear = contract.isTerminated(last_year_end);
-
-		if (contract.isTerminated(now)) {
-			this.transactions.forEach(function(transaction) {
-				interest.now += transaction.amount;
-				if (terminatedLastYear) {
-					interest.last_year += transaction.amount;
-				} else if (last_year_end.diff(transaction.transaction_date, 'days') > 0)  {
-					interest.last_year += transaction.interestToDate(contract.interest_rate, last_year_end);
-					interest.last_year -= transaction.interestToDate(contract.interest_rate, last_year_begin);
-				}
-			});
-			interest.now = Math.abs(interest.now);
-			interest.last_year = Math.abs(interest.last_year);
-		} else {
-			this.transactions.forEach(function(transaction) {
-				interest.now += transaction.interestToDate(contract.interest_rate, now);
-				interest.last_year += transaction.interestToDate(contract.interest_rate, last_year_end);
-				interest.last_year -= transaction.interestToDate(contract.interest_rate, last_year_begin);
-				if (contract.termination_date) {
-					interest.termination += transaction.interestToDate(contract.interest_rate, moment(contract.termination_date));
-				}
-			});
-			interest.now = Math.ceil(interest.now*100) / 100;
-			interest.termination = Math.ceil(interest.termination*100) / 100;
-		}
-		return interest;
-	};
-
 	contract.prototype.getFetchedTransactions = function () {
 		return this.transactions;
 	};
@@ -226,6 +188,40 @@ module.exports = (sequelize, DataTypes) => {
 		this.transactions.forEach(function(transaction) {
 			if (moment(date).diff(transaction.transaction_date) >= 0 && transaction.id != currentTransactionId) {
 				sum += transaction.amount + transaction.interestToDate(contract.interest_rate, date);
+			}
+		});
+		if (sum > 0) {
+			return sum;
+		} else {
+			return 0;
+		}
+	};
+
+	contract.prototype.getInterestToDate = function (date) {
+		var sum = 0;
+		var contract = this;
+		this.transactions.forEach(function(transaction) {
+			if (moment(date).diff(transaction.transaction_date) >= 0) {
+				sum += transaction.interestToDate(contract.interest_rate, date);
+			}
+		});
+		if (sum > 0) {
+			return sum;
+		} else {
+			return 0;
+		}
+	};
+
+	contract.prototype.getInterestOfYear = function (year) {
+		var sum = 0;
+		var contract = this;
+		var year_begin = moment(year+'-01-01').startOf("year");
+		var year_end = moment(year+'-01-01').add(1,'years');
+		console.log('begin: ', year_begin.toString(), ', end: ', year_end.toString());
+		this.transactions.forEach(function(transaction) {
+			if (year_end.diff(transaction.transaction_date) > 0) {
+				sum += transaction.interestToDate(contract.interest_rate, year_end);
+				sum -= transaction.interestToDate(contract.interest_rate, year_begin);
 			}
 		});
 		if (sum > 0) {
