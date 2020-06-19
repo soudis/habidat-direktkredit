@@ -35,7 +35,10 @@ const set = function(path, value, overwrite = true, overwriteNull = false) {
 const get = function(path) {
 	cursor = this;
 	if (path) {
-		for (var i=0, path=path.split('.'), len=path.length; i<len; i++){
+		for (var i=0, path=path.split('.'), len=path.length; i<len; i++) {
+			if (!cursor[path[i]]) {
+				return undefined;
+			}
 			cursor = cursor[path[i]];
 		}
 	}
@@ -101,6 +104,10 @@ const initProject = () => {
 	project.set('email',                                process.env.HABIDAT_DK_PROJECT_EMAIL, false);
 	project.set('url',                                  process.env.HABIDAT_DK_PROJECT_URL, false);
 	project.set('theme',                                process.env.HABIDAT_DK_PROJECT_THEME || 'red', false);
+	project.set('smtp.host', 							process.env.HABIDAT_DK_SMTP_HOST);
+	project.set('smtp.port', 							process.env.HABIDAT_DK_SMTP_PORT);
+	project.set('smtp.auth.user', 						process.env.HABIDAT_DK_SMTP_USER);
+	project.set('smtp.auth.pass', 						process.env.HABIDAT_DK_SMTP_PASSWORD);
 	project.set('defaults.interest_method',             process.env.HABIDAT_DK_PROJECT_DEFAULTS_INTEREST_METHOD, false);
 	project.set('defaults.interest_payment_type',       process.env.HABIDAT_DK_PROJECT_DEFAULTS_INTEREST_PAYMENT_TYPE, false);
 	project.set('defaults.termination_type',            process.env.HABIDAT_DK_PROJECT_DEFAULTS_TERMINATION_TYPE, false);

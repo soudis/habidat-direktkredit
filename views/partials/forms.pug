@@ -50,6 +50,9 @@ mixin id(name, label=undefined)
   +input_group(label||_t(name))(icon=attributes.icon || 'fa-sort-numeric-down')
     +group_input(name)(type='number' step="1")&attributes(attributes)  
 
+mixin number(name, label=undefined)
+  +input_group(label||_t(name))(icon=attributes.icon || 'fa-sort-numeric-down')
+    +group_input(name)(type='number' step="1")&attributes(attributes)  
 
 mixin percent(name, label=undefined)
   +input_group(label||_t(name))(icon=attributes.icon || 'fa-percent')

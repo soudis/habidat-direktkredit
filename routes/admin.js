@@ -108,6 +108,10 @@ module.exports = function(app){
 
 				setSetting('projectname');
 				setSetting('email');
+				setSetting('smtp.host', req.body.smtp_host);
+				setSetting('smtp.port', req.body.smtp_port);
+				setSetting('smtp.auth.user', req.body.smtp_auth_user);
+				setSetting('smtp.auth.pass', req.body.smtp_auth_pass);
 				setSetting('url');
 				setSetting('theme');
 				setSetting('defaults.interest_method', req.body.interest_method);

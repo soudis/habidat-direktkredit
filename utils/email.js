@@ -5,7 +5,7 @@ const utils = require('./');
 const models  = require('../models');
 
 const fromAddress = (req) => {
-	return 'no-reply@'+req.headers.host;
+	return settings.project.get('email') || 'no-reply@'+req.headers.host;
 }
 
 const sendMail = (from, recipient, subject, body) => {
@@ -15,17 +15,8 @@ const sendMail = (from, recipient, subject, body) => {
 				throw "Keine E-Mailadresse hinterlegt";
 			}
 			var transporter;
-			if (process.env.HABIDAT_DK_SMTP_HOST) {
-				var options = {
-			      host: process.env.HABIDAT_DK_SMTP_HOST,
-			      port: process.env.HABIDAT_DK_SMTP_PORT || 25
-			    }
-			    if (process.env.HABIDAT_DK_SMTP_USER && process.env.HABIDAT_DK_SMTP_PASSWORD) {
-			    	options.auth = {
-			    		user: process.env.HABIDAT_DK_SMTP_USER,
-			        	pass: process.env.HABIDAT_DK_SMTP_PASSWORD
-			    	}
-			    }
+			if (settings.project.get('smtp.host')) {
+				var options = settings.project.get('smtp');
 				transporter = nodemailer.createTransport(options);
 			} else if (process.env.HABIDAT_DK_SENDGRID_USER && process.env.HABIDAT_DK_SENDGRID_PASSWORD) {
 				transporter = nodemailer.createTransport({

@@ -30,6 +30,10 @@ block content
                 td.col-md-8.h6= settings.project.get('email')
               tr
                 td.col-md-4.h6 
+                  b SMTP Servereinstellungen:
+                td.col-md-8.h6= (settings.project.get('smtp.auth.user')?settings.project.get('smtp.auth.user')+'@':'') + settings.project.get('smtp.host') + ':' + (settings.project.get('smtp.port') || "25")
+              tr
+                td.col-md-4.h6 
                   b=_t('project_url')
                 td.col-md-8.h6= settings.project.get('url')
               tr
