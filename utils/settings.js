@@ -105,7 +105,7 @@ const initProject = () => {
 	project.set('url',                                  process.env.HABIDAT_DK_PROJECT_URL, false);
 	project.set('theme',                                process.env.HABIDAT_DK_PROJECT_THEME || 'red', false);
 	project.set('smtp.host', 							process.env.HABIDAT_DK_SMTP_HOST);
-	project.set('smtp.port', 							process.env.HABIDAT_DK_SMTP_PORT);
+	project.set('smtp.port', 							process.env.HABIDAT_DK_SMTP_PORT || "25");
 	project.set('smtp.auth.user', 						process.env.HABIDAT_DK_SMTP_USER);
 	project.set('smtp.auth.pass', 						process.env.HABIDAT_DK_SMTP_PASSWORD);
 	project.set('defaults.interest_method',             process.env.HABIDAT_DK_PROJECT_DEFAULTS_INTEREST_METHOD, false);
