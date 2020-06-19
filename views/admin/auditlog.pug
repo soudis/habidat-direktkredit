@@ -43,7 +43,7 @@ block content
           tr
             td(data-order=entry.timestamp)= moment(entry.timestamp).format('DD.MM.YYYY HH:mm')
             if entry.user
-              td= entry.user.getFullName() || entry.user.logon_id || 'System'
+              td= entry.user.getFullName() || entry.user.logon_id&&entry.user.logon_id!==null?entry.user.logon_id:entry.user.email || 'System'
             else 
               td System
             if entry.action === 'delete' || !entry.target
