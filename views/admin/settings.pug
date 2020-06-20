@@ -1,0 +1,71 @@
+extends ../layout
+
+block content 
+  .jumbotron
+    h2 Einstellungen
+    p.lead Hier können die Grundeinstellungen für euer Projekt vorgenommen und die Standards für Kreditverträge und Zinsberechnung eingestellt werden.
+  .row
+    .col-md-12
+      .card
+        h4.card-header 
+          span Projekteinstellungen 
+          span.float-right
+            a.btn.btn-light.btn-sm.sidebar-action(href=_url('/admin/edit_settings')) 
+              span.fa.fa-edit
+        .card-body
+          table.table
+            tbody
+              tr
+                td.col-md-4.h6 
+                  b Projektname:
+                td.col-md-8.h6= settings.project.get('projectname')
+              tr
+                td.col-md-4.h6 
+                  b Logo:
+                td.col-md-8
+                  img(src=settings.project.get('logo') height='100')
+              tr
+                td.col-md-4.h6 
+                  b Kontakt E-Mail Adresse:
+                td.col-md-8.h6= settings.project.get('email')
+              tr
+                td.col-md-4.h6 
+                  b SMTP Servereinstellungen:
+                td.col-md-8.h6= (settings.project.get('smtp.auth.user')?settings.project.get('smtp.auth.user')+'@':'') + settings.project.get('smtp.host') + ':' + (settings.project.get('smtp.port') || "25")
+              tr
+                td.col-md-4.h6 
+                  b=_t('project_url')
+                td.col-md-8.h6= settings.project.get('url')
+              tr
+                td.col-md-4.h6 
+                  b=_t('theme')
+                td.col-md-8.h6
+                  span.fa.fa-square-full.text-primary
+                  span  
+                  span= _t(settings.project.get('theme'))
+              tr
+                td.col-md-3.h6 
+                  b Standardwerte / Voreinstellungen:
+                td.col-md-9.h6
+                  table.table.margin-top
+                    tbody                
+                      tr.margin
+                        td.col-md-4.h6.squeeze-left Zinsberechnung:
+                        td.col-md-8.h6
+                          span= _t('interest_method_' + settings.project.get('defaults.interest_method'))
+                          span  
+                          span.fa.fa-info-circle(title=_t('interest_method_hint_' + settings.project.get('defaults.interest_method')))
+                      tr
+                        td.col-md-4.h6.squeeze-left=_t('interest_payment_type')+':'
+                        td.col-md-8.h6= _t('interest_payment_type_' + settings.project.get('defaults.interest_payment_type'))
+
+                      tr
+                        td.col-md-4.h6.squeeze-left Kündigungsart:
+                        td.col-md-8.h6= models.contract.getTerminationTypeFullString(settings.project.get('defaults.termination_type'), settings.project.get('defaults.termination_period'), settings.project.get('defaults.termination_period_type'))
+                      tr
+                        td.col-md-4.h6.squeeze-left Land (Kreditgeber*innen):
+                        td.col-md-8.h6= settings.project.get('defaults.country')
+                      tr
+                        td.col-md-4.h6.squeeze-left Beziehungsarten (Kreditgeber*innen):
+                        td.col-md-8.h6= settings.project.get('defaults.relationships').join(', ')
+

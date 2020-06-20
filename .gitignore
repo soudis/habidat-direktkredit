@@ -2,15 +2,16 @@ node_modules
 config/config.json
 config/key.pem
 config/certificate.pem
-config/projects.json
-config/site.json
+config/project.json
 sessions
 bin
 tmp
 upload
 templates
+!public/templates
 public/files
 public/images
+public/css/*.css
 docker-compose.yml
 
 # Compiled source #

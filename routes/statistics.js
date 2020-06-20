@@ -1,8 +1,13 @@
-var security = require('../utils/security');
-var moment = require("moment");
-var statistics = require('../utils/statistics');
-var utils = require('../utils')
-var router = require('express').Router();
+/* jshint esversion: 8 */
+const security = require('../utils/security');
+const moment = require("moment");
+const statistics = require('../utils/statistics');
+const utils = require('../utils');
+const router = require('express').Router();
+const models  = require('../models');
+const format = require('../utils/format');
+const settings = require('../utils/settings');
+const Op = require("sequelize").Op;
 
 module.exports = function(app){
 
@@ -10,27 +15,28 @@ module.exports = function(app){
 		res.render('statistics/downloads', { title: 'Downloads'});
 	});
 
-	router.get('/statistics/numbers', security.isLoggedInAdmin, function(req, res) {
-		var models  = require('../models')(req.session.project);		
-		statistics.getNumbers(models, req.session.project, function(numbers) {
-			console.log("numbers: " + JSON.stringify(numbers, null, 2));
-			res.render('statistics/numbers', { title: 'Zahlen, Daten, Fakten', "numbers": numbers});
-		});
-
+	router.get('/statistics/numbers', security.isLoggedInAdmin, function(req, res, next) {
+		statistics.getNumbers()
+			.then(numbers => {
+				res.render('statistics/numbers', { title: 'Zahlen, Daten, Fakten', "numbers": numbers});
+			})
+			.catch(next);
 	});
 
-	router.get('/statistics/byrelation', security.isLoggedInAdmin, (req, res) => {
-		var models  = require('../models')(req.session.project);		
+	router.get('/statistics/byrelation/:start/:end', security.isLoggedInAdmin, (req, res) => {
 		models.user.findAll({
-			  include:{ 
-					model: models.contract, 
-					as: 'contracts', 
-					include : { 
-						model: models.transaction, 
+			  where: { administrator: {[Op.not]: '1'}},
+			  include:{
+					model: models.contract,
+					as: 'contracts',
+					include : {
+						model: models.transaction,
 						as: 'transactions'
 					}
 				}
 		}).then(function(users) {
+			var endDate = moment(req.params.end, 'DD.MM.YYYY').endOf('month');
+			var startDate = moment(req.params.start, 'DD.MM.YYYY');
 			var byRelation = {};
 			var today = moment();
 			users.forEach((user) => {
@@ -38,68 +44,105 @@ module.exports = function(app){
 					byRelation[user.relationship] = 0;
 				}
 				user.contracts.forEach((contract) => {
-					byRelation[user.relationship] += contract.getAmountToDate(req.session.project, today);
-				})
-			})
+					if (moment(contract.sign_date).isBetween(startDate, endDate)) {
+						byRelation[user.relationship] += contract.getAmountToDate(endDate);
+					}
+				});
+			});
+			Object.keys(byRelation).forEach(key => {
+				byRelation[key] = Math.round(byRelation[key]*100)/100;
+			});
 			res.setHeader('Content-Type', 'application/json');
-    		res.send(JSON.stringify(byRelation));
+			res.send(JSON.stringify(byRelation));
 		});
 	});
-	
-	router.get('/statistics/byzip', security.isLoggedInAdmin, (req, res) => {
-		var models  = require('../models')(req.session.project);		
+
+	router.get('/statistics/byregion/:level/:start/:end', security.isLoggedInAdmin, (req, res, next) => {
 		models.user.findAll({
-			  include:{ 
-					model: models.contract, 
-					as: 'contracts', 
-					include : { 
-						model: models.transaction, 
+				where: { administrator: {[Op.not]: '1'}},
+			  	include:{
+					model: models.contract,
+					as: 'contracts',
+					include : {
+						model: models.transaction,
 						as: 'transactions'
 					}
 				}
 		}).then(function(users) {
-			var byZip = {};
+			var endDate = moment(req.params.end, 'DD.MM.YYYY').endOf('month');
+			var startDate = moment(req.params.start, 'DD.MM.YYYY');
+			var sections = {};
+			var total = 0;
 			var today = moment();
 			users.forEach((user) => {
-				var key = "Sonstige";
-				if (user.zip) {
-					if (user.zip.length == 4) {
-						key = "AT " + user.zip.substr(0,1) + "XXX";
+				var key = "Sonstige", skip = false;
+				var country = user.country || settings.project.get('defaults.country') || 'AT';
+				if (req.params.level === 'country') {
+					key = country;
+				} else if (req.params.level.startsWith('zip-')) {
+					var levelParts = req.params.level.split('-');
+					if (levelParts[1] != country) {
+						// skip if wrong country
+						skip = true;
+					} else {
+						if (levelParts.length === 3) {
+							if (!user.zip || !user.zip.startsWith(levelParts[2])) {
+								// skip if wrong zip region
+								skip = true;
+							} else {
+								key = levelParts[1] + '-' + user.zip.substring(0,levelParts[2].length+1);
+							}
+						} else {
+							if (!user.zip) {
+								skip = true;
+							} else {
+								key = levelParts[1] + '-' + user.zip.substring(0,1);
+							}
+						}
 					}
-					if (user.zip.length == 5) {
-						key = "DE"
-					}
-				} 
-				
-				if (!byZip[key]) {
-					byZip[key] = 0;
+				}
+
+				if (!sections[key]) {
+					sections[key] = 0;
 				}
 				user.contracts.forEach((contract) => {
-					byZip[key] += contract.getAmountToDate(req.session.project, today);
-				})
-			})
-			res.setHeader('Content-Type', 'application/json');
-    		res.send(JSON.stringify(byZip));
-		});
-	});	
-
-	router.get('/statistics/bymonth', security.isLoggedInAdmin, (req, res) => {
-		var models  = require('../models')(req.session.project);		
-
-		models.user.findAll({
-			  include:{ 
-					model: models.contract, 
-					as: 'contracts', 
-					include : { 
-						model: models.transaction, 
-						as: 'transactions'
+					if (moment(contract.sign_date).isBetween(startDate, endDate)) {
+						var amount = contract.getAmountToDate(endDate);
+						if (!skip) {
+							sections[key] += amount;
+						}
+						total += amount;
 					}
+				});
+			});
+			var result = {};
+			Object.keys(sections).forEach((section) => {
+				var percent = 100*sections[section] / total;
+				result[section + ' (' + format.format(percent, 2, '#%') + ')'] = Math.round(sections[section]*100)/100;
+			});
+			res.setHeader('Content-Type', 'application/json');
+			res.send(JSON.stringify(result));
+		})
+		.catch(error => next(error));
+	});
+
+	router.get('/statistics/bymonth/:start/:end', security.isLoggedInAdmin, (req, res) => {
+		models.user.findAll({
+			where: { administrator: {[Op.not]: '1'}},
+			include:{
+				model: models.contract,
+				as: 'contracts',
+				include : {
+					model: models.transaction,
+					as: 'transactions'
 				}
+			}
 		}).then(function(users) {
-			var currentDate = moment();
+			var endDate = moment(req.params.end, 'DD.MM.YYYY');
+			var startDate = moment(req.params.start, 'DD.MM.YYYY');
 			var months = [];
-			for (var i = 11; i>=0; i--) {
-				months.push(moment().subtract(1*i, 'months').endOf('month'));
+			for (var i = Math.abs(endDate.diff(startDate,'months')); i>=0; i--) {
+				months.push(moment(endDate).subtract(1*i, 'months').endOf('month'));
 			}
 			//console.log("months: " + JSON.stringify(months));
 			var byMonth = {};
@@ -107,36 +150,36 @@ module.exports = function(app){
 				sum = 0;
 				users.forEach((user) => {
 					user.contracts.forEach((contract) => {
-						var contractAmount = contract.getAmountToDate(req.session.project, month);
+						var contractAmount = contract.getAmountToDate(month);
 						//console.log("contract: " + contract.id + ", " + contractAmount);
 						sum+= contractAmount;
 
-					})
-				})
-				byMonth[month.format('MM YYYY')]  = sum;
-			})			
+					});
+				});
+				byMonth[month.format('MM YYYY')]  = Math.round(sum*100)/100;
+			});
 			res.setHeader('Content-Type', 'application/json');
-    		res.send(JSON.stringify(byMonth));
+			res.send(JSON.stringify(byMonth));
 		});
-	});	
+	});
 
-	router.get('/statistics/transactionsbymonth', security.isLoggedInAdmin, (req, res) => {
-		var models  = require('../models')(req.session.project);		
-
+	router.get('/statistics/transactionsbymonth/:start/:end', security.isLoggedInAdmin, (req, res) => {
 		models.user.findAll({
-			  include:{ 
-					model: models.contract, 
-					as: 'contracts', 
-					include : { 
-						model: models.transaction, 
-						as: 'transactions'
-					}
+			where: { administrator: {[Op.not]: '1'}},
+			include:{
+				model: models.contract,
+				as: 'contracts',
+				include : {
+					model: models.transaction,
+					as: 'transactions'
 				}
+			}
 		}).then(function(users) {
-			var currentDate = moment();
+			var endDate = moment(req.params.end, 'DD.MM.YYYY');
+			var startDate = moment(req.params.start, 'DD.MM.YYYY');
 			var months = [];
-			for (var i = 11; i>=0; i--) {
-				months.push(moment().subtract(1*i, 'months').endOf('month'));
+			for (var i = Math.abs(endDate.diff(startDate,'months')); i>=0; i--) {
+				months.push(moment(endDate).subtract(1*i, 'months').endOf('month'));
 			}
 			//console.log("months: " + JSON.stringify(months));
 			var byMonth = { deposits: {}, withdrawals: {}, interest: {}, notReclaimed: {}};
@@ -156,75 +199,68 @@ module.exports = function(app){
 										notReclaimed += transaction.amount;
 									} else {
 										withdrawals += transaction.amount;
-									}									
+									}
 								}
 							}
-							interest += transaction.interestToDate(req.session.project, contract.interest_rate, end) - transaction.interestToDate(req.session.project, contract.interest_rate, start);
+							interest += transaction.interestToDate(contract.interest_rate, end) - transaction.interestToDate(contract.interest_rate, start);
 						});
-					})
-				})
-				byMonth.deposits[month.format('MM YYYY')]  = deposits;
-				byMonth.withdrawals[month.format('MM YYYY')]  = -withdrawals;
-				byMonth.notReclaimed[month.format('MM YYYY')]  = -withdrawals;
-				byMonth.interest[month.format('MM YYYY')]  = interest;
-			})			
+					});
+				});
+				byMonth.deposits[month.format('MM YYYY')]  = Math.round(deposits*100)/100;
+				byMonth.withdrawals[month.format('MM YYYY')]  = Math.round(-withdrawals*100)/100;
+				byMonth.notReclaimed[month.format('MM YYYY')]  = Math.round(-notReclaimed*100)/100;
+				byMonth.interest[month.format('MM YYYY')]  = Math.round(interest*100)/100;
+			});
 			res.setHeader('Content-Type', 'application/json');
     		res.send(JSON.stringify(byMonth));
 		});
-	});	
-
-
-	router.post('/statistics/transactionList', security.isLoggedInAdmin, function(req, res) {
-		var models  = require('../models')(req.session.project);		
-		models.user.findAll({
-			  include:{ 
-					model: models.contract, 
-					as: 'contracts', 
-					include : { 
-						model: models.transaction, 
-						as: 'transactions'
-					}
-				}
-		}).then(function(users) {
-			var transactionList = [];
-			users.forEach(function(user) {
-				user.getTransactionList(req.session.project, req.body.year).forEach( function (transaction) {
-					transactionList.push(transaction);
-				});
-			});
-			transactionList.sort(function(a,b) {
-				if (a.date.diff(b.date) > 0)
-					return 1;
-				else if(b.date.diff(a.date) > 0)
-					return -1;
-				else {
-					var comp = new String(a.last_name).localeCompare(b.last_name);
-					if (comp === 0)	{
-						return new String(a.first_name).localeCompare(b.first_name);
-					} else {
-						return comp;
-					}
-				}
-			});
-			var filename = "./tmp/Jahresliste_"+ req.body.year +".csv"
-			file = utils.generateTransactionList(transactionList, filename);
-
-			res.setHeader('Content-Length', (new Buffer(file)).length);
-			res.setHeader('Content-Type', 'text/csv');
-			res.setHeader('Content-Disposition', 'inline; filename=Jahresliste_'+ req.body.year +'.csv');
-			res.write(file);
-			res.end();
-
-		});	
 	});
 
-	router.get('/statistics/german', security.isLoggedInAdmin, function(req, res) {
-		var models  = require('../models')(req.session.project);		
-		statistics.getGermanContractsByYearAndInterestRate(models, function(years) {
-			//console.log("test: " + JSON.stringify(numbers);
-			res.render('statistics/german', { title: 'Deutsche Direktkredite', years: years});
-		});
-	});	
+
+	router.post('/statistics/transactionList', security.isLoggedInAdmin, function(req, res, next) {
+		models.user.findFetchFull(models, { administrator: {[Op.not]: '1'}})
+			.then(users => {
+				var transactionList = [];
+				users.forEach(function(user) {
+					user.getTransactionList(req.body.year).forEach( function (transaction) {
+						transactionList.push(transaction);
+					});
+				});
+				transactionList.sort(function(a,b) {
+					if (a.date.diff(b.date) > 0)
+						return 1;
+					else if(b.date.diff(a.date) > 0)
+						return -1;
+					else {
+						var comp = new String(a.last_name).localeCompare(b.last_name);
+						if (comp === 0)	{
+							return new String(a.first_name).localeCompare(b.first_name);
+						} else {
+							return comp;
+						}
+					}
+				});
+
+				return transactionList;
+			})
+			.then(transactionList => utils.generateTransactionList(transactionList))
+			.then(workbook => {
+				res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+				res.setHeader('Content-Disposition', 'attachment; filename=Jahresliste_'+ req.body.year +'.xlsx');
+				return workbook.xlsx.write(res)
+					.then(() => res.end());
+			})
+			.catch(error => next)
+	});
+
+	router.get('/statistics/german', security.isLoggedInAdmin, function(req, res, next) {
+		statistics.getGermanContractsByYearAndInterestRate()
+			.then(years => {
+				//console.log("test: " + JSON.stringify(numbers);
+				res.render('statistics/german', { title: 'Deutsche Direktkredite', years: years});
+			})
+			.catch(error => next(error));
+	});
 
 
 	app.use('/', router);

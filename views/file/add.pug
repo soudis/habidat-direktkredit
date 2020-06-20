@@ -1,16 +1,7 @@
-mixin files_add(type, id)
-  .row
-    form.form-horizontal(action="/file/add" method="post" role="form" enctype="multipart/form-data")
-      input(type="hidden" name="id" value=id)
-      input(type="hidden" name="type" value=type)
-      legend Dateiupload
-      .form-group
-        label.control-label.col-md-2 Dateiname
-        .col-md-8
-          input.form-control(type="file"  name="file")
-      .form-group 
-        label.control-label.col-md-2 Beschreibung (optional)
-        .col-md-8
-          textarea.form-control(type="text" name="description")  
-        .col-md-2.text-right
-          button(type='submit' class='btn btn-primary') Speichern
+include ../partials/forms
++form('/file/add/user')(updateTag='user_files' updateAction='replace')
+  +hidden('id', id)
+  +hidden('type', type)
+  +file('file')(icon='fa-upload' required)
+  +text('description')(icon='fa-comment-alt')
+  +submit_button()

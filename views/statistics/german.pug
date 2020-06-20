@@ -1,34 +1,42 @@
-extends ../admin/layout
-block admin-content
+extends ../layout
+block content
   .jumbotron
     h2 Deutsche Direktkredite
-    p Nach deutschem Recht dürfen auch österreichische Projekte nur 100.000€ pro Jahr und Zinsrate (0,0%, 0,1%, ..., 2.0%) von deutschen Direktkreditgeber*innen aufnehmen. Deshalb hier eine Übersicht über den aktuellen Stand. Achtung: Die Unterscheidung ob ein Kredit aus Deutschland ist oder nicht wird anhand der Länge der Postleitzahl gemacht.
-  each year in years
-    .row
-      .col-md-12
-        h3.underline #{year.year}. Jahr von #{year.from.format('DD.MM.YYYY')} bis #{year.to.format('DD.MM.YYYY')}
-    each rate in year.rates
-      .row
-        .col-md-12
-          h4.underline Verträge mit #{sprintf('%.1f', rate.interest_rate)}% Zinsen, Gesamtsumme: #{sprintf('%.2f', rate.total_amount)} EUR
-          .row
-            .col-md-12
-              table.table.table-striped
-                thead
-                  tr
-                    th.col-md-3 Name
-                    th.col-md-4 Adresse
-                    th.col-md-2.text-center Datum
-                    th.col-md-3.text-right Betrag
-                tbody
-                  each contract in rate.contracts
+    p.lead Nach deutschem Recht dürfen Projekte (auch solche außerhalb Deutschlands) nur 100.000€ pro Jahr und Zinsrate (0,0%, 0,1%, ..., 2.0%) von deutschen Direktkreditgeber*innen annehmen. Deshalb hier eine Übersicht über den aktuellen Stand. 
+  col-md-12
+    table.table.table-striped(id="details-table")
+      thead
+        tr
+          th Details
+          th Jahr
+          th Zeitraum
+          th Zinsrate
+          th.text-right Kreditsumme
+          th.d-none Details
+      tbody
+
+        each year in years
+          each rate in year.rates
+            tr
+              td.md-auto.details-control
+                span.fa.fa-plus-circle
+              td= year.year
+              td #{year.from.format('DD.MM.YYYY')} - #{year.to.format('DD.MM.YYYY')}
+              td=format.formatPercent(rate.interest_rate, 1)
+              td.text-right(class=(rate.total_amount>100000?"text-danger":""))= format.formatMoney(rate.total_amount,2)
+              td.d-none.table-row-details(data-paging=false data-sorting=false data-info=false)
+                table.table.display.compact
+                  thead
                     tr
-                      if (contract.user.last_name)
-                        td= contract.user.last_name + ", " + contract.user.first_name
-                      else
-                        td= contract.user.first_name
-                      td 
-                        | #{contract.user.street}, #{contract.user.zip} #{contract.user.place}
-                      td.text-center #{moment(contract.sign_date).format('DD.MM.YYYY')}
-                      td.text-right #{sprintf('%.2f', contract.amount)} EUR
+                      th.col-md-3 Name
+                      th.col-md-4 Adresse
+                      th.col-md-2.text-center Datum
+                      th.col-md-3.text-right Betrag
+                  tbody
+                    each contract in rate.contracts
+                      tr
+                        td= contract.user.getFullName()
+                        td= contract.user.getAddress()
+                        td.text-center #{moment(contract.sign_date).format('DD.MM.YYYY')}                          
+                        td.text-right= format.formatMoney(contract.amount, 2)
 

@@ -1,24 +1,104 @@
-include mixins
+include partials/nav
 
 doctype html
 html
   head
-    title= title
-    link(rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.2/css/bootstrap.min.css")
-    link(rel="stylesheet" href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.min.css")
-    link(rel="stylesheet" href="/public/stylesheets/style.css")
-    link(rel="stylesheet" href="/public/stylesheets/datepicker.css")
-    link(rel="stylesheet" href="/public/stylesheets/dataTables.bootstrap.min.css")
-    script(type='text/javascript' src='/public/javascripts/jquery-2.1.4.min.js')
-    script(type='text/javascript' src='/public/javascripts/bootstrap.min.js')
-    script(type='text/javascript' src='/public/javascripts/moment.js')
-    script(type='text/javascript' src='/public/javascripts/bootstrap-datepicker.js')
-    script(type='text/javascript' src='/public/javascripts/locale/de.js')
-    script(type='text/javascript' src='/public/javascripts/jquery.dataTables.min.js')
-    script(type='text/javascript' src='/public/javascripts/dataTables.bootstrap.min.js')    
-    script(type='text/javascript' src='/public/javascripts/bootbox.min.js')     
-    script(type='text/javascript' src='/public/javascripts/custom.js')    
-    script(type='text/javascript' src='/public/javascripts/chart.min.js')
-  body
-    block content
-      
+    title= settings.project.get('projectname') + ' Kreditplattform - ' + title
+    // link(rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.2/css/bootstrap.min.css")
+    //link(rel="stylesheet" href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.min.css")
+    link(rel="shortcut icon" type="image/png" href=_url("/public/favicon.png"))
+    link(rel="stylesheet" href=_url("/public/datatables/dataTables.bootstrap4.min.css"))
+    link(rel="stylesheet" href=_url("/public/datatables/responsive.bootstrap4.min.css"))
+
+    link(rel="stylesheet" href=_url("/public/css/" + (settings.project.get('theme')||red) + ".css"))
+    link(rel="stylesheet" href=_url("/public/datepicker/bootstrap-datepicker.min.css"))
+    
+    link(rel="stylesheet" href=_url("/public/chart.js/Chart.min.css"))
+    //link(rel="stylesheet" href="/public/css/dataTables.bootstrap.min.css")
+    script(type='text/javascript' src=_url('/public/jquery/jquery.min.js'))
+    //script(type='text/javascript' src='/public/popper/popper.min.js')
+    script(type='text/javascript' src=_url('/public/bootstrap/bootstrap.bundle.min.js'))
+    script(type='text/javascript' src=_url('/public/datatables/jquery.dataTables.min.js'))
+    script(type='text/javascript' src=_url('/public/multiselect/bootstrap-multiselect.min.js'))
+    script(type='text/javascript' src=_url('/public/datatables/dataTables.bootstrap4.min.js'))
+    script(type='text/javascript' src=_url('/public/datatables/dataTables.responsive.min.js'))
+    script(type='text/javascript' src=_url('/public/datatables/responsive.bootstrap4.min.js'))
+    script(type='text/javascript' src=_url('/public/moment/moment.min.js'))
+    script(type='text/javascript' src=_url('/public/moment/locale/de.js'))
+    script(type='text/javascript' src=_url('/public/datepicker/bootstrap-datepicker.min.js'))
+    script(type='text/javascript' src=_url('/public/select/bootstrap-select.min.js'))
+    
+    script(type='text/javascript' src=_url('/public/javascripts/locale/de.js'))
+    script(type='text/javascript' src=_url('/public/bootbox/bootbox.min.js'))
+    script(type='text/javascript' src=_url('/public/chart.js/Chart.min.js'))
+    script(type='text/javascript' src=_url('/public/javascripts/custom.js'))
+    script(type='text/javascript' src=_url('/public/javascripts/actions.js'))
+    
+  body(data-projectid=settings.project.get('projectid'))
+    #body-container
+      +nav(settings.project.get('projectname') + " " + (currentUser&&currentUser.administrator?"Kreditverwaltung":"Kreditportal"), "dropdown_menu", _url(settings.project.get('logo')))
+        if currentUser && currentUser.administrator
+          +nav_item(_url("/user/list" ))
+            span.fa.fa-th-list
+            span  Kredite
+          +nav_item_dropdown( "#" )(label="Auswertungen" icon="fa-cogs")
+           +dd_item(_url("/statistics/downloads" ))
+             span.fa.fa-download
+             span  Downloads
+           +dd_item(_url("/statistics/numbers"))
+             span.fa.fa-chart-line
+             span  Zahlen, Daten, Fakten
+           +dd_item(_url("/user/list/cancelled"))
+             span.fa.fa-comment-dollar
+             span  Anstehende Rückzahlungen
+           +dd_item(_url("/statistics/german"))
+             span.fa.fa-balance-scale
+             span  Direktkredite aus Deutschland
+           +dd_item(_url("/process/interestpayment/" + moment().subtract(1,'years').year()))
+             span.fa.fa-calendar-check
+             span  Jährliche Zinszahlungen
+          +nav_item_dropdown( "#" )(label="Administration" icon="fa-tools")
+            +dd_item(_url("/admin/settings"))
+              span.fa.fa-cog
+              span  Einstellungen      
+            +dd_item(_url("/admin/accounts"))
+              span.fa.fa-user-shield
+              span  Admin Accounts
+            +dd_item(_url("/admin/templates"))
+              span.fa.fa-file-code
+              span  Vorlagen        
+            +dd_item(_url("/admin/infopack"))
+              span.fa.fa-file-download
+              span  Unterlagen für Kreditgeber*innen     
+          +nav_item(_url("/admin/auditlog/30d"))
+            span.fa.fa-history
+            span  Logbuch              
+        else if currentUser
+          +nav_item(_url("/profile"))
+            span.fa.fa-info
+            span  Finanzstatus
+          +nav_item(_url("/files"))
+            span.fa.fa-download
+            span  Dateien      
+        +nav_item(_url("/procrastinate")) #[span.fa.fa-clock]
+      .col-xl-12.col-lg-12.mx-auto(id="root-container")              
+          if error && error.length > 0
+            include partials/error
+
+          if success && success.length > 0
+            include partials/success       
+
+          block content
+
+    if currentUser && currentUser.administrator
+
+      #sidebar.col-md-8.col-sm-12.col-lg-6.col-xl-4
+        #sidebar-content
+        .sidebar-closer
+          a.btn.btn-light.btn-sm
+            span.fa.fa-times
+
+      #sidebar-opener.d-none
+        a
+          span.fa.fa-caret-left
+        

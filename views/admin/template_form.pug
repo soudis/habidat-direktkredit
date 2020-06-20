@@ -1,0 +1,9 @@
+include ../partials/forms
+
+
+mixin template_form(formTitle, type)
+  +form('/admin/addtemplate', formTitle)
+    +hidden('type', type)
+    +file('file')(icon='fa-upload')
+    +text('description')(icon='fa-comment-alt')
+    +submit_button()

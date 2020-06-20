@@ -1,0 +1,9 @@
+include ../partials/forms
+
++form('/process/startinterestpayment')
+  +output('year', "Zinsjahr")(value=year)
+  +hidden('year', year)
+  +output('contract_length', "Verträge")(value=contracts.length)
+  +hidden('contracts', contracts.join(','))
+  +output('sum', "Summe Zinsauszahlungen")(value=format.formatMoney(interests))
+  +submit_button('Eintragen')

@@ -1,0 +1,68 @@
+mixin user(user, templates_user, admin)
+  .card
+    h4.card-header 
+      span Stammdaten 
+      span.float-right
+        if admin
+          a.btn.btn-light.btn-sm(href=_url('/user/loginas/'+user.id) title="Als Direktkreditgeber*in einloggen") 
+            span.fa.fa-sign-in-alt
+          a.btn.btn-light.btn-sm.sidebar-action(href=_url('/user/edit/'+user.id) title="Direktkreditgeber*in bearbeiten") 
+            span.fa.fa-edit
+          a.btn.btn-light.btn-sm.confirm-action(data-link=_url('/user/delete/'+user.id) title="Direktkreditgeber*in löschen" data-confirmtext='Willst du Direktkreditgeber*in ' + user.first_name + ' ' + user.last_name  + ' wirklich löschen?') 
+            span.fa.fa-trash
+          if (templates_user && templates_user.length > 0)
+            .btn-group.dropdown
+              button.btn.btn-light.btn-sm.dropdown-toggle(id='userTemplateButton' type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false") 
+                span.fa.fa-file
+              .dropdown-menu.float-right.dropdown-menu-right( aria-labelledby="userTemplateButton")
+                each template in templates_user
+                  a.dropdown-item(href=_url('/docx/'+user.id+'?fileid='+template.id))
+                    span.fa.fa-file-download
+                    span  
+                    span= template.description
+    .card-body
+      table.table
+        tbody
+          if admin
+            tr
+              td.col-md-4.h6: b User ID
+              td.col-md-8.h6= user.id
+          tr
+            td.col-md-4.h6: b Name
+            td.col-md-8.h6= user.getFullName()
+          tr
+            td.col-md-4.h6: b Adresse
+            td.col-md-8.h6!= user.getAddress(true)
+          tr
+            td.col-md-4.h6: b Telefonnummer
+            td.col-md-8.h6= user.telno
+          tr
+            td.col-md-4.h6: b E-Mail Adresse
+            td.col-md-8.h6 #[a(href='mailto:'+user.email)= user.email]
+          tr
+            td.col-md-4.h6: b IBAN
+            td.col-md-8.h6= user.IBAN    
+          tr
+            td.col-md-4.h6: b BIC
+            td.col-md-8.h6= user.BIC
+          tr
+            td.col-md-4.h6: b Login Name
+            td.col-md-8.h6= user.logon_id
+          if admin
+            tr
+              td.col-md-4.h6: b Passwort
+              if user.password && user.password !== ''
+                td.col-md-8.h6= user.password 
+              else
+                td.col-md-8.h6
+                  i.text-secondary verschlüsselt
+            tr
+              td.col-md-4.h6: b Eingeloggt
+              if (user.loginCount || 0) == 0
+                td.col-md-8.h6 
+                  i.text-secondary Noch nie
+              else
+                td.col-md-8.h6= user.loginCount + ' mal, zuletzt am ' + moment(user.lastLogin).format('DD.MM.YYYY')
+            tr
+              td.col-md-4.h6: b Beziehung zum Projekt
+              td.col-md-8.h6= user.relationship  	

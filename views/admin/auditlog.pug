@@ -1,0 +1,78 @@
+extends ../layout
+
+mixin value(field, value)
+  - dateRegex = new RegExp(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.\d{3}Z$/gi);
+  if value === ''
+    td.text-secondary(class=attributes.class): i leer
+  else if ['passwordHashed'].includes(field)
+    td.text-secondary(class=attributes.class): i verschlüsselt
+  else if !isNaN(value)
+    td(class=attributes.class)= value
+  else if dateRegex.test(value)
+    td(class=attributes.class)= moment(value).format('DD.MM.YYYY HH:mm')
+  else 
+    td(class=attributes.class)= value
+    
+
+block content
+  .jumbotron
+    h2 Logbuch
+    p.lead Änderungen an den Direktkreditdaten werden aufgezeichnet und können hier eingesehen werden. 
+  col-md-12
+    .d-none.details-table-buttons(for-id="details-table_length")    
+      .input-group.datatable-button
+        .input-group-prepend
+          .input-group-text
+            span.fa.fa-calendar
+        select.custom-select(id="timeframe" title="Zeitraum" autocomplete="off")
+          option(value="30d" selected=timeframe==="30d") 30 Tage
+          option(value="6M" selected=timeframe==="6M") 6 Monate
+          option(value="1y" selected=timeframe==="1y") 1 Jahr
+          option(value="100y" selected=timeframe==="100y") Alle Einträge
+    table.table.table-striped.d-none(id="details-table" data-paging=25 data-page-length=10 data-sorting=true data-info=true  data-auto-width="false" data-order=[[ 0, 'desc' ]])
+      thead
+        tr
+          th Wann?
+          th Wer?
+          th(data-orderable="false") Was?
+          th.text-right(data-orderable="false") Details
+          th.d-none Details
+      tbody
+
+        each entry in auditLog
+          tr
+            td(data-order=entry.timestamp)= moment(entry.timestamp).format('DD.MM.YYYY HH:mm')
+            if entry.user
+              td= entry.user.getFullName() || entry.user.logon_id&&entry.user.logon_id!==null?entry.user.logon_id:entry.user.email || 'System'
+            else 
+              td System
+            if entry.action === 'delete' || !entry.target
+              td #{_t(entry.type)} #{entry.target_id} #{_t('log_'+entry.action)}
+            else 
+              td!=  entry.target.getDescriptor(models) + ' ' + _t('log_'+entry.action)
+            td.md-auto.details-control.text-right
+              span.fa.fa-plus-circle
+            td.d-none.table-row-details       
+              if entry.action === 'email'
+                div!=entry.changes
+              else
+                table.table.display.compact.col-md-6.col-sm-12
+                  thead
+                    tr
+                      th Datenbankfeld
+                      th.text-right Alter Wert
+                      th.slim
+                      th Neuer Wert
+                  tbody
+                    each change in JSON.parse(entry.changes)
+                      if !['savedViews'].includes(change.field) && (change.value !== "" || change.previousValue !== "")
+                        tr
+                          td= _t(change.field)
+                          +value(change.field, change.previousValue)(class='text-right')
+                          td.slim: span.fa.fa-long-arrow-alt-right
+                          +value(change.field, change.value)
+  script.
+    $(document).on('change', '#timeframe', function () {
+      $(location).attr("href", _url("/admin/auditlog/" + $(this).val()));
+    });
+

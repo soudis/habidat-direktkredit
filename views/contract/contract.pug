@@ -1,0 +1,122 @@
+include ../transaction/transaction
+
+mixin contract(contract, templates_contract, admin)
+  .col-md-12(id="contract_" + contract.id)
+    .card
+      .card-header
+        .row
+          .h5.section-title.col-md-auto Direktkredit vom #{moment(contract.sign_date).format('DD.MM.YYYY')}
+          if admin
+            .col-md.text-right.section-actions
+              a.btn.btn-light.btn-sm.sidebar-action(href=_url('/contract/edit/'+contract.id))
+                span.fa.fa-edit              
+              a.btn.btn-light.btn-sm.confirm-action(data-remove-tag='contract_'+contract.id data-link=_url('/contract/delete/'+contract.id) data-confirmtext='Willst du den Direktkredit vom ' + moment(contract.sign_date).format('DD.MM.YYYY') + ' wirklich löschen?')                  
+                span.fa.fa-trash
+              if templates_contract && templates_contract.length > 0
+                a.btn.btn-light.btn-sm.dropdown-toggle(id='contractTemplateButton' type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false") 
+                  span.fa.fa-file                          
+                .dropdown-menu.dropdown-menu-right( aria-labelledby="contractTemplateButton")
+                  each template in templates_contract
+                    a.dropdown-item(href=_url('/docx_c/'+contract.id+'?fileid='+template.id))
+                      span.fa.fa-file-download
+                      span  
+                      span= template.description                          
+      .card-body
+        table.table
+          tbody
+            tr
+              td.label: b Kreditnummer
+              td= contract.id
+            tr
+              td.label: b Betrag (Vertrag)
+              td= format.formatMoney(contract.amount)
+            tr
+              td: b Zinssatz
+              td= format.formatPercent(contract.interest_rate,3)                        
+            tr
+              td: b= _t('interest_payment_type')
+              td= _t('interest_payment_type_' + (contract.interest_payment_type || settings.project.get('defaults.interest_payment_type')))
+            tr
+              td: b Status
+              td= contract.getStatus()
+            tr.divider
+              td: b Kündigungsart
+              td= contract.getTerminationTypeFullString()
+            if contract.getTerminationType() == "T"
+              if (contract.termination_date)
+                tr
+                  td: b Kündigungsdatum
+                  td= moment(contract.termination_date).format('DD.MM.YYYY')
+                tr
+                  td: b Rückzahlungsfrist
+                  td= moment(contract.getPaybackDate()).format('DD.MM.YYYY')
+              else
+                tr
+                  td: b Kündigungsdatum
+                  td: i.text-secondary nicht gekündigt
+            else if contract.getTerminationType()=="D"
+              tr
+                td: b Rückzahlungsdatum
+                td= moment(contract.getPaybackDate()).format('DD.MM.YYYY')
+            else if contract.getTerminationType()=="P"
+              tr
+                td: b Ende der Laufzeit:
+                td= moment(contract.getPaybackDate()).format('DD.MM.YYYY')              
+            tr.divider
+              td: b Einzahlungen
+              td= format.formatMoney(contract.getDepositAmount())
+            tr
+              td: b Auszahlungen
+              td= format.formatMoney(contract.getWithdrawalAmount())
+            tr
+              td: b Zinsen bis heute
+              td= format.formatMoney(contract.getInterestToDate())
+            tr.divider
+              if admin
+                td: b Aushaftender Betrag
+                td= format.formatMoney(contract.getAmountToDate( moment()))    
+              else 
+                td.h6: b Kontostand
+                if contract.getAmountToDate(moment()) > 0
+                  td.h6.text-success: b= format.formatMoney(contract.getAmountToDate( moment()))    
+                else
+                  td.h6: b= format.formatMoney(contract.getAmountToDate( moment()))    
+              
+            if (admin && contract.notes && contract.notes.trim() !== '')      
+              tr.divider
+                td: b Notizen
+                td!= contract.notes.replace("\n", '<br/>')
+        table.table
+          thead
+            tr
+              th(colspan="5")
+                .row
+                  .h6.section-title.col-md-10
+                    b Zahlungen
+                  if admin
+                    .col-md-2.text-right.section-actions
+                      a.btn.btn-light.btn-sm.sidebar-action(href=_url('/transaction/add/'+contract.id))
+                        span.fa.fa-plus
+          tbody
+            if contract.transactions.length == 0
+              tr
+                td(colspan="4") keine Zahlungen vorhanden
+            each transaction in contract.transactions
+              +transaction(contract, transaction, admin)
+
+mixin contracts(user, templates_contract, admin)
+  .row
+    .col-md-12
+      .card.no-shadow
+        h4.card-header 
+          span Direktkredite
+          if admin
+            span.float-right
+              a.btn.btn-light.btn-sm.sidebar-action(href=_url('/contract/add/'+user.id))
+                span.fa.fa-plus
+        .card-body
+          #contracts_container.row
+            if (user.contracts.length == 0)
+              .col-md-12.empty-container-message Keine Direktkredite vorhanden
+            each contract in user.contracts
+              +contract(contract, templates_contract, admin)  

@@ -1,76 +1,109 @@
-var DocxGen = require('docxtemplater');
-var JSZipUtils = require('jszip');
-var fs = require('fs');
-var moment = require('moment');
-var projects    = require('../config/projects.json');
-// var cloudconvert = new (require('cloudconvert'))('oqxW0tKE_7gykv8GDULnAcRTv50QTqMtIPbFBtVzgQFUQe2VridmQ7czMIGtccFwO0ZvsyMNV-6IB4qXxWSo_g');
-var converter = require('office-converter')();
+/* jshint esversion: 8 */
+const DocxGen = require('docxtemplater');
+const JSZipUtils = require('jszip');
+const fs = require('fs');
+const moment = require('moment');
+const converter = require('libreoffice-convert');
+const json2csv = require('json2csv');
+const exceljs = require('exceljs');
+const urlUtil = require('url');
+const settings = require('./settings');
 
-var json2csv = require('json2csv');
 
-exports.getUserTemplates = function(models, callback){
-	models.file.findAll({
-		where: {
-			ref_table: "template_user"
-		}
-	}).then(function(templates) {
-		callback(templates);
-	}).catch(() => {
-		callback([]);
-	});	
+exports.render = (req, res, template, data, title = undefined) => {
+	return Promise.resolve()
+		.then(() => {
+			data.title = title;
+			res.render(template, data);
+		});
 };
 
-exports.getContractTemplates = function(models, callback){
-	models.file.findAll({
-		where: {
-			ref_table: "template_contract"
-		}
-	}).then(function(templates) {
-		callback(templates);
-	}).catch(() => {
-		callback([]);
-	});	
+exports.renderToText = (req, res, template, data, title = undefined) => {
+	return new Promise((resolve, reject) => {
+		data.title = title;
+		res.render(template, data, (error, html) => {
+			if (error) {
+				reject(error);
+			} else {
+				resolve(html);
+			}
+		});
+	});
 };
 
+exports.getTrackOptions = function(user, track) {
+	return{ track: track, user_id: user?user.id:-1 };
+}
 
-exports.generateDocx = function(templateFile, outputFile, data, project){
+exports.generateDocx = function(templateFile, data){
 	var path = templateFile;
-	if (templateFile.indexOf('/') === -1) {
-		path = __dirname + '/..' +  projects[project].templates + "/" + templateFile + ".docx";
-	}
 	var file = fs.readFileSync(path, 'binary');
-		var zip = new JSZipUtils(file);
-        var doc=new DocxGen();
-        doc.loadZip(zip);
-        doc.setData(data); 
-        doc.render();
-        var out=doc.getZip().generate({type:"nodebuffer"});
-        fs.writeFileSync("./tmp/"+ outputFile +".docx", out);
-        console.log("done");
+	var zip = new JSZipUtils(file);
+	var doc=new DocxGen();
+	doc.loadZip(zip);
+	doc.setData(data);
+	doc.render();
+	return doc.getZip().generate({type:"nodebuffer"});
 };
 
-exports.convertToPdf = function(file, callback){
-	
-	converter.generatePdf('./tmp/' + file + '.docx', function(err, result) {
-		// Process result if no error
-		if (result && result.status === 0) {
-		  console.log('Output File located at ' + result.outputFile);
-		  callback(null);
-		} else {
-		  callback('Error converting PDF: ' + err);
-		}
+exports.convertToPdf = function(stream){
+
+	return new Promise((resolve, reject) => {
+		converter.convert(stream, '.pdf', undefined, (err, result) => {
+		    if (err) {
+		      reject(err);
+		    }
+		    resolve(result);
+		});
 	});
 
+
 };
 
-exports.generateTransactionList = function(transactionList, outputFile){
+exports.generateTransactionList = function(transactionList){
+	return Promise.resolve()
+		.then(() => {
+			var workbook = new exceljs.Workbook();
+			workbook.creator = 'DK Plattform';
+			workbook.created = new Date();
 
-	var fieldNames = ["Nummer", "Nachname", "Vorname", "Vertragsnummer", "Vorgang", "Datum", "Betrag", "Zinssatz", "Zinsbetrag"];
-	var fieldList = ['id', 'last_name', 'first_name','contract_id', 'type', 'date', 'amount', 'interest_rate', 'interest'];
-	var csvRet;
-	json2csv({ data: transactionList, fieldNames: fieldNames, fields: fieldList }, function(err, csv) {
-		  if (err) console.log(err);
-		  csvRet = csv;
-		});
-	return csvRet;
+			var dataWorksheet = workbook.addWorksheet('Jahresliste');
+
+			var fieldNames = ["Nummer", "Nachname", "Vorname", "Vertragsnummer", "Vorgang", "Datum", "Betrag", "Zinssatz", "Zinsbetrag"];
+			var fieldList = ['id', 'last_name', 'first_name','contract_id', 'type', 'date', 'amount', 'interest_rate', 'interest'];
+
+			dataWorkSheetColumns = [];
+			fieldList.forEach((column, index) => {
+				dataWorkSheetColumns.push({header: fieldNames[index], key: column, width: 20});
+			});
+			dataWorksheet.columns = dataWorkSheetColumns;
+			transactionList.forEach(transaction => {
+				var row = [];
+				fieldList.forEach(field => {
+					if (field === 'date') {
+						row.push(transaction[field].toDate());
+					} else {
+						row.push(transaction[field]);
+					}
+
+				})
+				dataWorksheet.addRow(row);
+			});
+			return workbook;
+		})
 };
+
+exports.generateUrl = function(req, url) {
+	var url_parts = urlUtil.parse(req.url);
+	var projectId = settings.project.get('projectid');
+	if (req.addPath && url.startsWith('/')) {
+		return req.addPath+url;
+	} else {
+		return url;
+	}
+}
+
+exports.Warning = function(message) {
+   this.message = message;
+   this.name = 'Warning';
+}

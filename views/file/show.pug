@@ -1,14 +1,2 @@
-include add
-
-mixin files_show(files, type, id, addFile)
-  .row
-    .col-md-12
-      h3 Dateien #[a.btn.btn-default.btn-sm(href='/file/add/' + type + '/'+id) #[span.glyphicon.glyphicon-plus]] 
-  each file in files
-    .row
-      .col-md-4 
-        a(href='/file/get/' + file.id) #{file.filename} 
-      .col-md-7= file.description
-      .col-md-1 #[a.btn.btn-default.btn-sm.confirm(data-link='/file/delete/'+file.id, data-confirmtext='Willst du die Datei ' + file.filename + ' wirklich löschen?') #[span.glyphicon.glyphicon-trash]]
-  if addFile && addFile === type
-    +files_add(type,id)
+include ./files.pug
++files_show(files, type, id)

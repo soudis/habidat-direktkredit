@@ -45,8 +45,9 @@ services:
       # please change:
       - HABIDAT_DK_PROJECT_ID=project
       - HABIDAT_DK_PROJECT_NAME=Projectname
-      - HABIDAT_LOGO=logo.gif
-      - HABIDAT_ADMIN_EMAIL=admin@example.com
+      - HABIDAT_DK_PROJECT_EMAIL=
+      - HABIDAT_DK_PROJECT_LOGO=logo.gif
+      - HABIDAT_DK_ADMIN_EMAIL=admin@example.com
       - HABIDAT_DK_ADMIN_USERNAME=admin
       - HABIDAT_DK_ADMIN_PASSWORD=secret
       - HABIDAT_DK_DB_PASSWORD=secret
@@ -61,10 +62,10 @@ services:
       - HABIDAT_DK_LDAP_PASSWORD=secret
       - HABIDAT_DK_LDAP_BASE=dc=example,dc=com
       - HABIDAT_DK_LDAP_SEARCHFILTER=(cn={{username}})
-      - HABIDAT_DK_PORT_HTTP=8020
+      - HABIDAT_DK_PORT_HTTP=80
       # change if you need https:
       - HABIDAT_DK_HTTPS=false
-      - HABIDAT_DK_PORT_HTTPS=8010
+      - HABIDAT_DK_PORT_HTTPS=443
       - HABIDAT_DK_SSL_CERT=config/certificate.pem
       - HABIDAT_DK_SSL_KEY=config/key.pem      
     depends_on:
@@ -72,7 +73,7 @@ services:
     links:
       - db
     ports:
-      - 8020:8020
+      - 8020:80
     logging:
       options:
         max-size: 50m    

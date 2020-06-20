@@ -1,75 +1,85 @@
-extends ../admin/layout
-include ./template_mixins
-block admin-content 
-  .col-md-12
-    .page-header
-      h2 Vorlage für Jahresliste für Buchhaltung
-      p Vorlage für die Jahresliste die sich jede*r DK-Geber*in selbst ausdrucken kann. Die Vorlage muss im Format .docx sein und kann folgende Platzhalter beinhalten (jeweils in geschwungenen Klammern {...}): first_name, last_name, street, zip, place, country, telno, email, IBAN, BIC, year, current_date. 
-      p Außerdem kann die Liste an Transaktionen eingefügt werden. Diesen Block startet man mit {#transactionList} und endet ihn mit {/transactionList}. Dazwischen können folgende Platzhalter verwendet werden: contract_id, type, date, amount, interest_rate.
-  .col-md-12
-    table.table.table-striped
+extends ../layout
+include ./template_form
+
+mixin template_table(templates, type, description, replace)
+    table.table.table
       thead
         tr
-          th Bezeichnung
-          th Datei
+          th.col-md-6 Datei
+          th.col-md-6 Bezeichnung
+          th.fit Aktionen
       tbody
         each template in templates
-          if (template.ref_table == "template_account_notification")
-            tr
-              td=template.description
-              td
-                a(href='/file/get/' + template.id) #{template.filename} 
-  .col-md-12
-    hr
-  .col-md-12
-      +add_template("Vorlage überschreiben", "template_account_notification")    
-  .col-md-12
-    .page-header
-      h2 Vorlagen für Direktkreditgeber*in
-      p Vorlagen für die automatische Dokumentgenerierung (pro Direktkreditgeber*in). Die Vorlagen müssen im Format .docx sein und können folgende Platzhalter beinhalten (jeweils in geschwungenen Klammern {...}): first_name, last_name, logon_id, password, street, zip, place, country, telno, email, IBAN, BIC
-  .col-md-12
-    table.table.table-striped
-      thead
-        tr
-          th Bezeichnung
-          th Datei
-          th Aktionen
-      tbody
-        each template in templates
-          if (template.ref_table == "template_user")
-            tr
-              td=template.description
-              td
-                a(href='/file/get/' + template.id) #{template.filename} 
-              td.fit
-                  a.btn.btn-default.btn-sm(href='/file/delete/'+template.id) #[span.glyphicon.glyphicon-trash]
-  .col-md-12
-    hr
-  .col-md-12
-    +add_template("Neue Vorlage", "template_user")
-  .col-md-12
-    .page-header
-      h2 Vorlagen für Kredite
-      p Vorlage für den Direktkreditvertrag oder andere Kreditdokuente, verfügbare Platzhalter (jeweils in geschwungenen Klammern {...}): first_name, last_name, street, zip, place, country, telno, email, IBAN, BIC, amount, interest_rate, period, contract_date, termination_date, notes, status. 
-      p Außerdem kann die Liste an Transaktionen eingefügt werden. Diesen Block startet man mit {#transactionList} und endet ihn mit {/transactionList}. Dazwischen können folgende Platzhalter verwendet werden: type, date, amount
-  .col-md-12
-    table.table.table-striped
-      thead
-        tr
-          th Bezeichnung
-          th Datei
-          th Aktionen          
-      tbody
-        each template in templates
-          if (template.ref_table == "template_contract")
-            tr
-              td=template.description
-              td
-                a(href='/file/get/' + template.id) #{template.filename} 
-              td.fit
-                  a.btn.btn-default.btn-sm(href='/file/delete/'+template.id) #[span.glyphicon.glyphicon-trash]                
-  .col-md-12
-    hr
-  .col-md-12
-      +add_template("Neue Vorlage", "template_contract")       
-              
+          if (template.ref_table == type)
+            tr(id="file_"+template.id)
+              td.col-md-6
+                a(href='/file/get/' + template.id).btn.btn-sm.btn-light
+                  span.fa.fa-download
+                  span  
+                  span= template.filename                
+              td.col-md-6=template.description
+              td.fit.text-right
+                if replace
+                  a.btn.btn-light.btn-sm.sidebar-action(href=_url('/admin/addtemplate/template_account_notification') title="Vorlage Überschreiben")
+                    span.fa.fa-upload 
+                else
+                  a.btn.btn-light.btn-sm.confirm-action(data-link=_url('/file/delete/'+template.id) data-confirmtext='Willst du die ' + description + ' ' +template.description + ' wirklich löschen?' title="Vorlage Löschen") 
+                    span.fa.fa-trash 
+
+
+block content 
+  .jumbotron
+    h2 Vorlagen
+    p.lead Vorlagen sind .docx Dateien (MS Word oder LibreOffice) die Platzhalter für Datenfelder beinhalten und aus denen automatische Dokumente generiert werden können. Es gibt Vorlagen für verschiedene Datensätze: Direktkreditgeber*innen, Direktkredite und eine Vorlage für die Buchhaltungsbestätigung, die von den Kreditgeber*innen selbst runtergeladen werden kann. Datenfelder können mit "{Datenfeldname}" eingefügt werden. Welche Felder zur Verfügung stehen, siehst du in den Beispieldokumenten.
+  .card
+    h5.card-header 
+      span Vorlage für die Buchhaltungsbestätigung für Kreditgeber*innen
+      span.float-right
+        a.btn.btn-light.btn-sm.sidebar-action(href=_url('/admin/addtemplate/template_account_notification') title="Vorlage Überschreiben")
+          span.fa.fa-upload
+    .card-body
+      h6 
+        span Beispielvorlage: 
+        a.btn.btn-sm.btn-light(href=_url('/public/templates/buchhaltung.docx'))
+          span.fa.fa-download
+          span  
+          span buchhaltung.docx
+      hr
+      +template_table(templates, 'template_account_notification', 'Buchhaltungsbestätigung', true)
+  .card
+    h5.card-header 
+      span Vorlagen für Direktkreditgeber*in
+      span.float-right
+        a.btn.btn-light.btn-sm.sidebar-action(href=_url('/admin/addtemplate/template_user') title="Vorlage Hinzufügen")
+          span.fa.fa-upload
+    .card-body
+      h6 
+        span Beispielvorlage: 
+        a.btn.btn-sm.btn-light(href=_url('/public/templates/dankesschreiben.docx'))
+          span.fa.fa-download
+          span  
+          span dankesschreiben.docx
+      hr
+      +template_table(templates, 'template_user', 'Direktkreditegeber*innenvorlage', false)
+  .card      
+    h5.card-header 
+      span Vorlagen für Kredite
+      span.float-right
+        a.btn.btn-light.btn-sm.sidebar-action(href=_url('/admin/addtemplate/template_contract') title="Vorlage Hinzufügen")
+          span.fa.fa-upload
+    .card-body
+      h6
+        span Beispielvorlage: 
+        a.btn.btn-sm.btn-light(href=_url('/public/templates/vertrag.docx'))
+          span.fa.fa-download
+          span  
+          span vertrag.docx
+      hr
+      +template_table(templates, 'template_contract', 'Direktkreditvorlage', false)
+  script.
+    $(document).ready(function(){
+      var hash = $(location).attr('hash');
+      if (hash.includes ('file_')) {
+        $('#'+hash.substring(hash.indexOf('file_'))).addClass('active').parents('.card').addClass('active');
+      }
+    })

@@ -1,0 +1,58 @@
+include ../partials/forms
+
+mixin contract_form(action, updateAction, updateTag, editContract)
+  +form(action)(updateAction=updateAction updateTag=updateTag)
+    +hidden('user_id', user.id)
+    if editContract
+      +hidden('id', editContract.id)
+    else
+      +id('id', _t('contract_id'))(placeholder='Automatisch')        
+    - var termination_type = editContract?editContract.getTerminationType():settings.project.get('defaults.termination_type');
+    - var termination_period = editContract?editContract.getTerminationPeriod():settings.project.get('defaults.termination_period');
+    - var termination_period_type = editContract?editContract.getTerminationPeriodType():settings.project.get('defaults.termination_period_type');
+    - var interest_payment_type = editContract?editContract.getInterestPaymentType():settings.project.get('defaults.interest_payment_type');
+    +date('sign_date')(value=_iv(editContract, 'sign_date') required)
+    +money('amount')(value=_iv(editContract, 'amount') required)
+    +percent('interest_rate')(min="0" max="10" value=_iv(editContract, 'interest_rate') required)
+    +select('interest_payment_type')(icon='fa-reply')
+      +option('end', _t('interest_payment_type_end'))(selected=interest_payment_type)
+      +option('yearly', _t('interest_payment_type_yearly'))(selected=interest_payment_type)    
+    +select('termination_type')(icon='fa-sign-out-alt' required)
+      each type in ['T', 'P', 'D']
+        +option(type, _t('termination_type_'+type))(selected=termination_type)
+      
+    mixin period(type)
+      +input_group(_t('termination_type_'+type))(icon='fa-hourglass-half' class="termination-type-group termination-type-" + type + (termination_type === type?"":" d-none"))
+        +group_input('termination_period_'+type)(value=termination_period step="1" type="number")
+        +group_select('termination_period_type_'+type)
+          each period_type in ['M','w','Y']
+            +option(period_type, _t('termination_period_type_'+period_type))(selected=termination_period_type)
+
+    mixin termination_date(type, label)
+      +date('termination_date_'+type, label)(groupClass="termination-type-group termination-type-" + type + (termination_type === type?"":" d-none") value=_iv(editContract, 'termination_date'))
+
+    +period('T')
+    +termination_date('T', _t('termination_date'))
+    
+    +period('P')
+    
+    +termination_date('D', _t('payback_date'))
+
+    +select('status', _t('contract_status'))(icon="fa-file-contract")
+      each status in ['unknown', 'sign', 'sent', 'complete']
+        +option(status, _t('contract_status_'+status))(selected=_iv(editContract, 'status'))
+
+    +textarea('notes')(value=_iv(editContract, 'notes'))
+    +submit_button()
+  script.
+
+    $('.datepicker').datepicker({'format': 'dd.mm.yyyy', 'language': 'de'});
+    $('#termination_type').on('change', function() {
+      $(".termination-type-group").addClass("d-none");
+      $(".termination-type-"+$(this).val()).removeClass("d-none");
+      $(".termination-type-group").find('input').attr('required', false);
+      $(".termination-type-"+$(this).val()).find('input').attr('required', true);
+    });
+
+    $('#termination_type_input').change();
+  

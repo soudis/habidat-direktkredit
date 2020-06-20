@@ -1,0 +1,20 @@
+include ../partials/forms
+
+mixin transaction_form( action, updateAction, updateTag, contract, transaction)
+  +form(action)(updateTag=updateTag updateAction=updateAction)
+    if transaction
+      +hidden('id', transaction.id)(id='transaction_id')
+    +hidden('contract_id', contract.id)(id='transaction_contract_id')
+    +date('transaction_date')(value=_iv(transaction, 'transaction_date') required)
+    +select('type', _t('transaction_type'))(id='transaction_type' icon='fa-exchange-alt')
+      each type in ['initial', 'deposit', 'withdrawal', 'termination', 'notreclaimed']
+        +option(type, _t('transaction_type_'+type))(selected = _iv(transaction, 'type'))
+    +money('amount')(id='transaction_amount' step='0.01' value=_iv(transaction, 'amount') contract-amount=contract.amount transactions-amount=contract.getTransactionsAmount()-(transaction ? transaction.amount : 0) amount-to-date=contract.getAmountToDate(transaction?moment(transaction.transaction_date):moment() , transaction.id) required)
+    +select('payment_type')(icon='fa-money-bill')
+      each type in ['bank', 'cash', 'other']
+        +option(type, _t('payment_type_'+type))(selected = _iv(transaction, 'payment_type'))      
+    +checkbox("send_transaction_email")(help=_t('send_transaction_email_help'))           
+    +submit_button()
+  script.
+
+    $('#transaction_type').change();        

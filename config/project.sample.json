@@ -1,0 +1,15 @@
+{
+    "projectname": "My Project",
+    "logo": "/public/logo.png",
+    "url" : "https://example.com",
+    "usersuffix": "direktkredit",
+    "defaults": {
+        "interest_method": "365_compound",    
+        "interest_payment_type": "end",
+        "termination_type": "T",
+        "termination_period": "6",
+        "termination_period_type": "M",
+        "relationships": ["Unbekannt","Bewohner_innen","Nutzer_innen","Verwandte","Bekannte","MHS","habiTAT"],
+        "country": "AT"
+    }
+}

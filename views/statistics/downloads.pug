@@ -1,18 +1,47 @@
-extends ../admin/layout
+extends ../layout
 
-block admin-content
+block content
   .jumbotron
     h2 Downloads
-    p Hier gibt's automatisch generierte Dokumente für die Buchhaltung und sonstige Hausverwaltungsaufgaben. 
-  .row
-    .col-md-12
-      form.form-horizontal(action="/statistics/transactionList" method="post" role="form")
-        .form-group
-          .col-md-6
-            .h3 Jahresliste (Buchhaltung)
-          label.control-label.col-md-2 Jahr
-          .col-md-2
-            input.form-control(type="number" step="1" name="year" required="true" min="1900" max="2500")
-          .col-md-2
-            .text-right
-               button(type='submit' class='btn btn-primary') Generieren
+    p.lead Hier gibt's exportierte Datensätze und automatisch generierte Dokumente für die Buchhaltung, für sonstige Hausverwaltungsaufgaben und für die Kommunikation mit den Kreditgeber*innen. 
+  form.form-horizontal(action=_url("/statistics/transactionList") method="post" role="form")
+    .form-group.row
+      label.col-md-8 
+        h4 Jahresliste (Buchhaltung)
+      .col-md-4
+        .input-group
+          .input-group-prepend
+            .input-group-text(id="jahreslisteAddon") Jahr
+          input.form-control(type="number" step="1" name="year" required="true" min="1970" max=new Date().getFullYear() value=new Date().getFullYear()-1 )
+          .input.group-btn
+             button(type='submit' class='btn btn-primary')
+               span.fa.fa-download
+  form.form-horizontal(action=_url("/communication/email") method="post" role="form") 
+    .form-group.row
+      label.col-md-8 
+        h4 E-Mail Adressen Download
+      .col-md-4
+        .input-group
+          .input-group-prepend
+            .input-group-text(id="jahreslisteAddon") Auswahl
+          select.form-control(name="mode")
+            option(value='all') Alle
+            option(value='active') Nur aktive
+          .input.group-btn
+             button(type='submit' class='btn btn-primary')
+               span.fa.fa-download              
+
+  form.form-horizontal(action=_url("/communication/addresses") method="post" role="form")
+    .form-group.row
+      label.col-md-8 
+        h4 Adressen Download
+      .col-md-4
+        .input-group
+          .input-group-prepend
+            .input-group-text(id="jahreslisteAddon") Auswahl
+          select.form-control(name="mode")
+            option(value='all') Alle
+            option(value='active') Nur aktive       
+          .input.group-btn
+             button(type='submit' class='btn btn-primary')
+               span.fa.fa-download                      

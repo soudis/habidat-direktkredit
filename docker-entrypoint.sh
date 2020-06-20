@@ -4,20 +4,13 @@ set -e
 if [ ! -f config/config.json ]
 then
 	echo "Generating config.json..."
-	envsubst < config/config.json.sample > config/config.json
+	envsubst < config/config.sample.json > config/config.json
 fi
 
-if [ ! -f config/projects.json ]
+if [ ! -f config/project.json ]
 then
-	echo "Generating projects.json..."
-	envsubst < config/projects.json.sample > config/projects.json
+	echo "Generating project.json..."
+	envsubst < config/project.sample.json > config/project.json
 fi
-
-if [ ! -f config/site.json ]
-then
-	echo "Generating site.json..."
-	envsubst < config/site.json.sample > config/site.json
-fi
-
 
 exec "$@"

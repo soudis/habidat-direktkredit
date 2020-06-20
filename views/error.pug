@@ -1,6 +1,11 @@
 extends layout
 
 block content
-  h1= message
-  h2= error.status
-  pre #{error.stack}
+  .jumbotron
+    h2 Uuuups....
+    p.lead Es ist leider ein Fehler aufgetreten. Versuche es noch einmal, falls der Fehler bestehen bleibt, melde dich bitte unter #[a(href="mailto:"+settings.project.get('email'))= settings.project.get('email')].
+
+  p.text-danger
+    b= error.message
+  if settings.config.get('debug') && error.stack
+    p!= error.stack.split("\n").join('<br/>')

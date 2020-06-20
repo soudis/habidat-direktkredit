@@ -1,11 +1,32 @@
-extends ../admin/layout
+extends ../layout
 
-include ../file/show
+include ../file/files
+include ../contract/contract
+include user
 
-block admin-content
-  include ./show_user 
-  +files_show(user.files, 'user', user.id, addFile)  
-  include ../contract/show_contracts
+block content
+  .row
+    .col-xl-6.col-md-12
+      .row
+        .col-md-12
+          +user(user, templates_user, true)
+      +files_show(user.files, 'user', user.id, addFile)  
+    .col-xl-6.col-md-12
+      +contracts(user, templates_contract, true)
+
+  script.
+    $(document).ready(function(){
+      var hash = $(location).attr('hash');
+      if (hash.includes ('contract_')) {
+        $('#'+hash.substring(hash.indexOf('contract_'))).children('.card').addClass('active');
+      } else if (hash.includes ('transaction_')) {
+        $('#'+hash.substring(hash.indexOf('transaction_'))).addClass('active').parents('.card').addClass('active');
+      } else if (hash.includes ('file_')) {
+        $('#'+hash.substring(hash.indexOf('file_'))).addClass('active').parents('.card').addClass('active');
+      }
+
+      
+    })
 
               
             

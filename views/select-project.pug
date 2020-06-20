@@ -1,18 +1,21 @@
 extends layout
 
 block content
-  +nav("habiTAT Direktkredite", "dropdown_menu") 
-    +nav_item("/project") Projekt auswählen
-  div(class="col-md-8 col-md-offset-2 col-xs-12")
+  +nav("Direktkrediteportal", "dropdown_menu") 
+    +nav_item(_url("/project"))
+      span.fa.fa-th-large
+      span  Projekt auswählen
+  .container-fluid(id="root-container" class="col-xl-8 col-xl-offset-2 col-lg-12") 
     .jumbotron
       h2 Lieber Tausend Freund*innen im Rücken, als eine Bank im Nacken!
-      p Willkommen bei der Direktkredite-App des habiTAT. Bitte wähle das Projekt aus, das du unterstützt hast!
+      p.lead Willkommen bei der Direktkrediteplattform, bitte wähle das Projekt aus, das du unterstützt hast!
 
-    each project, id in projects
-      .col-lg-3.col-sm-6.col-xs-12
-        .thumbnail
-          a(href='/project/'+id)
-            div(style="min-height:100px")
-              img(src=project.logo height="100")
-          .caption
-            h3=project.projectname
+    .row
+      each project, id in projects
+        .col-lg-3.col-sm-6.col-xs-12
+          a.project-link(href=_url('/project/'+id))
+            .card.project-card
+              img.card-img-top(src=settings.project.get('logo') style="height: 100px; width: auto; object-fit: contain; ")  
+              .card-body.text-center
+                h5.card-title=settings.project.get('projectname')
+          

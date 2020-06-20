@@ -1,3 +1,3 @@
 {   
-    "ignore": ["sessions/*", "README"] 
+    "ignore": ["sessions/*", "README", "config/*"] 
 }
