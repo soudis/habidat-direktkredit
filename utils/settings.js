@@ -60,12 +60,12 @@ const initConfig = () => {
 	config.set('database.password',    process.env.HABIDAT_DK_DB_PASSWORD);
 	config.set('database.database',    process.env.HABIDAT_DK_DB_DATABASE);
 
-	config.set('auth.admin.method',                process.env.HABIDAT_DK_ADMIN_AUTH);
-	config.set('auth.admin.ldap.uri',              process.env.HABIDAT_DK_LDAP_URI);
-	config.set('auth.admin.ldap.bindDN',           process.env.HABIDAT_DK_LDAP_BINDDN);
-	config.set('auth.admin.ldap.bindCredentials',  process.env.HABIDAT_DK_LDAP_PASSWORD);
-	config.set('auth.admin.ldap.searchBase',       process.env.HABIDAT_DK_LDAP_BASE);
-	config.set('auth.admin.ldap.searchFilter',     process.env.HABIDAT_DK_LDAP_SEARCHFILTER);
+	config.set('auth.admin.method',                       process.env.HABIDAT_DK_ADMIN_AUTH);
+	config.set('auth.admin.ldap.server.url',              process.env.HABIDAT_DK_LDAP_URI);
+	config.set('auth.admin.ldap.server.bindDN',           process.env.HABIDAT_DK_LDAP_BINDDN);
+	config.set('auth.admin.ldap.server.bindCredentials',  process.env.HABIDAT_DK_LDAP_PASSWORD);
+	config.set('auth.admin.ldap.server.searchBase',       process.env.HABIDAT_DK_LDAP_BASE);
+	config.set('auth.admin.ldap.server.searchFilter',     process.env.HABIDAT_DK_LDAP_SEARCHFILTER);
 
 	config.set('debug',               process.env.HABIDAT_DK_DEBUG || false);
 	config.set('site.https',          process.env.HABIDAT_DK_HTTPS);
