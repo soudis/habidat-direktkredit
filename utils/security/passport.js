@@ -102,7 +102,7 @@ module.exports = function(passport) {
 					done(null, users[0]);
 				} else {
 					// if there are LDAP users, then check if current cn exists
-					var user = users.find((dbUser) => {return dbUser.logon_id.toLowerCase() === user.cn.toLowerCase(); });
+					var dbUser = users.find((dbUser) => {return dbUser.logon_id.toLowerCase() === user.cn.toLowerCase(); });
 					if (dbUser) {
 						dbUser.lastLogin = moment();
 						dbUser.loginCount = (dbUser.loginCount || 0) + 1;
