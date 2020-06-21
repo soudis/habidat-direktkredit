@@ -103,17 +103,17 @@ module.exports = function(passport) {
 				} else {
 					// if there are LDAP users, then check if current cn exists
 					var user = users.find((dbUser) => {return dbUser.logon_id.toLowerCase() === user.cn.toLowerCase(); });
-					if (user) {
-						user.lastLogin = moment();
-						user.loginCount = (user.loginCount || 0) + 1;
+					if (dbUser) {
+						dbUser.lastLogin = moment();
+						dbUser.loginCount = (dbUser.loginCount || 0) + 1;
 							models.user.update({
-								lastLogin: user.lastLogin,
-								loginCount: user.loginCount
+								lastLogin: dbUser.lastLogin,
+								loginCount: dbUser.loginCount
 							}, {
-								where: { id: user.id }, trackOptions: utils.getTrackOptions(user, false)
+								where: { id: dbUser.id }, trackOptions: utils.getTrackOptions(dbUser, false)
 							})
 							.then(() => {
-								done(null, user);
+								done(null, dbUser);
 							});
 					} else {
 						req.flash('loginMessage', "LDAP Benutzer*in nicht in Liste der Admin-Accounts");
