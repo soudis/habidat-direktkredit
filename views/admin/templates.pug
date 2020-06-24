@@ -30,7 +30,12 @@ mixin template_table(templates, type, description, replace)
 block content 
   .jumbotron
     h2 Vorlagen
-    p.lead Vorlagen sind .docx Dateien (MS Word oder LibreOffice) die Platzhalter für Datenfelder beinhalten und aus denen automatische Dokumente generiert werden können. Es gibt Vorlagen für verschiedene Datensätze: Direktkreditgeber*innen, Direktkredite und eine Vorlage für die Buchhaltungsbestätigung, die von den Kreditgeber*innen selbst runtergeladen werden kann. Datenfelder können mit "{Datenfeldname}" eingefügt werden. Welche Felder zur Verfügung stehen, siehst du in den Beispieldokumenten.
+    p.lead 
+      span Vorlagen sind .docx Dateien (MS Word oder LibreOffice) die Platzhalter für Datenfelder beinhalten und aus denen automatische Dokumente generiert werden können. Es gibt Vorlagen für verschiedene Datensätze: Direktkreditgeber*innen, Direktkredite und eine Vorlage für die Buchhaltungsbestätigung, die von den Kreditgeber*innen selbst runtergeladen werden kann. Datenfelder können mit "{Datenfeldname}" eingefügt werden. Welche Felder zur Verfügung stehen, siehst du in den Beispieldokumenten und 
+      a(href=_url('/admin/templatehelp')) hier
+      span . Detaillierte Infos über die Funktionsweise findest du außerdem 
+      a(href="https://docxtemplater.readthedocs.io/en/latest/tag_types.html") hier
+      span .
   .card
     h5.card-header 
       span Vorlage für die Buchhaltungsbestätigung für Kreditgeber*innen

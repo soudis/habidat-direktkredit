@@ -159,6 +159,11 @@ module.exports = function(app){
 		});
 	});
 
+	router.get('/admin/templatehelp', security.isLoggedInAdmin, function(req, res, next) {
+		res.render('admin/template_help', { title: 'Vorlagenfelder', userColumns: models.user.getColumns(), contractColumns: models.contract.getColumns(), transactionColumns: models.transaction.getColumns() });
+	});
+
+
 	router.get('/admin/infopack', security.isLoggedInAdmin, function(req, res, next) {
 		models.file.findAll({
 			where: {

@@ -8,6 +8,7 @@ const json2csv = require('json2csv');
 const exceljs = require('exceljs');
 const urlUtil = require('url');
 const settings = require('./settings');
+const docxtemplates = require('docx-templates');
 
 
 exports.render = (req, res, template, data, title = undefined) => {
@@ -36,14 +37,22 @@ exports.getTrackOptions = function(user, track) {
 }
 
 exports.generateDocx = function(templateFile, data){
-	var path = templateFile;
-	var file = fs.readFileSync(path, 'binary');
-	var zip = new JSZipUtils(file);
-	var doc=new DocxGen();
-	doc.loadZip(zip);
-	doc.setData(data);
-	doc.render();
-	return doc.getZip().generate({type:"nodebuffer"});
+
+	return new Promise((resolve, reject) => {
+		try {
+			var path = templateFile;
+			var file = fs.readFileSync(path, 'binary');
+			var zip = new JSZipUtils(file);
+			var doc=new DocxGen();
+			doc.loadZip(zip);
+			doc.setData(data);
+			doc.render();
+			resolve(doc.getZip().generate({type:"nodebuffer"}));
+		} catch(error) {
+			reject(error);
+		}
+	})
+
 };
 
 exports.convertToPdf = function(stream){

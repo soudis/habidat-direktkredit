@@ -8,45 +8,45 @@ const router = require('express').Router();
 const models  = require('../models');
 
 module.exports = function(app){
-	router.get('/docx/:id', security.isLoggedInAdmin, function(req, res) {
-		models.user.findOne({
-			where: {
-				id: req.params.id
-			}
-		}).then(function(user) {
-			var data = {
-				"first_name": user.first_name,
-				"last_name": user.last_name,
-				"logon_id": user.logon_id,
-				"password": user.password,
-				"street": user.street,
-				"zip": user.zip,
-				"place": user.place,
-				"country": user.country,
-				"telno": user.telno,
-				"email": user.email,
-				"IBAN": user.IBAN,
-				"BIC": user.BIC
-			};
+	router.get('/docx/:id', security.isLoggedInAdmin, function(req, res, next) {
+		models.user.findByIdFetchFull(models, req.params.id)
+			.then(function(user) {
+				var data = user.getRow();
+				Object.keys(data).forEach(key => {
+					data[key] = data[key].value;
+				})
+				data.user_contracts = user.contracts.map(contract => {
+					var data = contract.getRow();
+					Object.keys(data).forEach(key => {
+						data[key] = data[key].value;
+					})
+					data.contract_transactions = contract.transactions.map(transaction => {
+						var data = transaction.getRow();
+						Object.keys(data).forEach(key => {
+							data[key] = data[key].value;
+						})
+						return data;
+					})
+				})
+				data.current_date = moment().format('DD.MM.YYYY');
+				data.user_address = data.user_address.replace('</br>', "\n");
 
-		    models.file.findOne({
-				where: {
-					id: req.query.fileid
-			}}).then(function(file) {
-				return file.path;
-			}).catch((error) => {
-				return req.query.file;
-			}).then((template) => {
+			    return models.file.findOne({
+					where: {
+						id: req.query.fileid
+				}})
+				.then(function(file) {
+					return utils.generateDocx(file.path, data)
+						.then(result => {
 
-				var file = utils.generateDocx(template, data);
-
-				res.setHeader('Content-Length', file.length);
-				res.setHeader('Content-Type', 'application/msword');
-				res.setHeader('Content-Disposition', 'inline; filename=' + user.logon_id + '.docx');
-				res.write(file, 'binary');
-				res.end();
-			});
-		});
+							res.setHeader('Content-Length', result.length);
+							res.setHeader('Content-Type', 'application/msword');
+							res.setHeader('Content-Disposition', 'inline; filename="' + file.description + ' - Konto ' + user.id + ' (' + user.getFullName() + ').docx"');
+							res.write(result, 'binary');
+							res.end();
+						});
+				})
+			}).catch(error => next(error));
 	});
 
 	router.get('/docx_c/:id', security.isLoggedInAdmin, function(req, res, next) {
@@ -59,53 +59,46 @@ module.exports = function(app){
 				as: 'transactions'
 			}
 		}).then(function(contract) {
-			models.user.findByIdFetchFull(models, contract.user_id)
+			return models.user.findByIdFetchFull(models, contract.user_id)
 				.then(user => {
-					var data = {
-						"first_name": user.first_name,
-						"last_name": user.last_name,
-						"logon_id": user.logon_id,
-						"password": user.password,
-						"street": user.street,
-						"zip": user.zip,
-						"place": user.place,
-						"country": user.country,
-						"telno": user.telno,
-						"email": user.email,
-						"IBAN": user.IBAN,
-						"BIC": user.BIC,
-						"amount": format.formatNumber(contract.amount,2),
-						"interest_rate": format.formatNumber(contract.interest_rate,2),
-						"has_interest": contract.interest_rate > 0,
-						"contract_date": format.formatDate(contract.contract_date),
-						"termination_type": contract.termination_type,
-						"termination_date": format.formatDate(contract.termination_date),
-						"termination_period": contract.termination_period,
-						"termination_period_type": contract.termination_period_type,
-						"notes": contract.notes,
-						"status": contract.status,
-						"transactionList": contract.transactions
-					};
+					userData = user.getRow();
+					Object.keys(userData).forEach(key => {
+						userData[key] = userData[key].value;
+					})
 
-					return models.file.findOne({
+					contractData = contract.getRow();
+					Object.keys(contractData).forEach(key => {
+						contractData[key] = contractData[key].value;
+					})
+					contractData.contract_transactions = contract.transactions.map(transaction => {
+						var data = transaction.getRow();
+						Object.keys(data).forEach(key => {
+							data[key] = data[key].value;
+						})
+					})
+
+					var data = Object.assign(userData, contractData);
+
+					data.user_address = data.user_address.replace('</br>', "\n");
+					data.current_date = moment().format('DD.MM.YYYY');
+
+
+				    return models.file.findOne({
 						where: {
 							id: req.query.fileid
-					}}).then(function(file) {
-						return file.path;
-					}).catch((error) => {
-						return req.query.file;
-					}).then((template) => {
-						var stream;
-						file = utils.generateDocx(template, data);
-						res.setHeader('Content-Length', file.length);
-						res.setHeader('Content-Type', 'application/msword');
-						res.setHeader('Content-Disposition', 'inline; filename=' + user.logon_id + '_' + contract.id + '.docx');
-						res.write(file, 'binary');
-						res.end();
-					});
-				})
-				.catch(error => next);
-		});
+					}})
+					.then(function(file) {
+						return utils.generateDocx(file.path, data)
+							.then(result => {
+								res.setHeader('Content-Length', result.length);
+								res.setHeader('Content-Type', 'application/msword');
+								res.setHeader('Content-Disposition', 'inline; filename="' + file.description + ' - Konto ' + user.id + ' (' + user.getFullName() + ') - Vertrag ' + contract.id + '.docx"');
+								res.write(result, 'binary');
+								res.end();
+							});
+					})
+				});
+		}).catch(error => next(error));
 	});
 
 

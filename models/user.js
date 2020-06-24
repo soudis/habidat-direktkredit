@@ -6,6 +6,8 @@ const settings = require('../utils/settings');
 const bcrypt = require('bcrypt');
 const crypto = require('crypto');
 const utils = require('../utils');
+const format = require('../utils/format');
+const intl = require('../utils/intl');
 
 module.exports = (sequelize, DataTypes) => {
 	var User = sequelize.define('user', {
@@ -267,6 +269,71 @@ module.exports = (sequelize, DataTypes) => {
 				return count !== 0;
 			});
 	};
+
+
+	User.getColumns = function () {
+		return {
+			user_id: {id: "user_id",  label: "Kontonummer", filter: 'text'},
+			user_first_name: {id: "user_first_name",  label: "Vorname", filter: 'text'},
+			user_last_name: {id: "user_last_name",  label: "Nachname", filter: 'text'},
+			user_name: {id: "user_name",  label: "Name", priority: "2", filter: 'text'},
+			user_address: {id: "user_address",  label: "Adresse", filter: 'text'},
+			user_address_oneline: {id: "user_address_oneline",  label: "Adresse (einzeilig)", filter: 'text'},
+			user_telno: {id: "user_telno",  label:"Telefon", filter: 'text'},
+			user_email: {id: "user_email",  label:"E-Mail", filter: 'text'},
+			user_iban: {id: "user_iban",  label:"IBAN", filter: 'text'},
+			user_bic: {id: "user_bic",  label: "BIC", filter: 'text'},
+			user_relationship: {id: "user_relationship",  label:"Beziehung", filter: 'list'},
+			user_street: {id: "user_street",  label: "Strasse", filter: 'text'},
+			user_zip: {id: "user_zip",  label: "PLZ", filter: 'text'},
+			user_place: {id: "user_place",  label: "Ort", filter: 'text'},
+			user_country: {id: "user_country",  label: "Land", filter: 'text'},
+			user_logon_id: {id: "user_logon_id",  label: "Anmeldename", filter: 'text'}
+		}
+	}
+
+	const umlautMap = {
+		'\u00dc': 'UE',
+		'\u00c4': 'AE',
+		'\u00d6': 'OE',
+		'\u00fc': 'ue',
+		'\u00e4': 'ae',
+		'\u00f6': 'oe',
+		'\u00df': 'ss',
+	};
+
+	var replaceUmlaute = function (str) {
+		return str
+		.replace(/[\u00dc|\u00c4|\u00d6][a-z]/g, (a) => {
+			const big = umlautMap[a.slice(0, 1)];
+			return big.charAt(0) + big.charAt(1).toLowerCase() + a.slice(1);
+		})
+		.replace(new RegExp('['+Object.keys(umlautMap).join('|')+']',"g"),
+			(a) => umlautMap[a]
+			);
+	};
+
+	User.prototype.getRow = function () {
+		var user = this;
+		return {
+			user_id: { valueRaw: user.id, value:  user.id  },
+			user_first_name: { valueRaw: user.first_name, value:  user.first_name  },
+			user_last_name: { valueRaw: user.last_name, value:  user.last_name  },
+			user_name: { valueRaw: user.getFullName(), value: user.getFullName(), order: replaceUmlaute(user.getFullName())},
+			user_address: { valueRaw: user.getAddress(true), value: user.getAddress(true) },
+			user_address_oneline: { valueRaw: user.getAddress(false), value: user.getAddress(true) },
+			user_telno: { valueRaw: user.telno, value: user.telno },
+			user_email: { valueRaw: user.email, value: user.email },
+			user_iban: { valueRaw: user.IBAN, value: user.IBAN },
+			user_bic: { valueRaw: user.BIC, value: user.BIC },
+			user_relationship: { valueRaw: user.relationship, value: user.relationship },
+			user_street: { valueRaw: user.street, value: user.street },
+			user_zip: { valueRaw: user.zip, value: user.zip },
+			user_place: { valueRaw: user.place, value: user.place },
+			user_country: { valueRaw: user.country, value: user.country },
+			user_logon_id: { valueRaw: user.logon_id, value: user.logon_id }
+		}
+	}
 
 	User.prototype.getAddress = function (lineBreak=false) {
 		var address = "";

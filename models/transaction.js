@@ -2,6 +2,7 @@
 
 const moment = require('moment');
 const settings = require('../utils/settings');
+const format = require('../utils/format');
 const intl = require('../utils/intl');
 
 module.exports = (sequelize, DataTypes) => {
@@ -62,6 +63,27 @@ module.exports = (sequelize, DataTypes) => {
 			foreignKey: 'contract_id'
 		});
 	};
+
+	transaction.getColumns = function () {
+		return {
+			transaction_id: {id: "transaction_id", label: "Zahlungsnummer", filter: 'text'},
+			transaction_type: {id: "transaction_type", label: "Zahlungsrichtung", filter: 'text'},
+			transaction_date: {id: "transaction_date", label: "Zahlungsdatum", filter: 'date'},
+			transaction_amount: {id: "transaction_amount", label: "Zahlungsbetrag", class: "text-right", filter: 'number'},
+			transaction_payment_type: {id: "transaction_payment_type", label: "Zahlungsart", filter: 'text'}
+		}
+	}
+
+	transaction.prototype.getRow = function (effectiveDate = undefined, interestYear = undefined) {
+		var transaction = this;
+		return {
+			transaction_id: { valueRaw: transaction.id, value: transaction.id },
+			transaction_type: { valueRaw: transaction.getTypeText(), value: transaction.getTypeText() },
+			transaction_date: { valueRaw: transaction.transaction_date, value: moment(transaction.transaction_date).format('DD.MM.YYYY'), order: moment(transaction.transaction_date).format('YYYY/MM/DD') },
+			transaction_amount: { valueRaw: transaction.amount, value: format.formatMoney(transaction.amount,2), order: transaction.amount},
+			transaction_payment_type: { valueRaw: transaction.getPaymentTypeText(), value: transaction.getPaymentTypeText() }
+		};
+	}
 
 	transaction.prototype.getTypeText = function () {
 		switch(this.type) {

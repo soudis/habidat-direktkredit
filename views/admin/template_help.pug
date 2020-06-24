@@ -1,0 +1,73 @@
+extends ../layout
+
+block content 
+  .jumbotron
+    h2 Vorlagenfelder
+    p.lead 
+      span Die Liste an möglichen Felder für die Vorlagen.
+  table.table.table-narrow
+    thead
+      tr
+        th Ebene
+        th Feldname
+        th Beschreibung
+    tbody
+      tr
+        td Allgemein
+        td current_date
+        td Aktuelles Datum
+      tr
+        td Buchhaltungsbestätigung
+        td year
+        td Jahr
+      tr
+        td Buchhaltungsbestätigung
+        td interest_total
+        td Summe Jahreszinsen
+      tr
+        td Buchhaltungsbestätigung
+        td user_transactions_year
+        td Zahlungen und Zinsbuchungen des Jahres (Liste)      
+      tr
+        td Zahlungen und Zinsbuchungen des Jahres
+        td contract_id
+        td Vertragsnummer      
+      tr
+        td Zahlungen und Zinsbuchungen des Jahres
+        td contract_interest_rate
+        td Zinssatz      
+      tr
+        td Zahlungen und Zinsbuchungen des Jahres
+        td transaction_date
+        td Buchungsdatum      
+      tr
+        td Zahlungen und Zinsbuchungen des Jahres
+        td transaction_amount
+        td Buchungswert      
+      tr
+        td Zahlungen und Zinsbuchungen des Jahres
+        td transaction_type
+        td Buchungsart (Saldo Jahresbeginn, Zinsbuchung, ...)      
+      each column in userColumns
+        tr
+          td Kreditgeber*in
+          td=column.id
+          td=column.label
+      tr
+        td Kreditgeber*in
+        td user_contracts
+        td Verträge (Liste)
+      each column in contractColumns
+        tr
+          td Vertrag
+          td=column.id
+          td=column.label
+      tr
+        td Vertrag
+        td contract_transactions
+        td Zahlungen (Liste)
+      each column in transactionColumns
+        tr
+          td Zahlung
+          td=column.id
+          td=column.label

@@ -9,6 +9,8 @@ const router = require('express').Router();
 const models  = require('../models');
 const Op = require("sequelize").Op;
 
+const multer = require('multer');
+
 module.exports = function(app){
 
 	// =====================================
@@ -28,7 +30,7 @@ module.exports = function(app){
 						success: req.flash('success')
 					});
 				})
-				.catch(error => next);
+				.catch(error => next(error));
 		}
 	});
 
@@ -67,13 +69,39 @@ module.exports = function(app){
 				})
 
 		})
-		.catch(error => next);
+		.catch(error => next(error));
 	});
 
 
-	router.post('/accountnotification', security.isLoggedIn, function(req, res, next) {
+	router.post('/accountnotification', security.isLoggedIn, multer().none(),function(req, res, next) {
 		models.user.findByIdFetchFull(models, req.user.id)
 			.then(user => {
+
+				data = user.getRow();
+				data.user_contracts = user.contracts.map(contract => {
+					var data = contract.getRow();
+					Object.keys(data).forEach(key => {
+						data[key] = data[key].value;
+					})
+					data.contract_transactions = contract.transactions.map(transaction => {
+						var data = transaction.getRow();
+						Object.keys(data).forEach(key => {
+							data[key] = data[key].value;
+						})
+					})
+					data.current_date = moment().format('DD.MM.YYYY');
+
+				})
+
+				Object.keys(data).forEach(key => {
+					data[key] = data[key].value;
+				})
+
+				data.user_address = data.user_address.replace('</br>', "\n");
+
+				data.current_date = moment().format('DD.MM.YYYY');
+				data.year = req.body.year;
+
 				var transactionList = user.getTransactionList(req.body.year);
 
 				transactionList.sort(function(a,b) {
@@ -90,36 +118,24 @@ module.exports = function(app){
 							return 0;
 					}
 				});
-
+				data.user_transactions_year = [];
 
 				var interestTotal = 0;
 				transactionList.forEach(function(transaction) {
 					if (transaction.type.startsWith("Zinsertrag")) {
 						interestTotal = interestTotal + transaction.amount;
 					}
-					transaction.date = format.formatDate(transaction.date);
-					transaction.amount = format.formatMoney(transaction.amount);
-					transaction.interest_rate = format.formatPercent(transaction.interest_rate);
+					data.user_transactions_year.push ({
+						contract_id: transaction.contract_id,
+						contract_interest_rate: format.formatPercent(transaction.interest_rate),
+						transaction_date: format.formatDate(transaction.date),
+						transaction_amount: format.formatMoney(transaction.amount),
+						transaction_type: transaction.type,
+					});
 
 				});
 
-				var data = {
-						"id": user.id,
-						"first_name": user.first_name?user.first_name:"",
-						"last_name": user.last_name?user.last_name:"",
-						"street" :user.street,
-						"zip": user.zip,
-						"place": user.place,
-						"country": user.country,
-						"telno": user.telno,
-						"email": user.email,
-						"IBAN": user.IBAN,
-						"BIC": user.BIC,
-						"year": req.body.year,
-						"current_date": format.formatDate(moment()),
-						"transactionList": transactionList,
-						"interestTotal": format.formatMoney(interestTotal)
-					};
+				data.interest_total = format.formatMoney(interestTotal);
 
 				var filename =  "Kontomitteilung " + user.id + " " + req.body.year;
 
@@ -129,22 +145,19 @@ module.exports = function(app){
 						}
 					})
 			    	.then(template => {
-						var file = utils.generateDocx(template.path, data);
-
-
-
-						return utils.convertToPdf(file)
+						return utils.generateDocx(template.path, data)
+							.then(result => utils.convertToPdf(result))
 							.then(file => {
 								res.setHeader('Content-Length', file.length);
 								res.setHeader('Content-Type', 'application/pdf');
-								res.setHeader('Content-Disposition', 'inline; filename=' + filename + '.pdf');
+								res.setHeader('Content-Disposition', 'inline; filename="' + filename + '.pdf"');
 								res.write(file, 'binary');
 								res.end();
 							})
 					});
 
 			})
-			.catch(error => next);
+			.catch(error => next(error));
 	});
 
 	app.use('/', router);
