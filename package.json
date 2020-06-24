@@ -26,6 +26,7 @@
     "datatables.net-bs4": "^1.10.20",
     "datatables.net-responsive-bs4": "^2.2.3",
     "debug": "^4.1.0",
+    "docx-templates": "^4.3.0",
     "docxtemplater": "^3.6.6",
     "exceljs": "^3.9.0",
     "express": "^4.16.4",

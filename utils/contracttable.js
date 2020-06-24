@@ -29,45 +29,44 @@ var replaceUmlaute = function (str) {
 
 
 exports.contractTableRow = function(user, contract = undefined, effectiveDate = undefined, interestYear = undefined) {
+	var userRow = user.getRow();
 	if (contract) {
-		var interestToDate = Math.round(contract.getInterestToDate(moment(effectiveDate))*100)/100;
-		var amountToDate = Math.round(contract.getAmountToDate(moment(effectiveDate))*100)/100;
-		var interestOfYear = Math.round(contract.getInterestOfYear(interestYear)*100)/100;
+		var contractRow = contract.getRow(effectiveDate, interestYear);
 		return [
-			{ valueRaw: contract.sign_date, value: moment(contract.sign_date).format('DD.MM.YYYY'), order: moment(contract.sign_date).format('YYYY/MM/DD') },
-			{ valueRaw: user.id, value:  user.id  },
-			{ valueRaw: user.getFullName(), value: user.getFullName(), order: replaceUmlaute(user.getFullName())},
-			{ valueRaw: user.getAddress(true), value: user.getAddress(true) },
-			{ valueRaw: user.telno, value: user.telno },
-			{ valueRaw: user.email, value: user.email },
-			{ valueRaw: user.IBAN, value: user.IBAN },
-			{ valueRaw: user.BIC, value: user.BIC },
-			{ valueRaw: user.relationship, value: user.relationship },
-			{ valueRaw: contract.id, value: contract.id },
-			{ valueRaw: contract.amount, value: format.formatMoney(contract.amount,2), order: contract.amount},
-			{ valueRaw: contract.interest_rate, value: format.formatPercent(contract.interest_rate,3), order: contract.interest_rate},
-			{ valueRaw: contract.getDepositAmount(), value: format.formatMoney(contract.getDepositAmount(), 2), order: contract.getDepositAmount(), class: contract.getDepositAmount()>0?"text-success":""},
-			{ valueRaw: contract.getWithdrawalAmount(), value: format.formatMoney(contract.getWithdrawalAmount(), 2), order: contract.getWithdrawalAmount(), class: contract.getWithdrawalAmount()<0?"text-danger":"" },
-			{ valueRaw: amountToDate, value: format.formatMoney(amountToDate), order: amountToDate },
-			{ valueRaw: interestToDate, value: format.formatMoney(interestToDate), order: interestToDate },
-			{ valueRaw: interestOfYear, value: format.formatMoney(interestOfYear), order: interestOfYear },
-			{ valueRaw: intl._t('interest_payment_type_'+contract.getInterestPaymentType()), value: intl._t('interest_payment_type_'+contract.getInterestPaymentType())},
-			{ valueRaw: contract.getTerminationTypeFullString(), value: contract.getTerminationTypeFullString()},
-			{ valueRaw: contract.termination_date?contract.termination_date:"", value: contract.termination_date?moment(contract.termination_date).format('DD.MM.YYYY'):"", order: contract.termination_date?moment(contract.termination_date).format('YYYY/MM/DD'):""},
-			{ valueRaw: contract.getPaybackDate()?contract.getPaybackDate().format('YYYY-MM-DD'):"", value: contract.getPaybackDate()?moment(contract.getPaybackDate()).format('DD.MM.YYYY'):"", order: contract.getPaybackDate()?moment(contract.getPaybackDate()).format('YYYY/MM/DD'):""},
-			{ valueRaw: contract.getStatus(), value: contract.getStatus() }
+			contractRow.contract_sign_date,
+			userRow.user_id,
+			userRow.user_name,
+			userRow.user_address,
+			userRow.user_telno,
+			userRow.user_email,
+			userRow.user_iban,
+			userRow.user_bic,
+			userRow.user_relationship,
+			contractRow.contract_id,
+			contractRow.contract_amount,
+			contractRow.contract_interest_rate,
+			contractRow.contract_deposit,
+			contractRow.contract_withdrawal,
+			contractRow.contract_amount_to_date,
+			contractRow.contract_interest_to_date,
+			contractRow.contract_interest_of_year,
+			contractRow.contract_interest_payment_type,
+			contractRow.contract_termination_type,
+			contractRow.contract_termination_date,
+			contractRow.contract_payback_date,
+			contractRow.contract_status
 		];
 	} else {
 		return [
 			false,
-			{ valueRaw: user.id, value:  user.id  },
-			{ valueRaw: user.getFullName(), value: user.getFullName(), order: replaceUmlaute(user.getFullName())},
-			{ valueRaw: user.getAddress(true), value: user.getAddress(true) },
-			{ valueRaw: user.telno, value: user.telno },
-			{ valueRaw: user.email, value: user.email },
-			{ valueRaw: user.IBAN, value: user.IBAN },
-			{ valueRaw: user.BIC, value: user.BIC },
-			{ valueRaw: user.relationship, value: user.relationship },
+			userRow.user_id,
+			userRow.user_name,
+			userRow.user_address,
+			userRow.user_telno,
+			userRow.user_email,
+			userRow.user_iban,
+			userRow.user_bic,
+			userRow.user_relationship,
 			false,
 			false,
 			false,
@@ -89,29 +88,32 @@ exports.getContractTableColumns = (pInterestYear = undefined) => {
 
 	var interestYear = pInterestYear ? pInterestYear : moment().subtract(1,'years').year();
 
-	return contractTableColumns = [
-			{id: "contract_sign_date", label: "Vertragsdatum", priority: "2", filter: 'date'},
-			{id: "user_id", label: "User ID", filter: 'text'},
-			{id: "user_name", label: "Name", priority: "2", filter: 'text'},
-			{id: "user_address", label: "Adresse", filter: 'text'},
-			{id: "user_telno", label:"Telefon", filter: 'text'},
-			{id: "user_email", label:"E-Mail", filter: 'text'},
-			{id: "user_iban", label:"IBAN", filter: 'text'},
-			{id: "user_bic", label: "BIC", filter: 'text'},
-			{id: "user_relationship", label:"Beziehung", filter: 'list'},
-			{id: "contract_id", label:"Vertrag ID", filter: 'text'},
-			{id: "contract_amount", label: "Vertragswert", class: "text-right", filter: 'number'},
-			{id: "contract_interest_rate", label: "Zinssatz", class: "text-right", filter: 'number'},
-			{id: "contract_deposit", label: "Einzahlungen", class: "text-right", filter: 'number'},
-			{id: "contract_withdrawal", label: "Auszahlungen", class: "text-right", filter: 'number'},
-			{id: "contract_amount_to_date", label: "Aushaftend", class: "text-right", filter: 'number'},
-			{id: "contract_interest_to_date", label: "Zinsen", class: "text-right", filter: 'number'},
-			{id: "contract_interest_of_year", label: "Zinsen " + interestYear, class: "text-right", filter: 'number'},
-			{id: "contract_interest_payment_type", label: "Zinsauszahlung", class: "text-right", filter: 'number'},
-			{id: "contract_termination_type", label: "Kündigungsart", filter: 'list'},
-			{id: "contract_termination_date", label: "Kündigungsdatum", filter: 'date'},
-			{id: "contract_payback_date", label: "Rückzahlungsdatum", filter: 'date'},
-			{id: "contract_status", label: "Status", class: "text-center", priority: "2", filter: 'list'}
+	userColumns = models.user.getColumns();
+	contractColumns = models.contract.getColumns(interestYear);
+
+	return [
+			contractColumns.contract_sign_date,
+			userColumns.user_id,
+			userColumns.user_name,
+			userColumns.user_address,
+			userColumns.user_telno,
+			userColumns.user_email,
+			userColumns.user_iban,
+			userColumns.user_bic,
+			userColumns.user_relationship,
+			contractColumns.contract_id,
+			contractColumns.contract_amount,
+			contractColumns.contract_interest_rate,
+			contractColumns.contract_deposit,
+			contractColumns.contract_withdrawal,
+			contractColumns.contract_amount_to_date,
+			contractColumns.contract_interest_to_date,
+			contractColumns.contract_interest_of_year,
+			contractColumns.contract_interest_payment_type,
+			contractColumns.contract_termination_type,
+			contractColumns.contract_termination_date,
+			contractColumns.contract_payback_date,
+			contractColumns.contract_status
 		];
 }
 

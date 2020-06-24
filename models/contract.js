@@ -1,8 +1,10 @@
 /* jshint esversion: 8 */
 
 const moment = require('moment');
+const format = require('../utils/format');
 const settings = require('../utils/settings');
 const _t = require('../utils/intl')._t;
+const intl = require('../utils/intl');
 
 module.exports = (sequelize, DataTypes) => {
 	contract = sequelize.define('contract', {
@@ -80,6 +82,51 @@ module.exports = (sequelize, DataTypes) => {
 	contract.findByIdFetchFull = function (models, id) {
 		return models.contract.findOne({ where : { id: id }, include: [{model: models.transaction, as: "transactions"}]});
 	};
+
+	contract.getColumns = function (interestYear) {
+		return {
+			contract_sign_date: {id: "contract_sign_date", label: "Vertragsdatum", priority: "2", filter: 'date'},
+			contract_id: {id: "contract_id",  label:"Vertragsnummer", filter: 'text'},
+			contract_amount: {id: "contract_amount",  label: "Vertragswert", class: "text-right", filter: 'number'},
+			contract_interest_rate: {id: "contract_interest_rate",  label: "Zinssatz", class: "text-right", filter: 'number'},
+			contract_deposit: {id: "contract_deposit",  label: "Einzahlungen", class: "text-right", filter: 'number'},
+			contract_withdrawal: {id: "contract_withdrawal",  label: "Auszahlungen", class: "text-right", filter: 'number'},
+			contract_amount_to_date: {id: "contract_amount_to_date",  label: "Aushaftend", class: "text-right", filter: 'number'},
+			contract_interest_to_date: {id: "contract_interest_to_date",  label: "Zinsen", class: "text-right", filter: 'number'},
+			contract_interest_of_year: {id: "contract_interest_of_year",  label: "Zinsen " + interestYear, class: "text-right", filter: 'number'},
+			contract_interest_payment_type: {id: "contract_interest_payment_type",  label: "Zinsauszahlung", class: "text-right", filter: 'number'},
+			contract_termination_type: {id: "contract_termination_type",  label: "Kündigungsart", filter: 'list'},
+			contract_termination_date: {id: "contract_termination_date",  label: "Kündigungsdatum", filter: 'date'},
+			contract_payback_date: {id: "contract_payback_date",  label: "Rückzahlungsdatum", filter: 'date'},
+			contract_status: {id: "contract_status",  label: "Status", class: "text-center", priority: "2", filter: 'list'},
+			contract_has_interest: {id: "contract_has_interest",  label: "Zinssatz > 0", class: "text-center", priority: "2", filter: 'list'}
+		}
+	}
+
+
+	contract.prototype.getRow = function (effectiveDate = undefined, interestYear = undefined) {
+		var contract = this;
+		var interestToDate = Math.round(contract.getInterestToDate(moment(effectiveDate))*100)/100;
+		var amountToDate = Math.round(contract.getAmountToDate(moment(effectiveDate))*100)/100;
+		var interestOfYear = Math.round(contract.getInterestOfYear(interestYear || moment().subtract(1,'years').year())*100)/100;
+		return {
+			contract_sign_date: { valueRaw: contract.sign_date, value: moment(contract.sign_date).format('DD.MM.YYYY'), order: moment(contract.sign_date).format('YYYY/MM/DD') },
+			contract_id: { valueRaw: contract.id, value: contract.id },
+			contract_amount: { valueRaw: contract.amount, value: format.formatMoney(contract.amount,2), order: contract.amount},
+			contract_interest_rate: { valueRaw: contract.interest_rate, value: format.formatPercent(contract.interest_rate,3), order: contract.interest_rate},
+			contract_deposit: { valueRaw: contract.getDepositAmount(), value: format.formatMoney(contract.getDepositAmount(), 2), order: contract.getDepositAmount(), class: contract.getDepositAmount()>0?"text-success":""},
+			contract_withdrawal: { valueRaw: contract.getWithdrawalAmount(), value: format.formatMoney(contract.getWithdrawalAmount(), 2), order: contract.getWithdrawalAmount(), class: contract.getWithdrawalAmount()<0?"text-danger":"" },
+			contract_amount_to_date: { valueRaw: amountToDate, value: format.formatMoney(amountToDate), order: amountToDate },
+			contract_interest_to_date: { valueRaw: interestToDate, value: format.formatMoney(interestToDate), order: interestToDate },
+			contract_interest_of_year: { valueRaw: interestOfYear, value: format.formatMoney(interestOfYear), order: interestOfYear },
+			contract_interest_payment_type: { valueRaw: intl._t('interest_payment_type_'+contract.getInterestPaymentType()), value: intl._t('interest_payment_type_'+contract.getInterestPaymentType())},
+			contract_termination_type: { valueRaw: contract.getTerminationTypeFullString(), value: contract.getTerminationTypeFullString()},
+			contract_termination_date: { valueRaw: contract.termination_date?contract.termination_date:"", value: contract.termination_date?moment(contract.termination_date).format('DD.MM.YYYY'):"", order: contract.termination_date?moment(contract.termination_date).format('YYYY/MM/DD'):""},
+			contract_payback_date: { valueRaw: contract.getPaybackDate()?contract.getPaybackDate().format('YYYY-MM-DD'):"", value: contract.getPaybackDate()?moment(contract.getPaybackDate()).format('DD.MM.YYYY'):"", order: contract.getPaybackDate()?moment(contract.getPaybackDate()).format('YYYY/MM/DD'):""},
+			contract_status: { valueRaw: contract.getStatus(), value: contract.getStatus() },
+			contract_has_interest: { valueRaw: contract.interest_rate > 0, value: contract.interest_rate > 0 }
+		};
+	}
 
 	contract.prototype.isTerminated = function (date) {
 		// check if all money was paid back until given date
@@ -217,7 +264,6 @@ module.exports = (sequelize, DataTypes) => {
 		var contract = this;
 		var year_begin = moment(year+'-01-01').startOf("year");
 		var year_end = moment(year+'-01-01').add(1,'years');
-		console.log('begin: ', year_begin.toString(), ', end: ', year_end.toString());
 		this.transactions.forEach(function(transaction) {
 			if (year_end.diff(transaction.transaction_date) > 0) {
 				sum += transaction.interestToDate(contract.interest_rate, year_end);
