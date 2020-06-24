@@ -5,19 +5,19 @@ mixin template_table(templates, type, description, replace)
     table.table.table
       thead
         tr
-          th.col-md-6 Datei
-          th.col-md-6 Bezeichnung
+          th Datei
+          th Bezeichnung
           th.fit Aktionen
       tbody
         each template in templates
           if (template.ref_table == type)
             tr(id="file_"+template.id)
-              td.col-md-6
+              td
                 a(href='/file/get/' + template.id).btn.btn-sm.btn-light
                   span.fa.fa-download
                   span  
                   span= template.filename                
-              td.col-md-6=template.description
+              td=template.description
               td.fit.text-right
                 if replace
                   a.btn.btn-light.btn-sm.sidebar-action(href=_url('/admin/addtemplate/template_account_notification') title="Vorlage Überschreiben")
