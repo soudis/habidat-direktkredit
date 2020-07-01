@@ -130,15 +130,14 @@ module.exports = (sequelize, DataTypes) => {
 
 	contract.prototype.isTerminated = function (date) {
 		// check if all money was paid back until given date
-		var sum = 0;
 		var count = 0;
 		var toDate = date;
 		this.transactions.forEach(function(transaction) {
 			if (moment(toDate).diff(transaction.transaction_date) >= 0) {
 				count ++;
-				sum += transaction.amount;
 			}
 		});
+		var sum = this.getAmountToDate(date, undefined);
 		return count > 1 && sum <= 0;
 	};
 
