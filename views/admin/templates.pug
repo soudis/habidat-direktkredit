@@ -13,7 +13,7 @@ mixin template_table(templates, type, description, replace)
           if (template.ref_table == type)
             tr(id="file_"+template.id)
               td
-                a(href='/file/get/' + template.id).btn.btn-sm.btn-light
+                a(href=_url('/file/get/' + template.id)).btn.btn-sm.btn-light
                   span.fa.fa-download
                   span  
                   span= template.filename                
