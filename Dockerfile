@@ -21,8 +21,7 @@ USER node
 
 RUN npm install 
 
-RUN mkdir -p /habidat/public/images
-RUN mkdir -p /habidat/upload
+RUN mkdir -p /habidat/public/images && mkdir -p /habidat/upload && mkdir -p /habidat/log && touch /habidat/log/access.log
 COPY --chown=node:node . .
 
 ENTRYPOINT ["docker-entrypoint.sh"]
