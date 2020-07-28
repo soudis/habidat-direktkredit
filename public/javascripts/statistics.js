@@ -42,7 +42,6 @@ $(document).ready(function(){
 
 	var getSliderDateRange = function(sliderName) {
 		var slider = $('#'+sliderName);
-		console.log(sliderName);
 		var sliderValue = slider.data('slider').getValue();
 		var begin = moment(slider.data('start'));
 		var start = moment(begin).add(sliderValue[0], 'months');

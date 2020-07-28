@@ -156,7 +156,6 @@ mixin setpassword_form(action)
 
     function passwordCheckTimer() {
         if (checkPasswordQueue) {
-            console.log('check');
             var password =checkPasswordQueue;
             checkPasswordQueue = undefined;    
             checkPassword(password);
