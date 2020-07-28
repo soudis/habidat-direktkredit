@@ -176,7 +176,6 @@ module.exports = function(app){
 	});
 
 	router.post('/user/edit', security.isLoggedInAdmin, multer().none(), function(req, res, next) {
-		console.log(JSON.stringify(req.user));
 		models.user.update({
 				first_name: req.body.first_name,
 				last_name: req.body.last_name,

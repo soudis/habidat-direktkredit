@@ -109,6 +109,7 @@ module.exports = function(app){
 					termination_period_type = req.body.termination_period_type_P;
 					termination_period = req.body.termination_period_P;
 				}
+
 				return models.contract.update({
 					sign_date: moment(req.body.sign_date).toDate(),
 					termination_date: termination_date,

@@ -32,7 +32,6 @@ module.exports = function(app){
 	});
 
 	router.get('/process/startinterestpayment/:year/:contracts', security.isLoggedInAdmin, function(req, res, next) {
-		console.log(req.params.contracts);
 	  	if (!req.params.contracts || req.params.contracts.split(',').length === 0) {
 	  		next(new Error("Keine Verträge ausgewählt"));
 	  	}

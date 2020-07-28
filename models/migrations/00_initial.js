@@ -12,7 +12,7 @@ module.exports = {
 			logon_id: {
 				type: Sequelize.STRING,
 				allowNull: false
-			},    
+			},
 			administrator: {
 				type: Sequelize.BOOLEAN,
 				alowNull: true
@@ -20,7 +20,7 @@ module.exports = {
 			ldap: {
 				type: Sequelize.BOOLEAN,
 				alowNull: true
-			},    
+			},
 			password: {
 				type: Sequelize.STRING,
 				allowNull: false
@@ -71,11 +71,11 @@ module.exports = {
 			},
 			createdAt: {
 				type: Sequelize.DATE,
-        		allowNull: false				
+        		allowNull: false
 			},
 			updatedAt: {
 				type: Sequelize.DATE,
-        		allowNull: false				
+        		allowNull: false
 			}
 		})
 		.then(() => query.createTable('contract', {
@@ -92,7 +92,7 @@ module.exports = {
 					model: 'user',
 					key: 'id'
 				}
-			},      
+			},
 			sign_date: {
 				type: Sequelize.DATE,
 				allowNull: true
@@ -112,7 +112,7 @@ module.exports = {
 			termination_period_type: {
 				type: Sequelize.STRING,
 				allowNull: true
-			},      
+			},
 			amount: {
 				type: Sequelize.DECIMAL,
 				allowNull: true
@@ -131,12 +131,12 @@ module.exports = {
 			},
 			createdAt: {
 				type: Sequelize.DATE,
-        		allowNull: false				
+        		allowNull: false
 			},
 			updatedAt: {
 				type: Sequelize.DATE,
-        		allowNull: false				
-			}	
+        		allowNull: false
+			}
 		}))
 		.then(() => query.createTable('transaction', {
 			id: {
@@ -167,12 +167,12 @@ module.exports = {
 			},
 			createdAt: {
 				type: Sequelize.DATE,
-        		allowNull: false				
+        		allowNull: false
 			},
 			updatedAt: {
 				type: Sequelize.DATE,
-        		allowNull: false				
-			}	
+        		allowNull: false
+			}
 		}))
 		.then(() => query.createTable('file', {
 			id: {
@@ -207,13 +207,13 @@ module.exports = {
 			},
 			createdAt: {
 				type: Sequelize.DATE,
-        		allowNull: false				
+        		allowNull: false
 			},
 			updatedAt: {
 				type: Sequelize.DATE,
-        		allowNull: false				
-			}	
-		}))		
+        		allowNull: false
+			}
+		}))
 },
 down: async (query) => {
 	return query.dropTable('file')

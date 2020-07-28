@@ -418,14 +418,12 @@ $(document).ready(function(){
 	                views.splice(id, 1);
 	                var index = id;
 	                $('#saved_views option:eq(' + (id+1) + ')').nextAll().each(function(i) {
-	                	console.log('replace', index);
 	                    $(this).replaceWith($('<option>', {
 	                        text: views[index].name,
 	                        value: index
 	                    }));
 	                    index ++;
 	                });
-	                	console.log('remove', id+1);
 
 	                $('#saved_views option:eq(' + (id+1) + ')').remove();
 	                $('#saved_views').data('views', views);
@@ -476,13 +474,11 @@ $(document).ready(function(){
         if ($('.dataTable').hasClass('selectable')) {
 	       var selected = [];
 	       $.each(table.rows('.selected').data(), function() {
-	       	console.log(this);
 	           	selected.push(this[11].display);
 	       });
 	       contracts = contracts.filter(contract => { return selected.includes(contract);});
 	       selected = [];
 	       $.each(table.rows('.selected').data(), function() {
-	       	console.log(this);
 	           	selected.push(this[3].display);
 	       });
 	       users = users.filter(users => { return selected.includes(users);});
