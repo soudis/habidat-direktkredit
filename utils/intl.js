@@ -120,8 +120,7 @@ const texts = {
 	"interest_method_hint_360_nocompound": "Bei ACT/365 (Eurozins- / französische methode) werden die Zinstage eines Jahres kalendergenau berechnet, allerdings hat das Basis-Zinsjahr immer 360 Zinstage.",
 	"interest_method_ACT_nocompound": "ACT/ACT ohne Zinseszins",
 	"interest_method_hint_ACT_nocompound": "Bei ACT/ACT (Effektivzinsmethode) werden die Zinstage eines Jahres kalendergenau berechnet, auch das Basis-Zinsjahr hat je nach Jahr 365 oder 366 (Schaltjahr) Zinstage.",
-	"user_id": "User ID",
-	"user_id": "User ID",
+	"user_id": "Kontonummer",
 	"user": "Benutzer*in",
 	"zip": "PLZ"
 

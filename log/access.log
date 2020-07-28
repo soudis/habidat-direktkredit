@@ -134,3 +134,5 @@
 2020-05-09 14:10:34 AUTH-FAIL: URL: /logon, USER: florian.humer@gmail.com, CLIENT IP: 172.30.0.1
 2020-06-24 15:57:73 AUTH-FAIL: URL: /login, USER: florian.humer@gmail.com, CLIENT IP: 172.30.0.1
 2020-06-24 15:57:43 AUTH-FAIL: URL: /login, USER: florian.humer@gmail.com, CLIENT IP: 172.30.0.1
+2020-07-28 18:21:57 AUTH-FAIL: URL: /login, USER: administrator, CLIENT IP: 172.30.0.1
+2020-07-28 18:21:59 AUTH-FAIL: URL: /login, USER: administrator, CLIENT IP: 172.30.0.1

@@ -36,8 +36,8 @@ html
     
   body(data-projectid=settings.project.get('projectid'))
     #body-container
-      +nav(settings.project.get('projectname') + " " + (currentUser&&currentUser.administrator?"Kreditverwaltung":"Kreditportal"), "dropdown_menu", _url(settings.project.get('logo')))
-        if currentUser && currentUser.administrator
+      +nav(settings.project.get('projectname') + " " + (currentUser&&currentUser.isAdmin()?"Kreditverwaltung":"Kreditportal"), "dropdown_menu", _url(settings.project.get('logo')))
+        if currentUser && currentUser.isAdmin()
           +nav_item(_url("/user/list" ))
             span.fa.fa-th-list
             span  Kredite
@@ -90,7 +90,7 @@ html
 
           block content
 
-    if currentUser && currentUser.administrator
+    if currentUser && currentUser.isAdmin()
 
       #sidebar.col-md-8.col-sm-12.col-lg-6.col-xl-4
         #sidebar-content

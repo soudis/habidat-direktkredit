@@ -52,7 +52,9 @@ var createdb = function() {
 		if ("associate" in db[modelName]) {
 			db[modelName].associate(db);
 		}
-		db[modelName + 'Log'] = tracker(db[modelName], sequelize, {userModel: db.user, persistant: true,  changes: ['update', 'create', 'delete']});
+		if (modelName != 'admin') {
+			db[modelName + 'Log'] = tracker(db[modelName], sequelize, {userModel: db.admin, persistant: true,  changes: ['update', 'create', 'delete']});
+		}
 	});
 
 
@@ -76,14 +78,13 @@ var createdb = function() {
 			console.info('All migrations performed successfully');
 			// insert admin user if environment variables are set
 			if (process.env.HABIDAT_DK_ADMIN_EMAIL && process.env.HABIDAT_DK_ADMIN_USERNAME) {
-				return db.user.count()
+				return db.admin.count()
 					.then(count => {
 						if (count === 0) {
-							return db.user.create({
+							return db.admin.create({
 									email: process.env.HABIDAT_DK_ADMIN_EMAIL,
 									logon_id: process.env.HABIDAT_DK_ADMIN_USERNAME,
 									password: crypto.randomBytes(16).toString('hex'),
-									administrator:true,
 									ldap: false
 								}, { trackOptions: { track: false, user_id: -1 } })
 								.then(() => console.info('Admin user', process.env.HABIDAT_DK_ADMIN_USERNAME, 'with e-mail address', process.env.HABIDAT_DK_ADMIN_EMAIL, 'created'));

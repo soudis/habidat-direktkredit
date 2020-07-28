@@ -26,13 +26,13 @@ module.exports = function(app){
 	const columnsVisible = ['contract_sign_date', 'user_name', 'contract_status', 'contract_amount', "contract_deposit", "contract_withdrawal", 'contract_amount_to_date'];
 
 	router.get('/user/list/cancelled', security.isLoggedInAdmin, function(req, res, next) {
-		models.user.cancelledAndNotRepaid(models, { administrator: {[Op.not]: '1'}})
+		models.user.cancelledAndNotRepaid(models, { })
 			.then(users => utils.render(req, res, 'user/list', {contracts: contracttable.generateContractTable(req, res, users).setColumnsVisible((columnsVisible.join(',')+',contract_termination_type,contract_termination_date,contract_payback_date').split(','))}, 'Gekündigte, nicht ausgezahlte Kredite'))
 			.catch(error => next(error));
 	});
 
 	router.get('/user/list', security.isLoggedInAdmin, function(req, res, next) {
-		models.user.findFetchFull(models, { administrator: {[Op.not]: '1'}})
+		models.user.findFetchFull(models, { })
 			.then(users => utils.render(req, res, 'user/list', {success: req.flash('success'), contracts: contracttable.generateContractTable(req, res, users).setColumnsVisible(columnsVisible)}, 'Kreditliste'))
 			.catch(error => next(error));
 	});
@@ -131,6 +131,23 @@ module.exports = function(app){
 				}
 			})
 			.then(() => {
+				if (req.body.id && req.body.id !== '') {
+					return models.user.findByPk(req.body.id)
+						.then(taken => {
+							if (taken) {
+								throw "Kontonummer bereits vergeben";
+							} else {
+								return req.body.id;
+							}
+						})
+				} else {
+					return models.user.max('id')
+						.then(id => {
+							return id + 1;
+						})
+				}
+			})
+			.then(() => {
 				var length = 8,
 			    charset = "!#+?-_abcdefghijklnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789",
 			    password = "";
@@ -151,8 +168,6 @@ module.exports = function(app){
 					BIC: req.body.BIC,
 					logon_id: Math.abs(Math.random() * 100000000),
 					password: password,
-					administrator:false,
-					ldap: false,
 					relationship: req.body.relationship
 				}, { trackOptions: utils.getTrackOptions(req.user, true) });
 			})
@@ -238,7 +253,7 @@ module.exports = function(app){
 			}
 		});
 		dataWorksheet.columns = dataWorkSheetColumns;
-		models.user.findFetchFull(models, { administrator: {[Op.not]: '1'}})
+		models.user.findFetchFull(models, {})
 			.then(users => {
 				users.forEach(user => {
 					if (userIds.includes(user.id.toString())) {

@@ -21,14 +21,6 @@ module.exports = (sequelize, DataTypes) => {
 			type: DataTypes.STRING,
 			allowNull: false
 		},
-		administrator: {
-			type: DataTypes.BOOLEAN,
-			alowNull: true
-		},
-		ldap: {
-			type: DataTypes.BOOLEAN,
-			alowNull: true
-		},
 		password: {
 			type: DataTypes.STRING,
 			allowNull: true
@@ -98,34 +90,25 @@ module.exports = (sequelize, DataTypes) => {
        		type: DataTypes.DATE,
        		allowNull: true
        	},
-		savedViews: {
-			type:  DataTypes.TEXT,
-			allowNull: true,
-			defaultValue: '[]'
-		}
 	}, {
 		tableName: 'user',
 		freezeTableName: true
 	});
 
 	User.beforeCreate(user => {
-		if (!user.administrator) {
-			user.logon_id = Math.abs(Math.random() * 100000000);
-		}
+		user.logon_id = Math.abs(Math.random() * 100000000);
 	});
 
 	User.afterCreate(user => {
-		if (!user.administrator) {
-			var id = user.id + 10000;
-			return user.update({
-				logon_id: id + '_' + settings.project.get('usersuffix')
-			}, {
-				where: {
-					id: user.id
-				},
-				trackOptions: utils.getTrackOptions(user, false)
-			});
-		}
+		var id = parseInt(user.id) + 10000;
+		return user.update({
+			logon_id: id + '_' + settings.project.get('usersuffix')
+		}, {
+			where: {
+				id: user.id
+			},
+			trackOptions: utils.getTrackOptions(user, false)
+		});
 	});
 
 	User.beforeValidate(user => {
@@ -222,7 +205,7 @@ module.exports = (sequelize, DataTypes) => {
 
 	User.getUsers = function (models, mode, date) {
 		var activeUsers = [];
-		return models.user.findFetchFull(models, { administrator: {[Op.not]: '1'}})
+		return models.user.findFetchFull(models, {})
 		.then(users => {
 			users.forEach(function(user){
 				if(mode == 'all' || user.hasNotTerminatedContracts(date)) {
@@ -254,7 +237,6 @@ module.exports = (sequelize, DataTypes) => {
 	User.findByToken = function (token) {
 		return User.findOne({where: { passwordResetToken: token }})
 			.then(user => {
-				console.log('now: ' + moment() + ', expires: ' + moment(user.passwordResetExpires));
 				if (!user || moment().isAfter(moment(user.passwordResetExpires))) {
 					throw 'Der Link ist abgelaufen, bitte versuche es noch einmal';
 				} else {
@@ -421,9 +403,7 @@ module.exports = (sequelize, DataTypes) => {
 	};
 
 	User.prototype.isAdmin = function () {
-		if (this.administrator) {
-			return true;
-		}
+		return false;
 	};
 
 	User.prototype.getTransactionList = function (year) {

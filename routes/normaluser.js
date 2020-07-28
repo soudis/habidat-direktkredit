@@ -19,8 +19,8 @@ module.exports = function(app){
 	// we will want this protected so you have to be logged in to visit
 	// we will use route middleware to verify this (the isLoggedIn function)
 	router.get('/profile', security.isLoggedIn, function(req, res, next) {
-		if (req.user.dn || req.user.administrator) {
-			res.redirect(utils.generateUrl('/admin'));
+		if (req.user.dn || req.user.isAdmin()) {
+			res.redirect(utils.generateUrl(req, '/admin'));
 		} else {
 			models.user.findByIdFetchFull(models, req.user.id)
 				.then((user) => {

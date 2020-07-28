@@ -141,7 +141,7 @@ module.exports = function(app){
 	      		if (req.session.returnTo) {
 	      			return res.redirect(req.session.returnTo);
 	      		} else {
-	      			return res.redirect(utils.generateUrl(req, '/projfile'));
+	      			return res.redirect(utils.generateUrl(req, '/profile'));
 	      		}
 	    	});
 	  	})(req, res, next);
