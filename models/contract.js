@@ -113,7 +113,7 @@ module.exports = (sequelize, DataTypes) => {
 			contract_sign_date: { valueRaw: contract.sign_date, value: moment(contract.sign_date).format('DD.MM.YYYY'), order: moment(contract.sign_date).format('YYYY/MM/DD') },
 			contract_id: { valueRaw: contract.id, value: contract.id },
 			contract_amount: { valueRaw: contract.amount, value: format.formatMoney(contract.amount,2), order: contract.amount},
-			contract_interest_rate: { valueRaw: contract.interest_rate, value: format.formatPercent(contract.interest_rate,3), order: contract.interest_rate},
+			contract_interest_rate: { valueRaw: contract.interest_rate, value: format.formatPercent(contract.interest_rate,2), order: contract.interest_rate},
 			contract_deposit: { valueRaw: contract.getDepositAmount(), value: format.formatMoney(contract.getDepositAmount(), 2), order: contract.getDepositAmount(), class: contract.getDepositAmount()>0?"text-success":""},
 			contract_withdrawal: { valueRaw: contract.getWithdrawalAmount(), value: format.formatMoney(contract.getWithdrawalAmount(), 2), order: contract.getWithdrawalAmount(), class: contract.getWithdrawalAmount()<0?"text-danger":"" },
 			contract_amount_to_date: { valueRaw: amountToDate, value: format.formatMoney(amountToDate), order: amountToDate },

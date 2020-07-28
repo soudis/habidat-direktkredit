@@ -28,16 +28,20 @@ module.exports = function(passport) {
 
     // used to serialize the user for the session
     passport.serializeUser(function(user, done) {
-    	done(null, user);
+    	done(null, {id: user.id, administrator: user.isAdmin()});
     });
 
     // used to deserialize the user
     passport.deserializeUser(function(sessionUser, done) {
-
-		models.user.findByPk(sessionUser.id).then( function(user) {
-			done(null, user);
-		});
-
+    	if (sessionUser.administrator) {
+    		models.admin.findByPk(sessionUser.id).then( function(user) {
+				done(null, user);
+			});
+    	} else {
+    		models.user.findByPk(sessionUser.id).then( function(user) {
+				done(null, user);
+			});
+    	}
     });
 
     // =========================================================================
@@ -91,22 +95,22 @@ module.exports = function(passport) {
 	// by default, if there was no name, it would just be called 'local'
 	if (settings.config.get('auth.admin.method') === "ldap") {
 		passport.use('ldap-login-admin', new LDAPStrategy(settings.config.get('auth.admin.ldap'), (req, user, done) => {
-			models.user.findAll({
+			models.admin.findAll({
 				where: {
-					administrator: true,
 					ldap: true
 				}
 			}).then(function(users){
 				// if there are no LDAP users, all LDAP users are accepted
 				if (!users || users.length == 0) {
-					done(null, users[0]);
+					req.flash('loginMessage', "Keine LDAP Accounts");
+					done(null, false);
 				} else {
 					// if there are LDAP users, then check if current cn exists
 					var dbUser = users.find((dbUser) => {return dbUser.logon_id.toLowerCase() === user.cn.toLowerCase(); });
 					if (dbUser) {
 						dbUser.lastLogin = moment();
 						dbUser.loginCount = (dbUser.loginCount || 0) + 1;
-							models.user.update({
+							models.admin.update({
 								lastLogin: dbUser.lastLogin,
 								loginCount: dbUser.loginCount
 							}, {
@@ -136,40 +140,38 @@ module.exports = function(passport) {
 		passwordField : 'password',
 			passReqToCallback : true // allows us to pass back the entire request to the callback
 	    },
-	function(req, userid, password, done) { // callback with email and password from our form
+		function(req, userid, password, done) { // callback with email and password from our form
 
-		models.user.findOne({where: Sequelize.or({logon_id: userid}, {email: userid})}).then( function( user) {
+			models.admin.findOne({where: Sequelize.or({logon_id: userid}, {email: userid})}).then( function( user) {
 
-			// if no user is found, return the message
-			if (!user) {
-				logAuthFailed(req,userid);
-                return done(null, false, req.flash('loginMessage', 'Benutzer nicht gefunden')); // req.flash is the way to set flashdata using connect-flash
-            }
+				// if no user is found, return the message
+				if (!user) {
+					logAuthFailed(req,userid);
+	                return done(null, false, req.flash('loginMessage', 'Benutzer nicht gefunden')); // req.flash is the way to set flashdata using connect-flash
+	            }
 
-			// if the user is found but the password is wrong
-			if (user.password && user.password !== password || !user.password && !user.comparePassword(password)) {
-				logAuthFailed(req,userid);
-				return done(null, false, req.flash('loginMessage', 'Falsches Passwort')); // create the loginMessage and save it to session as flashdata
-			}
+				// if the user is found but the password is wrong
+				if (!user.comparePassword(password)) {
+					logAuthFailed(req,userid);
+					return done(null, false, req.flash('loginMessage', 'Falsches Passwort')); // create the loginMessage and save it to session as flashdata
+				}
 
-			if (!user.isAdmin()) {
-				logAuthFailed(req,userid);
-				return done(null, false, null); // create the loginMessage and save it to session as flashdata
-			}
-			user.lastLogin = moment();
-			user.loginCount = (user.loginCount || 0) + 1;
-			models.user.update({
-					lastLogin: user.lastLogin,
-					loginCount: user.loginCount
-				}, {
-					where: { id: user.id }, trackOptions: utils.getTrackOptions(user, false)
-				})
-				.then(() => {
-					done(null, user);
-				});
-			return done(null, user);
-		});
+				user.lastLogin = moment();
+				user.loginCount = (user.loginCount || 0) + 1;
+				models.admin.update({
+						lastLogin: user.lastLogin,
+						loginCount: user.loginCount
+					}, {
+						where: { id: user.id }, trackOptions: utils.getTrackOptions(user, false)
+					})
+					.then(() => {
+						done(null, user);
+					})
+					.catch(error => {
+						done(null, false, req.flash('loginMessage', 'Fehler: ' + error)); // create the loginMessage and save it to session as flashdata
+					});
+			});
 
-	}));
+		}));
 
 };

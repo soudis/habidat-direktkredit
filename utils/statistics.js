@@ -200,7 +200,6 @@ exports.getNumbers = function() {
 	var now = moment();
 
 	return models.user.findAll({
-			where: { administrator: {[Op.not]: '1'}},
 			include:{
 				model: models.contract,
 				as: 'contracts',

@@ -15,7 +15,7 @@ module.exports = function(app){
 	const columnsVisible = ['contract_sign_date', 'user_name', 'user_iban', 'contract_status', 'contract_amount', 'contract_amount_to_date', 'contract_interest_of_year', 'contract_interest_payment_type'];
 
 	router.get('/process/interestpayment/:year', security.isLoggedInAdmin, function(req, res, next) {
-		models.user.findFetchFull(models, { administrator: {[Op.not]: '1'}}, (user, contract) => {
+		models.user.findFetchFull(models, {}, (user, contract) => {
 				return (contract.interest_payment_type === 'yearly' || !contract.interest_payment_type && settings.project.get('defaults.interest_payment_type') === 'yearly') && contract.getInterestOfYear(req.params.year) > 0;
 			})
 			.then(users => {
@@ -36,7 +36,7 @@ module.exports = function(app){
 	  	if (!req.params.contracts || req.params.contracts.split(',').length === 0) {
 	  		next(new Error("Keine Verträge ausgewählt"));
 	  	}
-		models.user.findFetchFull(models, { administrator: {[Op.not]: '1'}}, (user, contract) => {
+		models.user.findFetchFull(models, {}, (user, contract) => {
 				return req.params.contracts.split(',').includes(contract.id.toString());
 			})
 			.then(users => {
@@ -52,7 +52,7 @@ module.exports = function(app){
 	});
 
 	router.post('/process/startinterestpayment', security.isLoggedInAdmin, multer().none(), function(req, res, next) {
-		models.user.findFetchFull(models, { administrator: {[Op.not]: '1'}}, (user, contract) => {
+		models.user.findFetchFull(models, { }, (user, contract) => {
 				return req.body.contracts.split(',').includes(contract.id.toString());
 			})
 			.then(users => {

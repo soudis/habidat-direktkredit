@@ -10,11 +10,13 @@ const fs = require('fs');
 const multer = require('multer');
 const email = require('../utils/email');
 const moment = require('moment');
+const bcrypt = require('bcrypt');
+
 
 module.exports = function(app){
 
 	router.get('/admin/accounts', security.isLoggedInAdmin, function(req, res, next) {
-		models.user.findFetchFull(models, {administrator: true})
+		models.admin.findAll()
 			.then(users => utils.render(req, res, 'admin/admin_accounts', {accounts: users, message: req.flash('error')}, 'Administrator*innen Accounts'))
 		.catch(error => next(error));
 	});
@@ -25,10 +27,9 @@ module.exports = function(app){
 	});
 
 	router.get('/admin/delete/:id', security.isLoggedInAdmin, function(req, res, next) {
-		models.user.destroy({
+		models.admin.destroy({
 			where: {
-				id: req.params.id,
-				administrator: true
+				id: req.params.id
 			}, trackOptions: utils.getTrackOptions(req.user, true)
 		}).then(deleted => {
 			if(deleted > 0) {
@@ -59,11 +60,14 @@ module.exports = function(app){
 				for (var i = 0, n = charset.length; i < length; ++i) {
 					generatedPassword += charset.charAt(Math.floor(Math.random() * n));
 				}
+
+				var salt = bcrypt.genSaltSync(10);
+				var passwordHashed = bcrypt.hashSync(generatedPassword, salt);
+
 				var user = {
 					logon_id: req.body.logon_id,
 					email: req.body.email,
-					administrator: true,
-					password: generatedPassword
+					passwordHashed: passwordHashed
 				};
 				if (req.body.ldap) {
 					user.ldap = true;
@@ -72,7 +76,7 @@ module.exports = function(app){
 					user.ldap = false;
 				}
 
-				return models.user.build(user);
+				return models.admin.build(user);
 			})
 			.then(user => {
 				if (req.body.send_password_link) {
@@ -136,8 +140,8 @@ module.exports = function(app){
 	});
 
 	router.get('/admin/settings', security.isLoggedInAdmin, function(req, res, next) {
-		models.user.findFetchFull(models, {administrator: true})
-			.then(users => utils.render(req, res, 'admin/settings', {}, 'Einstellungen'))
+		Promise.resolve()
+			.then(() => utils.render(req, res, 'admin/settings', {}, 'Einstellungen'))
 			.catch(error => next(error));
 	});
 
@@ -252,9 +256,9 @@ module.exports = function(app){
 			}
 		Promise.join(
 			models.userLog.findAll({where: where, include: {all:true}}),
-			models.contractLog.findAll({where: where, include: [{model: models.user, as: 'user'},{model: models.contract, as: 'target', include: {model: models.user, as: 'user'}}]} ),
-			models.transactionLog.findAll({where: where, include: [{model: models.user, as: 'user'},{model: models.transaction, as: 'target', include: {model: models.contract, as: 'contract', include: {model: models.user, as: 'user'}}}]}),
-			models.fileLog.findAll({where: where, include: [{model: models.user, as: 'user'},{model: models.file, as: 'target', include: {model: models.user, as: 'user'}}]} ),
+			models.contractLog.findAll({where: where, include: [{model: models.admin, as: 'user'},{model: models.contract, as: 'target', include: {model: models.user, as: 'user'}}]} ),
+			models.transactionLog.findAll({where: where, include: [{model: models.admin, as: 'user'},{model: models.transaction, as: 'target', include: {model: models.contract, as: 'contract', include: {model: models.user, as: 'user'}}}]}),
+			models.fileLog.findAll({where: where, include: [{model: models.admin, as: 'user'},{model: models.file, as: 'target', include: {model: models.user, as: 'user'}}]} ),
 			function(userLog, contractLog, transactionLog, fileLog) {
 				const addType = function(list, type) {
 					list.forEach(entry => {

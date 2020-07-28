@@ -19,9 +19,11 @@ exports.isLoggedIn = function(req, res, next) {
 //route middleware to make sure a user is logged in
 exports.isLoggedInAdmin = function(req, res, next) {
 	// 	if user is authenticated in the session, carry on
+	console.log('user: ', JSON.stringify(req.user));
+	console.log('authenticated: ', req.isAuthenticated());
 	if (req.isAuthenticated() && req.user.dn)
 		return next();
-	else if (req.isAuthenticated() && (req.user.administrator))
+	else if (req.isAuthenticated() && (req.user.isAdmin()))
 		return next();
 	else if (req.isAuthenticated()) {
 		res.redirect(utils.generateUrl(req, '/profile'));

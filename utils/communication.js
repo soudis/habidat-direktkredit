@@ -6,7 +6,7 @@ const Op = require("sequelize").Op;
 
 exports.getEmails = function(mode){
 	var usersString = '';
-	return models.user.findFetchFull(models, { administrator: {[Op.not]: '1'}})
+	return models.user.findFetchFull(models, { })
 		.then(users => {
 			users.forEach(function(user){
 				var add;
