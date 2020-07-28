@@ -7,7 +7,7 @@ const texts = {
 	"country": "Land",
 	"description": "Beschreibung",
 	"contract": "Kreditvertrag",
-	"contract_id": "Vertrag ID",
+	"contract_id": "Kreditnummer",
 	"email": "E-Mail Adresse",
 	"file": "Datei",
 	"filename": "Dateiname",

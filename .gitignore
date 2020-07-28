@@ -13,6 +13,7 @@ public/files
 public/images
 public/css/*.css
 docker-compose.yml
+log/*
 
 # Compiled source #
 ###################
