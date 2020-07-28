@@ -21,6 +21,7 @@ module.exports = function(app){
 	router.get('/contract/edit/:id', security.isLoggedInAdmin, function(req, res, next) {
 		models.contract.findByPk(req.params.id)
 			.then(contract => {
+				console.log('sign date showedit:', contract.sign_date);
 				return models.user.findByIdFetchFull(models, contract.user_id)
 					.then(user => utils.render(req, res, 'contract/edit', { user:user, editContract:contract }));
 			})
@@ -109,6 +110,8 @@ module.exports = function(app){
 					termination_period_type = req.body.termination_period_type_P;
 					termination_period = req.body.termination_period_P;
 				}
+				console.log('sign date',req.body.sign_date, moment(req.body.sign_date), moment(req.body.sign_date).toDate());
+
 				return models.contract.update({
 					sign_date: moment(req.body.sign_date).toDate(),
 					termination_date: termination_date,

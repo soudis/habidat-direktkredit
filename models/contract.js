@@ -23,7 +23,7 @@ module.exports = (sequelize, DataTypes) => {
 				}
 			},
 			sign_date: {
-				type: DataTypes.DATE,
+				type: DataTypes.DATEONLY,
 				allowNull: true
 			},
 			interest_payment_type: {
@@ -35,7 +35,7 @@ module.exports = (sequelize, DataTypes) => {
 				allowNull: true
 			},
 			termination_date: {
-				type: DataTypes.DATE,
+				type: DataTypes.DATEONLY,
 				allowNull: true
 			},
 			termination_period: {
@@ -47,11 +47,11 @@ module.exports = (sequelize, DataTypes) => {
 				allowNull: true
 			},
 			amount: {
-				type: DataTypes.DECIMAL,
+				type: DataTypes.DECIMAL(14,2),
 				allowNull: true
 			},
 			interest_rate: {
-				type: DataTypes.DECIMAL,
+				type: DataTypes.DECIMAL(10,3),
 				allowNull: true
 			},
 			status: {

@@ -26,11 +26,11 @@ module.exports = (sequelize, DataTypes) => {
 				allowNull: false
 			},
 			transaction_date: {
-				type: DataTypes.DATE,
+				type: DataTypes.DATEONLY,
 				allowNull: false
 			},
 			amount: {
-				type: DataTypes.DECIMAL,
+				type: DataTypes.DECIMAL(14,2),
 				allowNull: false,
 				validate: {
 					isValid: function(value) {
