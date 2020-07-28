@@ -37,6 +37,23 @@ module.exports = function(app){
 	router.post('/contract/add', security.isLoggedInAdmin, multer().none(), function(req, res, next) {
 		Promise.resolve()
 			.then(() => {
+				if (req.body.id && req.body.id !== '') {
+					return models.contract.findByPk(req.body.id)
+						.then(taken => {
+							if (taken) {
+								throw "Kreditnummer bereits vergeben";
+							} else {
+								return req.body.id;
+							}
+						})
+				} else {
+					return models.contract.max('id')
+						.then(id => {
+							return id + 1;
+						})
+				}
+			})
+			.then(contractId => {
 				var termination_date = null;
 				if (req.body.termination_type == "T") {
 					termination_date = req.body.termination_date_T==""?null:moment(req.body.termination_date_T);
@@ -52,7 +69,7 @@ module.exports = function(app){
 					termination_period = req.body.termination_period_P;
 				}
 				return models.contract.create({
-					id: req.body.id,
+					id: contractId,
 					sign_date: moment(req.body.sign_date),
 					interest_payment_type: req.body.interest_payment_type,
 					termination_date: termination_date,

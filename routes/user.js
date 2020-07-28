@@ -147,7 +147,7 @@ module.exports = function(app){
 						})
 				}
 			})
-			.then(() => {
+			.then(userId => {
 				var length = 8,
 			    charset = "!#+?-_abcdefghijklnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789",
 			    password = "";
@@ -155,7 +155,7 @@ module.exports = function(app){
 					password += charset.charAt(Math.floor(Math.random() * n));
 				}
 				return models.user.create({
-					id: req.body.id,
+					id: userId,
 					first_name: req.body.first_name,
 					last_name: req.body.last_name,
 					street: req.body.street,
@@ -207,11 +207,10 @@ module.exports = function(app){
 			});
 	});
 
-	const generateDatasheetRow = function(fields, contractTableRow) {
+	const generateDatasheetRow = function(interestYear, fields, contractTableRow) {
 		var row = [];
-		contractTableColumns.forEach((column, index) => {
+		contracttable.getContractTableColumns(interestYear).forEach((column, index) => {
 			if (fields === 'all' || fields.includes(column.id)) {
-				console.log(contractTableRow[index].valueRaw);
 				row.push(contractTableRow[index].valueRaw);
 			}
 		});
@@ -257,20 +256,18 @@ module.exports = function(app){
 			.then(users => {
 				users.forEach(user => {
 					if (userIds.includes(user.id.toString())) {
-						console.log('user acc');
 						var contractsCount = 0;
 						if (user.contracts) {
 							user.contracts.forEach(contract => {
 								if (contractIds.includes(contract.id.toString())) {
-									console.log('contract acc');
 									contractsCount ++;
-									dataWorksheet.addRow(generateDatasheetRow(fields, contracttable.contractTableRow(user, contract, undefined, interestYear)));
+									dataWorksheet.addRow(generateDatasheetRow(interestYear, fields, contracttable.contractTableRow(user, contract, undefined, interestYear)));
 								}
 							});
 						}
 
 						if (contractsCount === 0) {
-							dataWorksheet.addRow(generateDatasheetRow(fields, contracttable.contractTableRow(user, undefined, undefined, interestYear)));
+							dataWorksheet.addRow(generateDatasheetRow(interestYear, fields, contracttable.contractTableRow(user, undefined, undefined, interestYear)));
 						}
 					}
 				});
