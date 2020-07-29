@@ -56,7 +56,7 @@ const texts = {
 	"project_smtp_user": "SMTP Username",
 	"project_smtp_pass": "SMTP Passwort",
 	"project_url": "Webseite",
-	"project_usersuffix": "Logon ID Endung",
+	"project_usersuffix": "Endung Login Name",
 	"relationship": "Beziehung zum Projekt",
 	"relationships": "Beziehungsarten (Kreditgeber*innen)",
 	"save": "Speichern",
