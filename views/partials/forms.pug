@@ -19,6 +19,8 @@ mixin input_group(label)
       if attributes.icon
         +prepend_icon(attributes.icon || 'fa-caret-down')
       block
+    if attributes.help
+      small.form-text.text-muted(id=name+"_help")=attributes.help    
 
 mixin input(name, label=undefined )
   .form-group(class=attributes.class)
@@ -59,7 +61,7 @@ mixin percent(name, label=undefined)
     +group_input(name)(type='number' step="0.01")&attributes(attributes)  
 
 mixin text(name, label=undefined)
-  +input_group(label||_t(name))(icon=attributes.icon class=attributes.groupClass)
+  +input_group(label||_t(name))(icon=attributes.icon class=attributes.groupClass help=attributes.help)
     +group_input(name)(type=type||'text')&attributes(attributes)
 
 mixin select(name, label=undefined)

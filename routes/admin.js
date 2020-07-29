@@ -125,6 +125,7 @@ module.exports = function(app){
 				setSetting('defaults.termination_period_type', req.body.termination_period_type);
 				setSetting('defaults.relationships', JSON.parse(req.body.relationships) || []);
 				setSetting('defaults.country', req.body.country);
+				setSetting('usersuffix', req.body.usersuffix);
 
 				if (req.body.logo_change === 'logo_link') {
 					setSetting('logo', req.body.logo_link);
