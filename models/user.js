@@ -100,9 +100,24 @@ module.exports = (sequelize, DataTypes) => {
 	});
 
 	User.afterCreate(user => {
-		var id = parseInt(user.id) + 10000;
+		var id;
+		if (user.id.toString().length <= 4) {
+			id = ("0000" + user.id.toString()).substring(user.id.toString().length);
+		} else {
+			id = user.id.toString();
+		}
+		var suffix = settings.project.get('usersuffix');
+		var field = suffix.match(/{(.*)}/i);
+		var logon_id;
+		if (field == null) {
+			logon_id = id + '_' + suffix;
+		} else {
+			var fieldValue = user.getRow()[field[1]];
+			logon_id = id + '_' + (fieldValue?fieldValue.value.split(' ').join('_').toLowerCase():suffix);
+		}
+
 		return user.update({
-			logon_id: id + '_' + settings.project.get('usersuffix')
+			logon_id: logon_id
 		}, {
 			where: {
 				id: user.id
