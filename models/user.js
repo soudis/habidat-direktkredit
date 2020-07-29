@@ -113,7 +113,7 @@ module.exports = (sequelize, DataTypes) => {
 			logon_id = id + '_' + suffix;
 		} else {
 			var fieldValue = user.getRow()[field[1]];
-			logon_id = id + '_' + (fieldValue?fieldValue.value.split(' ').join('_').toLowerCase():suffix);
+			logon_id = id + '_' + (fieldValue&&fieldValue.value?fieldValue.value.split(' ').join('_').toLowerCase():'direktkredit');
 		}
 
 		return user.update({
