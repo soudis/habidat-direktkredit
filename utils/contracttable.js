@@ -54,7 +54,8 @@ exports.contractTableRow = function(user, contract = undefined, effectiveDate = 
 			contractRow.contract_termination_type,
 			contractRow.contract_termination_date,
 			contractRow.contract_payback_date,
-			contractRow.contract_status
+			contractRow.contract_status,
+			contractRow.contract_deposit_date
 		];
 	} else {
 		return [
@@ -67,6 +68,7 @@ exports.contractTableRow = function(user, contract = undefined, effectiveDate = 
 			userRow.user_iban,
 			userRow.user_bic,
 			userRow.user_relationship,
+			false,
 			false,
 			false,
 			false,
@@ -113,7 +115,8 @@ exports.getContractTableColumns = (pInterestYear = undefined) => {
 			contractColumns.contract_termination_type,
 			contractColumns.contract_termination_date,
 			contractColumns.contract_payback_date,
-			contractColumns.contract_status
+			contractColumns.contract_status,
+			contractColumns.contract_deposit_date
 		];
 }
 
