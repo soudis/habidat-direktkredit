@@ -84,7 +84,7 @@ var createdb = function() {
 							return db.admin.create({
 									email: process.env.HABIDAT_DK_ADMIN_EMAIL,
 									logon_id: process.env.HABIDAT_DK_ADMIN_USERNAME,
-									password: crypto.randomBytes(16).toString('hex'),
+									passwordHashed: crypto.randomBytes(16).toString('hex'),
 									ldap: false
 								}, { trackOptions: { track: false, user_id: -1 } })
 								.then(() => console.info('Admin user', process.env.HABIDAT_DK_ADMIN_USERNAME, 'with e-mail address', process.env.HABIDAT_DK_ADMIN_EMAIL, 'created'));
