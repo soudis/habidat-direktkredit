@@ -7,6 +7,7 @@ const settings = require('../utils/settings');
 const models  = require('../models');
 const utils = require('../utils');
 const email = require('../utils/email');
+const bcrypt = require('bcrypt');
 
 module.exports = function(app){
 
@@ -26,17 +27,25 @@ module.exports = function(app){
 	});
 
 	router.get('/getpassword', function(req, res, next) {
-		res.render('getpassword', { title: 'Passwort setzen', error: req.flash('error') } );
+		res.render('getpassword', { title: 'Passwort rücksetzen', error: req.flash('error') } );
 	});
 
-	router.get('/setpassword', security.isLoggedIn, function(req, res, next) {
-   		res.render('setpassword', { user: req.user, title: 'Passwort ändern', error: req.flash('error') } );
+	router.get('/setpassword/user', security.isLoggedIn, function(req, res, next) {
+   		res.render('setpassword', { user: req.user, usertype: 'user', title: 'Passwort ändern', error: req.flash('error') } );
+	});
+
+	router.get('/setpassword/admin', security.isLoggedInAdmin, function(req, res, next) {
+   		res.render('setpassword', { user: req.user, usertype: 'admin', title: 'Passwort ändern', error: req.flash('error') } );
 	});
 
 	router.get('/getpassword/:token', function(req, res, next) {
-		models.user.findByToken(req.params.token)
+		models.admin.findByToken(req.params.token)
+		    .catch(error => {
+		    	// if no admin account was found by token try user accounts
+		    	return models.user.findByToken(req.params.token);
+		    })
 			.then(user => {
-				res.render('setpassword', {token: req.params.token, user: user, title: 'Passwort setzen', error: req.flash('error')});
+				res.render('setpassword', {token: req.params.token, usertype: (user.isAdmin()?'admin':'user'), user: user, title: 'Passwort setzen', error: req.flash('error')});
 			})
 			.catch(error => {
 				req.flash('error', error);
@@ -52,7 +61,18 @@ module.exports = function(app){
 			req.flash('error', 'Passwörter müssen übereinstimmen');
 			res.redirect(utils.generateUrl(req, '/getpassword/' + req.body.token));
 		} else {
-			models.user.update({ password: req.body.password, passwordHashed: req.body.password, passwordResetToken: null, passwordResetExpires: null }, {where: { id:req.body.id }, trackOptions: utils.getTrackOptions(req.user, true) })
+			Promise.resolve()
+				.then(() => {
+					var salt = bcrypt.genSaltSync(10);
+					var passwordHashed = bcrypt.hashSync(req.body.password, salt);
+					if (req.body.usertype === 'admin') {
+						console.log('update admin pwd');
+						return models.admin.update({ passwordHashed: passwordHashed, passwordResetToken: null, passwordResetExpires: null }, {where: { id:req.body.id }, trackOptions: utils.getTrackOptions(req.user, true) });
+					} else {
+						console.log('update user pwd');
+						return models.user.update({ passwordHashed: passwordHashed, passwordResetToken: null, passwordResetExpires: null }, {where: { id:req.body.id }, trackOptions: utils.getTrackOptions(req.user, true) });
+					}
+				})
 				.then(() => {
 					if (req.body.token) {
 						req.flash('success', 'Dein Passwort wurde gesetzt, logge dich jetzt ein');
@@ -67,11 +87,20 @@ module.exports = function(app){
 
 	router.post('/getpassword', function(req, res, next) {
 
-		models.user.findOne({where: { email: req.body.email }})
+		models.admin.findOne({where: { email: req.body.email }})
+			.then(user => {
+				if (!user) {
+					// if no admin account was found by token try user accounts
+					return models.user.findOne({where: { email: req.body.email }})
+				} else {
+					return user;
+				}
+			})
 			.then(user => {
 				if (!user) {
 					return;
 				} else {
+					console.log('user found: ', user.isAdmin());
 					user.setPasswordResetToken();
 					return user.save({trackOptions: utils.getTrackOptions(req.user, false)})
 						.then(user => email.sendPasswordMail(req,res,user));

@@ -5,6 +5,9 @@ $theme-colors: (
 
 $primary-glow: change-color($primary-color, $alpha: 0.2);
 
+
+$font-family-sans-serif:  "Lucida Grande", Helvetica, Arial, sans-serif; 
+
 $custom-file-text: (
   de: "Durchsuchen",
   en: "Browse",
@@ -22,10 +25,6 @@ $custom-file-text: (
 @import "node_modules/@fortawesome/fontawesome-free/scss/solid";
 @import "./tag-input.scss";
 
-body {
-  
-  font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
-}
 
 a {
   color: $link-color;
