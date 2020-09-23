@@ -81,7 +81,12 @@ module.exports = {
 					updatedAt: new Date
 				})
 			});
-			return query.bulkInsert('admin', admins, {});
+			if (admins.length > 0) {
+				return query.bulkInsert('admin', admins, {});
+			} else {
+				return;
+			}
+
 		});
 
 	},

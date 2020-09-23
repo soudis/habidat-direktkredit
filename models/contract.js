@@ -99,7 +99,8 @@ module.exports = (sequelize, DataTypes) => {
 			contract_termination_date: {id: "contract_termination_date",  label: "Kündigungsdatum", filter: 'date'},
 			contract_payback_date: {id: "contract_payback_date",  label: "Rückzahlungsdatum", filter: 'date'},
 			contract_status: {id: "contract_status",  label: "Status", class: "text-center", priority: "2", filter: 'list'},
-			contract_has_interest: {id: "contract_has_interest",  label: "Zinssatz > 0", class: "text-center", priority: "2", filter: 'list'}
+			contract_has_interest: {id: "contract_has_interest",  label: "Zinssatz > 0", class: "text-center", priority: "2", filter: 'list'},
+			contract_deposit_date: {id: "contract_deposit_date",  label: "Einzahlungsdatum", class: "text-right", filter: 'date'}
 		}
 	}
 
@@ -109,6 +110,7 @@ module.exports = (sequelize, DataTypes) => {
 		var interestToDate = Math.round(contract.getInterestToDate(moment(effectiveDate))*100)/100;
 		var amountToDate = Math.round(contract.getAmountToDate(moment(effectiveDate))*100)/100;
 		var interestOfYear = Math.round(contract.getInterestOfYear(interestYear || moment().subtract(1,'years').year())*100)/100;
+		var depositDate = contract.getDepositDate();
 		return {
 			contract_sign_date: { valueRaw: contract.sign_date, value: moment(contract.sign_date).format('DD.MM.YYYY'), order: moment(contract.sign_date).format('YYYY/MM/DD') },
 			contract_id: { valueRaw: contract.id, value: contract.id },
@@ -124,7 +126,8 @@ module.exports = (sequelize, DataTypes) => {
 			contract_termination_date: { valueRaw: contract.termination_date?contract.termination_date:"", value: contract.termination_date?moment(contract.termination_date).format('DD.MM.YYYY'):"", order: contract.termination_date?moment(contract.termination_date).format('YYYY/MM/DD'):""},
 			contract_payback_date: { valueRaw: contract.getPaybackDate()?contract.getPaybackDate().format('YYYY-MM-DD'):"", value: contract.getPaybackDate()?moment(contract.getPaybackDate()).format('DD.MM.YYYY'):"", order: contract.getPaybackDate()?moment(contract.getPaybackDate()).format('YYYY/MM/DD'):""},
 			contract_status: { valueRaw: contract.getStatus(), value: contract.getStatus() },
-			contract_has_interest: { valueRaw: contract.interest_rate > 0, value: contract.interest_rate > 0 }
+			contract_has_interest: { valueRaw: contract.interest_rate > 0, value: contract.interest_rate > 0 },
+			contract_deposit_date: { valueRaw: depositDate?depositDate:"", value: depositDate?moment(depositDate).format('DD.MM.YYYY'):"", order: depositDate?moment(depositDate).format('YYYY/MM/DD'):""}
 		};
 	}
 
@@ -141,6 +144,22 @@ module.exports = (sequelize, DataTypes) => {
 		return count > 1 && sum <= 0;
 	};
 
+	// get first deposit (initial) transaction date
+	contract.prototype.getDepositDate = function () {
+		var depositDate;
+		this.transactions.forEach(function(transaction) {
+			if (transaction.type === 'initial') {
+				if (depositDate) {
+					if (moment(depositDate).isAfter(transaction.transaction_date)) {
+						depositDate = transaction.transaction_date;
+					}
+				} else {
+					depositDate = transaction.transaction_date;
+				}
+			}
+		});
+		return depositDate;
+	};
 
 	contract.prototype.getTerminationType = function () {
 		return this.termination_type || settings.project.get('defaults.termination_type') || 'T';

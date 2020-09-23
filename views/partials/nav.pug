@@ -28,7 +28,7 @@ mixin nav(name, id, logo, style)
           ul.nav.navbar-nav.ml-auto.navbar-right
             if (currentUser)
               +nav_item_dropdown( "#" )(label=currentUser.first_name || currentUser.logon_id icon="fa-user" dropDownMenuClass='dropdown-menu-right')
-                +dd_item(_url('/setpassword'))
+                +dd_item(_url('/setpassword/' + (currentUser.isAdmin()?'admin':'user')))
                   span.fa.fa-lock
                   span  Passwort ändern            
                 +dd_item(_url('/logout'))
@@ -91,8 +91,9 @@ mixin getpassword_form(action)
 mixin setpassword_form(action)        
   form.password-form(action=action method="post")
     input(type="hidden" name="id" value=user.id)
-    if token
+    if token      
       input(type="hidden" name="token" value=token)
+    input(type="hidden" name="usertype" value=usertype)
     .form-group.row
       label Passwort    
       .input-group
