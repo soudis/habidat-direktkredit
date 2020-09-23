@@ -35,9 +35,9 @@ mixin group_select(name)
     block  
 
 mixin file(name, label=undefined)
-  +input_group(label||_t(name))(class=attributes.class icon=attributes.icon)
+  +input_group(label||_t(name))(class=attributes.class icon=attributes.icon help=attributes.help)
     .custom-file
-      input.custom-file-input(type='file' name=name value=attributes.value id=attributes.id||name lang="de" required=attributes.required)    
+      input.custom-file-input(type='file' name=name value=attributes.value id=attributes.id||name lang="de" required=attributes.required)          
       label.custom-file-label(for=attributes.id||name)=_t('choose_file')
 
 mixin date(name, label=undefined)
