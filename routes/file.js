@@ -73,7 +73,7 @@ module.exports = function(app){
 
 	});
 
-	router.post('/file/add/user', security.isLoggedInAdmin, multer({dest:'./upload/'}).single('file'), function(req, res, next) {
+	router.post('/file/add/user', security.isLoggedInAdmin, multer({dest:'./upload/', limits: { fileSize: 10 * 1024 * 1024 }}).single('file'), function(req, res, next) {
 		models.file.create({
 				filename: req.file.originalname,
 				description: req.body.description,

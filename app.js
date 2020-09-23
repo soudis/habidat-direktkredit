@@ -190,6 +190,9 @@ try{
 		if (settings.config.get('debug')) {
 			console.log(err);
 		}
+		if (err.code === 'LIMIT_FILE_SIZE') {
+			err.message = "Datei zu groß";
+		}
 		if (req.xhr || req.headers.accept.indexOf('json') > -1) {
 			res.status(err.status || 500);
 			res.render('partials/error', {

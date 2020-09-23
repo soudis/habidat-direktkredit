@@ -2,6 +2,6 @@ include ../partials/forms
 +form('/file/add/user')(updateTag='user_files' updateAction='replace')
   +hidden('id', id)
   +hidden('type', type)
-  +file('file')(icon='fa-upload' required)
+  +file('file')(icon='fa-upload' required help="maximale Dateigröße 10MB")
   +text('description')(icon='fa-comment-alt')
   +submit_button()
