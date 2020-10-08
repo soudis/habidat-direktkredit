@@ -184,7 +184,8 @@ $(document).ready(function(){
 	       	error: function(xhr, status, error) {
 	       		var data = JSON.parse(xhr.responseText);
         		form.find('.submit-button').parent().before(data.html);
-        		if (data.error.name === 'Warning') {
+        		if (data.type === 'Warning') {
+        			console.log('test');
         			form.append('<input type="hidden" name="ignore_warning" value="true" />')
         		}
 	       	}

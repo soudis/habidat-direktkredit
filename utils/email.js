@@ -57,7 +57,10 @@ exports.sendTransactionEmail = function(req, res, transaction, contract, user) {
 				subject = 'Die Rückzahlung deines Direktkredites bei ' + settings.project.get('projectname') + ' wurde veranlasst!';
 			} else if (transaction.type === 'withdrawal') {
 				subject = 'Die (Teil-)Rückzahlung deines Direktkredites bei ' + settings.project.get('projectname') + ' wurde veranlasst!';
+			} else if (transaction.type === 'interestpayment') {
+				subject = 'Die Zinsauszahlung für deinen Direktkredit bei ' + settings.project.get('projectname') + ' wurde veranlasst!';
 			}
+
 			return sendMail(fromAddress(req), user.email, subject, emailBody)
 				.then(() => {
 						return models.transactionLog.create({

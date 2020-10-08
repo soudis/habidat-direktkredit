@@ -22,7 +22,7 @@ block content
                 span.fa.fa-plus-circle
               td= year.year
               td #{year.from.format('DD.MM.YYYY')} - #{year.to.format('DD.MM.YYYY')}
-              td=format.formatPercent(rate.interest_rate, 1)
+              td=format.formatPercent(rate.interest_rate, 2)
               td.text-right(class=(rate.total_amount>100000?"text-danger":""))= format.formatMoney(rate.total_amount,2)
               td.d-none.table-row-details(data-paging=false data-sorting=false data-info=false)
                 table.table.display.compact

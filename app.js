@@ -199,7 +199,7 @@ try{
 				message: err.message,
 				error: err
 			}, (renderError, html) => {
-				res.json({html: html, error: err.message?err.message:err});
+				res.json({html: html, error: err.message?err.message:err, type: err.name});
 			});
 		} else {
 		  res.render('error', {message: err.message, error: err, title: 'Uups..'});

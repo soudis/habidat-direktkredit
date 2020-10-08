@@ -35,7 +35,7 @@ module.exports = (sequelize, DataTypes) => {
 				validate: {
 					isValid: function(value) {
 		    		  	//console.log("value " + this.type);
-		    		  	if (this.type === 'withdrawal' || this.type === 'termination' || this.type === 'notreclaimed'){
+		    		  	if (this.type === 'withdrawal' || this.type === 'termination' || this.type === 'notreclaimed' || this.type === 'interestpayment'){
 		    		  		if (value >= 0) {
 		    		  			throw new Error("Rückzahlungen müssen negativ sein");
 		    		  		}
@@ -97,6 +97,8 @@ module.exports = (sequelize, DataTypes) => {
 			return 'Rückzahlung';
 			case "notreclaimed":
 			return 'Nicht rückgefordert';
+			case "interestpayment":
+			return 'Zinsauszahlung';
 		}
 
 		return "Unbekannt";
