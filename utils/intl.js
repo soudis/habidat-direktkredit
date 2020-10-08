@@ -103,6 +103,7 @@ const texts = {
 	"transaction_type_withdrawal": "Teilauszahlung",
 	"transaction_type_termination": "Rückzahlung",
 	"transaction_type_notreclaimed": "Nicht rückgefordert",
+	"transaction_type_interestpayment": "Zinsauszahlung",
 	"type": "Typ",
 	"interest_method": "Zinsberechnung",
 	"interest_method_365_compound": "ACT/365 mit Zinseszins",

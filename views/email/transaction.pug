@@ -19,8 +19,8 @@ h3 Eine Zahlung für deinen Direktkredit wurde vermerkt:
         td(style="text-align:right; padding-left: 10px; padding-right: 10px; padding-top:20px;")
           h4= format.formatMoney(parseFloat(transaction.amount))
 h3 
-  span Dein neuer Kontostand beträgt somit 
-  span: b(style="color:rgb(30, 126, 52);")=format.formatMoney(contract.getAmountToDate(moment()))
+  span Dein neuer Gesamtkontostand beträgt somit 
+  span: b(style="color:rgb(30, 126, 52);")=format.formatMoney(user.getAmountToDate(moment()))
 h3 Du kannst deine Daten jederzeit unter 
   a(style="color: #00b7ff; font-style:none; text-decoration:none;" href=siteurl)
     b= siteurl

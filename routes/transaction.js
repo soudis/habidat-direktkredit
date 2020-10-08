@@ -39,7 +39,7 @@ module.exports = function(app){
 				return models.contract.findByIdFetchFull(models, req.body.contract_id)
 					.then(contract => {
 						if (req.body.send_transaction_email) {
-							return models.user.findByPk(contract.user_id)
+							return models.user.findByIdFetchFull(models, contract.user_id)
 								.then(user => email.sendTransactionEmail(req, res, transaction, contract, user))
 								.then(() => {
 									return contract;

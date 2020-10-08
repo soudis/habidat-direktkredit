@@ -90,7 +90,7 @@ exports.getGermanContractsByYearAndInterestRate = function() {
 				} else {
 					year = years-1;
 				}
-				var rate = Math.round(contract.interest_rate*10)/10;
+				var rate = Math.round(contract.interest_rate*100)/100;
 
 				var findRate = function(rates, rate) {
 					var found = -1;

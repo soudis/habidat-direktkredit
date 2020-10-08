@@ -406,6 +406,14 @@ module.exports = (sequelize, DataTypes) => {
 		return notTerminated;
 	};
 
+	User.prototype.getAmountToDate = function (date, currentTransactionId) {
+		var sum = 0;
+		this.contracts.forEach(contract => {
+			sum += contract.getAmountToDate(date, currentTransactionId);
+		})
+		return sum;
+	};
+
 
 	User.prototype.isActive = function () {
 		var active;
