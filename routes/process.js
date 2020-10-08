@@ -61,7 +61,7 @@ module.exports = function(app){
 						var transaction = {
 								transaction_date: moment(req.body.year).endOf('year'),
 								amount: -Math.round(contract.getInterestOfYear(req.body.year)*100)/100,
-								type: 'withdrawal',
+								type: 'interestpayment',
 								contract_id: contract.id,
 								payment_type: 'bank'
 							}
