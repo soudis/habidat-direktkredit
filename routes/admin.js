@@ -101,7 +101,7 @@ module.exports = function(app){
 		}
 	});
 
-	router.post('/admin/settings', security.isLoggedInAdmin, multer({storage:storage}).single('logo_upload'), function(req, res, next) {
+	router.post('/admin/settings', security.isLoggedInAdmin, multer({storage:storage}).fields([{name: 'logo_upload', maxCount: 1},{name: 'logo_select_upload', maxCount:1}]), function(req, res, next) {
 
 		Promise.resolve()
 			.then(() => {
@@ -127,10 +127,19 @@ module.exports = function(app){
 				setSetting('defaults.country', req.body.country);
 				setSetting('usersuffix', req.body.usersuffix);
 
+				console.log(req.files);
+
 				if (req.body.logo_change === 'logo_link') {
 					setSetting('logo', req.body.logo_link);
-				} else if (req.body.logo_change === 'logo_upload' && req.file && req.file.originalname) {
-					setSetting('logo', '/public/images/' + req.file.originalname);
+				} else if (req.body.logo_change === 'logo_upload' && req.files && req.files['logo_upload'] && req.files['logo_upload'].length == 1 && req.files['logo_upload'][0].originalname) {
+					console.log('set logo');
+					setSetting('logo', '/public/images/' + req.files['logo_upload'][0].originalname);
+				}
+
+				if (req.body.logo_select_change === 'logo_select_link') {
+					setSetting('logo_select', req.body.logo_select_link);
+				} else if (req.body.logo_select_change === 'logo_select_upload' && req.files && req.files['logo_select_upload'] && req.files['logo_select_upload'].length == 1 && req.files['logo_select_upload'][0].originalname) {
+					setSetting('logo_select', '/public/images/' + req.files['logo_select_upload'][0].originalname);
 				}
 
 				return settings.project.save();
