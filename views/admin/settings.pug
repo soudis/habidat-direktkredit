@@ -21,9 +21,14 @@ block content
                 td.col-md-8.h6= settings.project.get('projectname')
               tr
                 td.col-md-4.h6 
-                  b Logo:
+                  b Logo (Menüleiste):
                 td.col-md-8
                   img(src=settings.project.get('logo') height='100')
+              tr
+                td.col-md-4.h6 
+                  b Logo (Projektauswahl):
+                td.col-md-8
+                  img(src=settings.project.get('logo_select') || settings.project.get('logo') height='100')                  
               tr
                 td.col-md-4.h6 
                   b Kontakt E-Mail Adresse:

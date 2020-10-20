@@ -4,15 +4,26 @@ include ../country
 mixin settings_form()
   +form('/admin/settings')
     +text('projectname')(value=settings.project.get('projectname') icon='fa-home')
-    +output_image('logo', settings.project.get('logo'))(help=settings.project.get('logo') imgClass='logo')
-    +input_group('logo_group')(icon='fa-file-image' noLabel)
-      +group_select('logo_change')
-        +option('logo_keep')
-        +option('logo_upload')
-        +option('logo_link')
-      +group_output('logo_keep')(class="form-control-plaintext logo-change-input")
-      +group_file('logo_upload')(class="d-none logo-change-input" inputId="logo_file")
-      +group_input('logo_link')(class="d-none logo-change-input" placeholder="https://...")
+    .logo-container(id="logo_container" data-ref="logo")
+      +output_image('logo', settings.project.get('logo'))(help=settings.project.get('logo') imgClass='logo')
+      +input_group('logo_group')(icon='fa-file-image' noLabel)
+        +group_select('logo_change')
+          +option('logo_keep')
+          +option('logo_upload')
+          +option('logo_link')
+        +group_output('logo_keep')(class="form-control-plaintext logo-change-input")
+        +group_file('logo_upload')(class="d-none logo-change-input" inputId="logo_file")
+        +group_input('logo_link')(class="d-none logo-change-input" placeholder="https://...")
+    .logo-container(id="logo_select_container" data-ref="logo_select")
+      +output_image('logo_select', settings.project.get('logo_select')||settings.project.get('logo'))(help=settings.project.get('logo_select')||settings.project.get('logo') imgClass='logo')
+      +input_group('logo_select_group')(icon='fa-file-image' noLabel)
+        +group_select('logo_select_change')
+          +option('logo_select_keep')
+          +option('logo_select_upload')
+          +option('logo_select_link')
+        +group_output('logo_select_keep')(class="form-control-plaintext logo-change-input")
+        +group_file('logo_select_upload')(class="d-none logo-change-input" inputId="logo_select_file")
+        +group_input('logo_select_link')(class="d-none logo-change-input" placeholder="https://...")      
     +text('email', _t('project_email'))(icon='fa-at' type='email' value=settings.project.get('email'))
     +text('smtp_host', _t('project_smtp_host'))(icon='fa-envelope' value=settings.project.get('smtp.host'))
     +number('smtp_port', _t('project_smtp_port'))(placeholder="25" value=settings.project.get('smtp.port'))
@@ -71,82 +82,88 @@ mixin settings_form()
       });
     }
 
-    $('#logo_change').on('change', function() {
-      $('.logo-change-input').addClass('d-none');      
-      $('input.logo-change-input').removeAttr('required');      
-      $('div.logo-change-input').children('input').removeAttr('required');      
-      $('#'+this.value).removeClass('d-none');
+    $('#logo_change, #logo_select_change').on('change', function() {
+      var containerId = $(this).parents('.logo-container').attr('id');
+      var ref = $(this).parents('.logo-container').data('ref');
+      $('#' + containerId + ' .logo-change-input').addClass('d-none');      
+      $('#' + containerId + ' input.logo-change-input').removeAttr('required');      
+      $('#' + containerId + ' div.logo-change-input').children('input').removeAttr('required');      
+      $('#' + this.value).removeClass('d-none');
       var src, name;
-      if (this.value === 'logo_keep') {
-        src = $('#logo').data('src');
-        $('#logo_link').get(0).setCustomValidity('');
+      if (this.value === ref+'_keep') {
+        src = $('#'+ref).data('src');
+        $('#'+ref+'_link').get(0).setCustomValidity('');
       }
-      else if (this.value === 'logo_upload') {        
-        if ($('#logo').data('localsrc')) {
-          src = $('#logo').data('localsrc');
-          name = $('#logo').data('localname');
+      else if (this.value === ref+'_upload') {        
+        if ($('#'+ref).data('localsrc')) {
+          src = $('#'+ref).data('localsrc');
+          name = $('#'+ref).data('localname');
         } else {
-          src = $('#logo').data('src');
+          src = $('#'+ref).data('src');
         }
-        $('#logo_link').get(0).setCustomValidity('');
-        $('#logo_file').attr('required', 'true');      
-      } else if (this.value === 'logo_link') {
-        if ($('#logo_link').val()) {
-          src = $('#logo_link').val()
+        $('#'+ref+'_link').get(0).setCustomValidity('');
+        $('#'+ref+'_file').attr('required', 'true');      
+      } else if (this.value === ref+'_link') {
+        if ($('#'+ref+'_link').val()) {
+          src = $('#'+ref+'_link').val()
         } else {
-          src = $('#logo').data('src');
+          src = $('#'+ref).data('src');
         }
-        var value = $('#logo_link').val();
+        var value = $('#'+ref+'_link').val();
         if (value && value !== "") {
           urlExists(value, function(success) {
             if (success) {
-              $("#logo").attr('src', value);
-              $('#logo_help').html( value);      
-              $('#logo_link').get(0).setCustomValidity('');
+              $("#"+ref).attr('src', value);
+              $('#'+ref+'_help').html( value);      
+              $('#'+ref+'_link').get(0).setCustomValidity('');
             } else {
-              $("#logo").attr('src', $('#logo').data('src'));
-              $('#logo_help').html( $('#logo').data('src'));      
-              $('#logo_link').get(0).setCustomValidity('URL-Adresse nicht gefunden');
+              $("#"+ref).attr('src', $('#'+ref).data('src'));
+              $('#'+ref+'_help').html( $('#'+ref).data('src'));      
+              $('#'+ref+'_link').get(0).setCustomValidity('URL-Adresse nicht gefunden');
             }
           });
         }  
         $('#'+this.value).attr('required', 'true');      
       }
-      $("#logo").attr('src', src);
-      $('#logo_help').html(name || src);      
+      $("#"+ref).attr('src', src);
+      $('#'+ref+'_help').html(name || src);      
     }); 
 
-    $('#logo_link').on('keyup', function() {  
+    $('#logo_link, #logo_select_link').on('keyup', function() { 
+      var containerId = $(this).parents('.logo-container').attr('id');
+      var ref = $(this).parents('.logo-container').data('ref');
       var value = this.value;
       if (value && value !== "") {
         urlExists(this.value, function(success) {
           if (success) {
-            $("#logo").attr('src', value);
-            $('#logo_help').html( value);      
-            $('#logo_link').get(0).setCustomValidity('');
+            $("#"+ref).attr('src', value);
+            $('#'+ref+'_help').html( value);      
+            $('#'+ref+'_link').get(0).setCustomValidity('');
           } else {
-            $("#logo").attr('src', $('#logo').data('src'));
-            $('#logo_help').html( $('#logo').data('src'));      
-            $('#logo_link').get(0).setCustomValidity('URL-Adresse nicht gefunden');
+            $("#"+ref).attr('src', $('#'+ref).data('src'));
+            $('#'+ref+'_help').html( $('#'+ref).data('src'));      
+            $('#'+ref+'_link').get(0).setCustomValidity('URL-Adresse nicht gefunden');
           }
         });
       } else {
-        $("#logo").attr('src', $('#logo').data('src'));
-        $('#logo_help').html( $('#logo').data('src'));      
-        $('#logo_link').get(0).setCustomValidity('');      
+        $("#"+ref).attr('src', $('#'+ref).data('src'));
+        $('#'+ref+'_help').html( $('#'+ref).data('src'));      
+        $('#'+ref+'_link').get(0).setCustomValidity('');      
       }
       
     });
 
-    $('#logo_file').on('change', function() {      
+    $('#logo_file, #logo_select_file').on('change', function() {   
+      var containerId = $(this).parents('.logo-container').attr('id');
+      var ref = $(this).parents('.logo-container').data('ref');
       if (this.files && this.files[0]) {
         var file = this.files[0];
         var reader = new FileReader();        
         reader.onload = function(e) {
-          $('#logo').attr('src', e.target.result);
-          $('#logo').data('localsrc', e.target.result);
-          $('#logo_help').html(file.name);
-          $('#logo').data('localname', file.name);
+          $('#'+ref).attr('src', e.target.result);
+          $('#'+ref).data('localsrc', e.target.result);
+          $('#'+ref+'_help').html(file.name);
+          $('#'+ref).data('localname', file.name);
         }        
         reader.readAsDataURL(this.files[0]); // convert to base64 string        
       }

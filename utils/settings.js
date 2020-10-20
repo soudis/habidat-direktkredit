@@ -101,6 +101,7 @@ const initProject = () => {
 	project.set('projectid',                            process.env.HABIDAT_DK_PROJECT_ID, true);
 	project.set('projectname',                          process.env.HABIDAT_DK_PROJECT_NAME, false);
 	project.set('logo',                                 process.env.HABIDAT_DK_PROJECT_LOGO, false);
+	project.set('logo_select',                          process.env.HABIDAT_DK_PROJECT_LOGO_SELECT, false);
 	project.set('email',                                process.env.HABIDAT_DK_PROJECT_EMAIL, false);
 	project.set('url',                                  process.env.HABIDAT_DK_PROJECT_URL, false);
 	project.set('theme',                                process.env.HABIDAT_DK_PROJECT_THEME || 'red', false);
