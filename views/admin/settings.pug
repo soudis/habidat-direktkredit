@@ -23,12 +23,16 @@ block content
                 td.col-md-4.h6 
                   b Logo (Menüleiste):
                 td.col-md-8
-                  img(src=settings.project.get('logo') height='100')
+                  - var logo = settings.project.get('logo') 
+                  - logo = logo.startsWith('http')?logo:_url(logo)
+                  img(src=logo height='100')
               tr
                 td.col-md-4.h6 
                   b Logo (Projektauswahl):
                 td.col-md-8
-                  img(src=settings.project.get('logo_select') || settings.project.get('logo') height='100')                  
+                  - var logo = src=settings.project.get('logo_select') || settings.project.get('logo') 
+                  - logo = logo.startsWith('http')?logo:_url(logo)
+                  img(src=logo height='100')                  
               tr
                 td.col-md-4.h6 
                   b Kontakt E-Mail Adresse:
