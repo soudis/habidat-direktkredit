@@ -16,6 +16,7 @@ try{
 	var multer = require('multer');
 	var mkdirp = require('mkdirp');
 	var numeral = require('numeral');
+	const urlUtil = require('url');
 	const intl = require('./utils/intl');
 	const utils = require('./utils');
 	const settings = require('./utils/settings');
@@ -98,11 +99,29 @@ try{
 	app.use(cookieParser());
 	app.use(flash());
 
-	app.use(session({
-		secret: 'klasjdf098034lja2309bdjkla789lsdfjsafd098',
-		store: new FileStore(),
-		resave: true,
-		saveUninitialized: true}));
+	var sessionHandlers = Object.create(null);
+    var projectId = settings.project.get('projectid');
+	app.use(function (req,res,next) {
+		var key;
+		var urlParts = urlUtil.parse(req.url);
+		if (projectId && urlParts.pathname.startsWith('/'+ projectId)) {
+			key = '/'+projectId;
+		} else {
+			key = '/';
+		}
+		if (!sessionHandlers[key]) {
+			sessionHandlers[key] = session({
+					secret: 'klasjdf098034lja2309bdjkla789lsdfjsafd098',
+					store: new FileStore(),
+					resave: true,
+					cookie: {
+						path: key
+					},
+					saveUninitialized: true
+				});
+		}
+		sessionHandlers[key](req,res,next);
+	});
 	app.use(passport.initialize());
 	app.use(passport.session()); // persistent login sessions
 
@@ -164,7 +183,6 @@ try{
 	}));
 
 	app.use('/', router);
-	var projectId = settings.project.get('projectid');
 	if (projectId) {
 		app.use('/'+projectId, (req,res,next) => {
 			req.addPath = '/'+projectId;
