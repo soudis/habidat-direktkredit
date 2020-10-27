@@ -251,7 +251,6 @@ module.exports = function(app){
 							description: req.body.description,
 							mime: req.file.mimetype,
 							path: req.file.path,
-							ref_id: 1,
 							ref_table: type
 						}, { trackOptions: utils.getTrackOptions(req.user, true) }))
 			.then(() => res.json({redirect: 'reload'}))
