@@ -103,6 +103,7 @@ const initProject = () => {
 	project.set('logo',                                 process.env.HABIDAT_DK_PROJECT_LOGO, false);
 	project.set('logo_select',                          process.env.HABIDAT_DK_PROJECT_LOGO_SELECT, false);
 	project.set('email',                                process.env.HABIDAT_DK_PROJECT_EMAIL, false);
+	project.set('email_sendcopy',                       process.env.HABIDAT_DK_PROJECT_EMAIL_SENDCOPY, false);
 	project.set('url',                                  process.env.HABIDAT_DK_PROJECT_URL, false);
 	project.set('theme',                                process.env.HABIDAT_DK_PROJECT_THEME || 'red', false);
 	project.set('smtp.host', 							process.env.HABIDAT_DK_SMTP_HOST);
