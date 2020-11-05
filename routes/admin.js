@@ -106,12 +106,17 @@ module.exports = function(app){
 		Promise.resolve()
 			.then(() => {
 
-				var setSetting = function(id, value = undefined) {
-					settings.project.set(id, value || req.body[id] ||settings.project.get(id));
+				var setSetting = function(id, value = undefined, checkbox = false) {
+					if (checkbox) {
+						settings.project.set(id, value || req.body[id]?true:false);
+					} else {
+						settings.project.set(id, value || req.body[id] ||settings.project.get(id));
+					}
 				};
 
 				setSetting('projectname');
 				setSetting('email');
+				setSetting('email_sendcopy', undefined, true);
 				setSetting('smtp.host', req.body.smtp_host);
 				setSetting('smtp.port', req.body.smtp_port);
 				setSetting('smtp.auth.user', req.body.smtp_auth_user);

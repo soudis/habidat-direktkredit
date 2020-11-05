@@ -35,6 +35,9 @@ const sendMail = (from, recipient, subject, body) => {
 			    subject: subject,
 			    html: body
 			};
+			if (settings.project.get('email_sendcopy')) {
+				mailOptions.bcc = [from];
+			}
 			return transporter.sendMail(mailOptions);
 		})
 }
