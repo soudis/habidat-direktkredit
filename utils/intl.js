@@ -57,7 +57,7 @@ const texts = {
 	"projectname": "Projektname",
 	"project_email": "Kontakt E-Mail Adresse",
 	"project_email_sendcopy": "Kopie ausgehender E-Mails",
-	"project_email_sendcopy_help": "Willst du eine Kopie aller ausgehender E-Mails and die Kontakt E-Mailadresse erhalten?",
+	"project_email_sendcopy_help": "Willst du eine Kopie aller ausgehender E-Mails an die Kontakt E-Mailadresse erhalten?",
 	"project_smtp_host": "SMTP Hostname",
 	"project_smtp_port": "SMTP Port (Standard: 25)",
 	"project_smtp_user": "SMTP Username",
