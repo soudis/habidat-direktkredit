@@ -35,6 +35,8 @@ exports.contractTableRow = function(user, contract = undefined, effectiveDate = 
 		return [
 			contractRow.contract_sign_date,
 			userRow.user_id,
+			userRow.user_first_name,
+			userRow.user_last_name,
 			userRow.user_name,
 			userRow.user_address,
 			userRow.user_telno,
@@ -61,6 +63,8 @@ exports.contractTableRow = function(user, contract = undefined, effectiveDate = 
 		return [
 			false,
 			userRow.user_id,
+			userRow.user_first_name,
+			userRow.user_last_name,
 			userRow.user_name,
 			userRow.user_address,
 			userRow.user_telno,
@@ -96,6 +100,8 @@ exports.getContractTableColumns = (pInterestYear = undefined) => {
 	return [
 			contractColumns.contract_sign_date,
 			userColumns.user_id,
+			userColumns.user_first_name,
+			userColumns.user_last_name,
 			userColumns.user_name,
 			userColumns.user_address,
 			userColumns.user_telno,
