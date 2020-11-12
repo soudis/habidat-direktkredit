@@ -120,3 +120,41 @@ mixin contracts(user, templates_contract, admin)
               .col-md-12.empty-container-message Keine Direktkredite vorhanden
             each contract in user.contracts
               +contract(contract, templates_contract, admin)  
+
+mixin contracts_summary(user, admin)
+  .card
+    h4.card-header 
+      span Kontostand 
+      if user.contracts.length > 1
+        span  (
+        span= user.contracts.length      
+        span  Kredite)
+
+    .card-body
+      if (user.contracts.length == 0)
+        .col-md-12.empty-container-message Keine Direktkredite vorhanden
+      else
+        table.table
+          tbody
+            tr
+              td.label: b Vertragswert:
+              td= format.formatMoney(user.getContractAmount())
+            tr
+              td: b Einzahlungen
+              td= format.formatMoney(user.getDepositAmount())
+            tr
+              td: b Auszahlungen
+              td= format.formatMoney(user.getWithdrawalAmount())
+            tr
+              td: b Zinsen bis heute
+              td= format.formatMoney(user.getInterestToDate())
+            tr
+              if admin
+                td: b Aushaftender Betrag
+                td= format.formatMoney(user.getAmountToDate( moment()))    
+              else 
+                td.h6: b Kontostand
+                if user.getAmountToDate(moment()) > 0
+                  td.h6.text-success: b= format.formatMoney(user.getAmountToDate( moment()))    
+                else
+                  td.h6: b= format.formatMoney(user.getAmountToDate( moment()))    

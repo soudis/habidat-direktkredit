@@ -10,6 +10,9 @@ block content
       .row
         .col-md-12
           +user(user, templates_user, true)
+      .row
+        .col-md-12
+          +contracts_summary(user, true)
       +files_show(user.files, 'user', user.id, addFile)  
     .col-xl-6.col-md-12
       +contracts(user, templates_contract, true)

@@ -415,6 +415,38 @@ module.exports = (sequelize, DataTypes) => {
 	};
 
 
+	User.prototype.getDepositAmount = function () {
+		var sum = 0;
+		this.contracts.forEach(contract => {
+			sum += contract.getDepositAmount();
+		})
+		return sum;
+	};
+
+	User.prototype.getWithdrawalAmount = function () {
+		var sum = 0;
+		this.contracts.forEach(contract => {
+			sum += contract.getWithdrawalAmount();
+		})
+		return sum;
+	};
+
+	User.prototype.getInterestToDate = function (date) {
+		var sum = 0;
+		this.contracts.forEach(contract => {
+			sum += contract.getInterestToDate(date);
+		})
+		return sum;
+	};
+
+	User.prototype.getContractAmount = function (date) {
+		var sum = 0;
+		this.contracts.forEach(contract => {
+			sum += contract.amount;
+		})
+		return sum;
+	};
+
 	User.prototype.isActive = function () {
 		var active;
 		this.contracts.forEach(function(contract){
