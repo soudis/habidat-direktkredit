@@ -51,6 +51,7 @@ function _url(url) {
 }
 
 moment.locale('de');
+var detailsTable;
 
 $(document).ready(function(){
 
@@ -96,8 +97,9 @@ $(document).ready(function(){
 		$(".alert-fadeout").slideUp(500);
 	});
 
-	var detailsTable = $('#details-table').DataTable({
-		language: dataTableLanguange
+	detailsTable = $('#details-table').DataTable({
+		language: dataTableLanguange,
+		order: [[ 3, 'desc' ]]
 	});
 
 	$("#details-table").removeClass("d-none");

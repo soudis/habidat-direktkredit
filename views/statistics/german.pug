@@ -1,42 +1,76 @@
 extends ../layout
 block content
   .jumbotron
-    h2 Deutsche Direktkredite
-    p.lead Nach deutschem Recht dürfen Projekte (auch solche außerhalb Deutschlands) nur 100.000€ pro Jahr und Zinsrate (0,0%, 0,1%, ..., 2.0%) von deutschen Direktkreditgeber*innen annehmen. Deshalb hier eine Übersicht über den aktuellen Stand. 
+    h2 Direktkredite aus Deutschland
+    p.lead Nach deutschem Recht dürfen Projekte (auch solche außerhalb Deutschlands) nur 100.000€ pro Jahr und Zinsrate (0,0%, 0,1%, ..., 2.0%) von deutschen Direktkreditgeber*innen annehmen. Hier siehst du eine Übersicht aller möglichen Zeiträume und Zinssätze sortiert nach größter Gesamtkreditsumme im jeweiligen Zeitraum. Du hast außerdem die Möglichkeit ein bestimmtes Datum und einen bestimmmten Zinsatz abzufragen.
   col-md-12
-    table.table.table-striped(id="details-table")
+    .d-none.details-table-buttons(for-id="details-table_length")
+
+      .input-group.datatable-button
+        .input-group-prepend
+          .input-group-text
+            span.fa.fa-percent
+        input.form-control(id="interest_rate" min="0" max="10" type="number" step="0.01"  autocomplete="off" title="Zinssatz" value=interestRate placeholder="alle Zinssätze")
+
+      .input-group.datatable-button
+        .input-group-prepend
+          .input-group-text
+            span.fa.fa-calendar
+        input.form-control(id="effective_date" title="Datum" type="date"  autocomplete="off" value=effectiveDate)
+
+    table.table.table-striped(id="details-table" data-auto-width="false").d-none
       thead
         tr
           th Details
-          th Jahr
           th Zeitraum
-          th Zinsrate
+          th Zinssatz
           th.text-right Kreditsumme
           th.d-none Details
       tbody
 
-        each year in years
-          each rate in year.rates
-            tr
-              td.md-auto.details-control
-                span.fa.fa-plus-circle
-              td= year.year
-              td #{year.from.format('DD.MM.YYYY')} - #{year.to.format('DD.MM.YYYY')}
-              td=format.formatPercent(rate.interest_rate, 2)
-              td.text-right(class=(rate.total_amount>100000?"text-danger":""))= format.formatMoney(rate.total_amount,2)
-              td.d-none.table-row-details(data-paging=false data-sorting=false data-info=false)
-                table.table.display.compact
-                  thead
+        each entry in result
+          tr(data-interest-rate=entry.interestRate data-start-date=entry.startDate.format('YYYY-MM-DD') data-end-date=entry.endDate.format('YYYY-MM-DD'))
+            td.md-auto.details-control
+              span.fa.fa-plus-circle
+            td #{entry.startDate.format('DD.MM.YYYY')} - #{entry.endDate.format('DD.MM.YYYY')}
+            td= format.formatPercent(entry.interestRate, 2)
+            td.text-right(class=(entry.totalAmount>100000?"text-danger":""))= format.formatMoney(entry.totalAmount,2)
+            td.d-none.table-row-details(data-paging=false data-sorting=false data-info=false)
+              table.table.display.compact
+                thead
+                  tr
+                    th.col-md-2 Name
+                    th.col-md-4 Adresse
+                    th.col-md-2.text-center Datum
+                    th.col-md-3.text-right Betrag
+                    th.col-md-1.fit.text-right 
+                      span.fa.fa-cogs                    
+                tbody
+                  each contract in entry.contracts
                     tr
-                      th.col-md-3 Name
-                      th.col-md-4 Adresse
-                      th.col-md-2.text-center Datum
-                      th.col-md-3.text-right Betrag
-                  tbody
-                    each contract in rate.contracts
-                      tr
-                        td= contract.user.getFullName()
-                        td= contract.user.getAddress()
-                        td.text-center #{moment(contract.sign_date).format('DD.MM.YYYY')}                          
-                        td.text-right= format.formatMoney(contract.amount, 2)
+                      td= contract.user.getFullName()
+                      td= contract.user.getAddress()
+                      td.text-center #{moment(contract.sign_date).format('DD.MM.YYYY')}                          
+                      td.text-right= format.formatMoney(contract.amount, 2)
+                      td.fit.text-right
+                        a.btn.btn-light.btn-sm(href=_url('/user/show/'+contract.user.id+'#show_contract_'+contract.id)) #[span.fa.fa-search-plus]
 
+  script.
+    $.fn.dataTable.ext.search.push(
+        function( settings, data, dataIndex ) {
+            var effectiveDate = $('#effective_date').val();
+            var interestRate = $('#interest_rate').val();
+            var row = $(settings.aoData[dataIndex].nTr)
+            return ((!effectiveDate || (moment(effectiveDate).isSameOrAfter(row.data('start-date')) && moment(effectiveDate).isSameOrBefore(row.data('end-date'))))
+                  &&(!interestRate || interestRate == row.data('interest-rate')));
+        }
+    );   
+    $(document).on( 'change', '#effective_date', function () {
+      detailsTable.draw();
+    } ); 
+    $(document).on( 'keyup', '#interest_rate', function () {
+      detailsTable.draw();
+    } );     
+    $(document).on( 'change', '#interest_rate', function () {
+      detailsTable.draw();
+    } );       

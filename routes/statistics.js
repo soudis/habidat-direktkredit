@@ -141,14 +141,12 @@ module.exports = function(app){
 			for (var i = Math.abs(endDate.diff(startDate,'months')); i>=0; i--) {
 				months.push(moment(endDate).subtract(1*i, 'months').endOf('month'));
 			}
-			//console.log("months: " + JSON.stringify(months));
 			var byMonth = {};
 			months.forEach((month)  => {
 				sum = 0;
 				users.forEach((user) => {
 					user.contracts.forEach((contract) => {
 						var contractAmount = contract.getAmountToDate(month);
-						//console.log("contract: " + contract.id + ", " + contractAmount);
 						sum+= contractAmount;
 
 					});
@@ -177,12 +175,10 @@ module.exports = function(app){
 			for (var i = Math.abs(endDate.diff(startDate,'months')); i>=0; i--) {
 				months.push(moment(endDate).subtract(1*i, 'months').endOf('month'));
 			}
-			//console.log("months: " + JSON.stringify(months));
 			var byMonth = { deposits: {}, withdrawals: {}, interest: {}, notReclaimed: {}};
 			months.forEach((month)  => {
 				var start = moment(month).startOf('month');
 				var end = month;
-				//console.log("start " + start + " end " + end);
 				var deposits = 0, withdrawals = 0, interest = 0, notReclaimed = 0;
 				users.forEach((user) => {
 					user.contracts.forEach((contract) => {
@@ -251,9 +247,9 @@ module.exports = function(app){
 
 	router.get('/statistics/german', security.isLoggedInAdmin, function(req, res, next) {
 		statistics.getGermanContractsByYearAndInterestRate()
-			.then(years => {
+			.then(result => {
 				//console.log("test: " + JSON.stringify(numbers);
-				res.render('statistics/german', { title: 'Deutsche Direktkredite', years: years});
+				res.render('statistics/german', { title: 'Deutsche Direktkredite', result: result});
 			})
 			.catch(error => next(error));
 	});
