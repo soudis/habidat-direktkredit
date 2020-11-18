@@ -44,82 +44,85 @@ var generatePieChart = function(data, callback) {
 	callback(canvas.toBuffer().toString('base64'));
 };
 
-exports.getGermanContractsByYearAndInterestRate = function() {
-
-	// find all german contracts (NOTE: distinction is just by
-	// length of ZIP code > 4)
+exports.getGermanContractsByYearAndInterestRate = function(effectiveDate = undefined, interestRate = undefined, ignoreId = undefined) {
 	return models.user.findAll({
-		  where: { country: 'DE' },
-		  include:{
+		  	where: { country: 'DE' },
+		  	include:{
 				model: models.contract,
-				as: 'contracts',
-				include : {
-					model: models.transaction,
-					as: 'transactions'
-				}
+				as: 'contracts'
 			}
-	}).then(function(users){
-		// find first contract to have start date
-		var first = moment();
-		users.forEach(function(user) {
-			user.contracts.forEach(function(contract) {
-				if (first.diff(moment(contract.sign_date)) > 0) {
-					first = moment(contract.sign_date);
-				}
-			});
-		});
+		}).then(users => {
 
-        // init array for years since first contract
- 	    var result = [];
-		var years = Math.ceil(Math.abs(moment().diff(first,'days')/365));
-		for(var i = 0; i<years;i++) {
-			result.push({
-				year: i+1,
-				from: moment(first).add(i, 'years'),
-				to: moment(first).add(i+1, 'years').add(-1,'days'),
-				rates: []});
-		}
-
-		// iterate all contracts and push contracts in
-		// right year and right intest rate array
-		users.forEach(function(user) {
-			user.contracts.forEach(function(contract) {
-				var year;
-				if (moment(contract.sign_date).isValid()) {
-					year = Math.floor(Math.abs(moment(contract.sign_date).diff(first,'days')/365));
-				} else {
-					year = years-1;
-				}
-				var rate = Math.round(contract.interest_rate*100)/100;
-
-				var findRate = function(rates, rate) {
-					var found = -1;
-					for (var i = 0; i< rates.length; i++) {
-						if (rates[i].interest_rate === rate) {
-							found = i;
+			// determine begin and end of ṕossible ranges
+			var rangesBegin, rangesEnd;
+			if (effectiveDate) {
+				rangesBegin= moment(effectiveDate).subtract(1, 'y').add(1, 'days');
+				rangesEnd = moment(effectiveDate).add(1, 'y').subtract(1, 'days');
+			} else {
+				rangesBegin = moment('3000-01-01');
+				rangesEnd = moment('1900-01-01');
+				users.forEach(function(user) {
+					user.contracts.forEach(function(contract) {
+						if (rangesBegin.isAfter(contract.sign_date)) {
+							rangesBegin = moment(contract.sign_date);
 						}
-					}
-					return found;
-				};
+						if (rangesEnd.isBefore(contract.sign_date)) {
+							rangesEnd = moment(contract.sign_date);
+						}
+					});
+				});
+			}
 
-				// see if rate already exists and push it if not
-				var rateIndex = findRate(result[year].rates, rate);
-				if (rateIndex === -1) {
-					result[year].rates.push({interest_rate: rate, total_amount: 0, contracts : []});
-					rateIndex = result[year].rates.length-1;
+			if (rangesBegin.isSame(moment('1900-01-01'))) {
+				return [];
+			} else {
+
+				// build all possible year ranges
+				var ranges = [];
+				for (var i = 0; i <= moment(rangesEnd).add(1,'days').subtract(1, 'years').diff(rangesBegin, 'days'); i++) {
+					ranges.push({
+						startDate: moment(rangesBegin).add(i, 'days'),
+						endDate: moment(rangesBegin).add(i, 'days').add(1, 'years').subtract(1, 'days'),
+					});
 				}
 
-				// add contract to year and rate and increase total amount
-				result[year].rates[rateIndex].total_amount += contract.amount;
-				contract.user=user;
-				result[year].rates[rateIndex].contracts.push(contract);
-			});
+				// loop over all contracts and assign them to all ranges and build result
+				var result = [];
+				users.forEach(user => {
+					user.contracts.forEach(contract => {
+						if ((!interestRate || contract.interest_rate == interestRate) && (!ignoreId || ignoreId != contract.id)) {
+							contract.user = user;
+							var signDate = moment(contract.sign_date);
+							ranges.forEach(range => {
+								if (signDate.isSameOrAfter(range.startDate) && signDate.isSameOrBefore(range.endDate)) {
+									var entry = result.find(entry => { return entry.startDate.isSame(range.startDate) && entry.endDate.isSame(range.endDate) && entry.interestRate === contract.interest_rate})
+									if (!entry) {
+										result.push({
+											startDate: range.startDate,
+											endDate: range.endDate,
+											interestRate: contract.interest_rate,
+											totalAmount: contract.amount,
+											contracts: [contract]
+										})
+									} else {
+										entry.totalAmount += contract.amount;
+										entry.contracts.push(contract);
+									}
+								}
+							})
+						}
+					})
+				})
+
+				// sort ranges with largest total amount first
+				result.sort((a, b) => {
+					return b.totalAmount - a.totalAmount;
+				})
+
+				return result;
+			}
 		});
-
-		return result;
-
-	});
-};
+}
 
 exports.getNumbers = function() {
 

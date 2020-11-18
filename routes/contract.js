@@ -1,5 +1,7 @@
 /* jshint esversion: 8 */
 const security = require('../utils/security');
+const statistics = require('../utils/statistics');
+const format = require('../utils/format');
 const moment = require("moment");
 const utils = require("../utils");
 const router = require('express').Router();
@@ -36,6 +38,20 @@ module.exports = function(app){
 
 	router.post('/contract/add', security.isLoggedInAdmin, multer().none(), function(req, res, next) {
 		Promise.resolve()
+			.then(() => {
+				return models.user.findByPk(req.body.user_id)
+					.then(user => {
+						if (user.country === 'DE' && !req.body.ignore_warning) {
+							return statistics.getGermanContractsByYearAndInterestRate(req.body.sign_date, req.body.interest_rate)
+								.then(result => {
+									if (result.length > 0 && result[0].totalAmount + req.body.amount > 100000) {
+										throw new utils.Warning('In diesem Zeitraum sind für diesen Zinssatz bereits Kredite aus Deutschland in der Höhe von ' + format.formatMoney(result[0].totalAmount) + ' angelegt (siehe Auswertungen / Kredite aus Deutschland)');
+									}
+								})
+						}
+						return;
+					})
+			})
 			.then(() => {
 				if (req.body.id && req.body.id !== '') {
 					return models.contract.findByPk(req.body.id)
@@ -94,6 +110,20 @@ module.exports = function(app){
 	router.post('/contract/edit', security.isLoggedInAdmin, multer().none(), function(req, res, next) {
 
 		return Promise.resolve()
+			.then(() => {
+				return models.user.findByPk(req.body.user_id)
+					.then(user => {
+						if (user.country === 'DE' && !req.body.ignore_warning) {
+							return statistics.getGermanContractsByYearAndInterestRate(req.body.sign_date, req.body.interest_rate, req.body.id)
+								.then(result => {
+									if (result.length > 0 && result[0].totalAmount + parseFloat(req.body.amount) > 100000) {
+										throw new utils.Warning('In diesem Zeitraum sind für diesen Zinssatz bereits Kredite aus Deutschland in der Höhe von ' + format.formatMoney(result[0].totalAmount) + ' angelegt (siehe Auswertungen / Kredite aus Deutschland)');
+									}
+								})
+						}
+						return;
+					})
+			})
 			.then(() => {
 				var termination_date = null;
 				if (req.body.termination_type == "T") {
