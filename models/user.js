@@ -379,12 +379,13 @@ module.exports = (sequelize, DataTypes) => {
 		return name;
 	};
 
-	User.prototype.getLink = function () {
-		return `<a href="/user/show/${this.id}">${this.getFullName()}</a>`
+	User.prototype.getLink = function (req) {
+		var url = utils.generateUrl(req, `/user/show/${this.id}`);
+		return `<a href="${url}">${this.getFullName()}</a>`;
 	}
 
-	User.prototype.getDescriptor = function (models) {
-		return `Stammdaten von ${this.getLink()}`
+	User.prototype.getDescriptor = function (req, models) {
+		return `Stammdaten von ${this.getLink(req)}`
 	};
 
 	User.prototype.comparePassword = function comparePassword(candidatePassword, cb) {
