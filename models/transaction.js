@@ -4,6 +4,7 @@ const moment = require('moment');
 const settings = require('../utils/settings');
 const format = require('../utils/format');
 const intl = require('../utils/intl');
+const utils = require('../utils');
 
 module.exports = (sequelize, DataTypes) => {
 		transaction = sequelize.define('transaction', {
@@ -113,12 +114,13 @@ module.exports = (sequelize, DataTypes) => {
 	};
 
 
-	transaction.prototype.getLink = function () {
-		return `<a href="/user/show/${this.contract.user.id}#show_transaction_${this.id}">${moment(this.transaction_date).format('DD.MM.YYYY')}</a>`;
+	transaction.prototype.getLink = function (req) {
+		var url = utils.generateUrl(req, `/user/show/${this.contract.user.id}#show_transaction_${this.id}`);
+		return `<a href="${url}">${moment(this.transaction_date).format('DD.MM.YYYY')}</a>`;
 	}
 
-	transaction.prototype.getDescriptor = function (models) {
-		return `Zahlung vom ${this.getLink()} für den Vertrag vom ${this.contract.getLink()} von ${this.contract.user.getLink()}`;
+	transaction.prototype.getDescriptor = function (req, models) {
+		return `Zahlung vom ${this.getLink(req)} für den Vertrag vom ${this.contract.getLink(req)} von ${this.contract.user.getLink(req)}`;
 	};
 
 

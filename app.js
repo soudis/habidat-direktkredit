@@ -152,6 +152,7 @@ try{
 		res.locals.models = models;
 		res.locals._t = intl._t;
 		res.locals._iv = _iv;
+		res.locals.req = req;
 
 		var newPrevURLs = [];
 		if (req.session.prevURLs && req.session.prevURLs.length >= 1) {

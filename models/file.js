@@ -1,6 +1,7 @@
 /* jshint esversion: 8 */
 
 var moment = require('moment');
+const utils = require('../utils');
 
 module.exports = (sequelize, DataTypes) => {
 	file = sequelize.define('file',
@@ -48,41 +49,40 @@ module.exports = (sequelize, DataTypes) => {
 		});
 	};
 
-	contract.prototype.getLink = function () {
-		return `<a href="/user/show/${this.user.id}">${moment(this.sign_date).format('DD.MM.YYYY')}</a>`;
-	}
-
-	file.prototype.getLink = function (models) {
+	file.prototype.getLink = function (req) {
 		if (this.ref_table === 'user') {
-			return `<a href="/user/show/${this.user.id}#show_file_${this.id}">${this.filename}</a>`;
+			var url = utils.generateUrl(req, `/user/show/${this.user.id}#show_file_${this.id}`);		
+			return `<a href="${url}">${this.filename}</a>`;
 		} else if (this.ref_table.startsWith('template_')) {
-			return `<a href="/admin/templates#show_file_${this.id}">${this.filename}</a>`;
+			var url = utils.generateUrl(req, `/admin/templates#show_file_${this.id}`);		
+			return `<a href="${url}">${this.filename}</a>`;
 		} else if (this.ref_table.startsWith('infopack')) {
-			return `<a href="/admin/infopack#show_file_${this.id}">${this.filename}</a>`;
+			var url = utils.generateUrl(req, `/admin/infopack#show_file_${this.id}`);	
+			return `<a href="${url}">${this.filename}</a>`;
 		} else {
 			return this.filename;
 		}
 	};
 
 
-	file.prototype.getDescriptor = function (models) {
+	file.prototype.getDescriptor = function (req, models) {
 		console.log(this.ref_table);
 		if (this.ref_table === 'user') {
-			return "Dokument " + this.getLink() + " für " + this.user.getLink();
+			return "Dokument " + this.getLink(req) + " für " + this.user.getLink(req);
 		} else if (this.ref_table === 'template_contract') {
-			return "Dokumentvorlage " + this.getLink() + " für Verträge";
+			return "Dokumentvorlage " + this.getLink(req) + " für Verträge";
 		} else if (this.ref_table === 'template_account_notification') {
-			return "Dokumentvorlage " + this.getLink() + " für Buchhaltung";
+			return "Dokumentvorlage " + this.getLink(req) + " für Buchhaltung";
 		} else if (this.ref_table === 'template_user') {
-			return "Dokumentvorlage " + this.getLink() + " für Kreditgeber*innen";
+			return "Dokumentvorlage " + this.getLink(req) + " für Kreditgeber*innen";
 		} else if (this.ref_table === 'infopack_balance') {
-			return "Jahresabschluss für Kreditgeber*innen " + this.getLink();
+			return "Jahresabschluss für Kreditgeber*innen " + this.getLink(req);
 		} else if (this.ref_table === 'infopack_infopack') {
-			return "Direktkreditinformation für Kreditgeber*innen " + this.getLink();
+			return "Direktkreditinformation für Kreditgeber*innen " + this.getLink(req);
 		} else if (this.ref_table === 'infopack_other') {
-			return "Infodokument für Kreditgeber*innen " + this.getLink();
+			return "Infodokument für Kreditgeber*innen " + this.getLink(req);
 		} else {
-			return "Datei " + this.getLink();
+			return "Datei " + this.getLink(req);
 		}
 	};
 

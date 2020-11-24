@@ -49,7 +49,7 @@ block content
             if entry.action === 'delete' || !entry.target
               td #{_t(entry.type)} #{entry.target_id} #{_t('log_'+entry.action)}
             else 
-              td!=  entry.target.getDescriptor(models) + ' ' + _t('log_'+entry.action)
+              td!=  entry.target.getDescriptor(req, models) + ' ' + _t('log_'+entry.action)
             td.md-auto.details-control.text-right
               span.fa.fa-plus-circle
             td.d-none.table-row-details       
