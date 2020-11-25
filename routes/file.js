@@ -33,7 +33,9 @@ module.exports = function(app){
 	router.get('/file/getpublic/:id', security.isLoggedIn, function(req, res, next) {
 		models.file.findByPk(req.params.id)
 			.then(file => {
-				if (file.ref_table.startsWith("infopack_")) {
+				if (!file) {
+					res.send(404);
+				} else if (file.ref_table.startsWith("infopack_") || file.ref_table.startsWith("balance_") || file.ref_table.startsWith("other_") || (file.ref_table === 'user' && file.ref_id === req.user.id && file.public)) {
 					var fileData = fs.readFileSync(file.path, 'binary');
 
 					res.setHeader('Content-Length', fileData.length);
@@ -79,6 +81,7 @@ module.exports = function(app){
 				description: req.body.description,
 				mime: req.file.mimetype,
 				path: req.file.path,
+				public: req.body.public==='on',
 				ref_id: req.body.id,
 				ref_table: req.body.type
 			}, { trackOptions: utils.getTrackOptions(req.user, true) })
@@ -86,6 +89,17 @@ module.exports = function(app){
 			.then(files => utils.render(req, res, 'file/show', {files: files, type: 'user', id: req.body.id}))
 			.catch(error => next(error));
 	});
+
+	router.put('/file/switch_public/:userid/:id', security.isLoggedInAdmin, function(req, res, next) {
+		models.file.findByPk(req.params.id)
+			.then(file => {
+				file.public = !file.public;
+				return file.save({trackOptions: utils.getTrackOptions(req.user, true)});
+			})
+			.then(() => models.file.getFilesFor('user', req.params.userid))
+			.then(files => utils.render(req, res, 'file/show', {files: files, type: 'user', id: req.params.userid}))
+			.catch(error => next(error));
+	});	
 
 	app.use('/', router);
 };

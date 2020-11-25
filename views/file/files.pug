@@ -1,12 +1,15 @@
-mixin files_show(files, type, id, addFile)
+mixin files_show(files, type, id, addFile, publicOnly)
+  if publicOnly
+    - files = files.filter(file => {return file.public === true;})
   .row(id= type + '_files')
     .col-md-12
       .card
         h4.card-header 
           span Dokumente
-          span.float-right
-            a.btn.btn-light.btn-sm.sidebar-action(href=_url('/file/add/' + type + '/'+id))
-              span.fa.fa-upload
+          if currentUser && currentUser.isAdmin()                  
+            span.float-right
+              a.btn.btn-light.btn-sm.sidebar-action(href=_url('/file/add/' + type + '/'+id))
+                span.fa.fa-upload
         .card-body
           table.table
             tbody
@@ -16,13 +19,19 @@ mixin files_show(files, type, id, addFile)
               each file in files
                 tr(id='file_' + file.id)
                   td.col-md-4 
-                    a(href=_url('/file/get/' + file.id)).btn.btn-sm.btn-light
+                    a(href=_url('/file/get' + (currentUser && currentUser.isAdmin()?'':'public') + '/' + file.id)).btn.btn-sm.btn-light
                       span.fa.fa-download
                       span  
                       span= file.filename
                   td.col-md-7= file.description
-                  td.col-md-1.text-right 
-                    a.btn.btn-light.btn-sm.confirm-action(data-update-tag=type + '_files' data-link=_url('/file/delete/' + type + '/' +file.id), data-confirmtext='Willst du die Datei ' + file.filename + ' wirklich löschen?') 
-                     span.fa.fa-trash
+                  if currentUser && currentUser.isAdmin()                  
+                    td.col-md-1.text-right.fit 
+                      a.btn.btn-light.btn-sm.direct-action(href=_url('/file/switch_public/'+id+'/'+file.id) data-file-id=file.id title=_t('file_public_' + file.public) data-update-tag='user_files' data-update-action='replace') 
+                        if file.public === true
+                          span.fa.fa-eye
+                        else
+                          span.fa.fa-eye-slash
+                      a.btn.btn-light.btn-sm.confirm-action(data-update-tag=type + '_files' data-link=_url('/file/delete/' + type + '/' +file.id), data-confirmtext='Willst du die Datei ' + file.filename + ' wirklich löschen?') 
+                       span.fa.fa-trash
               if addFile && addFile === type
                 +files_add(type,id)
