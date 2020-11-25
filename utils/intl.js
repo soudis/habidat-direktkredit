@@ -86,6 +86,7 @@ const texts = {
 	"payment_type_cash": "Bar",
 	"payment_type_other": "Sonstige",
 	"place": "Ort",
+	"public": "Sichtbar",
 	"red": "Rot",
 	"send_password_link": "E-Mail senden",
 	"send_password_link_help": "Eine E-Mail mit einem Link zum Setzen des Passworts senden?",
