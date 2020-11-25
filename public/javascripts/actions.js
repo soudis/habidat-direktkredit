@@ -139,6 +139,45 @@ $(document).ready(function(){
 	    });
 	});
 
+	$(document).on("click", ".direct-action", function (e) {
+
+		e.preventDefault();
+
+		var url = $(this).attr("href");
+   		var action = $(this).data('update-action');
+   		var tag = $(this).data('update-tag');		
+
+	    if ($(this).data('parameters')) {
+	    	url += '/' + $(this).data('parameters');
+	    }
+
+		$.ajax({
+		    url : url,
+		    type: "PUT",
+	        success: function(data) {
+	        	if (data.error) {
+	        		errorAlert(data.error);
+	        	} else {
+					if (data.redirect) {
+		  				redirectOrReload(data.redirect);
+		  			} else if (data.message) {
+		  				infoAlert(data.message);
+		  			}
+		       		if (action == 'append') {
+		       			$('#' + tag).append(data);
+		       		} else if (action == 'replace') {
+		       			$('#' + tag).replaceWith(data);
+		       		}
+	        	}
+	       	},
+	       	error: function(xhr, status, error) {
+	       		var data = JSON.parse(xhr.responseText);
+        		errorAlert(data.error);
+	       	}
+       	});
+	});
+
+
 	$(document).on("click", "#body-container", function (e) {
 		hideSidebar();
 	});
@@ -185,7 +224,6 @@ $(document).ready(function(){
 	       		var data = JSON.parse(xhr.responseText);
         		form.find('.submit-button').parent().before(data.html);
         		if (data.type === 'Warning') {
-        			console.log('test');
         			form.append('<input type="hidden" name="ignore_warning" value="true" />')
         		}
 	       	}

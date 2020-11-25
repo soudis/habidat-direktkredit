@@ -497,7 +497,7 @@ $(document).ready(function(){
     var updateSelected = function() {
        var contracts = [];
        $.each(table.rows('.selected').data(), function() {
-           	contracts.push(this[11].display);
+           	contracts.push(this[ table.column("contract_id:name").index()].display);
        });
        $('#process_interest_payment').data('parameters', encodeURIComponent(contracts.join(',')));
     }

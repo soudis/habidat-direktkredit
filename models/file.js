@@ -28,6 +28,11 @@ module.exports = (sequelize, DataTypes) => {
 			type: DataTypes.STRING,
 			allowNull: false
 		},
+		public: {
+			type: DataTypes.BOOLEAN,
+			allowNull: true,
+			defaultValue: false
+		},
 		ref_id:  {
 			type: DataTypes.INTEGER(11),
 			allowNull: true

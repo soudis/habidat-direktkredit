@@ -4,4 +4,5 @@ include ../partials/forms
   +hidden('type', type)
   +file('file')(icon='fa-upload' required help="maximale Dateigröße 10MB")
   +text('description')(icon='fa-comment-alt')
+  +checkbox('public', _t('file_public'))(help=_t('file_public_help'))
   +submit_button()

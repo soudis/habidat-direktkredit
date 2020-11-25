@@ -1,6 +1,7 @@
 extends layout
 
 include user/user
+include file/files
 include contract/contract
 block content
   .jumbotron
@@ -16,5 +17,6 @@ block content
       .row
         .col-md-12
           +contracts_summary(user, false)
+      +files_show(user.files, 'user', user.id, addFile, true)            
     .col-xl-6.col-md-12
       +contracts(user, undefined, false)
