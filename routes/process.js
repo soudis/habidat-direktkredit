@@ -22,7 +22,7 @@ module.exports = function(app){
 				return models.transaction.min('transaction_date')
 					.then(minTransactionDate => {
 						var years = [];
-						for (var year = parseInt(moment(minTransactionDate).year()); year < parseInt(moment().year()); year ++) {
+						for (var year = parseInt(moment(minTransactionDate).year()); year <= parseInt(moment().year()); year ++) {
 							years.push(year.toString());
 						}
 						return utils.render(req, res, 'process/interestpayment', {success: req.flash('success'), years: years, year: req.params.year, contracts: contracttable.generateContractTable(req, res, users, undefined, req.params.year).setColumnsVisible(columnsVisible)}, 'Jährliche Zinsauszahlung');
