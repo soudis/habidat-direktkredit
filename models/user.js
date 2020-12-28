@@ -483,9 +483,9 @@ module.exports = (sequelize, DataTypes) => {
 				contract.transactions.forEach(function(transaction) {
 					if (firstDay.diff(transaction.transaction_date) >= 0) {
 						sums.begin.amount += transaction.amount;
-						sums.begin.interest += + transaction.interestToDate(contract.interest_rate, firstDay);
+						sums.begin.interest += + transaction.interestToDate(contract.interest_rate,  moment(firstDay));
 						sums.end.amount += transaction.amount;
-						sums.end.interest += + transaction.interestToDate(contract.interest_rate, firstDayNextYear);
+						sums.end.interest += + transaction.interestToDate(contract.interest_rate, moment(firstDayNextYear));
 					} else  if ( firstDay.diff(transaction.transaction_date) < 0 && firstDayNextYear.diff(transaction.transaction_date) >= 0) {
 						var trans =  {
 							id : user.id,
@@ -496,18 +496,20 @@ module.exports = (sequelize, DataTypes) => {
 							date: moment(transaction.transaction_date),
 							type: transaction.getTypeText(),
 							amount: transaction.amount,
-							interest: ""
+							interest: "",
+							interest_payment_type: contract.getInterestPaymentType()
 						};
 						transactionList.push(trans);
 						sums.transactions++;
 						lastTransaction = transaction.transaction_date;
 						sums.end.amount += transaction.amount;
-						sums.end.interest += + transaction.interestToDate(contract.interest_rate, firstDayNextYear);
+						sums.end.interest += + transaction.interestToDate(contract.interest_rate, moment(firstDayNextYear));
 
 					}
 				});
-				sums.begin.interest = Math.ceil(sums.begin.interest*100) / 100;
-				sums.end.interest = Math.ceil(sums.end.interest*100) / 100;
+				sums.interest = Math.round((sums.end.interest - sums.begin.interest)*100)/100;
+				sums.begin.interest = Math.round(sums.begin.interest*100) / 100;
+				sums.end.interest = Math.round(sums.end.interest*100) / 100;
 				if (contract.isTerminated(firstDayNextYear)) {
 					sums.end.interest = -sums.end.amount;
 					sums.end.amount = 0;
@@ -518,10 +520,11 @@ module.exports = (sequelize, DataTypes) => {
 						first_name: user.first_name,
 						contract_id: contract.id,
 						interest_rate: contract.interest_rate,
-						date: firstDayNextYear,
+						date: moment(firstDay).endOf('year'),
 						type: 'Kontostand Jahresende',
 						amount: sums.end.amount + sums.end.interest,
-						interest: sums.end.interest
+						interest: sums.end.interest,
+						interest_payment_type: contract.getInterestPaymentType()
 					};
 					transactionList.push(endBalance);
 				}
@@ -535,7 +538,8 @@ module.exports = (sequelize, DataTypes) => {
 						date: firstDay,
 						type: 'Kontostand Jahresbeginn',
 						amount: sums.begin.amount + sums.begin.interest,
-						interest: sums.begin.interest
+						interest: sums.begin.interest,
+						interest_payment_type: contract.getInterestPaymentType()
 					};
 					transactionList.push(beginBalance);
 				}
@@ -548,8 +552,9 @@ module.exports = (sequelize, DataTypes) => {
 					interest_rate: contract.interest_rate,
 					date: (contract.isTerminated(firstDayNextYear)&&lastTransaction?moment(lastTransaction):moment(firstDayNextYear).subtract(1, 'days')),
 					type: 'Zinsertrag ' + year,
-					amount: Math.round((sums.end.interest - sums.begin.interest) * 100)/100,
-					interest: ""
+					amount: sums.interest,
+					interest: "",
+					interest_payment_type: contract.getInterestPaymentType()
 				};
 				transactionList.push(interest);
 			}

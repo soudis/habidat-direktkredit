@@ -9,6 +9,8 @@ const router = require('express').Router();
 const models  = require('../models');
 const Op = require("sequelize").Op;
 
+const intl = require('../utils/intl');
+
 const multer = require('multer');
 
 module.exports = function(app){
@@ -120,14 +122,18 @@ module.exports = function(app){
 				});
 				data.user_transactions_year = [];
 
-				var interestTotal = 0;
+				var interestTotal = 0, interestTotalPaid = 0;
 				transactionList.forEach(function(transaction) {
 					if (transaction.type.startsWith("Zinsertrag")) {
 						interestTotal = interestTotal + transaction.amount;
 					}
+					if (transaction.type.startsWith("Zinsauszahlung")) {
+						interestTotalPaid -= transaction.amount;
+					}					
 					data.user_transactions_year.push ({
 						contract_id: transaction.contract_id,
 						contract_interest_rate: format.formatPercent(transaction.interest_rate),
+						contract_interest_payment_type: intl._t('interest_payment_type_' + transaction.interest_payment_type),
 						transaction_date: format.formatDate(transaction.date),
 						transaction_amount: format.formatMoney(transaction.amount),
 						transaction_type: transaction.type,
@@ -136,6 +142,7 @@ module.exports = function(app){
 				});
 
 				data.interest_total = format.formatMoney(interestTotal);
+				data.interest_total_paid = format.formatMoney(interestTotalPaid);
 
 				var filename =  "Kontomitteilung " + user.id + " " + req.body.year;
 
