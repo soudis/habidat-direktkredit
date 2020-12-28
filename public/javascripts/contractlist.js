@@ -79,8 +79,8 @@ $(document).ready(function(){
     $("#datatable_parent").removeClass("d-none");
     table.responsive.recalc();
     $("#datatable_pagelength").parent().detach().prependTo($('#datatable_filter'));
-    $('#datatable_filter').parent().removeClass('col-sm-12').removeClass('col-md-6').addClass('col-sm-5');
-    $('#datatable_length').parent().removeClass('col-sm-12').removeClass('col-md-6').addClass('col-sm-7');
+    $('#datatable_filter').parent().removeClass('col-sm-12').removeClass('col-md-6').addClass('col-sm-4');
+    $('#datatable_length').parent().removeClass('col-sm-12').removeClass('col-md-6').addClass('col-sm-8');
     $('#datatable_info').parent().removeClass('col-sm-12').removeClass('col-md-5').addClass('col-sm-5');
     $('#datatable_paginate').parent().removeClass('col-sm-12').removeClass('col-md-7').addClass('col-sm-7');
 

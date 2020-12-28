@@ -38,7 +38,7 @@ module.exports = function(app){
 	});
 
 	router.post('/user/saveview', security.isLoggedInAdmin, function(req, res, next) {
-		models.user.findByPk(req.user.id)
+		models.admin.findByPk(req.user.id)
 			.then(user => {
 				var views;
 				if (user.savedViews) {
@@ -57,7 +57,7 @@ module.exports = function(app){
 	});
 
 	router.post('/user/saveview/:id', security.isLoggedInAdmin, function(req, res, next) {
-		models.user.findByPk(req.user.id)
+		models.admin.findByPk(req.user.id)
 			.then(user => {
 				var views;
 				if (user.savedViews) {
@@ -76,7 +76,7 @@ module.exports = function(app){
 	});
 
 	router.get('/user/deleteview/:id', security.isLoggedInAdmin, function(req, res, next) {
-		models.user.findByPk(req.user.id)
+		models.admin.findByPk(req.user.id)
 			.then(user => {
 				var views;
 				if (user.savedViews) {
