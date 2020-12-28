@@ -150,13 +150,13 @@ module.exports = (sequelize, DataTypes) => {
 	        	// calculation interest until toDate
 	        	var interestDays = 0;
 	        	if (method === '30E360') {
-	        		var endOfMonth = fromDate.endOf('month');
+	        		var endOfMonth = moment(fromDate).endOf('month');
 	        		if (endOfMonth.diff(toDate) >= 0) {
 	        			interestDays = moment(toDate).diff(fromDate, 'days');
 	        		} else {
-	        			interestDays = 30 - fromDate.date();
-	        			var months = moment(toDate).diff(endOfMonth, 'months');
-	        			interestDays += months * 30 + moment(toDate).date();
+	        			interestDays = Math.max(30 - fromDate.date(), 0);
+	        			var months = moment(toDate).month() - fromDate.month() - 1;
+	        			interestDays += months * 30 + Math.min(moment(toDate).date(),30);
 	        		}
 	        	} else {
 	        		interestDays = moment(toDate).diff(fromDate, 'days');
@@ -168,9 +168,9 @@ module.exports = (sequelize, DataTypes) => {
 
 	        	var interestDays = 0;
 	        	if (method === '30E360') {
-	       			interestDays = 30 - fromDate.date();
+	       			interestDays = Math.max(30 - fromDate.date() + 1,0);
 	        		var months = 12 - fromDate.month() - 1;
-	        		interestDays += months * 30;
+	        		interestDays += months * 30 ;
 	        	} else {
 	        		interestDays = endOfYear.diff(fromDate, 'days');
 	        	}
@@ -186,19 +186,19 @@ module.exports = (sequelize, DataTypes) => {
 	        	}
 
 	        	if (method === '30E360') {
-	       			interestDays = moment(toDate).date();
+	       			interestDays = Math.min(moment(toDate).date(), 30)-1;
 	        		var months = moment(toDate).month();
 	        		interestDays += months * 30;
 	        	} else {
 	        		interestDays = moment(toDate).diff(endOfYear.add(years, 'years'),'days');
 	        	}
-
 	        	//calculate interest for remaining days in last year
 	        	if (methodCompound === 'nocompound') {
 	        		amountWithInterest += this.amount * rate / 100 * interestDays / getBaseDays(toDate);
 	        	} else {
 	        		amountWithInterest += amountWithInterest * rate / 100 * interestDays / getBaseDays(toDate);
 	        	}
+
 	    	}
 	    	return amountWithInterest - this.amount;
 		} else {
