@@ -66,11 +66,9 @@ module.exports = function(app){
 					var salt = bcrypt.genSaltSync(10);
 					var passwordHashed = bcrypt.hashSync(req.body.password, salt);
 					if (req.body.usertype === 'admin') {
-						console.log('update admin pwd');
 						return models.admin.update({ passwordHashed: passwordHashed, passwordResetToken: null, passwordResetExpires: null }, {where: { id:req.body.id }, trackOptions: utils.getTrackOptions(req.user, true) });
 					} else {
-						console.log('update user pwd');
-						return models.user.update({ passwordHashed: passwordHashed, passwordResetToken: null, passwordResetExpires: null }, {where: { id:req.body.id }, trackOptions: utils.getTrackOptions(req.user, true) });
+						return models.user.update({ passwordHashed: passwordHashed, password: null, passwordResetToken: null, passwordResetExpires: null }, {where: { id:req.body.id }, trackOptions: utils.getTrackOptions(req.user, true) });
 					}
 				})
 				.then(() => {
