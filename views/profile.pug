@@ -6,7 +6,10 @@ include contract/contract
 block content
   .jumbotron
     h2= "Finanzstatus für " + user.first_name + ' ' + user.last_name
-    p.lead Hier siehst du deinen aktuellen Finanzstatus und deine Stammdaten. Falls die Daten nicht stimmen, melde dich bitte unter #[a(href='mailto:#{settings.project.get("email")}') #{settings.project.get('email')}]
+    p.lead 
+      | Hier siehst du deinen aktuellen Finanzstatus und deine Stammdaten. Falls die Daten nicht stimmen, melde dich bitte unter
+      | 
+      a(href='mailto:'+settings.project.get("email"))= settings.project.get('email')
   
 
   .row
