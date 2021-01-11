@@ -5,16 +5,19 @@ block content
     p.lead Hier findest du alle wichtigen Informationsblätter für Direktkredite. Außerdem stellen wir jährlich unsere Bilanz hier online, damit du einen Einblick in die Verwendung deines Geldes bekommst. 
   .col-md-6.col-xs-12
     h4 Kontomitteilung (für Steuererklärung):    
-    form.form-horizontal(action=_url("/accountnotification") method="post" role="form")
-      .list-group        
-        .list-group-item
-          .input-group
-            .input-group-prepend
-              span.input-group-text Jahr
-            input.form-control(type="number" step="1" name="year" required="true" min=moment(user.getOldestContract().sign_date).get('year') max=moment().get('year') value=moment().get('year'))
-            .input-group-append
-              button.btn.btn-light(type='submit' title="Download Kontomitteilung")
-                span.fa.fa-download
+    if moment(user.getOldestContract().sign_date).get('year') <= moment().subtract(1,'years').get('year')
+      form.form-horizontal(action=_url("/accountnotification") method="post" role="form")
+        .list-group        
+          .list-group-item
+            .input-group
+              .input-group-prepend
+                span.input-group-text Jahr
+              input.form-control(type="number" step="1" name="year" required="true" min=moment(user.getOldestContract().sign_date).get('year') max=moment().subtract(1,'years').get('year') value=moment().subtract(1,'years').get('year'))
+              .input-group-append
+                button.btn.btn-light(type='submit' title="Download Kontomitteilung")
+                  span.fa.fa-download
+    else
+      p.lead Es stehen noch keine Kontomitteilungen für abgeschlossene Kalenderjahre zur Verfügung. 
   each group, group_id in groups      
     if (group.files && group.files.length > 0)
       .col-md-6.col-xs-12.file-list
