@@ -122,14 +122,20 @@ module.exports = function(app){
 				});
 				data.user_transactions_year = [];
 
-				var interestTotal = 0, interestTotalPaid = 0;
+				var interestTotal = 0, interestTotalPaid = 0, amountTotalEnd = 0, amountTotalBegin = 0;
 				transactionList.forEach(function(transaction) {
 					if (transaction.type.startsWith("Zinsertrag")) {
 						interestTotal = interestTotal + transaction.amount;
 					}
 					if (transaction.type.startsWith("Zinsauszahlung")) {
 						interestTotalPaid -= transaction.amount;
-					}					
+					}			
+					if (transaction.type.startsWith("Kontostand Jahresende")) {
+						amountTotalEnd += transaction.amount;
+					}	
+					if (transaction.type.startsWith("Kontostand Jahresbeginn")) {
+						amountTotalBegin += transaction.amount;
+					}						
 					data.user_transactions_year.push ({
 						contract_id: transaction.contract_id,
 						contract_interest_rate: format.formatPercent(transaction.interest_rate),
@@ -143,6 +149,8 @@ module.exports = function(app){
 
 				data.interest_total = format.formatMoney(interestTotal);
 				data.interest_total_paid = format.formatMoney(interestTotalPaid);
+				data.amount_total_end = format.formatMoney(amountTotalEnd);
+				data.amount_total_begin = format.formatMoney(amountTotalBegin);
 
 				var filename =  "Kontomitteilung " + user.id + " " + req.body.year;
 
