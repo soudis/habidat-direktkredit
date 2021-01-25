@@ -101,7 +101,8 @@ module.exports = (sequelize, DataTypes) => {
 			contract_payback_date: {id: "contract_payback_date",  label: "Rückzahlungsdatum", filter: 'date'},
 			contract_status: {id: "contract_status",  label: "Status", class: "text-center", priority: "2", filter: 'list'},
 			contract_has_interest: {id: "contract_has_interest",  label: "Zinssatz > 0", class: "text-center", priority: "2", filter: 'list'},
-			contract_deposit_date: {id: "contract_deposit_date",  label: "Einzahlungsdatum", class: "text-right", filter: 'date'}
+			contract_deposit_date: {id: "contract_deposit_date",  label: "Einzahlungsdatum", class: "text-right", filter: 'date'},
+			contract_notes: {id: "contract_notes",  label: "Vertragsnotizen", filter: 'text'}
 		}
 	}
 
@@ -128,7 +129,8 @@ module.exports = (sequelize, DataTypes) => {
 			contract_payback_date: { valueRaw: contract.getPaybackDate()?contract.getPaybackDate().format('YYYY-MM-DD'):"", value: contract.getPaybackDate()?moment(contract.getPaybackDate()).format('DD.MM.YYYY'):"", order: contract.getPaybackDate()?moment(contract.getPaybackDate()).format('YYYY/MM/DD'):""},
 			contract_status: { valueRaw: contract.getStatus(), value: contract.getStatus() },
 			contract_has_interest: { valueRaw: contract.interest_rate > 0, value: contract.interest_rate > 0 },
-			contract_deposit_date: { valueRaw: depositDate?depositDate:"", value: depositDate?moment(depositDate).format('DD.MM.YYYY'):"", order: depositDate?moment(depositDate).format('YYYY/MM/DD'):""}
+			contract_deposit_date: { valueRaw: depositDate?depositDate:"", value: depositDate?moment(depositDate).format('DD.MM.YYYY'):"", order: depositDate?moment(depositDate).format('YYYY/MM/DD'):""},
+			contract_notes: { valueRaw: contract.notes, value: contract.notes }
 		};
 	}
 

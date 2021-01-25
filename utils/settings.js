@@ -106,10 +106,10 @@ const initProject = () => {
 	project.set('email_sendcopy',                       process.env.HABIDAT_DK_PROJECT_EMAIL_SENDCOPY, false);
 	project.set('url',                                  process.env.HABIDAT_DK_PROJECT_URL, false);
 	project.set('theme',                                process.env.HABIDAT_DK_PROJECT_THEME || 'red', false);
-	project.set('smtp.host', 							process.env.HABIDAT_DK_SMTP_HOST);
-	project.set('smtp.port', 							process.env.HABIDAT_DK_SMTP_PORT || "25");
-	project.set('smtp.auth.user', 						process.env.HABIDAT_DK_SMTP_USER);
-	project.set('smtp.auth.pass', 						process.env.HABIDAT_DK_SMTP_PASSWORD);
+	project.set('smtp.host', 							process.env.HABIDAT_DK_SMTP_HOST, false);
+	project.set('smtp.port', 							process.env.HABIDAT_DK_SMTP_PORT || "25", false);
+	project.set('smtp.auth.user', 						process.env.HABIDAT_DK_SMTP_USER, false);
+	project.set('smtp.auth.pass', 						process.env.HABIDAT_DK_SMTP_PASSWORD, false);
 	project.set('defaults.interest_method',             process.env.HABIDAT_DK_PROJECT_DEFAULTS_INTEREST_METHOD, false);
 	project.set('defaults.interest_payment_type',       process.env.HABIDAT_DK_PROJECT_DEFAULTS_INTEREST_PAYMENT_TYPE, false);
 	project.set('defaults.termination_type',            process.env.HABIDAT_DK_PROJECT_DEFAULTS_TERMINATION_TYPE, false);

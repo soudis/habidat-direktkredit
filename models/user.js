@@ -497,7 +497,8 @@ module.exports = (sequelize, DataTypes) => {
 							type: transaction.getTypeText(),
 							amount: transaction.amount,
 							interest: "",
-							interest_payment_type: contract.getInterestPaymentType()
+							interest_payment_type: contract.getInterestPaymentType(),
+							order: 1
 						};
 						transactionList.push(trans);
 						sums.transactions++;
@@ -524,7 +525,8 @@ module.exports = (sequelize, DataTypes) => {
 						type: 'Kontostand Jahresende',
 						amount: sums.end.amount + sums.end.interest,
 						interest: sums.end.interest,
-						interest_payment_type: contract.getInterestPaymentType()
+						interest_payment_type: contract.getInterestPaymentType(),
+						order: 1
 					};
 					transactionList.push(endBalance);
 				}
@@ -539,7 +541,8 @@ module.exports = (sequelize, DataTypes) => {
 						type: 'Kontostand Jahresbeginn',
 						amount: sums.begin.amount + sums.begin.interest,
 						interest: sums.begin.interest,
-						interest_payment_type: contract.getInterestPaymentType()
+						interest_payment_type: contract.getInterestPaymentType(),
+						order: 1
 					};
 					transactionList.push(beginBalance);
 				}
@@ -554,7 +557,8 @@ module.exports = (sequelize, DataTypes) => {
 					type: 'Zinsertrag ' + year,
 					amount: sums.interest,
 					interest: "",
-					interest_payment_type: contract.getInterestPaymentType()
+					interest_payment_type: contract.getInterestPaymentType(),
+					order: 0
 				};
 				transactionList.push(interest);
 			}

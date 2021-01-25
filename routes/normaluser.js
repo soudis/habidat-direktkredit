@@ -111,18 +111,24 @@ module.exports = function(app){
 						return 1;
 					else if (b.contract_id > a.contract_id)
 						return -1;
-					else {
-						if (a.date.diff(b.date) > 0)
+					else {						
+						if (a.date.isAfter(b.date, 'day'))
 							return 1;
-						else if(b.date.diff(a.date) > 0)
+						else if (b.date.isAfter(a.date, 'day'))
 							return -1;
-						else
-							return 0;
+						else {
+							if (a.order > b.order)
+								return 1;
+							else if (a.order < b.order)
+								return -1;
+							else 
+								return 0;
+						}
 					}
 				});
 				data.user_transactions_year = [];
 
-				var interestTotal = 0, interestTotalPaid = 0, amountTotalEnd = 0, amountTotalBegin = 0;
+				var interestTotal = 0, interestTotalPaid = 0, amountTotalEnd = 0, amountTotalBegin = 0, lastTransaction;
 				transactionList.forEach(function(transaction) {
 					if (transaction.type.startsWith("Zinsertrag")) {
 						interestTotal = interestTotal + transaction.amount;
@@ -140,10 +146,14 @@ module.exports = function(app){
 						contract_id: transaction.contract_id,
 						contract_interest_rate: format.formatPercent(transaction.interest_rate),
 						contract_interest_payment_type: intl._t('interest_payment_type_' + transaction.interest_payment_type),
+						contract_first_line: !lastTransaction || lastTransaction.contract_id !== transaction.contract_id,
 						transaction_date: format.formatDate(transaction.date),
 						transaction_amount: format.formatMoney(transaction.amount),
 						transaction_type: transaction.type,
+
 					});
+
+					lastTransaction = transaction;
 
 				});
 
