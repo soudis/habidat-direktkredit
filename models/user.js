@@ -77,6 +77,10 @@ module.exports = (sequelize, DataTypes) => {
 			type: DataTypes.STRING,
 			allowNull: true
 		},
+		account_notification_type:{
+			type: DataTypes.STRING,
+			allowNull: true
+		},		
 		relationship: {
 			type: DataTypes.STRING,
 			allowNull: true
@@ -301,7 +305,8 @@ module.exports = (sequelize, DataTypes) => {
 			user_zip: {id: "user_zip",  label: "PLZ", filter: 'text'},
 			user_place: {id: "user_place",  label: "Ort", filter: 'text'},
 			user_country: {id: "user_country",  label: "Land", filter: 'text'},
-			user_logon_id: {id: "user_logon_id",  label: "Anmeldename", filter: 'text'}
+			user_logon_id: {id: "user_logon_id",  label: "Anmeldename", filter: 'text'},
+			user_account_notification_type: {id: "user_account_notification_type",  label: "Kontomitteilung", filter: 'list'}
 		}
 	}
 
@@ -348,7 +353,8 @@ module.exports = (sequelize, DataTypes) => {
 			user_zip: { valueRaw: user.zip, value: user.zip },
 			user_place: { valueRaw: user.place, value: user.place },
 			user_country: { valueRaw: user.country, value: user.country },
-			user_logon_id: { valueRaw: user.logon_id, value: user.logon_id }
+			user_logon_id: { valueRaw: user.logon_id, value: user.logon_id },
+			user_account_notification_type: { valueRaw: user.account_notification_type||'online', value: intl._t('account_notification_type_' + (user.account_notification_type||'online')) }
 		}
 	}
 
@@ -408,6 +414,19 @@ module.exports = (sequelize, DataTypes) => {
 			return name;
 		}
 	};
+
+
+	User.prototype.getFullNameNoTitle = function () {
+		var name = this.first_name;
+		if (this.type === 'organisation') {
+			return name;
+		} else {
+			if (this.last_name) {
+				name = this.last_name.toUpperCase() + ' ' + name;
+			}
+			return name;
+		}
+	};	
 
 	User.prototype.getLink = function (req) {
 		var url = utils.generateUrl(req, `/user/show/${this.id}`);
@@ -491,6 +510,92 @@ module.exports = (sequelize, DataTypes) => {
 	User.prototype.isAdmin = function () {
 		return false;
 	};
+
+	User.prototype.getAccountNotificationData = function (year)  {
+		data = this.getRow();
+		data.user_contracts = this.contracts.map(contract => {
+			var data = contract.getRow();
+			Object.keys(data).forEach(key => {
+				data[key] = data[key].value;
+			})
+			data.contract_transactions = contract.transactions.map(transaction => {
+				var data = transaction.getRow();
+				Object.keys(data).forEach(key => {
+					data[key] = data[key].value;
+				})
+			})
+			data.current_date = moment().format('DD.MM.YYYY');
+
+		})
+
+		Object.keys(data).forEach(key => {
+			data[key] = data[key].value;
+		})
+
+		data.user_address = data.user_address.replace('</br>', "\n");
+
+		data.current_date = moment().format('DD.MM.YYYY');
+		data.year = year;
+
+		var transactionList = this.getTransactionList(year);
+
+		transactionList.sort(function(a,b) {
+			if (a.contract_id > b.contract_id)
+				return 1;
+			else if (b.contract_id > a.contract_id)
+				return -1;
+			else {						
+				if (a.date.isAfter(b.date, 'day'))
+					return 1;
+				else if (b.date.isAfter(a.date, 'day'))
+					return -1;
+				else {
+					if (a.order > b.order)
+						return 1;
+					else if (a.order < b.order)
+						return -1;
+					else 
+						return 0;
+				}
+			}
+		});
+		data.user_transactions_year = [];
+
+		var interestTotal = 0, interestTotalPaid = 0, amountTotalEnd = 0, amountTotalBegin = 0, lastTransaction;
+		transactionList.forEach(function(transaction) {
+			if (transaction.type.startsWith("Zinsertrag")) {
+				interestTotal = interestTotal + transaction.amount;
+			}
+			if (transaction.type.startsWith("Zinsauszahlung")) {
+				interestTotalPaid -= transaction.amount;
+			}			
+			if (transaction.type.startsWith("Kontostand Jahresende")) {
+				amountTotalEnd += transaction.amount;
+			}	
+			if (transaction.type.startsWith("Kontostand Jahresbeginn")) {
+				amountTotalBegin += transaction.amount;
+			}						
+			data.user_transactions_year.push ({
+				contract_id: transaction.contract_id,
+				contract_interest_rate: format.formatPercent(transaction.interest_rate),
+				contract_interest_payment_type: intl._t('interest_payment_type_' + transaction.interest_payment_type),
+				contract_first_line: !lastTransaction || lastTransaction.contract_id !== transaction.contract_id,
+				transaction_date: format.formatDate(transaction.date),
+				transaction_amount: format.formatMoney(transaction.amount),
+				transaction_type: transaction.type,
+
+			});
+
+			lastTransaction = transaction;
+
+		});
+
+		data.interest_total = format.formatMoney(interestTotal);
+		data.interest_total_paid = format.formatMoney(interestTotalPaid);
+		data.amount_total_end = format.formatMoney(amountTotalEnd);
+		data.amount_total_begin = format.formatMoney(amountTotalBegin);		
+		return data;
+	}
 
 	User.prototype.getTransactionList = function (year) {
 		var transactionList = [];
@@ -577,20 +682,22 @@ module.exports = (sequelize, DataTypes) => {
 					transactionList.push(beginBalance);
 				}
 
-				var interest = {
-					id : user.id,
-					last_name: user.last_name,
-					first_name: user.first_name,
-					contract_id: contract.id,
-					interest_rate: contract.interest_rate,
-					date: (contract.isTerminated(firstDayNextYear)&&lastTransaction?moment(lastTransaction):moment(firstDayNextYear).subtract(1, 'days')),
-					type: 'Zinsertrag ' + year,
-					amount: sums.interest,
-					interest: "",
-					interest_payment_type: contract.getInterestPaymentType(),
-					order: 0
-				};
-				transactionList.push(interest);
+				if (contract.transactions.length > 0) {
+					var interest = {
+						id : user.id,
+						last_name: user.last_name,
+						first_name: user.first_name,
+						contract_id: contract.id,
+						interest_rate: contract.interest_rate,
+						date: (contract.isTerminated(firstDayNextYear)&&lastTransaction?moment(lastTransaction):moment(firstDayNextYear).subtract(1, 'days')),
+						type: 'Zinsertrag ' + year,
+						amount: sums.interest,
+						interest: "",
+						interest_payment_type: contract.getInterestPaymentType(),
+						order: 0
+					};
+					transactionList.push(interest);
+				}
 			}
 		});
 		return transactionList;

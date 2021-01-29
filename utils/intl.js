@@ -1,5 +1,9 @@
 /* jshint esversion: 8 */
 const texts = {
+	"account_notification_type": "Erhalt Kontomitteilung",
+	"account_notification_type_online": "Online",
+	"account_notification_type_email": "E-Mail",
+	"account_notification_type_mail": "Post",
 	"administrator": "Administrator",
 	"amount": "Betrag",
 	"BIC": "BIC",
