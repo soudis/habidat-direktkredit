@@ -7,9 +7,16 @@ mixin user_form(formTitle, action, user)
       +hidden('id', user.id)
     else
       +id('id', _t('user_id'))(placeholder='Automatisch')  
-    .form-row
-      +text('first_name')(value=_iv(user, 'first_name') groupClass="col" icon='fa-user' required)
-      +text('last_name')(value=_iv(user, 'last_name') groupClass="col")
+    .form-row.col-md-12
+      +radio('type', _t('user_type_person'))(value='person' selected=_iv(user, 'type') default=true)
+      +radio('type', _t('user_type_organisation'))(value='organisation' selected=_iv(user, 'type'))
+    .form-row.radio-inputs(id="person_inputs")
+      +text('title_prefix')(value=_iv(user, 'title_prefix') groupClass="col-md-2" icon='fa-graduation-cap')
+      +text('first_name')(value=_iv(user, 'first_name') groupClass="col-md-4" icon='fa-user' required)
+      +text('last_name')(value=_iv(user, 'last_name') groupClass="col-md-4" icon='fa-user' required)
+      +text('title_suffix')(value=_iv(user, 'title_suffix') groupClass="col-md-2" icon='fa-graduation-cap')
+    .form-row.radio-inputs(id="organisation_inputs").d-none
+      +text('organisation_name')(value=_iv(user, 'first_name') groupClass="col" icon="fa-building")
     +text('street')(value=_iv(user, 'street') icon="fa-map-marker")
     .form-row
       +text('zip')(value=_iv(user, 'zip') icon="fa-envelope" groupClass="col-md-4")
@@ -25,3 +32,7 @@ mixin user_form(formTitle, action, user)
       each type in settings.project.get('defaults.relationships')
         +option(type, type)(selected=_iv(user, 'relationship'))
     +submit_button()
+
+  script.
+
+    $('input[type=radio][name=type][checked=checked]').change();

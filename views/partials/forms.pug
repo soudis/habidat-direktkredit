@@ -105,6 +105,11 @@ mixin checkbox(name, label=undefined)
       if attributes.help
         small.form-text.text-muted(id=name+"_help")=attributes.help
 
+mixin radio(name, label=undefined)
+  .custom-control.custom-control-inline.custom-radio
+    input.custom-control-input(id=name+'_'+attributes.value type="radio" name=name checked=attributes.default&&!attributes.selected||attributes.selected&&attributes.selected==attributes.value?"checked":undefined)&attributes(attributes)
+    label.custom-control-label.radio-label(for=name+'_'+attributes.value)= label||_t(name)
+
 mixin option(value, label=undefined) 
   option(selected=attributes.selected && attributes.selected==value value=value)=label||_t(value)
 
