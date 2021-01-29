@@ -1,4 +1,5 @@
 /* jshint esversion: 8 */
+const archiver = require('archiver');
 const security = require('../utils/security');
 const moment = require("moment");
 const statistics = require('../utils/statistics');
@@ -7,6 +8,8 @@ const router = require('express').Router();
 const models  = require('../models');
 const format = require('../utils/format');
 const settings = require('../utils/settings');
+const multer = require('multer');
+const Promise = require('bluebird');
 const Op = require("sequelize").Op;
 
 module.exports = function(app){
@@ -253,6 +256,38 @@ module.exports = function(app){
 			})
 			.catch(error => next(error));
 	});
+
+	router.post('/statistics/accountnotifications', security.isLoggedInAdmin, multer().none(), function(req, res, next) {
+
+		models.user.findFetchFull(models, { account_notification_type: req.body.mode})
+			.then(users => {
+				users = users.filter(user => {
+					return moment(user.getOldestContract().sign_date).get('year') <= req.body.year;
+				})
+				return models.file.findOne({
+						where: {
+							ref_table: "template_account_notification"
+						}
+					})
+					.then(template => {
+						var archive = archiver('zip');
+						res.setHeader('Content-Type', 'application/zip');
+						res.setHeader('Content-Disposition', 'inline; filename="Kontomitteilungen per ' + req.body.mode==='mail'?'Post':'E-Mail' + ' ' + req.body.year + '.zip"');
+						archive.pipe(res)
+						return Promise.map(users, user => {
+
+							data = user.getAccountNotificationData(req.body.year);
+							var filename =  'Kontomitteilung ' + user.getFullNameNoTitle() + ' ' + req.body.year + '.pdf';
+							return utils.generateDocx(template.path, data)
+								.then(result => utils.convertToPdf(result))
+								.then(file => archive.append(file, { name: filename }));
+						}, {concurrency: 1})
+						.then(() => archive.finalize())
+						.then(() => res.end());
+					})
+			})
+			.catch(error => next(error));
+	});	
 
 
 	app.use('/', router);

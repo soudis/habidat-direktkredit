@@ -170,6 +170,7 @@ module.exports = function(app){
 					country: req.body.country,
 					IBAN: req.body.IBAN,
 					BIC: req.body.BIC,
+					account_notification_type: req.body.account_notification_type,
 					logon_id: Math.abs(Math.random() * 100000000),
 					password: password,
 					relationship: req.body.relationship
@@ -195,6 +196,7 @@ module.exports = function(app){
 				email: req.body.email,
 				IBAN: req.body.IBAN,
 				BIC: req.body.BIC,
+				account_notification_type: req.body.account_notification_type,
 				relationship: req.body.relationship
 			}, {where: { id:req.body.id }, trackOptions: utils.getTrackOptions(req.user, true) })
 			.then(() => res.send({redirect: 'reload'}))

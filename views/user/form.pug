@@ -31,6 +31,10 @@ mixin user_form(formTitle, action, user)
     +select('relationship')(icon='fa-user-friends')
       each type in settings.project.get('defaults.relationships')
         +option(type, type)(selected=_iv(user, 'relationship'))
+    +select('account_notification_type')(icon='fa-bell')
+      +option('online', _t('account_notification_type_online'))(selected=_iv(user, 'account_notification_type'))
+      +option('email', _t('account_notification_type_email'))(selected=_iv(user, 'account_notification_type'))
+      +option('mail', _t('account_notification_type_mail'))(selected=_iv(user, 'account_notification_type'))
     +submit_button()
 
   script.

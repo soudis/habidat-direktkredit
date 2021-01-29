@@ -44,4 +44,20 @@ block content
             option(value='active') Nur aktive       
           .input.group-btn
              button(type='submit' class='btn btn-primary')
-               span.fa.fa-download                      
+               span.fa.fa-download  
+
+  form.form-horizontal(action=_url("/statistics/accountnotifications") method="post" role="form")
+    .form-group.row
+      label.col-md-8
+        h4 Offline Kontomitteilungen
+      .col-md-4
+        .input-group
+          .input-group-prepend
+            .input-group-text(id="jahreslisteAddon") Jahr
+          input.form-control(type="number" step="1" name="year" required="true" min="1970" max=new Date().getFullYear() value=new Date().getFullYear()-1 )
+          select.form-control(name="mode")
+            option(value='email') E-Mail
+            option(value='mail') Post
+          .input.group-btn
+             button(type='submit' class='btn btn-primary')
+               span.fa.fa-download
