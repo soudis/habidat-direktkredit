@@ -259,10 +259,21 @@ module.exports = function(app){
 
 	router.post('/statistics/accountnotifications', security.isLoggedInAdmin, multer().none(), function(req, res, next) {
 
-		models.user.findFetchFull(models, { account_notification_type: req.body.mode})
+		var whereClause = {};
+		if (req.body.mode !== 'all') {
+			whereClause = { account_notification_type: req.body.mode};
+		}
+
+		models.user.findFetchFull(models, whereClause)
 			.then(users => {
 				users = users.filter(user => {
-					return moment(user.getOldestContract().sign_date).get('year') <= req.body.year;
+					var oldestContract = user.getOldestContract();
+					if (oldestContract) {
+						return moment(oldestContract.sign_date).get('year') <= req.body.year;
+					} else {
+						return false;
+					}
+					
 				})
 				return models.file.findOne({
 						where: {
@@ -272,7 +283,7 @@ module.exports = function(app){
 					.then(template => {
 						var archive = archiver('zip');
 						res.setHeader('Content-Type', 'application/zip');
-						res.setHeader('Content-Disposition', 'inline; filename="Kontomitteilungen per ' + (req.body.mode==='mail'?'Post':'E-Mail') + ' ' + req.body.year + '.zip"');
+						res.setHeader('Content-Disposition', 'inline; filename="Kontomitteilungen' + (req.body.mode==='mail'?' per Post':req.body.mode==='email'?' per E-Mail':req.body.mode==='online'?' Online':'') + ' ' + req.body.year + '.zip"');
 						archive.pipe(res)
 						return Promise.map(users, user => {
 
