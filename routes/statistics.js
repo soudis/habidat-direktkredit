@@ -272,7 +272,7 @@ module.exports = function(app){
 					.then(template => {
 						var archive = archiver('zip');
 						res.setHeader('Content-Type', 'application/zip');
-						res.setHeader('Content-Disposition', 'inline; filename="Kontomitteilungen per ' + req.body.mode==='mail'?'Post':'E-Mail' + ' ' + req.body.year + '.zip"');
+						res.setHeader('Content-Disposition', 'inline; filename="Kontomitteilungen per ' + (req.body.mode==='mail'?'Post':'E-Mail') + ' ' + req.body.year + '.zip"');
 						archive.pipe(res)
 						return Promise.map(users, user => {
 
