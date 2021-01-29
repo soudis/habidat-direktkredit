@@ -49,7 +49,7 @@ block content
   form.form-horizontal(action=_url("/statistics/accountnotifications") method="post" role="form")
     .form-group.row
       label.col-md-8
-        h4 Offline Kontomitteilungen
+        h4 Kontomitteilungen
       .col-md-4
         .input-group
           .input-group-prepend
@@ -58,6 +58,8 @@ block content
           select.form-control(name="mode")
             option(value='email') E-Mail
             option(value='mail') Post
+            option(value='online') Online
+            option(value='all') Alle
           .input.group-btn
              button(type='submit' class='btn btn-primary')
                span.fa.fa-download
