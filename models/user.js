@@ -25,11 +25,23 @@ module.exports = (sequelize, DataTypes) => {
 			type: DataTypes.STRING,
 			allowNull: true
 		},
+		type: {
+			type: DataTypes.STRING,
+			allowNull: true
+		},		
 		first_name: {
 			type: DataTypes.STRING,
 			allowNull: true
 		},
 		last_name: {
+			type: DataTypes.STRING,
+			allowNull: true
+		},
+		title_prefix: {
+			type: DataTypes.STRING,
+			allowNull: true
+		},
+		title_suffix: {
 			type: DataTypes.STRING,
 			allowNull: true
 		},
@@ -271,8 +283,12 @@ module.exports = (sequelize, DataTypes) => {
 	User.getColumns = function () {
 		return {
 			user_id: {id: "user_id",  label: "Kontonummer", filter: 'text'},
+			user_type: {id: "user_type",  label: "Benutzer*innentyp", filter: 'list'},
+			user_is_person: {id: "user_is_person",  label: "Indikator ob Benutzer*in eine natürliche Person ist", filter: 'text'},
+			user_title_prefix: {id: "user_title_prefix",  label: "Titel", filter: 'text'},
 			user_first_name: {id: "user_first_name",  label: "Vorname", filter: 'text'},
 			user_last_name: {id: "user_last_name",  label: "Nachname", filter: 'text'},
+			user_title_suffix: {id: "user_title_suffix",  label: "Titel, nachgestellt", filter: 'text'},
 			user_name: {id: "user_name",  label: "Name", priority: "2", filter: 'text'},
 			user_address: {id: "user_address",  label: "Adresse", filter: 'text'},
 			user_address_oneline: {id: "user_address_oneline",  label: "Adresse (einzeilig)", filter: 'text'},
@@ -314,8 +330,12 @@ module.exports = (sequelize, DataTypes) => {
 		var user = this;
 		return {
 			user_id: { valueRaw: user.id, value:  user.id  },
+			user_type: { valueRaw: user.type||'person', value:  user.type?intl._t('user_type_'+user.type):intl._t('user_type_person')},
+			user_is_person: { valueRaw: !user.type&&user.type==='person', value: !user.type&&user.type==='person'},
+			user_title_prefix: { valueRaw: user.title_prefix, value:  user.title_prefix},
 			user_first_name: { valueRaw: user.first_name, value:  user.first_name  },
 			user_last_name: { valueRaw: user.last_name, value:  user.last_name  },
+			user_title_suffix: { valueRaw: user.title_suffix, value:  user.title_suffix},
 			user_name: { valueRaw: user.getFullName(), value: user.getFullName(), order: replaceUmlaute(user.getFullName())},
 			user_address: { valueRaw: user.getAddress(true), value: user.getAddress(true) },
 			user_address_oneline: { valueRaw: user.getAddress(false), value: user.getAddress(true) },
@@ -373,10 +393,20 @@ module.exports = (sequelize, DataTypes) => {
 
 	User.prototype.getFullName = function () {
 		var name = this.first_name;
-		if (this.last_name) {
-			name = this.last_name.toUpperCase() + " " + name;
+		if (this.type === 'organisation') {
+			return name;
+		} else {
+			if (this.last_name) {
+				name = this.last_name.toUpperCase() + ' ' + name;
+			}
+			if (this.title_prefix) {
+				name = this.title_prefix + ' ' + name;
+			}
+			if (this.title_suffix) {
+				name= name + ', ' + this.title_suffix
+			}
+			return name;
 		}
-		return name;
 	};
 
 	User.prototype.getLink = function (req) {

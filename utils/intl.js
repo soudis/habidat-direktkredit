@@ -78,6 +78,7 @@ const texts = {
 	"contract_status_complete": "Vertrag abgeschlossen",
 	"no_contract": "Noch kein Vertrag angelegt",
 	"notes": "Notizen",
+	"organisation_name": "Name",
 	"payback_date": "Rückzahlungsdatum",
 	"password": "Passwort",
 	"passwordHashed": "Passwort (verschlüsselt)",
@@ -106,6 +107,8 @@ const texts = {
 	"termination_period_type_Y": "Jahr(e)",
 	"termination_period": "Kündigungsfrist",
 	"termination_period_type": "Kündigungsfrist (Typ)",
+	"title_prefix": "Titel",
+	"title_suffix": "Titel, nachgestellt",
 	"theme": "Farbschema",
 	"transaction": "Zahlung",
 	"transaction_date": "Datum",
@@ -135,6 +138,9 @@ const texts = {
 	"interest_method_ACT_nocompound": "ACT/ACT ohne Zinseszins",
 	"interest_method_hint_ACT_nocompound": "Bei ACT/ACT (Effektivzinsmethode) werden die Zinstage eines Jahres kalendergenau berechnet, auch das Basis-Zinsjahr hat je nach Jahr 365 oder 366 (Schaltjahr) Zinstage.",
 	"user_id": "Kontonummer",
+	"user_type": "Benutzer*innentyp",	
+	"user_type_person": "Person",
+	"user_type_organisation": "Organisation",	
 	"user": "Benutzer*in",
 	"zip": "PLZ"
 

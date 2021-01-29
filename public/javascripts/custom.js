@@ -70,6 +70,18 @@ $(document).ready(function(){
 		}
 	});
 
+	$(document).on("change", 'input[type=radio][name=type]', function(e) {
+		$('.radio-inputs').addClass('d-none');
+		$('.radio-inputs input').prop('required', false);
+		$('#' + this.value + '_inputs').removeClass('d-none');
+		if (this.value === 'person') {
+			$('#first_name').prop('required', true);
+			$('#last_name').prop('required', true);
+		} else if (this.value === 'organisation') {
+			$('#organisation_name').prop('required', true);
+		}
+	});
+
 	$(document).on("change", '#transaction_date', function(e) {
 		var transactionDate = $('#transaction_date').val();
 		var contractId = $('#transaction_contract_id').val();

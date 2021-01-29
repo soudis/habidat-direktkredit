@@ -154,10 +154,14 @@ module.exports = function(app){
 				for (var i = 0, n = charset.length; i < length; ++i) {
 					password += charset.charAt(Math.floor(Math.random() * n));
 				}
+				console.log(req.body.type);
 				return models.user.create({
 					id: userId,
-					first_name: req.body.first_name,
-					last_name: req.body.last_name,
+					type: req.body.type,
+					title_prefix: req.body.type==='person'?req.body.title_prefix:null,
+					first_name: req.body.type==='person'?req.body.first_name:req.body.organisation_name,
+					last_name: req.body.type==='person'?req.body.last_name:null,
+					title_suffix: req.body.type==='person'?req.body.title_suffix:null,
 					street: req.body.street,
 					zip: req.body.zip,
 					place: req.body.place,
@@ -176,9 +180,13 @@ module.exports = function(app){
 	});
 
 	router.post('/user/edit', security.isLoggedInAdmin, multer().none(), function(req, res, next) {
+		console.log(req.body.type);
 		models.user.update({
-				first_name: req.body.first_name,
-				last_name: req.body.last_name,
+				type: req.body.type,
+				title_prefix: req.body.type==='person'?req.body.title_prefix:'',
+				first_name: req.body.type==='person'?req.body.first_name:req.body.organisation_name,
+				last_name: req.body.type==='person'?req.body.last_name:'',
+				title_suffix: req.body.type==='person'?req.body.title_suffix:'',
 				street: req.body.street,
 				zip: req.body.zip,
 				place: req.body.place,
