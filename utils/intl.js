@@ -82,6 +82,7 @@ const texts = {
 	"contract_status_complete": "Vertrag abgeschlossen",
 	"no_contract": "Noch kein Vertrag angelegt",
 	"notes": "Notizen",
+	"notes_public": "Notizen für Kreditgeber*in sichtbar?",
 	"organisation_name": "Name",
 	"payback_date": "Rückzahlungsdatum",
 	"password": "Passwort",
