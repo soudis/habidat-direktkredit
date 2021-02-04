@@ -1,0 +1,17 @@
+.note {
+  color: #333;
+  width: 300px;
+  padding: 10px;
+  box-shadow: 0 6px 6px 2px rgba(0,0,0,0.3);
+
+  background: #efec8f;
+  -webkit-transform: rotate(-1deg);
+  -moz-transform: rotate(-1deg);
+  -o-transform: rotate(-1deg);
+  -ms-transform: rotate(-1deg);
+  transform: rotate(-1deg); 
+}
+
+.note > p:last-child {
+	margin-bottom: 0px;
+}

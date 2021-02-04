@@ -110,11 +110,13 @@ module.exports = function(app){
 					if (checkbox) {
 						settings.project.set(id, value || req.body[id]?true:false);
 					} else {
-						settings.project.set(id, value || req.body[id] ||settings.project.get(id));
+						settings.project.set(id, value || req.body[id], true, true);
 					}
 				};
 
 				setSetting('projectname');
+				setSetting('project_iban');
+				setSetting('project_bic');
 				setSetting('email');
 				setSetting('email_sendcopy', undefined, true);
 				setSetting('smtp.host', req.body.smtp_host);
@@ -146,6 +148,8 @@ module.exports = function(app){
 				} else if (req.body.logo_select_change === 'logo_select_upload' && req.files && req.files['logo_select_upload'] && req.files['logo_select_upload'].length == 1 && req.files['logo_select_upload'][0].originalname) {
 					setSetting('logo_select', '/public/images/' + req.files['logo_select_upload'][0].originalname);
 				}
+
+				settings.project.setDefaults();
 
 				return settings.project.save();
 			})

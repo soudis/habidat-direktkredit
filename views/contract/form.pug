@@ -43,6 +43,7 @@ mixin contract_form(action, updateAction, updateTag, editContract)
         +option(status, _t('contract_status_'+status))(selected=_iv(editContract, 'status'))
 
     +textarea('notes')(value=_iv(editContract, 'notes'))
+    +checkbox('notes_public')(value=_iv(editContract, 'notes_public'))    
     +submit_button()
   script.
 

@@ -62,6 +62,11 @@ module.exports = (sequelize, DataTypes) => {
 			notes: {
 				type: DataTypes.TEXT,
 				allowNull: true
+			},
+			notes_public: {
+				type: DataTypes.BOOLEAN,
+				allowNull: true,
+				defaultValue: false
 			}
 		}, {
 			tableName: 'contract',

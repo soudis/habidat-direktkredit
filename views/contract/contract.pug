@@ -82,10 +82,23 @@ mixin contract(contract, templates_contract, admin)
                 else
                   td.h6: b= format.formatMoney(contract.getAmountToDate( moment()))    
               
-            if (admin && contract.notes && contract.notes.trim() !== '')      
+            if ((admin || contract.notes_public) && contract.notes && contract.notes.trim() !== '')      
               tr.divider
-                td: b Notizen
-                td!= contract.notes.replace("\n", '<br/>')
+                td
+                  b 
+                    | Notizen
+                    if admin
+                      | &nbsp;
+                      small
+                        if contract.notes_public
+                          i.fa.fa-eye
+                        else
+                          i.fa.fa-eye-slash
+
+                td
+                  blockquote.note
+                    each line in contract.notes.split("\r") 
+                      p=line
         table.table
           thead
             tr

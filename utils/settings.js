@@ -78,6 +78,7 @@ const initConfig = () => {
 	return config;
 };
 
+
 const initProject = () => {
 	console.info("Loading project settings...");
 	var project = require('../config/project.json');
@@ -97,25 +98,31 @@ const initProject = () => {
 		});
 	};
 
-	// use environment variables as default values (do not overwrite project.json values)
-	project.set('projectid',                            process.env.HABIDAT_DK_PROJECT_ID, true);
-	project.set('projectname',                          process.env.HABIDAT_DK_PROJECT_NAME, false);
-	project.set('logo',                                 process.env.HABIDAT_DK_PROJECT_LOGO, false);
-	project.set('logo_select',                          process.env.HABIDAT_DK_PROJECT_LOGO_SELECT, false);
-	project.set('email',                                process.env.HABIDAT_DK_PROJECT_EMAIL, false);
-	project.set('email_sendcopy',                       process.env.HABIDAT_DK_PROJECT_EMAIL_SENDCOPY, false);
-	project.set('url',                                  process.env.HABIDAT_DK_PROJECT_URL, false);
-	project.set('theme',                                process.env.HABIDAT_DK_PROJECT_THEME || 'red', false);
-	project.set('smtp.host', 							process.env.HABIDAT_DK_SMTP_HOST, false);
-	project.set('smtp.port', 							process.env.HABIDAT_DK_SMTP_PORT || "25", false);
-	project.set('smtp.auth.user', 						process.env.HABIDAT_DK_SMTP_USER, false);
-	project.set('smtp.auth.pass', 						process.env.HABIDAT_DK_SMTP_PASSWORD, false);
-	project.set('defaults.interest_method',             process.env.HABIDAT_DK_PROJECT_DEFAULTS_INTEREST_METHOD, false);
-	project.set('defaults.interest_payment_type',       process.env.HABIDAT_DK_PROJECT_DEFAULTS_INTEREST_PAYMENT_TYPE, false);
-	project.set('defaults.termination_type',            process.env.HABIDAT_DK_PROJECT_DEFAULTS_TERMINATION_TYPE, false);
-	project.set('defaults.termination_period',          process.env.HABIDAT_DK_PROJECT_DEFAULTS_TERMINATION_PERIOD, false);
-	project.set('defaults.termination_period_type',     process.env.HABIDAT_DK_PROJECT_DEFAULTS_TERMINATION_PERIOD_TYPE, false);
-	project.set('defaults.country',                     process.env.HABIDAT_DK_PROJECT_DEFAULTS_COUNTRY, false);
+	project.setDefaults = function () {
+		// use environment variables as default values (do not overwrite project.json values)
+		this.set('projectid',                            process.env.HABIDAT_DK_PROJECT_ID, true);
+		this.set('projectname',                          process.env.HABIDAT_DK_PROJECT_NAME, false);
+		this.set('project_iban',                         process.env.HABIDAT_DK_PROJECT_IBAN, false);
+		this.set('project_bic',                          process.env.HABIDAT_DK_PROJECT_BIC, false);
+		this.set('logo',                                 process.env.HABIDAT_DK_PROJECT_LOGO, false);
+		this.set('logo_select',                          process.env.HABIDAT_DK_PROJECT_LOGO_SELECT, false);
+		this.set('email',                                process.env.HABIDAT_DK_PROJECT_EMAIL, false);
+		this.set('email_sendcopy',                       process.env.HABIDAT_DK_PROJECT_EMAIL_SENDCOPY, false);
+		this.set('url',                                  process.env.HABIDAT_DK_PROJECT_URL, false);
+		this.set('theme',                                process.env.HABIDAT_DK_PROJECT_THEME || 'red', false);
+		this.set('smtp.host', 							process.env.HABIDAT_DK_SMTP_HOST, false);
+		this.set('smtp.port', 							process.env.HABIDAT_DK_SMTP_PORT || "25", false);
+		this.set('smtp.auth.user', 						process.env.HABIDAT_DK_SMTP_USER, false);
+		this.set('smtp.auth.pass', 						process.env.HABIDAT_DK_SMTP_PASSWORD, false);
+		this.set('defaults.interest_method',             process.env.HABIDAT_DK_PROJECT_DEFAULTS_INTEREST_METHOD, false);
+		this.set('defaults.interest_payment_type',       process.env.HABIDAT_DK_PROJECT_DEFAULTS_INTEREST_PAYMENT_TYPE, false);
+		this.set('defaults.termination_type',            process.env.HABIDAT_DK_PROJECT_DEFAULTS_TERMINATION_TYPE, false);
+		this.set('defaults.termination_period',          process.env.HABIDAT_DK_PROJECT_DEFAULTS_TERMINATION_PERIOD, false);
+		this.set('defaults.termination_period_type',     process.env.HABIDAT_DK_PROJECT_DEFAULTS_TERMINATION_PERIOD_TYPE, false);
+		this.set('defaults.country',                     process.env.HABIDAT_DK_PROJECT_DEFAULTS_COUNTRY, false);
+	}
+
+	project.setDefaults();
 
 	return project;
 };

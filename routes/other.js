@@ -28,7 +28,6 @@ module.exports = function(app){
 						return data;
 					})
 				})
-				data.current_date = moment().format('DD.MM.YYYY');
 				data.user_address = data.user_address.replace('</br>', "\n");
 
 			    return models.file.findOne({
@@ -79,8 +78,7 @@ module.exports = function(app){
 
 					var data = Object.assign(userData, contractData);
 
-					data.user_address = data.user_address.replace('</br>', "\n");
-					data.current_date = moment().format('DD.MM.YYYY');
+					data.user_address = data.user_address.replace('</br>', "\n");					
 
 
 				    return models.file.findOne({

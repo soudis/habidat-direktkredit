@@ -19,6 +19,11 @@ block content
                 td.col-md-4.h6 
                   b Projektname:
                 td.col-md-8.h6= settings.project.get('projectname')
+              if settings.project.get('project_iban') || settings.project.get('project_bic')     
+                tr
+                  td.col-md-4.h6 
+                    b Projekt IBAN / BIC:
+                  td.col-md-8.h6= [settings.project.get('project_iban'),settings.project.get('project_bic')].filter(Boolean).join(' / ')
               tr
                 td.col-md-4.h6 
                   b Logo (Menüleiste):

@@ -40,6 +40,12 @@ exports.generateDocx = function(templateFile, data){
 
 	return new Promise((resolve, reject) => {
 		try {
+
+            data.current_date = moment().format('DD.MM.YYYY');
+            data.project_name = settings.project.get('projectname');
+            data.project_iban = settings.project.get('project_iban');
+            data.project_bic = settings.project.get('project_bic');
+
 			var path = templateFile;
 			var file = fs.readFileSync(path, 'binary');
 			var zip = new JSZipUtils(file);

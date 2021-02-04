@@ -96,7 +96,8 @@ module.exports = function(app){
 					interest_rate: req.body.interest_rate,
 					user_id: req.body.user_id,
 					status: req.body.status,
-					notes: req.body.notes
+					notes: req.body.notes,
+					notes_public: req.body.notes_public?true:false
 				}, { trackOptions: utils.getTrackOptions(req.user, true) });
 			})
 			.then(contract => models.contract.findOne({ where : { id: contract.id }, include: [{model: models.transaction, as: "transactions"}]}))
@@ -150,7 +151,8 @@ module.exports = function(app){
 					amount: parseFloat(req.body.amount),
 					interest_rate: parseFloat(req.body.interest_rate),
 					status: req.body.status,
-					notes: req.body.notes
+					notes: req.body.notes,
+					notes_public: req.body.notes_public?true:false
 				}, {where:{id:req.body.id}, trackOptions: utils.getTrackOptions(req.user, true)});
 			})
 
