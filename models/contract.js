@@ -149,7 +149,7 @@ module.exports = (sequelize, DataTypes) => {
 			}
 		});
 		var sum = this.getAmountToDate(date, undefined);
-		return count > 1 && sum <= 0;
+		return count > 1 && sum < 0.01;
 	};
 
 	// get first deposit (initial) transaction date
@@ -265,7 +265,7 @@ module.exports = (sequelize, DataTypes) => {
 			}
 		});
 		if (sum > 0) {
-			return sum;
+			return Math.ceil(sum * 100) / 100;
 		} else {
 			return 0;
 		}
@@ -280,7 +280,7 @@ module.exports = (sequelize, DataTypes) => {
 			}
 		});
 		if (sum > 0) {
-			return sum;
+			return Math.ceil(sum * 100) / 100;
 		} else {
 			return 0;
 		}
