@@ -111,7 +111,7 @@ $(document).ready(function(){
 
 	detailsTable = $('#details-table').DataTable({
 		language: dataTableLanguange,
-		order: [[ 3, 'desc' ]]
+		order: [[ 5, 'desc' ]]
 	});
 
 	$("#details-table").removeClass("d-none");

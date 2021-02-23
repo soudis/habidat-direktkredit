@@ -88,11 +88,17 @@ exports.getGermanContractsByYearAndInterestRate = function(effectiveDate = undef
 
 				// loop over all contracts and assign them to all ranges and build result
 				var result = [];
+				var contractsPerInterest = {};
 				users.forEach(user => {
 					user.contracts.forEach(contract => {
 						if ((!interestRate || contract.interest_rate == interestRate) && (!ignoreId || ignoreId != contract.id)) {
 							contract.user = user;
 							var signDate = moment(contract.sign_date);
+							if (contractsPerInterest[contract.interest_rate.toString()]) {
+								contractsPerInterest[contract.interest_rate.toString()] ++;
+							} else {
+								contractsPerInterest[contract.interest_rate.toString()] = 1; 
+							}
 							ranges.forEach(range => {
 								if (signDate.isSameOrAfter(range.startDate) && signDate.isSameOrBefore(range.endDate)) {
 									var entry = result.find(entry => { return entry.startDate.isSame(range.startDate) && entry.endDate.isSame(range.endDate) && entry.interestRate === contract.interest_rate})
@@ -102,24 +108,56 @@ exports.getGermanContractsByYearAndInterestRate = function(effectiveDate = undef
 											endDate: range.endDate,
 											interestRate: contract.interest_rate,
 											totalAmount: contract.amount,
-											contracts: [contract]
+											contracts: [contract],
+											id: contract.id.toString()
 										})
 									} else {
 										entry.totalAmount += contract.amount;
 										entry.contracts.push(contract);
+										entry.id = entry.id + ',' + contract.id
 									}
 								}
 							})
 						}
 					})
 				})
+				console.log(contractsPerInterest);
+				result.sort((a, b) => {
+					if (a.id < b.id) {
+						return -1;
+					} else if (a.id > b.id) {
+						return 1;
+					} else {
+						return a.startDate.diff(b.startDate, 'days');
+					}
+				})
+
+				result.forEach(entry => { console.log(entry.id, entry.startDate.format('DD.MM.YYYY'), entry.endDate.format('DD.MM.YYYY'))})
+
+				// merge time ranges with same result
+				var currentEntry;
+				var resultMerged = [];
+				result.forEach(entry => {
+					if (!currentEntry || currentEntry.id !== entry.id) {
+						if (currentEntry) {
+							resultMerged.push(currentEntry);
+						}
+						currentEntry = entry;
+						currentEntry.contractsPerInterest = contractsPerInterest[currentEntry.interestRate];
+						currentEntry.contracts.sort((a,b) => { return moment(a.sign_date).diff(b.sign_date);});
+					}
+					currentEntry.endDate = entry.endDate;
+				})
+				if (currentEntry) {
+					resultMerged.push(currentEntry);
+				}
 
 				// sort ranges with largest total amount first
-				result.sort((a, b) => {
+				resultMerged.sort((a, b) => {
 					return b.totalAmount - a.totalAmount;
 				})
 
-				return result;
+				return resultMerged;
 			}
 		});
 }
