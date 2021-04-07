@@ -1,7 +1,7 @@
 /* jshint esversion: 8 */
 $(document).ready(function(){
 	var orderBy = 1;
-	if ($('.dataTable').hasClass('selectable')) {
+	if ($('#datatable').hasClass('selectable')) {
 		orderBy = 2;
 	}
     table = $('#datatable').DataTable({
@@ -461,7 +461,7 @@ $(document).ready(function(){
     });
 
     $(document).on( 'click', '.export-data', function () {
-    	var interest_year = $('.dataTable').data('interest-year');
+    	var interest_year = $('#datatable').data('interest-year');
         var fields = $('#column_select').val();
         var users = [];
         table.column('user_id:name', { search:'applied' }).data().each((value) => users.push(value));
@@ -471,10 +471,10 @@ $(document).ready(function(){
         	errorAlert('Keine Einträge ausgewählt');
         	return false;
         }
-        if ($('.dataTable').hasClass('selectable')) {
+        if ($('#datatable').hasClass('selectable')) {
 	       var selected = [];
 	       $.each(table.rows('.selected').data(), function() {
-	           	selected.push(this[11].display);
+	           	selected.push(this[17].display);
 	       });
 	       contracts = contracts.filter(contract => { return selected.includes(contract);});
 	       selected = [];
@@ -487,7 +487,7 @@ $(document).ready(function(){
         $('<form action="' + action + '" method="POST"></form>')
             .append('<input name="fields" value="' + fields + '" />')
             .append('<input name="users" value="' + users + '" />')
-            .append('<input name="interest_year" value="' + interest_year + '" />')
+            .append(interest_year?'<input name="interest_year" value="' + interest_year + '" />':'')
             .append('<input name="contracts" value="' +contracts + '" />')
             .appendTo('body')
             .submit()
@@ -506,13 +506,13 @@ $(document).ready(function(){
       $(location).attr("href", _url("/process/interestpayment/" + $(this).val()));
     });
 
-    $(document).on( 'click', '.dataTable.selectable td.selectable', function () {
+    $(document).on( 'click', '#datatable.selectable td.selectable', function () {
         $(this).parent().toggleClass('selected');
         $(this).parent().find('td.selector span').toggleClass('d-none');
         updateSelected();
     } );
 
-    $(document).on( 'click', '.dataTable.selectable th.selector', function () {
+    $(document).on( 'click', '#datatable.selectable th.selector', function () {
     	if ($(this).hasClass('selected')) {
     		$(this).removeClass('selected');
     		$(this).children('span.selected').addClass('d-none');
