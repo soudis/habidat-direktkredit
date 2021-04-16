@@ -134,6 +134,11 @@ module.exports = function(app){
 						relationship = settings.project.get('defaults.relationships')[0];
 					}
 
+					var country = getValue('user_country', req.body.country);
+					if (country) {
+						country = country.toUpperCase();
+					}
+
 					return models.user.create(
 						{
 							id: userId,
@@ -147,7 +152,7 @@ module.exports = function(app){
 							place: getValue('user_place', req.body.place),
 							telno: getValue('user_telno', req.body.telno),
 							email: getValue('user_email', req.body.email),
-							country: getValue('user_country', req.body.country).toUpperCase(),
+							country: country,
 							IBAN: getValue('user_iban', req.body.IBAN),
 							BIC: getValue('user_bic', req.body.BIC),
 							account_notification_type: getValue('user_account_notification_type', req.body.account_notification_type),
