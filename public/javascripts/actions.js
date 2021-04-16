@@ -205,7 +205,6 @@ $(document).ready(function(){
 	        	if (data.error) {
 	        		form.parent().append(data.html);
 	        	} else {
-					hideSidebar();
 					if (data.redirect) {
 		  				redirectOrReload(data.redirect);
 		  			} else if (data.message) {
@@ -214,9 +213,13 @@ $(document).ready(function(){
 		       		var action = form.attr('update-action');
 		       		var tag = form.attr('update-tag');
 		       		if (action == 'append') {
+   					    hideSidebar();
 		       			$('#' + tag).append(data);
 		       		} else if (action == 'replace') {
 		       			$('#' + tag).replaceWith(data);
+   					    hideSidebar();
+		       		} else if (action === 'replace_self') {
+		       			form.replaceWith(data);
 		       		}
 	        	}
 	       	},

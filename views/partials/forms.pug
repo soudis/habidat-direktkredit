@@ -1,5 +1,5 @@
-mixin form(action, title=undefined)
-  form.form-horizontal.update-form(class=attributes.class action=_url(action) method="post" role="form" update-action=attributes.updateAction update-tag=attributes.updateTag)
+mixin form(action, title=undefined, updateForm = true)
+  form.form-horizontal(class=(updateForm?'update-form ':'')+attributes.class||'' action=_url(action) method="post" role="form" update-action=attributes.updateAction update-tag=attributes.updateTag)
     legend=title || _t('form' + action.split('/').join('_'))
     block
 
@@ -37,7 +37,7 @@ mixin group_select(name)
 mixin file(name, label=undefined)
   +input_group(label||_t(name))(class=attributes.class icon=attributes.icon help=attributes.help)
     .custom-file
-      input.custom-file-input(type='file' name=name value=attributes.value id=attributes.id||name lang="de" required=attributes.required)          
+      input.custom-file-input(type='file' name=name value=attributes.value id=attributes.id||name lang="de" required=attributes.required accept=attributes.accept)          
       label.custom-file-label(for=attributes.id||name)=_t('choose_file')
 
 mixin date(name, label=undefined)
@@ -87,7 +87,7 @@ mixin tags(name, label=undefined)
 
 mixin group_file(name)
   .custom-file(id=attributes.id||name class=attributes.class)
-    input.custom-file-input(type='file' name=name value=attributes.value id=attributes.inputId)    
+    input.custom-file-input(type='file' name=name value=attributes.value id=attributes.inputId required=attributes.required)    
     label.custom-file-label(for=attributes.id||name)=_t('choose_file')
 
 mixin group_output(name)
@@ -95,7 +95,7 @@ mixin group_output(name)
 
 mixin submit_button(label=_t('save'))
   .text-right
-    button.submit-button(type='submit' class='btn btn-primary')=label
+    button.submit-button.btn.btn-primary(type='submit' class=attributes.class)=label
 
 mixin checkbox(name, label=undefined)
   .form-group
@@ -126,3 +126,9 @@ mixin output_image(name, src)
     if attributes.help
       small.form-text.text-muted(id=name+"_help")=attributes.help
                     
+mixin is_import(column, name=undefined, label=undefined)
+  if importMappings && importMappings[column] !== undefined
+    +input_group(label || _t(name || column))(icon='fa-file-export')(class=attributes.groupClass)
+      +group_input(name || column)(value=importFileColumns[importMappings[column]].header type="text" disabled="disabled")
+  else
+    block

@@ -2,10 +2,21 @@ mixin contractlist(contracts)
   .d-none(id="datatable_parent")
     .d-none.datatable-buttons(for-id="datatable_length")
 
-      if attributes.fnExport
+      if attributes.fnExport 
         .datatable-button
-          a.datatable-button.btn.btn-light.export-data(href='#' title="Daten exportieren")
-            span.fa.fa-file-import 
+          if attributes.fnExport
+            a.datatable-button.btn.btn-light.export-data(href='#' title="Daten exportieren")
+              span.fa.fa-file-import 
+
+      if attributes.fnImport
+        .datatable-button
+            a.datatable-button.btn.btn-light.sidebar-action(href=_url('/process/import') title="Daten importieren")
+              span.fa.fa-file-export             
+
+      if attributes.fnSelectable && attributes.fnBulkDelete
+        .datatable-button
+            a.datatable-button.btn.btn-light.bulk-delete(href='#' title="Ausgewählte " + _t(attributes.fnBulkDelete+'s') + " löschen" data-target=attributes.fnBulkDelete)
+              span.fa.fa-trash                     
 
       if attributes.fnViews
         .input-group.datatable-button

@@ -494,6 +494,43 @@ $(document).ready(function(){
             .remove();
     });
 
+    $(document).on( 'click', '.bulk-delete', function () {
+        var target = $(this).data('target');
+        bootbox.confirm({
+            message: "Ausgewählte Datensätze löschen?",
+            buttons: {
+                confirm: {
+                    label: 'Ja',
+                    className: 'btn-success'
+                },
+                cancel: {
+                    label: 'Lieber nicht',
+                    className: 'btn-danger'
+                }
+            },
+            callback: function (result) {
+                if (result) {
+                    var ids = [];
+                    $.each(table.rows('.selected').data(), function() {
+                        ids.push(this[ table.column(target + "_id:name").index()].display);
+                    });
+                    if (ids.length === 0) {
+                        bootbox.alert('Keine Zeilen ausgewählt')
+                    } else {
+                        $.post(_url('/' + target + '/bulkdelete'), { ids: JSON.stringify(ids) })
+                            .done(response => {
+                                if (response.error) {
+                                    bootbox.alert(response.error)
+                                } else {
+                                    table.rows('.selected').remove().draw();
+                                }                    
+                            });            
+                    }   
+                }                
+            }
+        });        
+    });
+
     var updateSelected = function() {
        var contracts = [];
        $.each(table.rows('.selected').data(), function() {

@@ -115,12 +115,21 @@ module.exports = (sequelize, DataTypes) => {
 
 
 	transaction.prototype.getLink = function (req) {
-		var url = utils.generateUrl(req, `/user/show/${this.contract.user.id}#show_transaction_${this.id}`);
-		return `<a href="${url}">${moment(this.transaction_date).format('DD.MM.YYYY')}</a>`;
+		if (this.contract && this.user) {
+			var url = utils.generateUrl(req, `/user/show/${this.contract.user.id}#show_transaction_${this.id}`);
+			return `<a href="${url}">${moment(this.transaction_date).format('DD.MM.YYYY')}</a>`;			
+		} else {
+			return moment(this.transaction_date).format('DD.MM.YYYY');
+		}
 	}
 
 	transaction.prototype.getDescriptor = function (req, models) {
-		return `Zahlung vom ${this.getLink(req)} für den Vertrag vom ${this.contract.getLink(req)} von ${this.contract.user.getLink(req)}`;
+		if (this.contract) {
+			return `Zahlung vom ${this.getLink(req)} für den Vertrag vom ${this.contract.getLink(req)} von ${this.contract.user.getLink(req)}`;			
+		} else {
+			return `Zahlung vom ${this.getLink(req)} für den Vertrag ${this.contract_id}`;
+		}
+		
 	};
 
 

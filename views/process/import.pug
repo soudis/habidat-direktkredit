@@ -1,0 +1,8 @@
+include ../partials/forms
+
++form('/process/import')(updateAction='replace_self')
+  +select('import_target')(icon='fa-file-export')
+    +option('user',_t('users'))
+    +option('contract',_t('contracts'))
+  +file('file')(icon='fa-upload' accept='.xlsx' required=true )
+  +submit_button('Weiter')

@@ -283,19 +283,62 @@ module.exports = (sequelize, DataTypes) => {
 			});
 	};
 
+	User.validateEmailAddress = function(email, ignoreWarning = false) {
+		return Promise.resolve()
+			.then(() => {
+				if (!email || email === '') {
+					if (!ignoreWarning) {
+						throw new utils.Warning('Ohne E-Mailadresse kann sich der*die Kreditgeber*in nicht einloggen');
+					} else {
+						return;
+					}
+				} else {
+					return User.emailAddressTaken(email)
+						.then(taken => {
+							if (taken) {
+								throw "E-Mailadresse " + email + " wird bereits verwendet";
+							} else {
+								return ;
+							}
+						})
+				}
+			})
+	}
+
+	User.validateOrGenerateId = function(id = undefined) {
+		return Promise.resolve()
+			.then(() => {
+				if (id && id !== '') {
+					return User.findByPk(id)
+						.then(taken => {
+							if (taken) {
+								throw "Kontonummer " + id + " bereits vergeben";
+							} else {
+								return id;
+							}
+						})
+				} else {
+					return User.max('id')
+						.then(id => {
+							return id + 1;
+						})
+				}
+			})
+	}
+
 
 	User.getColumns = function () {
 		return {
 			user_id: {id: "user_id",  label: "Kontonummer", filter: 'text'},
 			user_type: {id: "user_type",  label: "Benutzer*innentyp", filter: 'list'},
-			user_is_person: {id: "user_is_person",  label: "Indikator ob Benutzer*in eine natürliche Person ist", filter: 'text'},
+			user_is_person: {id: "user_is_person",  label: "Indikator ob Benutzer*in eine natürliche Person ist", filter: 'text', displayOnly: true},
 			user_title_prefix: {id: "user_title_prefix",  label: "Titel", filter: 'text'},
 			user_first_name: {id: "user_first_name",  label: "Vorname", filter: 'text'},
 			user_last_name: {id: "user_last_name",  label: "Nachname", filter: 'text'},
 			user_title_suffix: {id: "user_title_suffix",  label: "Titel, nachgestellt", filter: 'text'},
-			user_name: {id: "user_name",  label: "Name", priority: "2", filter: 'text'},
-			user_address: {id: "user_address",  label: "Adresse", filter: 'text'},
-			user_address_oneline: {id: "user_address_oneline",  label: "Adresse (einzeilig)", filter: 'text'},
+			user_name: {id: "user_name",  label: "Name", priority: "2", filter: 'text', displayOnly: true},
+			user_address: {id: "user_address",  label: "Adresse", filter: 'text', displayOnly: true},
+			user_address_oneline: {id: "user_address_oneline",  label: "Adresse (einzeilig)", filter: 'text', displayOnly: true},
 			user_telno: {id: "user_telno",  label:"Telefon", filter: 'text'},
 			user_email: {id: "user_email",  label:"E-Mail", filter: 'text'},
 			user_iban: {id: "user_iban",  label:"IBAN", filter: 'text'},
@@ -305,7 +348,7 @@ module.exports = (sequelize, DataTypes) => {
 			user_zip: {id: "user_zip",  label: "PLZ", filter: 'text'},
 			user_place: {id: "user_place",  label: "Ort", filter: 'text'},
 			user_country: {id: "user_country",  label: "Land", filter: 'text'},
-			user_logon_id: {id: "user_logon_id",  label: "Anmeldename", filter: 'text'},
+			user_logon_id: {id: "user_logon_id",  label: "Anmeldename", filter: 'text', displayOnly: true},
 			user_account_notification_type: {id: "user_account_notification_type",  label: "Kontomitteilung", filter: 'list'}
 		}
 	}

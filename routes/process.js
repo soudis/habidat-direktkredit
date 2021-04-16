@@ -7,7 +7,9 @@ const models  = require('../models');
 const email = require('../utils/email');
 const settings = require('../utils/settings');
 const contracttable = require('../utils/contracttable');
+const exceljs = require('exceljs');
 const multer = require('multer');
+const _t = require('../utils/intl')._t;
 const Op = require("sequelize").Op;
 
 module.exports = function(app){
@@ -75,6 +77,99 @@ module.exports = function(app){
 	  		})
 	  		.catch(error => next(error));
 	});
+
+    router.get('/process/import', security.isLoggedInAdmin, function(req, res, next) {
+	  	res.render('process/import');
+	});
+
+    router.post('/process/import', security.isLoggedInAdmin, multer({dest:'./upload/'}).single('file'), function(req, res, next) {
+    	Promise.resolve()
+    		.then(() => {
+    			// read file
+    			var workbook = new exceljs.Workbook();
+    			if (req.file.mimetype === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet') {
+					return workbook.xlsx.readFile(req.file.path);
+    			} else if (req.file.mimetype === 'text/csv') {
+					return workbook.csv.readFile(req.file.path, {dateFormats: ['DD.MM.YYYY'], parserOptions: { delimiter: ',', quote: true }});
+    			} else {
+    				throw(_t('error_wrong_filetype'));
+    			}
+    		})
+    		.then(workbook => {
+    			var worksheet = workbook.worksheets[0];
+    			var header = worksheet.getRow(1);
+    			var example = worksheet.getRow(2);
+    			var dbColumns = models[req.body.import_target].getColumns();
+    			var fileColumns = [];
+    			header.eachCell((cell, colNumber) => {
+    				var fileColumn = cell.value;
+	    			// try to find a matching db column
+    				var dbColumn = Object.keys(dbColumns).find(dbColumn => {
+    					if (dbColumns[dbColumn].displayOnly !== true) {
+							if (fileColumn.toLowerCase() === dbColumn.toLowerCase()) {
+	    						return true;
+	    					} else if (fileColumn.toLowerCase() === dbColumns[dbColumn].label.toLowerCase()) {
+	    						return true;
+	    					} else {
+	    						return false;
+	    					}
+    					} else {
+    						delete dbColumns[dbColumn];
+    						return false;
+    					} 					
+    				})
+    				// second try with includes
+    				if (!dbColumn) {
+    					dbColumn = Object.keys(dbColumns).find(dbColumn => {
+							if (fileColumn.toLowerCase().includes(dbColumns[dbColumn].label.toLowerCase()) || dbColumns[dbColumn].label.toLowerCase().includes(fileColumn.toLowerCase())) {
+	    						return true;
+	    					} else {
+	    						return false;
+	    					}    						
+    					});
+    				}
+    				var exampleCell = example.getCell(colNumber);
+    				var exampleValue = exampleCell.value;
+    				if (exampleCell.type === exceljs.ValueType.Date) {
+    					exampleValue = moment(exampleValue).format('DD.MM.YYYY');
+    				} else if (exampleCell.text) {
+    					exampleValue = exampleCell.text;
+    				}
+    				fileColumns.push({header: fileColumn, mapping: dbColumn, example: exampleValue});
+    			})
+    			return models.file.create({
+							filename: req.file.originalname,
+							description: req.body.description,
+							mime: req.file.mimetype,
+							path: req.file.path,
+							ref_table: 'import_' + req.body.import_target,
+						}, { trackOptions: utils.getTrackOptions(req.user, true) })
+    				.then(result => {
+						res.render('process/import_mapping', { fileColumns: fileColumns, dbColumns: dbColumns, importTarget: req.body.import_target, fileId: result.id} );
+    				})    			
+    		})
+    		.catch(error => next(error));
+	});
+
+    router.post('/process/import_mapping', security.isLoggedInAdmin, multer().none(), function(req, res, next) {
+    	Promise.resolve()
+    		.then(file => {
+    			var fileColumns = JSON.parse(req.body.file_columns);
+    			var importMappings = {};
+    			fileColumns.forEach((fileColumn, index) => {
+    				if (req.body['file_column_' + index] !== 'not_assigned') {
+    					importMappings[req.body['file_column_' + index]] = index;
+    				}
+    			})
+    			if (req.body.import_target === 'contract' && importMappings['contract_user_id'] === undefined) {
+    				throw "Eine Spalte der Datei muss der Kontonummer zugeordnet werden"
+    			}
+
+    			res.render(req.body.import_target + '/import', { importMappings: importMappings, importFileColumns: fileColumns, importFileId: req.body.file_id, importTarget: req.body.import_target})
+    		})
+    		.catch(error => next(error));
+    });
+
 
 	app.use('/', router);
 };
