@@ -135,9 +135,10 @@ module.exports = function(app){
 					}
 
 					var country = getValue('user_country', req.body.country);
-					if (country) {
-						country = country.toUpperCase();
-					}
+					if (!country) {
+						country = settings.project.get('defaults.country');
+					} 
+					country = country.toUpperCase();
 
 					return models.user.create(
 						{
