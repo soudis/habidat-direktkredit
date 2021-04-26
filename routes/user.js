@@ -124,6 +124,22 @@ module.exports = function(app){
 					if (!['organisation', 'person'].includes(user_type)) {
 						throw dbColumns['user_type'].label + ' muss entweder "organsiation" oder "person" sein';
 					}
+					var first_name = user_type==='person'?getValue('user_first_name', req.body.first_name):getValue('user_first_name', req.body.organisation_name);
+					var last_name = user_type==='person'?getValue('user_last_name', req.body.last_name):null;
+
+					if (user_type === 'person') {
+						if (!!!first_name) {
+							throw 'Vorname fehlt';
+						}
+						if (!!!last_name) {
+							throw 'Nachname fehlt';
+						}
+					} else if (user_type === 'organsiation') {
+						if (!!!first_name) {
+							throw 'Organisationsname fehlt';
+						}						
+					}
+
 					var relationship = getValue('user_relationship', req.body.relationship);
 					var allowedRelationships = settings.project.get('defaults.relationships').map(rel => { return rel.toLowerCase();});
 					if (relationship && relationship !== '' && !allowedRelationships.includes(relationship.toLowerCase())) {

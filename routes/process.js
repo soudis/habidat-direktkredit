@@ -164,6 +164,11 @@ module.exports = function(app){
     			if (req.body.import_target === 'contract' && importMappings['contract_user_id'] === undefined) {
     				throw "Eine Spalte der Datei muss der Kontonummer zugeordnet werden"
     			}
+    			if (req.body.import_target === 'user') {
+    				if (importMappings['user_first_name'] === undefined) {
+    					throw 'Eine Spalte der Datei muss dem Feld Vorname zugeordnet werden';
+    				}
+    			}
 
     			res.render(req.body.import_target + '/import', { importMappings: importMappings, importFileColumns: fileColumns, importFileId: req.body.file_id, importTarget: req.body.import_target})
     		})
