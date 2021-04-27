@@ -305,7 +305,7 @@ module.exports = (sequelize, DataTypes) => {
 			})
 	}
 
-	User.validateOrGenerateId = function(id = undefined) {
+	User.validateOrGenerateId = function(id = undefined, increment = 1) {
 		return Promise.resolve()
 			.then(() => {
 				if (id && id !== '') {
@@ -320,7 +320,7 @@ module.exports = (sequelize, DataTypes) => {
 				} else {
 					return User.max('id')
 						.then(id => {
-							return id + 1;
+							return id + increment;
 						})
 				}
 			})

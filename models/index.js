@@ -8,6 +8,7 @@ const settings  	= require('../utils/settings');
 const Umzug 		= require('umzug');
 const tracker       = require('../utils/tracker');
 const crypto 		= require('crypto');
+const config        = require('../config/config.json');
 
 var createdb = function() {
 
@@ -17,7 +18,7 @@ var createdb = function() {
 		dbURI = settings.config.get('database.dialect')+ '://' + settings.config.get('database.username') + ':' + encodeURIComponent(settings.config.get('database.password')) + '@' + settings.config.get('database.host') + '/' + settings.config.get('database.database');
 	}
 	var sequelize = new Sequelize(dbURI, {
-		logging: false,
+		logging: config.debug?console.log:false,
 		pool: {
 			idle: 30000,
 			min: 1,

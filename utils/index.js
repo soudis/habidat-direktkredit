@@ -11,7 +11,7 @@ const settings = require('./settings');
 const docxtemplates = require('docx-templates');
 const models  = require('../models');
 const Promise = require('bluebird');
-
+const Sequelize 	= require("sequelize");
 
 exports.render = (req, res, template, data, title = undefined) => {
 	return Promise.resolve()
@@ -160,13 +160,13 @@ exports.processImportFile = function(fileId, importTarget, importMappings, valid
 				if (rowIndex > 1) {
 
 					promises.push(
-						validateAndCreate(getValue)
-							.then(object => {
-								return { success: true,  rowIndex: rowIndex, row: row, object: object };
-							})
-							.catch(error => {
-								return { success: false, rowIndex: rowIndex, row: row, error : error};
-							})						
+							validateAndCreate(getValue, rowIndex)
+								.then(object => {
+									return { success: true,  rowIndex: rowIndex, row: row, object: object };
+								})
+								.catch(error => {
+									return { success: false, rowIndex: rowIndex, row: row, error : error};
+								})						
 					)
 				}
 

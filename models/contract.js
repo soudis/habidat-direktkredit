@@ -113,10 +113,10 @@ module.exports = (sequelize, DataTypes) => {
 		}
 	}
 
-	contract.validateOrGenerateId = function(id = undefined) {
+	contract.validateOrGenerateId = function(id = undefined, increment = 1) {
 		return Promise.resolve()
 			.then(() => {
-				if (id && id !== '') {
+				if (!!id) {
 					return contract.findByPk(id)
 						.then(taken => {
 							if (taken) {
@@ -128,7 +128,7 @@ module.exports = (sequelize, DataTypes) => {
 				} else {
 					return contract.max('id')
 						.then(id => {
-							return id + 1;
+							return id + increment;
 						})
 				}
 			})

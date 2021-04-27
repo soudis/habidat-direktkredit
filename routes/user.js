@@ -115,9 +115,9 @@ module.exports = function(app){
 
 	router.post('/user/import', security.isLoggedInAdmin, multer().none(), function(req, res, next) {
 
-		var validateAndCreate = function(getValue) {
+		var validateAndCreate = function(getValue, rowIndex) {
 			return models.user.validateEmailAddress(getValue('user_email', req.body.email), true)
-				.then(() => models.user.validateOrGenerateId(getValue('user_id', req.body.id)))
+				.then(() => models.user.validateOrGenerateId(getValue('user_id', req.body.id), rowIndex - 1))
 				.then(userId => {
 					var user_type = getValue('user_type', req.body.type).toLowerCase();
 					var dbColumns = models.user.getColumns();
@@ -178,7 +178,7 @@ module.exports = function(app){
 							relationship: relationship
 						}, 
 						{ 
-							trackOptions: utils.getTrackOptions(req.user, true) 
+							trackOptions: utils.getTrackOptions(req.user, true)
 						});									
 				})			
 		}

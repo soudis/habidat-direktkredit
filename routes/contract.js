@@ -40,9 +40,9 @@ module.exports = function(app){
 
 	router.post('/contract/import', security.isLoggedInAdmin, multer().none(), function(req, res, next) {
 
-		var validateAndCreate = function(getValue) {
+		var validateAndCreate = function(getValue, rowIndex) {
 			return Promise.join(models.user.findByPk(getValue('contract_user_id')),
-					models.contract.validateOrGenerateId(getValue('contract_id', req.body.id)),
+					models.contract.validateOrGenerateId(getValue('contract_id', req.body.id), rowIndex - 1 ),
 				(user, contractId) => {
 					var userId = getValue('contract_user_id');
 					if (userId === undefined || userId === null || userId === '') {
