@@ -444,6 +444,20 @@ module.exports = (sequelize, DataTypes) => {
 		return oldest;;
 	};
 
+	User.prototype.getLastWithdrawal = function () {
+		var newest;
+		this.contracts.forEach(contract => {
+			contract.transactions.forEach(transaction => {
+				if (transaction.amount < 0 && (!newest || moment(transaction.transaction_date).isAfter(newest.transaction_date))) {
+					newest = transaction;
+				}
+
+			})
+		})
+		return newest?.transaction_date;
+	};
+
+
 
 	User.prototype.getFullName = function () {
 		var name = this.first_name;
