@@ -680,9 +680,9 @@ module.exports = (sequelize, DataTypes) => {
 				contract.transactions.forEach(function(transaction) {
 					if (firstDay.diff(transaction.transaction_date) >= 0) {
 						sums.begin.amount += transaction.amount;
-						sums.begin.interest += + transaction.interestToDate(contract.interest_rate,  moment(firstDay));
+						sums.begin.interest += transaction.interestToDate(contract.interest_rate,  moment(firstDay));
 						sums.end.amount += transaction.amount;
-						sums.end.interest += + transaction.interestToDate(contract.interest_rate, moment(firstDayNextYear));
+						sums.end.interest += transaction.interestToDate(contract.interest_rate, moment(firstDayNextYear));
 					} else  if ( firstDay.diff(transaction.transaction_date) < 0 && firstDayNextYear.diff(transaction.transaction_date) >= 0) {
 						var trans =  {
 							id : user.id,
@@ -701,7 +701,7 @@ module.exports = (sequelize, DataTypes) => {
 						sums.transactions++;
 						lastTransaction = transaction.transaction_date;
 						sums.end.amount += transaction.amount;
-						sums.end.interest += + transaction.interestToDate(contract.interest_rate, moment(firstDayNextYear));
+						sums.end.interest += transaction.interestToDate(contract.interest_rate, moment(firstDayNextYear));
 
 					}
 				});
@@ -710,6 +710,7 @@ module.exports = (sequelize, DataTypes) => {
 				sums.end.interest = Math.round(sums.end.interest*100) / 100;
 				if (contract.isTerminated(firstDayNextYear)) {
 					sums.end.interest = -sums.end.amount;
+					sums.interest = Math.round((-sums.end.amount - sums.begin.interest) * 100) / 100;
 					sums.end.amount = 0;
 				} else if (sums.end.amount >0 || sums.end.interest >0){
 					var endBalance = {
@@ -736,7 +737,7 @@ module.exports = (sequelize, DataTypes) => {
 						interest_rate: contract.interest_rate,
 						date: firstDay,
 						type: 'Kontostand Jahresbeginn',
-						amount: sums.begin.amount + sums.begin.interest,
+						amount: Math.round((sums.begin.amount + sums.begin.interest) * 100) / 100,
 						interest: sums.begin.interest,
 						interest_payment_type: contract.getInterestPaymentType(),
 						order: 1
