@@ -57,6 +57,7 @@ try{
 	router.use('/public/popper', express.static(path.join(__dirname, 'node_modules/@popperjs/core/dist/umd'),  { maxAge: oneDay }));
 	router.use('/public/webfonts', express.static(path.join(__dirname, 'node_modules/@fortawesome/fontawesome-free/webfonts'), { maxAge: oneDay }));
 	router.use('/public/multiselect', express.static(path.join(__dirname, 'node_modules/bootstrap-multiselect/dist/js'), { maxAge: oneDay }));
+	router.use('/public/multiselect', express.static(path.join(__dirname, 'node_modules/bootstrap-multiselect/dist/css'), { maxAge: oneDay }));
 	router.use('/public/datatables', express.static(path.join(__dirname, 'node_modules/datatables.net-responsive/js'), { maxAge: oneDay }));
 	router.use('/public/datatables', express.static(path.join(__dirname, 'node_modules/datatables.net-responsive-bs4/js'), { maxAge: oneDay }));
 	router.use('/public/datatables', express.static(path.join(__dirname, 'node_modules/datatables.net-responsive-bs4/css'), { maxAge: oneDay }));

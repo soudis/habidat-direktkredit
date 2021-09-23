@@ -124,8 +124,10 @@ module.exports = (sequelize, DataTypes) => {
 	}
 
 	transaction.prototype.getDescriptor = function (req, models) {
-		if (this.contract) {
+		if (this.contract && this.contract.user) {
 			return `Zahlung vom ${this.getLink(req)} für den Vertrag vom ${this.contract.getLink(req)} von ${this.contract.user.getLink(req)}`;			
+		} else if (this.contract) {
+			return `Zahlung vom ${this.getLink(req)} für den Vertrag vom ${this.contract.getLink(req)}`;			
 		} else {
 			return `Zahlung vom ${this.getLink(req)} für den Vertrag ${this.contract_id}`;
 		}

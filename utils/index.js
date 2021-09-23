@@ -1,6 +1,6 @@
 /* jshint esversion: 8 */
 const DocxGen = require('docxtemplater');
-const JSZipUtils = require('jszip');
+const PizZip = require('pizzip');
 const fs = require('fs');
 const moment = require('moment');
 const converter = require('libreoffice-convert');
@@ -8,7 +8,6 @@ const json2csv = require('json2csv');
 const exceljs = require('exceljs');
 const urlUtil = require('url');
 const settings = require('./settings');
-const docxtemplates = require('docx-templates');
 const models  = require('../models');
 const Promise = require('bluebird');
 const Sequelize 	= require("sequelize");
@@ -40,27 +39,22 @@ exports.getTrackOptions = function(user, track) {
 
 exports.generateDocx = function(templateFile, data){
 
-	return new Promise((resolve, reject) => {
-		try {
-
-            data.current_date = moment().format('DD.MM.YYYY');
-            data.project_name = settings.project.get('projectname');
-            data.project_iban = settings.project.get('project_iban');
-            data.project_bic = settings.project.get('project_bic');
+	return Promise.resolve()
+		.then(() => {
+			data.current_date = moment().format('DD.MM.YYYY');
+			data.project_name = settings.project.get('projectname');
+			data.project_iban = settings.project.get('project_iban');
+			data.project_bic = settings.project.get('project_bic');
 
 			var path = templateFile;
 			var file = fs.readFileSync(path, 'binary');
-			var zip = new JSZipUtils(file);
 			var doc=new DocxGen();
+			var zip = new PizZip(file);	
 			doc.loadZip(zip);
 			doc.setData(data);
 			doc.render();
-			resolve(doc.getZip().generate({type:"nodebuffer"}));
-		} catch(error) {
-			reject(error);
-		}
-	})
-
+			return doc.getZip().generate({type:"nodebuffer"});					
+		});
 };
 
 exports.convertToPdf = function(stream){

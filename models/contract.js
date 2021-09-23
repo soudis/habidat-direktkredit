@@ -107,7 +107,7 @@ module.exports = (sequelize, DataTypes) => {
 			contract_status: {id: "contract_status",  label: "Status", class: "text-center", priority: "2", filter: 'list'},
 			contract_has_interest: {id: "contract_has_interest",  label: "Zinssatz > 0", class: "text-center", priority: "2", filter: 'list', displayOnly: true},
 			contract_deposit_date: {id: "contract_deposit_date",  label: "Einzahlungsdatum", class: "text-right", filter: 'date'},
-			contract_deposit_amount: {id: "contract_deposit_amount",  label: "Einzahlungsbetrag / Kontostand (Import)", filter: 'text'},
+			contract_deposit_amount: {id: "contract_deposit_amount",  label: "Einzahlungsbetrag", filter: 'text'},
 			contract_notes: {id: "contract_notes",  label: "Vertragsnotizen", filter: 'text'},
 			contract_user_id: {id: "contract_user_id",  label: "Kontonummer", filter: 'text'}
 		}
@@ -264,12 +264,21 @@ module.exports = (sequelize, DataTypes) => {
 	};
 
 	contract.prototype.getLink = function (req) {
-		var url = utils.generateUrl(req, `/user/show/${this.user.id}#show_contract_${this.id}`);
-		return `<a href="${url}">${moment(this.sign_date).format('DD.MM.YYYY')}</a>`;
+		if (this.user) {
+			var url = utils.generateUrl(req, `/user/show/${this.user.id}#show_contract_${this.id}`);
+			return `<a href="${url}">${moment(this.sign_date).format('DD.MM.YYYY')}</a>`;			
+		} else {
+			return moment(this.sign_date).format('DD.MM.YYYY');
+		}
+		
 	}
 
 	contract.prototype.getDescriptor = function (req, models) {
-		return `Vertrag vom ${this.getLink(req)} von ${this.user.getLink(req)}`;
+		if (this.user) {
+			return `Vertrag vom ${this.getLink(req)} von ${this.user.getLink(req)}`;	
+		} else {
+			return `Vertrag vom ${this.getLink(req)}`;
+		}
 	};
 
 	contract.prototype.sortTransactions = function () {

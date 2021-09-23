@@ -64,6 +64,7 @@ $(document).ready(function(){
     $('#column_select').multiselect({
         buttonClass: 'btn btn-light',
         enableHTML: true,
+        maxHeight: 500,
         buttonText: function(options, select) {
             return '<span class="fa fa-columns "></span>';
         },
