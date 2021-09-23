@@ -61,6 +61,7 @@ mixin contract_form(action, updateAction, updateTag, editContract, updateForm = 
       $(".termination-type-"+$(this).val()).removeClass("d-none");
       $(".termination-type-group").find('input').attr('required', false);
       $(".termination-type-"+$(this).val()).find('input').attr('required', true);
+      $(".termination-type-T").find('input#termination_date_T').attr('required', false);
     });
 
     $('#termination_type_input').change();
