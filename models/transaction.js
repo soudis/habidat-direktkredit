@@ -137,10 +137,12 @@ module.exports = (sequelize, DataTypes) => {
 
 	transaction.prototype.interestToDate = function (rate, toDate) {
 
-		if (rate > 0 && moment(toDate).diff(this.transaction_date) >= 0) {
-			var methodString = settings.project.get('defaults.interest_method') || '365_compound';
-			var method = methodString.split('_')[0];
-			var methodCompound = methodString.split('_')[1];
+		var methodString = settings.project.get('defaults.interest_method') || '365_compound';
+		var method = methodString.split('_')[0];
+		var methodCompound = methodString.split('_')[1];
+
+		if (rate > 0 && moment(toDate).diff(this.transaction_date) >= 0 && (methodCompound !== 'nocompound' || this.type !== 'interestpayment')) {
+
 
 			var getBaseDays = function(date) {
 				if (method === 'ACT') {
