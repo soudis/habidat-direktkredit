@@ -505,7 +505,7 @@ module.exports = (sequelize, DataTypes) => {
 
 	User.prototype.setPasswordResetToken = function() {
 		this.passwordResetToken = crypto.randomBytes(16).toString('hex');
-		this.passwordResetExpires = Date.now() + 3600000 * 48; // 48 hours
+		this.passwordResetExpires = Date.now() + 3600000 * 168; // 1 week
 	}
 
 	User.prototype.hasNotTerminatedContracts = function (date) {
