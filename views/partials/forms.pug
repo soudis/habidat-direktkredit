@@ -42,7 +42,7 @@ mixin file(name, label=undefined)
 
 mixin date(name, label=undefined)
   +input_group(label||_t(name))(icon=attributes.icon || 'fa-calendar' class=attributes.groupClass)
-    +group_input(name)&attributes(attributes)(type='date' value=attributes.value?moment(attributes.value).format('YYYY-MM-DD'):undefined)
+    +group_input(name)&attributes(attributes)(class="alt-datepicker" type='date' value=attributes.value?moment(attributes.value).format('YYYY-MM-DD'):undefined)
 
 mixin money(name, label=undefined)
   +input_group(label||_t(name))(icon=attributes.icon || 'fa-euro-sign')

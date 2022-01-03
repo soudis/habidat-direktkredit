@@ -55,7 +55,7 @@ module.exports = (sequelize, DataTypes) => {
 	};
 
 	file.prototype.getLink = function (req) {
-		if (this.ref_table === 'user') {
+		if (this.ref_table === 'user' && this.user) {
 			var url = utils.generateUrl(req, `/user/show/${this.user.id}#show_file_${this.id}`);		
 			return `<a href="${url}">${this.filename}</a>`;
 		} else if (this.ref_table.startsWith('template_')) {
@@ -71,8 +71,7 @@ module.exports = (sequelize, DataTypes) => {
 
 
 	file.prototype.getDescriptor = function (req, models) {
-		console.log(this.ref_table);
-		if (this.ref_table === 'user') {
+		if (this.ref_table === 'user' && this.user) {
 			return "Dokument " + this.getLink(req) + " für " + this.user.getLink(req);
 		} else if (this.ref_table === 'template_contract') {
 			return "Dokumentvorlage " + this.getLink(req) + " für Verträge";

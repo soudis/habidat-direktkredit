@@ -15,6 +15,9 @@ const showSidebar = html => {
 	sidebar.addClass('shown');
 	sidebar.removeClass('d-none');
 	$('#sidebar-opener').addClass('d-none');
+	if (!isDateSupported()) {
+		$('#sidebar .alt-datepicker').datepicker({format: 'yyyy-mm-dd', language: 'de'});
+	}
 };
 
 const hideSidebar = () => {

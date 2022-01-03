@@ -1,4 +1,14 @@
 /* jshint esversion: 8 */
+
+var isDateSupported = function () {
+	var input = document.createElement('input');
+	var value = 'a';
+	input.setAttribute('type', 'date');
+	input.setAttribute('value', value);
+	return (input.value !== value);
+};
+
+
 var dataTableLanguange = {
 	"sEmptyTable":      "Keine Daten in der Tabelle vorhanden",
 	"sInfo":            "_START_ bis _END_ von _TOTAL_",
@@ -154,6 +164,13 @@ $(document).ready(function(){
 			event.preventDefault();
 		}
 	});
+
+
+	if (!isDateSupported()) {
+		$('.alt-datepicker').datepicker({format: 'yyyy-mm-dd', language: 'de'});
+	}
+
+	
 
 
 });

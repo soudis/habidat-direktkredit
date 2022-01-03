@@ -106,11 +106,11 @@ module.exports = function(app){
 		Promise.resolve()
 			.then(() => {
 
-				var setSetting = function(id, value = undefined, checkbox = false) {
+				var setSetting = function(id, value = undefined, checkbox = false, overwriteNull = true) {
 					if (checkbox) {
 						settings.project.set(id, value || req.body[id]?true:false);
 					} else {
-						settings.project.set(id, value || req.body[id], true, true);
+						settings.project.set(id, value || req.body[id], true, overwriteNull);
 					}
 				};
 
@@ -122,7 +122,7 @@ module.exports = function(app){
 				setSetting('smtp.host', req.body.smtp_host);
 				setSetting('smtp.port', req.body.smtp_port);
 				setSetting('smtp.auth.user', req.body.smtp_auth_user);
-				setSetting('smtp.auth.pass', req.body.smtp_auth_pass);
+				setSetting('smtp.auth.pass', req.body.smtp_auth_pass, false, false);
 				setSetting('url');
 				setSetting('theme');
 				setSetting('defaults.interest_method', req.body.interest_method);
