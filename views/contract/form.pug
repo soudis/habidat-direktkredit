@@ -1,22 +1,30 @@
 include ../partials/forms
 
-mixin contract_form(action, updateAction, updateTag, editContract)
-  +form(action)(updateAction=updateAction updateTag=updateTag)
-    +hidden('user_id', user.id)
+mixin contract_form(action, updateAction, updateTag, editContract, updateForm = true)
+  +form(action, undefined, updateForm)(updateAction=updateAction updateTag=updateTag)
+    if user
+      +hidden('user_id', user.id)
+    if importMappings
+      +hidden('import_mappings', JSON.stringify(importMappings))
+    if importFileColumns
+      +hidden('import_file_columns', JSON.stringify(importFileColumns))      
+    if importFileId
+      +hidden('import_file_id', importFileId)          
     if editContract
       +hidden('id', editContract.id)
     else
-      +id('id', _t('contract_id'))(placeholder='Automatisch')        
+      +is_import('contract_id'): +id('id', _t('contract_id'))(placeholder='Automatisch')        
     - var termination_type = editContract?editContract.getTerminationType():settings.project.get('defaults.termination_type');
     - var termination_period = editContract?editContract.getTerminationPeriod():settings.project.get('defaults.termination_period');
     - var termination_period_type = editContract?editContract.getTerminationPeriodType():settings.project.get('defaults.termination_period_type');
     - var interest_payment_type = editContract?editContract.getInterestPaymentType():settings.project.get('defaults.interest_payment_type');
-    +date('sign_date')(value=_iv(editContract, 'sign_date') required)
-    +money('amount')(value=_iv(editContract, 'amount') required)
-    +percent('interest_rate')(min="0" max="10" value=_iv(editContract, 'interest_rate') required)
-    +select('interest_payment_type')(icon='fa-reply')
-      +option('end', _t('interest_payment_type_end'))(selected=interest_payment_type)
-      +option('yearly', _t('interest_payment_type_yearly'))(selected=interest_payment_type)    
+    +is_import('contract_sign_date', 'sign_date'): +date('sign_date')(value=_iv(editContract, 'sign_date') required)
+    +is_import('contract_amount', 'amount'): +money('amount')(value=_iv(editContract, 'amount') required)
+    +is_import('contract_interest_rate', 'interest_rate'): +percent('interest_rate')(min="0" max="10" value=_iv(editContract, 'interest_rate') required)
+    +is_import('contract_interest_payment_type', 'interest_payment_type')
+      +select('interest_payment_type')(icon='fa-reply')
+        +option('end', _t('interest_payment_type_end'))(selected=interest_payment_type)
+        +option('yearly', _t('interest_payment_type_yearly'))(selected=interest_payment_type)    
     +select('termination_type')(icon='fa-sign-out-alt' required)
       each type in ['T', 'P', 'D']
         +option(type, _t('termination_type_'+type))(selected=termination_type)
@@ -32,7 +40,7 @@ mixin contract_form(action, updateAction, updateTag, editContract)
       +date('termination_date_'+type, label)(groupClass="termination-type-group termination-type-" + type + (termination_type === type?"":" d-none") value=_iv(editContract, 'termination_date'))
 
     +period('T')
-    +termination_date('T', _t('termination_date'))
+    +is_import('contract_termination_date', 'termination_date')(groupClass="termination-type-group termination-type-T" + (termination_type === 'T'?"":" d-none")): +termination_date('T', _t('termination_date'))
     
     +period('P')
     
@@ -42,7 +50,7 @@ mixin contract_form(action, updateAction, updateTag, editContract)
       each status in ['unknown', 'sign', 'sent', 'complete']
         +option(status, _t('contract_status_'+status))(selected=_iv(editContract, 'status'))
 
-    +textarea('notes')(value=_iv(editContract, 'notes'))
+    +is_import('contract_notes', 'notes'): +textarea('notes')(value=_iv(editContract, 'notes'))
     +checkbox('notes_public')(value=_iv(editContract, 'notes_public'))    
     +submit_button()
   script.
@@ -53,6 +61,7 @@ mixin contract_form(action, updateAction, updateTag, editContract)
       $(".termination-type-"+$(this).val()).removeClass("d-none");
       $(".termination-type-group").find('input').attr('required', false);
       $(".termination-type-"+$(this).val()).find('input').attr('required', true);
+      $(".termination-type-T").find('input#termination_date_T').attr('required', false);
     });
 
     $('#termination_type_input').change();

@@ -1,40 +1,50 @@
 include ../country
 include ../partials/forms
 
-mixin user_form(formTitle, action, user)
-  +form(action)
+mixin user_form(formTitle, action, user, updateForm)
+  +form(action, undefined, updateForm)
+    if importMappings
+      +hidden('import_mappings', JSON.stringify(importMappings))
+    if importFileColumns
+      +hidden('import_file_columns', JSON.stringify(importFileColumns))      
+    if importFileId
+      +hidden('import_file_id', importFileId)      
     if user
       +hidden('id', user.id)
     else
-      +id('id', _t('user_id'))(placeholder='Automatisch')  
-    .form-row.col-md-12
-      +radio('type', _t('user_type_person'))(value='person' selected=_iv(user, 'type') default=true)
-      +radio('type', _t('user_type_organisation'))(value='organisation' selected=_iv(user, 'type'))
+      +is_import('user_id'): +id('id', _t('user_id'))(placeholder='Automatisch')  
+    +is_import('user_type')
+      .form-row.col-md-12
+        +radio('type', _t('user_type_person'))(value='person' selected=_iv(user, 'type') default=true)
+        +radio('type', _t('user_type_organisation'))(value='organisation' selected=_iv(user, 'type'))
     .form-row.radio-inputs(id="person_inputs")
-      +text('title_prefix')(value=_iv(user, 'title_prefix') groupClass="col-md-2" icon='fa-graduation-cap')
-      +text('first_name')(value=_iv(user, 'first_name') groupClass="col-md-4" icon='fa-user' required)
-      +text('last_name')(value=_iv(user, 'last_name') groupClass="col-md-4" icon='fa-user' required)
-      +text('title_suffix')(value=_iv(user, 'title_suffix') groupClass="col-md-2" icon='fa-graduation-cap')
+      +is_import('user_title_prefix', 'title_prefix')(groupClass="col-md-2"): +text('title_prefix')(value=_iv(user, 'title_prefix') groupClass="col-md-2" icon='fa-graduation-cap')
+      +is_import('user_first_name', 'first_name')(groupClass="col-md-4"): +text('first_name')(value=_iv(user, 'first_name') groupClass="col-md-4" icon='fa-user' required)
+      +is_import('user_last_name', 'last_name')(groupClass="col-md-4"): +text('last_name')(value=_iv(user, 'last_name') groupClass="col-md-4" icon='fa-user' required)
+      +is_import('user_title_suffix', 'title_suffix')(groupClass="col-md-2"): +text('title_suffix')(value=_iv(user, 'title_suffix') groupClass="col-md-2" icon='fa-graduation-cap')
     .form-row.radio-inputs(id="organisation_inputs").d-none
       +text('organisation_name')(value=_iv(user, 'first_name') groupClass="col" icon="fa-building")
-    +text('street')(value=_iv(user, 'street') icon="fa-map-marker")
+    +is_import('user_street', 'street'): +text('street')(value=_iv(user, 'street') icon="fa-map-marker")
     .form-row
-      +text('zip')(value=_iv(user, 'zip') icon="fa-envelope" groupClass="col-md-4")
-      +text('place')(value=_iv(user, 'place') icon="fa-city" groupClass="col-md-8")
-    +select('country')(value=_iv(user, 'country')||settings.project.get('defaults.country') icon="fa-globe-africa")
-      +country_select_options(_iv(user, 'country')||settings.project.get('defaults.country'))
-    +text('telno')(type="tel" value=_iv(user, 'telno') icon="fa-phone")
-    +text('email')(type="email" value=_iv(user, 'email') icon="fa-at")
+      +is_import('user_zip', 'zip')(groupClass="col-md-4"): +text('zip')(value=_iv(user, 'zip') icon="fa-envelope" groupClass="col-md-4")
+      +is_import('user_place', 'place')(groupClass="col-md-8"): +text('place')(value=_iv(user, 'place') icon="fa-city" groupClass="col-md-8")
+    +is_import('user_country', 'country')
+      +select('country')(value=_iv(user, 'country')||settings.project.get('defaults.country') icon="fa-globe-africa")
+        +country_select_options(_iv(user, 'country')||settings.project.get('defaults.country'))
+    +is_import('user_telno', 'telno'): +text('telno')(type="tel" value=_iv(user, 'telno') icon="fa-phone")
+    +is_import('user_email', 'email'): +text('email')(type="email" value=_iv(user, 'email') icon="fa-at")
     .form-row
-      +text('IBAN')(value=_iv(user, 'IBAN') icon="fa-credit-card" groupClass="col-md-8")
-      +text('BIC')(value=_iv(user, 'BIC') groupClass='col-md-4')
-    +select('relationship')(icon='fa-user-friends')
-      each type in settings.project.get('defaults.relationships')
-        +option(type, type)(selected=_iv(user, 'relationship'))
-    +select('account_notification_type')(icon='fa-bell')
-      +option('online', _t('account_notification_type_online'))(selected=_iv(user, 'account_notification_type'))
-      +option('email', _t('account_notification_type_email'))(selected=_iv(user, 'account_notification_type'))
-      +option('mail', _t('account_notification_type_mail'))(selected=_iv(user, 'account_notification_type'))
+      +is_import('user_iban', 'IBAN')(groupClass="col-md-8"): +text('IBAN')(value=_iv(user, 'IBAN') icon="fa-credit-card" groupClass="col-md-8")
+      +is_import('user_bic', 'BIC')(groupClass="col-md-4"): +text('BIC')(value=_iv(user, 'BIC') groupClass='col-md-4')
+    +is_import('user_relationship', 'relationship')
+      +select('relationship')(icon='fa-user-friends')
+        each type in settings.project.get('defaults.relationships')
+          +option(type, type)(selected=_iv(user, 'relationship'))
+    +is_import('user_account_notification_type', 'account_notification_type')
+      +select('account_notification_type')(icon='fa-bell')
+        +option('online', _t('account_notification_type_online'))(selected=_iv(user, 'account_notification_type'))
+        +option('email', _t('account_notification_type_email'))(selected=_iv(user, 'account_notification_type'))
+        +option('mail', _t('account_notification_type_mail'))(selected=_iv(user, 'account_notification_type'))
     +submit_button()
 
   script.

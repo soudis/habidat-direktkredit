@@ -15,6 +15,9 @@ const showSidebar = html => {
 	sidebar.addClass('shown');
 	sidebar.removeClass('d-none');
 	$('#sidebar-opener').addClass('d-none');
+	if (!isDateSupported()) {
+		$('#sidebar .alt-datepicker').datepicker({format: 'yyyy-mm-dd', language: 'de'});
+	}
 };
 
 const hideSidebar = () => {
@@ -205,7 +208,6 @@ $(document).ready(function(){
 	        	if (data.error) {
 	        		form.parent().append(data.html);
 	        	} else {
-					hideSidebar();
 					if (data.redirect) {
 		  				redirectOrReload(data.redirect);
 		  			} else if (data.message) {
@@ -214,9 +216,13 @@ $(document).ready(function(){
 		       		var action = form.attr('update-action');
 		       		var tag = form.attr('update-tag');
 		       		if (action == 'append') {
+   					    hideSidebar();
 		       			$('#' + tag).append(data);
 		       		} else if (action == 'replace') {
 		       			$('#' + tag).replaceWith(data);
+   					    hideSidebar();
+		       		} else if (action === 'replace_self') {
+		       			form.replaceWith(data);
 		       		}
 	        	}
 	       	},

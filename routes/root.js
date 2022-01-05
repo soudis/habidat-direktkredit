@@ -13,7 +13,7 @@ module.exports = function(app){
 
 	router.get('/projectconfig', function(req, res, next) {
 		var project = settings.project.get(undefined);
-		res.json(project);
+		res.json({projectname: project.projectname, logo: project.logo, logo_select: project.logo_select});
 	});
 
 	/* Welcome Site */
@@ -53,7 +53,33 @@ module.exports = function(app){
 			});
 	});
 
-	router.post('/setpassword', function(req, res, next) {
+	router.post('/setpassword', security.isLoggedIn, function(req, res, next) {
+		if (!req.body.password || req.body.password === '') {
+			req.flash('error', 'Passwort darf nicht leer sein!');
+			res.redirect(utils.generateUrl(req, '/getpassword/' + req.body.usertype));
+		} else if(req.body.password !== req.body.passwordRepeat) {
+			req.flash('error', 'Passwörter müssen übereinstimmen');
+			res.redirect(utils.generateUrl(req, '/getpassword/' + req.body.usertype));
+		} else {
+			Promise.resolve()
+				.then(() => {
+					var salt = bcrypt.genSaltSync(10);
+					var passwordHashed = bcrypt.hashSync(req.body.password, salt);
+					if (req.body.usertype === 'admin') {
+						return models.admin.update({ passwordHashed: passwordHashed, passwordResetToken: null, passwordResetExpires: null }, {where: { id:req.user.id }, trackOptions: utils.getTrackOptions(req.user, true) });
+					} else {
+						return models.user.update({ passwordHashed: passwordHashed, password: null, passwordResetToken: null, passwordResetExpires: null }, {where: { id:req.user.id }, trackOptions: utils.getTrackOptions(req.user, true) });
+					}
+				})
+				.then(() => {
+					req.flash('success', 'Dein Passwort wurde geändert');
+					res.redirect(utils.generateUrl(req, '/'));
+				});
+		}
+
+	});
+
+	router.post('/setpasswordbytoken', function(req, res, next) {
 		if (!req.body.password || req.body.password === '') {
 			req.flash('error', 'Passwort darf nicht leer sein!');
 			res.redirect(utils.generateUrl(req, '/getpassword/' + req.body.token));
@@ -66,22 +92,18 @@ module.exports = function(app){
 					var salt = bcrypt.genSaltSync(10);
 					var passwordHashed = bcrypt.hashSync(req.body.password, salt);
 					if (req.body.usertype === 'admin') {
-						return models.admin.update({ passwordHashed: passwordHashed, passwordResetToken: null, passwordResetExpires: null }, {where: { id:req.body.id }, trackOptions: utils.getTrackOptions(req.user, true) });
+						return models.admin.update({ passwordHashed: passwordHashed, passwordResetToken: null, passwordResetExpires: null }, {where: { passwordResetToken:req.body.token }, trackOptions: utils.getTrackOptions(req.user, true) });
 					} else {
-						return models.user.update({ passwordHashed: passwordHashed, password: null, passwordResetToken: null, passwordResetExpires: null }, {where: { id:req.body.id }, trackOptions: utils.getTrackOptions(req.user, true) });
+						return models.user.update({ passwordHashed: passwordHashed, password: null, passwordResetToken: null, passwordResetExpires: null }, {where: { passwordResetToken:req.body.token }, trackOptions: utils.getTrackOptions(req.user, true) });
 					}
 				})
 				.then(() => {
-					if (req.body.token) {
-						req.flash('success', 'Dein Passwort wurde gesetzt, logge dich jetzt ein');
-					} else {
-						req.flash('success', 'Dein Passwort wurde geändert');
-					}
+					req.flash('success', 'Dein Passwort wurde gesetzt, logge dich jetzt ein');
 					res.redirect(utils.generateUrl(req, '/'));
 				});
 		}
 
-	});
+	});	
 
 	router.post('/getpassword', function(req, res, next) {
 

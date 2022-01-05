@@ -2,10 +2,21 @@ mixin contractlist(contracts)
   .d-none(id="datatable_parent")
     .d-none.datatable-buttons(for-id="datatable_length")
 
-      if attributes.fnExport
+      if attributes.fnExport 
         .datatable-button
-          a.datatable-button.btn.btn-light.export-data(href='#' title="Daten exportieren")
-            span.fa.fa-file-import 
+          if attributes.fnExport
+            a.datatable-button.btn.btn-light.export-data(href='#' title="Daten exportieren")
+              span.fa.fa-file-import 
+
+      if attributes.fnImport
+        .datatable-button
+            a.datatable-button.btn.btn-light.sidebar-action(href=_url('/process/import') title="Daten importieren")
+              span.fa.fa-file-export             
+
+      if attributes.fnSelectable && attributes.fnBulkDelete
+        .datatable-button
+            a.datatable-button.btn.btn-light.bulk-delete(href='#' title="Ausgewählte " + _t(attributes.fnBulkDelete+'s') + " löschen" data-target=attributes.fnBulkDelete)
+              span.fa.fa-trash                     
 
       if attributes.fnViews
         .input-group.datatable-button
@@ -90,8 +101,8 @@ mixin contractlist(contracts)
               else
                 td.selectable(data-order=(cell.order?cell.order:cell.value) class=cell.class + (contracts.columns[cellIndex].class?" "+contracts.columns[cellIndex].class:""))!=cell.value
             td.fit.text-right
-              if row[9] === false
+              if row[15] === false
                 a.btn.btn-light.btn-sm(href=_url('/user/show/'+row[1].value)) #[span.fa.fa-search-plus]  
               else
-                a.btn.btn-light.btn-sm(href=_url('/user/show/'+row[1].value+'#show_contract_'+row[9].value)) #[span.fa.fa-search-plus]
+                a.btn.btn-light.btn-sm(href=_url('/user/show/'+row[1].value+'#show_contract_'+row[15].value)) #[span.fa.fa-search-plus]
   script(type='text/javascript' src=_url('/public/javascripts/contractlist.js')) 

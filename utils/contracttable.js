@@ -61,7 +61,8 @@ exports.contractTableRow = function(user, contract = undefined, effectiveDate = 
 			contractRow.contract_termination_date,
 			contractRow.contract_payback_date,
 			contractRow.contract_status,
-			contractRow.contract_deposit_date
+			contractRow.contract_deposit_date,
+			contractRow.contract_deposit_amount
 		];
 	} else {
 		return [
@@ -80,6 +81,7 @@ exports.contractTableRow = function(user, contract = undefined, effectiveDate = 
 			userRow.user_bic,
 			userRow.user_account_notification_type,
 			userRow.user_relationship,
+			false,
 			false,
 			false,
 			false,
@@ -134,7 +136,8 @@ exports.getContractTableColumns = (pInterestYear = undefined) => {
 			contractColumns.contract_termination_date,
 			contractColumns.contract_payback_date,
 			contractColumns.contract_status,
-			contractColumns.contract_deposit_date
+			contractColumns.contract_deposit_date,
+			contractColumns.contract_deposit_amount
 		];
 }
 
@@ -157,12 +160,13 @@ exports.generateContractTable = (req, res, users, effectiveDate = undefined, pIn
 		data: []
 	};
 	users.forEach(user => {
-		if (user.contracts.length === 0) {
+		if (!user.contracts || user.contracts.length === 0) {
 			contracts.data.push(exports.contractTableRow(user, undefined, effectiveDate, interestYear));
+		} else {
+			user.contracts.forEach(contract => {
+				contracts.data.push(exports.contractTableRow(user, contract, effectiveDate, interestYear));
+			});			
 		}
-		user.contracts.forEach(contract => {
-			contracts.data.push(exports.contractTableRow(user, contract, effectiveDate, interestYear));
-		});
 	});
 	contracts.columns.forEach((column, index) => {
 		if (column.filter === 'list') {

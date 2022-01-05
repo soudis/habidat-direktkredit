@@ -1,0 +1,16 @@
+include ../country
+include ../partials/forms
+
++form('/process/import_mapping', _t(importTarget+'s') + ' ' + _t('import') + ': ' + _t('column_mapping'))(updateAction='replace_self')
+  +hidden('file_id', fileId)
+  +hidden('import_target', importTarget)
+  +hidden('file_columns', JSON.stringify(fileColumns))
+  each fileColumn, index in fileColumns
+    - var header = fileColumn.header
+    if fileColumn.example
+      - var header = header + ' (' + _t('example') +': ' + (fileColumn.example.text || fileColumn.example) + ')'
+    +select('file_column_'+index, header )(icon='fa-long-arrow-alt-right')
+      +option('not_assigned')
+      each dbColumn, key in dbColumns
+        +option(key, dbColumn.label)(selected=fileColumn.mapping)
+  +submit_button('Weiter')

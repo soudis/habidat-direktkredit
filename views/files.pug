@@ -4,15 +4,17 @@ block content
     h2 Dateien
     p.lead Hier findest du alle wichtigen Informationsblätter für Direktkredite. Außerdem stellen wir jährlich unsere Bilanz hier online, damit du einen Einblick in die Verwendung deines Geldes bekommst. 
   .col-md-6.col-xs-12
-    h4 Kontomitteilung (für Steuererklärung):    
-    if moment(user.getOldestContract().sign_date).get('year') <= moment().subtract(1,'years').get('year')
+    h4 Kontomitteilung (für Steuererklärung):
+    - var lastWithdrawal = user.getLastWithdrawal() || '1900-01-01'
+    - var maxYear = user.isActive()?moment().subtract(1,'years').get('year'):moment(lastWithdrawal).get('year')
+    if moment(user.getOldestContract().sign_date).get('year') <= maxYear
       form.form-horizontal(action=_url("/accountnotification") method="post" role="form")
         .list-group        
           .list-group-item
             .input-group
               .input-group-prepend
                 span.input-group-text Jahr
-              input.form-control(type="number" step="1" name="year" required="true" min=moment(user.getOldestContract().sign_date).get('year') max=moment().subtract(1,'years').get('year') value=moment().subtract(1,'years').get('year'))
+              input.form-control(type="number" step="1" name="year" required="true" min=moment(user.getOldestContract().sign_date).get('year') max=maxYear value=maxYear)
               .input-group-append
                 button.btn.btn-light(type='submit' title="Download Kontomitteilung")
                   span.fa.fa-download

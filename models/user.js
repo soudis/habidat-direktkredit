@@ -283,19 +283,62 @@ module.exports = (sequelize, DataTypes) => {
 			});
 	};
 
+	User.validateEmailAddress = function(email, ignoreWarning = false) {
+		return Promise.resolve()
+			.then(() => {
+				if (!email || email === '') {
+					if (!ignoreWarning) {
+						throw new utils.Warning('Ohne E-Mailadresse kann sich der*die Kreditgeber*in nicht einloggen');
+					} else {
+						return;
+					}
+				} else {
+					return User.emailAddressTaken(email)
+						.then(taken => {
+							if (taken) {
+								throw "E-Mailadresse " + email + " wird bereits verwendet";
+							} else {
+								return ;
+							}
+						})
+				}
+			})
+	}
+
+	User.validateOrGenerateId = function(id = undefined, increment = 1) {
+		return Promise.resolve()
+			.then(() => {
+				if (id && id !== '') {
+					return User.findByPk(id)
+						.then(taken => {
+							if (taken) {
+								throw "Kontonummer " + id + " bereits vergeben";
+							} else {
+								return id;
+							}
+						})
+				} else {
+					return User.max('id')
+						.then(id => {
+							return id + increment;
+						})
+				}
+			})
+	}
+
 
 	User.getColumns = function () {
 		return {
 			user_id: {id: "user_id",  label: "Kontonummer", filter: 'text'},
 			user_type: {id: "user_type",  label: "Benutzer*innentyp", filter: 'list'},
-			user_is_person: {id: "user_is_person",  label: "Indikator ob Benutzer*in eine natürliche Person ist", filter: 'text'},
+			user_is_person: {id: "user_is_person",  label: "Indikator ob Benutzer*in eine natürliche Person ist", filter: 'text', displayOnly: true},
 			user_title_prefix: {id: "user_title_prefix",  label: "Titel", filter: 'text'},
 			user_first_name: {id: "user_first_name",  label: "Vorname", filter: 'text'},
 			user_last_name: {id: "user_last_name",  label: "Nachname", filter: 'text'},
 			user_title_suffix: {id: "user_title_suffix",  label: "Titel, nachgestellt", filter: 'text'},
-			user_name: {id: "user_name",  label: "Name", priority: "2", filter: 'text'},
-			user_address: {id: "user_address",  label: "Adresse", filter: 'text'},
-			user_address_oneline: {id: "user_address_oneline",  label: "Adresse (einzeilig)", filter: 'text'},
+			user_name: {id: "user_name",  label: "Name", priority: "2", filter: 'text', displayOnly: true},
+			user_address: {id: "user_address",  label: "Adresse", filter: 'text', displayOnly: true},
+			user_address_oneline: {id: "user_address_oneline",  label: "Adresse (einzeilig)", filter: 'text', displayOnly: true},
 			user_telno: {id: "user_telno",  label:"Telefon", filter: 'text'},
 			user_email: {id: "user_email",  label:"E-Mail", filter: 'text'},
 			user_iban: {id: "user_iban",  label:"IBAN", filter: 'text'},
@@ -305,7 +348,7 @@ module.exports = (sequelize, DataTypes) => {
 			user_zip: {id: "user_zip",  label: "PLZ", filter: 'text'},
 			user_place: {id: "user_place",  label: "Ort", filter: 'text'},
 			user_country: {id: "user_country",  label: "Land", filter: 'text'},
-			user_logon_id: {id: "user_logon_id",  label: "Anmeldename", filter: 'text'},
+			user_logon_id: {id: "user_logon_id",  label: "Anmeldename", filter: 'text', displayOnly: true},
 			user_account_notification_type: {id: "user_account_notification_type",  label: "Kontomitteilung", filter: 'list'}
 		}
 	}
@@ -321,14 +364,19 @@ module.exports = (sequelize, DataTypes) => {
 	};
 
 	var replaceUmlaute = function (str) {
-		return str
-		.replace(/[\u00dc|\u00c4|\u00d6][a-z]/g, (a) => {
-			const big = umlautMap[a.slice(0, 1)];
-			return big.charAt(0) + big.charAt(1).toLowerCase() + a.slice(1);
-		})
-		.replace(new RegExp('['+Object.keys(umlautMap).join('|')+']',"g"),
-			(a) => umlautMap[a]
-			);
+		if (str) {
+			return str
+			.replace(/[\u00dc|\u00c4|\u00d6][a-z]/g, (a) => {
+				const big = umlautMap[a.slice(0, 1)];
+				return big.charAt(0) + big.charAt(1).toLowerCase() + a.slice(1);
+			})
+			.replace(new RegExp('['+Object.keys(umlautMap).join('|')+']',"g"),
+				(a) => umlautMap[a]
+				);			
+		} else {
+			return null;
+		}
+
 	};
 
 	User.prototype.getRow = function () {
@@ -396,6 +444,20 @@ module.exports = (sequelize, DataTypes) => {
 		return oldest;;
 	};
 
+	User.prototype.getLastWithdrawal = function () {
+		var newest;
+		this.contracts.forEach(contract => {
+			contract.transactions.forEach(transaction => {
+				if (transaction.amount < 0 && (!newest || moment(transaction.transaction_date).isAfter(newest.transaction_date))) {
+					newest = transaction;
+				}
+
+			})
+		})
+		return newest?.transaction_date;
+	};
+
+
 
 	User.prototype.getFullName = function () {
 		var name = this.first_name;
@@ -443,7 +505,7 @@ module.exports = (sequelize, DataTypes) => {
 
 	User.prototype.setPasswordResetToken = function() {
 		this.passwordResetToken = crypto.randomBytes(16).toString('hex');
-		this.passwordResetExpires = Date.now() + 3600000 * 48; // 48 hours
+		this.passwordResetExpires = Date.now() + 3600000 * 168; // 1 week
 	}
 
 	User.prototype.hasNotTerminatedContracts = function (date) {
@@ -618,9 +680,9 @@ module.exports = (sequelize, DataTypes) => {
 				contract.transactions.forEach(function(transaction) {
 					if (firstDay.diff(transaction.transaction_date) >= 0) {
 						sums.begin.amount += transaction.amount;
-						sums.begin.interest += + transaction.interestToDate(contract.interest_rate,  moment(firstDay));
+						sums.begin.interest += transaction.interestToDate(contract.interest_rate,  moment(firstDay));
 						sums.end.amount += transaction.amount;
-						sums.end.interest += + transaction.interestToDate(contract.interest_rate, moment(firstDayNextYear));
+						sums.end.interest += transaction.interestToDate(contract.interest_rate, moment(firstDayNextYear));
 					} else  if ( firstDay.diff(transaction.transaction_date) < 0 && firstDayNextYear.diff(transaction.transaction_date) >= 0) {
 						var trans =  {
 							id : user.id,
@@ -639,7 +701,7 @@ module.exports = (sequelize, DataTypes) => {
 						sums.transactions++;
 						lastTransaction = transaction.transaction_date;
 						sums.end.amount += transaction.amount;
-						sums.end.interest += + transaction.interestToDate(contract.interest_rate, moment(firstDayNextYear));
+						sums.end.interest += transaction.interestToDate(contract.interest_rate, moment(firstDayNextYear));
 
 					}
 				});
@@ -648,6 +710,7 @@ module.exports = (sequelize, DataTypes) => {
 				sums.end.interest = Math.round(sums.end.interest*100) / 100;
 				if (contract.isTerminated(firstDayNextYear)) {
 					sums.end.interest = -sums.end.amount;
+					sums.interest = Math.round((-sums.end.amount - sums.begin.interest) * 100) / 100;
 					sums.end.amount = 0;
 				} else if (sums.end.amount >0 || sums.end.interest >0){
 					var endBalance = {
@@ -674,7 +737,7 @@ module.exports = (sequelize, DataTypes) => {
 						interest_rate: contract.interest_rate,
 						date: firstDay,
 						type: 'Kontostand Jahresbeginn',
-						amount: sums.begin.amount + sums.begin.interest,
+						amount: Math.round((sums.begin.amount + sums.begin.interest) * 100) / 100,
 						interest: sums.begin.interest,
 						interest_payment_type: contract.getInterestPaymentType(),
 						order: 1

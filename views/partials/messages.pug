@@ -1,0 +1,20 @@
+mixin error(error)
+  .alert.alert-dismissible.fade.show(role='alert' class=error&&error.name==='Warning'?"alert-warning":"alert-danger")
+    strong=error&&error.name==='Warning'?"Warnung! ":"Fehler! "
+    span!= error.message || error
+    if error && error.name === 'Warning'
+      br
+      span: i  Noch einmal speichern um die Warnung zu ignorieren
+    block
+    button.close(type="button" data-dismiss="alert" aria-label="Close")
+      small.fa.fa-times(aria-hidden="true")
+    if error.stack && process.env.DEBUG === 'true'
+      pre=error.stack
+
+
+mixin success(success)
+  .alert.alert-success.alert-dismissible.fade.show(role='alert')
+    strong Juhu! 
+    span!= success
+    button.close(type="button" data-dismiss="alert" aria-label="Close")
+      small.fa.fa-times(aria-hidden="true")

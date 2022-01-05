@@ -2,7 +2,7 @@ extends ../layout
 block content
   .jumbotron
     h2 Direktkredite aus Deutschland
-    p.lead Nach deutschem Recht dürfen Projekte (auch solche außerhalb Deutschlands) nur 100.000€ pro Jahr und Zinsrate (0,0%, 0,1%, ..., 2.0%) von deutschen Direktkreditgeber*innen annehmen. Hier siehst du eine Übersicht aller möglichen Zeiträume und Zinssätze sortiert nach größter Gesamtkreditsumme im jeweiligen Zeitraum. Du hast außerdem die Möglichkeit ein bestimmtes Datum und einen bestimmmten Zinsatz abzufragen.
+    p.lead Nach deutschem Recht dürfen Projekte (auch solche außerhalb Deutschlands) nur 100.000€ pro Jahr und Zinssatz (0,0%, 0,1%, ..., 2.0%) von deutschen Direktkreditgeber*innen annehmen, außer es gibt mit diesem Zinssatz insgesamt nicht mehr als 20 Kredite. Hier siehst du eine Übersicht aller möglichen Zeiträume und Zinssätze sortiert nach größter Gesamtkreditsumme im jeweiligen Zeitraum. Du hast außerdem die Möglichkeit ein bestimmtes Datum und einen bestimmmten Zinsatz abzufragen.
   col-md-12
     .d-none.details-table-buttons(for-id="details-table_length")
 
@@ -24,6 +24,8 @@ block content
           th Details
           th Zeitraum
           th Zinssatz
+          th Kredite (Zeitraum)
+          th Kredite (Zinssatz, gesamt)
           th.text-right Kreditsumme
           th.d-none Details
       tbody
@@ -34,6 +36,8 @@ block content
               span.fa.fa-plus-circle
             td #{entry.startDate.format('DD.MM.YYYY')} - #{entry.endDate.format('DD.MM.YYYY')}
             td= format.formatPercent(entry.interestRate, 2)
+            td= entry.contracts.length
+            td(class=(entry.contractsPerInterest>20?"text-danger":""))= entry.contractsPerInterest
             td.text-right(class=(entry.totalAmount>100000?"text-danger":""))= format.formatMoney(entry.totalAmount,2)
             td.d-none.table-row-details(data-paging=false data-sorting=false data-info=false)
               table.table.display.compact

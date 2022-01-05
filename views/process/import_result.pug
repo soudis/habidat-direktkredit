@@ -1,0 +1,16 @@
+extends ../layout
+include ../partials/contractlist
+include ../partials/messages
+
+block content
+  if errors.length && errors.length > 0 
+    +error(errors.length  + '/' + rowCount +  ' Zeilen konnten wegen eines Fehlers nicht importiert werden')
+      hr
+      each error in errors
+        strong= 'Zeile ' + (error.rowIndex - 1) + ': '
+        span= error.error
+        br
+
+  if rowCount - errors.length > 0
+    +success((rowCount - errors.length) + '/' + rowCount + ' Zeilen erfolgreich importiert')
+  +contractlist(contracts)(fnExport=true fnFilter=true fnColumns=true fnSelectable=true fnBulkDelete=importTarget)

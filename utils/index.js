@@ -1,6 +1,6 @@
 /* jshint esversion: 8 */
 const DocxGen = require('docxtemplater');
-const JSZipUtils = require('jszip');
+const PizZip = require('pizzip');
 const fs = require('fs');
 const moment = require('moment');
 const converter = require('libreoffice-convert');
@@ -8,8 +8,9 @@ const json2csv = require('json2csv');
 const exceljs = require('exceljs');
 const urlUtil = require('url');
 const settings = require('./settings');
-const docxtemplates = require('docx-templates');
-
+const models  = require('../models');
+const Promise = require('bluebird');
+const Sequelize 	= require("sequelize");
 
 exports.render = (req, res, template, data, title = undefined) => {
 	return Promise.resolve()
@@ -38,27 +39,22 @@ exports.getTrackOptions = function(user, track) {
 
 exports.generateDocx = function(templateFile, data){
 
-	return new Promise((resolve, reject) => {
-		try {
-
-            data.current_date = moment().format('DD.MM.YYYY');
-            data.project_name = settings.project.get('projectname');
-            data.project_iban = settings.project.get('project_iban');
-            data.project_bic = settings.project.get('project_bic');
+	return Promise.resolve()
+		.then(() => {
+			data.current_date = moment().format('DD.MM.YYYY');
+			data.project_name = settings.project.get('projectname');
+			data.project_iban = settings.project.get('project_iban');
+			data.project_bic = settings.project.get('project_bic');
 
 			var path = templateFile;
 			var file = fs.readFileSync(path, 'binary');
-			var zip = new JSZipUtils(file);
 			var doc=new DocxGen();
+			var zip = new PizZip(file);	
 			doc.loadZip(zip);
 			doc.setData(data);
 			doc.render();
-			resolve(doc.getZip().generate({type:"nodebuffer"}));
-		} catch(error) {
-			reject(error);
-		}
-	})
-
+			return doc.getZip().generate({type:"nodebuffer"});					
+		});
 };
 
 exports.convertToPdf = function(stream){
@@ -116,6 +112,61 @@ exports.generateUrl = function(req, url) {
 	} else {
 		return url;
 	}
+}
+
+exports.processImportFile = function(fileId, importTarget, importMappings, validateAndCreate) {
+    return models.file.findByPk(fileId)
+		.then(file => {				
+				var workbook = new exceljs.Workbook();
+			if (file.mime === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet') {
+				return workbook.xlsx.readFile(file.path);
+			} else if (file.mime === 'text/csv') {
+				return workbook.csv.readFile(req.file.path, {dateFormats: ['DD.MM.YYYY'], parserOptions: { delimiter: ',', quote: true }});
+			} else {
+				throw(_t('error_wrong_filetype'));
+			}
+		})
+		.then(workbook => {   			
+			var worksheet = workbook.worksheets[0];
+			var header = worksheet.getRow(1);		
+			var dbColumns = models[importTarget].getColumns();
+			var promises = [];		
+			worksheet.eachRow((row, rowIndex) => {
+				var getValue = function(columnName, bodyValue = undefined) {
+					if (importMappings[columnName] !== undefined) {
+						var cell = row.getCell(importMappings[columnName] + 1);
+						var value = cell.value;
+						if (cell.type === exceljs.ValueType.Number) {
+						    if (cell.numFmt && cell.numFmt.includes("%")) {
+						        // Detect Percent Values 
+						        value = cell.value * 100;
+						    } else {
+						        value = cell.value;
+						    }
+						} else if (cell.type === exceljs.ValueType.Hyperlink ) {
+							value = value.text;
+						}
+						return value;
+					} else {
+						return bodyValue;
+					}
+				}    			    				
+				if (rowIndex > 1) {
+
+					promises.push(
+							validateAndCreate(getValue, rowIndex)
+								.then(object => {
+									return { success: true,  rowIndex: rowIndex, row: row, object: object };
+								})
+								.catch(error => {
+									return { success: false, rowIndex: rowIndex, row: row, error : error};
+								})						
+					)
+				}
+
+			});
+			return Promise.each(promises, (promise) => {return promise});
+		})
 }
 
 exports.Warning = function(message) {

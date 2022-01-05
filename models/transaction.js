@@ -115,21 +115,34 @@ module.exports = (sequelize, DataTypes) => {
 
 
 	transaction.prototype.getLink = function (req) {
-		var url = utils.generateUrl(req, `/user/show/${this.contract.user.id}#show_transaction_${this.id}`);
-		return `<a href="${url}">${moment(this.transaction_date).format('DD.MM.YYYY')}</a>`;
+		if (this.contract && this.user) {
+			var url = utils.generateUrl(req, `/user/show/${this.contract.user.id}#show_transaction_${this.id}`);
+			return `<a href="${url}">${moment(this.transaction_date).format('DD.MM.YYYY')}</a>`;			
+		} else {
+			return moment(this.transaction_date).format('DD.MM.YYYY');
+		}
 	}
 
 	transaction.prototype.getDescriptor = function (req, models) {
-		return `Zahlung vom ${this.getLink(req)} für den Vertrag vom ${this.contract.getLink(req)} von ${this.contract.user.getLink(req)}`;
+		if (this.contract && this.contract.user) {
+			return `Zahlung vom ${this.getLink(req)} für den Vertrag vom ${this.contract.getLink(req)} von ${this.contract.user.getLink(req)}`;			
+		} else if (this.contract) {
+			return `Zahlung vom ${this.getLink(req)} für den Vertrag vom ${this.contract.getLink(req)}`;			
+		} else {
+			return `Zahlung vom ${this.getLink(req)} für den Vertrag ${this.contract_id}`;
+		}
+		
 	};
 
 
 	transaction.prototype.interestToDate = function (rate, toDate) {
 
-		if (rate > 0 && moment(toDate).diff(this.transaction_date) >= 0) {
-			var methodString = settings.project.get('defaults.interest_method') || '365_compound';
-			var method = methodString.split('_')[0];
-			var methodCompound = methodString.split('_')[1];
+		var methodString = settings.project.get('defaults.interest_method') || '365_compound';
+		var method = methodString.split('_')[0];
+		var methodCompound = methodString.split('_')[1];
+
+		if (rate > 0 && moment(toDate).diff(this.transaction_date) >= 0 && (methodCompound !== 'nocompound' || this.type !== 'interestpayment')) {
+
 
 			var getBaseDays = function(date) {
 				if (method === 'ACT') {

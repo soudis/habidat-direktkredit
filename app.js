@@ -57,6 +57,7 @@ try{
 	router.use('/public/popper', express.static(path.join(__dirname, 'node_modules/@popperjs/core/dist/umd'),  { maxAge: oneDay }));
 	router.use('/public/webfonts', express.static(path.join(__dirname, 'node_modules/@fortawesome/fontawesome-free/webfonts'), { maxAge: oneDay }));
 	router.use('/public/multiselect', express.static(path.join(__dirname, 'node_modules/bootstrap-multiselect/dist/js'), { maxAge: oneDay }));
+	router.use('/public/multiselect', express.static(path.join(__dirname, 'node_modules/bootstrap-multiselect/dist/css'), { maxAge: oneDay }));
 	router.use('/public/datatables', express.static(path.join(__dirname, 'node_modules/datatables.net-responsive/js'), { maxAge: oneDay }));
 	router.use('/public/datatables', express.static(path.join(__dirname, 'node_modules/datatables.net-responsive-bs4/js'), { maxAge: oneDay }));
 	router.use('/public/datatables', express.static(path.join(__dirname, 'node_modules/datatables.net-responsive-bs4/css'), { maxAge: oneDay }));
@@ -111,7 +112,7 @@ try{
 		}
 		if (!sessionHandlers[key]) {
 			sessionHandlers[key] = session({
-					secret: 'klasjdf098034lja2309bdjkla789lsdfjsafd098',
+					secret: process.env.HABIDAT_DK_SESSION_SECRET,
 					store: new FileStore(),
 					resave: true,
 					cookie: {
