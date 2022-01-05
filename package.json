@@ -58,6 +58,6 @@
     "session-file-store": "^1.2.0",
     "sprintf": "^0.1.5",
     "umzug": "^2.3.0",
-    "validator": "^4.0.4"
+    "validator": "^13.7.0"
   }
 }
