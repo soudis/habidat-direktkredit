@@ -56,10 +56,10 @@ module.exports = function(app){
 	router.post('/setpassword', security.isLoggedIn, function(req, res, next) {
 		if (!req.body.password || req.body.password === '') {
 			req.flash('error', 'Passwort darf nicht leer sein!');
-			res.redirect(utils.generateUrl(req, '/getpassword/' + req.body.usertype));
+			res.redirect(utils.generateUrl(req, '/setpassword/' + req.body.usertype));
 		} else if(req.body.password !== req.body.passwordRepeat) {
 			req.flash('error', 'Passwörter müssen übereinstimmen');
-			res.redirect(utils.generateUrl(req, '/getpassword/' + req.body.usertype));
+			res.redirect(utils.generateUrl(req, '/setpassword/' + req.body.usertype));
 		} else {
 			Promise.resolve()
 				.then(() => {
