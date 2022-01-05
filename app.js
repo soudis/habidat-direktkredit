@@ -112,7 +112,7 @@ try{
 		}
 		if (!sessionHandlers[key]) {
 			sessionHandlers[key] = session({
-					secret: 'klasjdf098034lja2309bdjkla789lsdfjsafd098',
+					secret: process.env.HABIDAT_DK_SESSION_SECRET,
 					store: new FileStore(),
 					resave: true,
 					cookie: {

@@ -134,12 +134,9 @@ module.exports = function(app){
 				setSetting('defaults.country', req.body.country);
 				setSetting('usersuffix', req.body.usersuffix);
 
-				console.log(req.files);
-
 				if (req.body.logo_change === 'logo_link') {
 					setSetting('logo', req.body.logo_link);
 				} else if (req.body.logo_change === 'logo_upload' && req.files && req.files['logo_upload'] && req.files['logo_upload'].length == 1 && req.files['logo_upload'][0].originalname) {
-					console.log('set logo');
 					setSetting('logo', '/public/images/' + req.files['logo_upload'][0].originalname);
 				}
 
