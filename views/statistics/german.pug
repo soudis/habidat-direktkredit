@@ -43,10 +43,10 @@ block content
             td.md-auto.details-control
               span.fa.fa-plus-circle
             td #{entry.startDate.format('DD.MM.YYYY')} - #{entry.endDate.format('DD.MM.YYYY')}
-            td= format.formatPercent(entry.interestRate, 2)
+            td(data-order=entry.interestRate)= format.formatPercent(entry.interestRate, 2)
             td= entry.contracts.length
             td(class=(entry.contractsPerInterest>20?"text-danger":""))= entry.contractsPerInterest
-            td.text-right(class=(entry.totalAmount>100000?"text-danger":""))= format.formatMoney(entry.totalAmount,2)
+            td.text-right(data-order=entry.totalAmount class=(entry.totalAmount>100000?"text-danger":""))= format.formatMoney(entry.totalAmount,2)
             td.d-none.table-row-details(data-paging=false data-sorting=false data-info=false)
               table.table.display.compact
                 thead
