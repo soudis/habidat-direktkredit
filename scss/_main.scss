@@ -15,15 +15,15 @@ $custom-file-text: (
 );
 
 
-@import "node_modules/bootstrap/scss/bootstrap";
-@import "node_modules/bootstrap-select/sass/bootstrap-select.scss";
-@import "node_modules/bootstrap-slider/src/sass/bootstrap-slider.scss";
-@import "node_modules/@fortawesome/fontawesome-free/scss/fontawesome";
-@import "node_modules/@fortawesome/fontawesome-free/scss/brands";
-@import "node_modules/@fortawesome/fontawesome-free/scss/regular";
-@import "node_modules/@fortawesome/fontawesome-free/scss/solid";
-@import "./tag-input.scss";
-@import "./partials/note.scss";
+@import "../node_modules/bootstrap/scss/bootstrap";
+@import "../node_modules/bootstrap-select/sass/bootstrap-select.scss";
+@import "../node_modules/bootstrap-slider/src/sass/bootstrap-slider.scss";
+@import "../node_modules/@fortawesome/fontawesome-free/scss/fontawesome";
+@import "../node_modules/@fortawesome/fontawesome-free/scss/brands";
+@import "../node_modules/@fortawesome/fontawesome-free/scss/regular";
+@import "../node_modules/@fortawesome/fontawesome-free/scss/solid";
+@import "./partials/_tag-input.scss";
+@import "./partials/_note.scss";
 
 
 a {

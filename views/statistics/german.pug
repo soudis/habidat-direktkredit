@@ -6,6 +6,14 @@ block content
   col-md-12
     .d-none.details-table-buttons(for-id="details-table_length")
 
+      .datatable-button
+          a.datatable-button.btn.btn-light.reset-date(title="Zurücksetzen")
+            span.fa.fa-undo
+
+      .datatable-button
+          a.datatable-button.btn.btn-light.request-date(title="Abfragen")
+            span.fa.fa-search
+
       .input-group.datatable-button
         .input-group-prepend
           .input-group-text
@@ -16,7 +24,7 @@ block content
         .input-group-prepend
           .input-group-text
             span.fa.fa-calendar
-        input.form-control(id="effective_date" title="Datum" type="date"  autocomplete="off" value=effectiveDate)
+        input.form-control(id="effective_date" title="Datum" type="date"  autocomplete="off" value=effectiveDate && effectiveDate.format('YYYY-MM-DD'))
 
     table.table.table-striped(id="details-table" data-auto-width="false").d-none
       thead
@@ -60,21 +68,12 @@ block content
                         a.btn.btn-light.btn-sm(href=_url('/user/show/'+contract.user.id+'#show_contract_'+contract.id)) #[span.fa.fa-search-plus]
 
   script.
-    $.fn.dataTable.ext.search.push(
-        function( settings, data, dataIndex ) {
-            var effectiveDate = $('#effective_date').val();
-            var interestRate = $('#interest_rate').val();
-            var row = $(settings.aoData[dataIndex].nTr)
-            return ((!effectiveDate || (moment(effectiveDate).isSameOrAfter(row.data('start-date')) && moment(effectiveDate).isSameOrBefore(row.data('end-date'))))
-                  &&(!interestRate || interestRate == row.data('interest-rate')));
-        }
-    );   
-    $(document).on( 'change', '#effective_date', function () {
-      detailsTable.draw();
+    $(document).on( 'click', '.request-date', function () {
+      var effectiveDate = $('#effective_date').val();
+      effectiveDate = effectiveDate?moment(effectiveDate).format('YYYY-MM-DD'):'all';
+      var interestRate = $('#interest_rate').val() || 'all';
+      $(location).attr('href', _url('/statistics/german/' + effectiveDate + '/' + interestRate));
     } ); 
-    $(document).on( 'keyup', '#interest_rate', function () {
-      detailsTable.draw();
-    } );     
-    $(document).on( 'change', '#interest_rate', function () {
-      detailsTable.draw();
+    $(document).on( 'click', '.reset-date', function () {
+      $(location).attr('href', _url('/statistics/german/all/all'));
     } );       

@@ -20,7 +20,6 @@ try{
 	const intl = require('./utils/intl');
 	const utils = require('./utils');
 	const settings = require('./utils/settings');
-	const sass = require('node-sass-middleware');
 
 	mkdirp('tmp', function(err) { });
 	mkdirp('upload', function(err) { });
@@ -32,9 +31,9 @@ try{
 	var session      = require('express-session');
 	var FileStore = require('session-file-store')(session);
 
+
+
 	var app = express();
-
-
 
 	var router = express.Router();
 
@@ -178,11 +177,6 @@ try{
 	require('./routes/admin')(router);
 	require('./routes/process')(router);
 
-	app.use(sass({
-		src: path.join(__dirname, '/'),
-		dest: path.join(__dirname, '/'),
-		debug: true
-	}));
 
 	app.use('/', router);
 	if (projectId) {
@@ -191,12 +185,6 @@ try{
 			next();
 		})
 		app.use('/'+projectId, router);
-		app.use(sass({
-			src: path.join(__dirname, '/'),
-			dest: path.join(__dirname, '/'),
-			prefix: '/'+projectId,
-			debug: true
-		}));
 	}
 
 	// catch 404 and forward to error handler

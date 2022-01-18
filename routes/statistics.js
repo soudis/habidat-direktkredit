@@ -248,14 +248,16 @@ module.exports = function(app){
 			.catch(error => next)
 	});
 
-	router.get('/statistics/german', security.isLoggedInAdmin, function(req, res, next) {
-		statistics.getGermanContractsByYearAndInterestRate()
+	router.get('/statistics/german/:effectivedate/:interestrate', security.isLoggedInAdmin, function(req, res, next) {
+		var interestRate = (req.params.interestrate && req.params.interestrate != 'all')?req.params.interestrate:undefined;
+		var effectiveDate =(req.params.effectivedate && req.params.effectivedate != 'all')?moment(req.params.effectivedate):undefined;
+		statistics.getGermanContractsByYearAndInterestRate(effectiveDate, interestRate)
 			.then(result => {
-				//console.log("test: " + JSON.stringify(numbers);
-				res.render('statistics/german', { title: 'Deutsche Direktkredite', result: result});
+				res.render('statistics/german', { title: 'Deutsche Direktkredite', result: result, effectiveDate: effectiveDate, interestRate: interestRate});
 			})
 			.catch(error => next(error));
 	});
+
 
 	router.post('/statistics/accountnotifications', security.isLoggedInAdmin, multer().none(), function(req, res, next) {
 

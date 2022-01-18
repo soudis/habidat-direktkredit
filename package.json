@@ -3,7 +3,6 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "postinstall": "npm rebuild node-sass",
     "start": "node ./bin/www"
   },
   "dependencies": {
@@ -42,8 +41,6 @@
     "multer": "^1.1.0",
     "mysql2": "^2.0.1",
     "nchart": "^1.0.1",
-    "node-sass": "^6.0.1",
-    "node-sass-middleware": "^0.11.0",
     "nodemailer": "^6.6.4",
     "nodemon": "^2.0.1",
     "numeral": "^2.0.6",

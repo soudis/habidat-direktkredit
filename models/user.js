@@ -672,8 +672,12 @@ module.exports = (sequelize, DataTypes) => {
 				},
 				end : {
 					amount: 0,
-					interest: 0},
-					transactions : 0
+					interest: 0
+				},
+				current: {
+					amount: 0
+				},
+				transactions : 0
 			};
 			var lastTransaction;
 			if (contract.isTerminated(firstDay) === false) {
@@ -701,6 +705,7 @@ module.exports = (sequelize, DataTypes) => {
 						sums.transactions++;
 						lastTransaction = transaction.transaction_date;
 						sums.end.amount += transaction.amount;
+						sums.current.amount += transaction.amount;
 						sums.end.interest += transaction.interestToDate(contract.interest_rate, moment(firstDayNextYear));
 
 					}
@@ -712,7 +717,8 @@ module.exports = (sequelize, DataTypes) => {
 					sums.end.interest = -sums.end.amount;
 					sums.interest = Math.round((-sums.end.amount - sums.begin.interest) * 100) / 100;
 					sums.end.amount = 0;
-				} else if (sums.end.amount >0 || sums.end.interest >0){
+				} 
+				if (!contract.isTerminated(firstDayNextYear) && (sums.end.amount >0 || sums.end.interest >0)){
 					var endBalance = {
 						id : user.id,
 						last_name: user.last_name,
@@ -721,13 +727,13 @@ module.exports = (sequelize, DataTypes) => {
 						interest_rate: contract.interest_rate,
 						date: moment(firstDay).endOf('year'),
 						type: 'Kontostand Jahresende',
-						amount: sums.end.amount + sums.end.interest,
+						amount:  Math.round((sums.begin.amount + sums.begin.interest) * 100) / 100 + sums.interest + sums.current.amount,
 						interest: sums.end.interest,
 						interest_payment_type: contract.getInterestPaymentType(),
 						order: 1
 					};
 					transactionList.push(endBalance);
-				}
+				}				
 				if (sums.begin.amount > 0 || sums.begin.interest > 0) {
 					var beginBalance = {
 						id : user.id,
@@ -744,7 +750,6 @@ module.exports = (sequelize, DataTypes) => {
 					};
 					transactionList.push(beginBalance);
 				}
-
 				if (contract.transactions.length > 0) {
 					var interest = {
 						id : user.id,
@@ -760,7 +765,8 @@ module.exports = (sequelize, DataTypes) => {
 						order: 0
 					};
 					transactionList.push(interest);
-				}
+				}				
+
 			}
 		});
 		return transactionList;

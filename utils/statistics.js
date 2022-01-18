@@ -121,7 +121,6 @@ exports.getGermanContractsByYearAndInterestRate = function(effectiveDate = undef
 						}
 					})
 				})
-				console.log(contractsPerInterest);
 				result.sort((a, b) => {
 					if (a.id < b.id) {
 						return -1;
@@ -156,6 +155,18 @@ exports.getGermanContractsByYearAndInterestRate = function(effectiveDate = undef
 				resultMerged.sort((a, b) => {
 					return b.totalAmount - a.totalAmount;
 				})
+
+				// if there is no result for a period but an interestrate is requested return number of total contracts for interest rate
+				if (resultMerged.length === 0 && interestRate) {
+					resultMerged.push({
+						startDate: rangesBegin,
+						endDate: rangesEnd,
+						interestRate: parseFloat(interestRate),
+						totalAmount: 0,
+						contracts: [],
+						contractsPerInterest: contractsPerInterest[interestRate] || 0
+					})					
+				}
 
 				return resultMerged;
 			}
