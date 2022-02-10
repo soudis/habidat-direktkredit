@@ -42,7 +42,7 @@
     "multer": "^1.1.0",
     "mysql2": "^2.0.1",
     "nchart": "^1.0.1",
-    "node-sass": "^6.0.1",
+    "node-sass": "^7.0.0",
     "node-sass-middleware": "^0.11.0",
     "nodemailer": "^6.6.4",
     "nodemon": "^2.0.1",
