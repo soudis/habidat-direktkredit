@@ -38,14 +38,14 @@
     "lodash.clonedeep": "^4.5.0",
     "mkdirp": "^0.5.1",
     "morgan": "^1.9.1",
-    "multer": "^1.1.0",
+    "multer": "^1.4.5-lts.1",
     "mysql2": "^2.0.1",
     "nchart": "^1.0.1",
     "nodemailer": "^6.6.4",
     "nodemon": "^2.0.1",
     "numeral": "^2.0.6",
-    "passport": "~0.3.2",
-    "passport-ldapauth": "^2.0.0",
+    "passport": "~0.6.0",
+    "passport-ldapauth": "^3.0.1",
     "passport-local": "~1.0.0",
     "path": "~0.12.7",
     "pizzip": "^3.1.1",
@@ -55,6 +55,6 @@
     "session-file-store": "^1.2.0",
     "sprintf": "^0.1.5",
     "umzug": "^2.3.0",
-    "validator": "^4.0.4"
+    "validator": "^13.7.0"
   }
 }

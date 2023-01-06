@@ -1,7 +1,6 @@
 /* jshint esversion: 8 */
 const moment = require("moment");
 const Op = require("sequelize").Op;
-const clonedeep = require("lodash.clonedeep");
 const settings = require("../utils/settings");
 const bcrypt = require("bcrypt");
 const crypto = require("crypto");
