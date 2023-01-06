@@ -175,7 +175,8 @@ module.exports = function(app){
 							account_notification_type: getValue('user_account_notification_type', req.body.account_notification_type),
 							logon_id: Math.abs(Math.random() * 100000000),
 							password: crypto.randomBytes(16).toString('hex'),
-							relationship: relationship
+							relationship: relationship,
+							membership_status:  getValue('user_membership_status', req.body.membership_status)						
 						}, 
 						{ 
 							trackOptions: utils.getTrackOptions(req.user, true)
@@ -224,7 +225,8 @@ module.exports = function(app){
 					account_notification_type: req.body.account_notification_type,
 					logon_id: Math.abs(Math.random() * 100000000),
 					password: password,
-					relationship: req.body.relationship
+					relationship: req.body.relationship,
+					membership_status: req.body.membership_status
 				}, { trackOptions: utils.getTrackOptions(req.user, true) });
 			})
 			.then(user => res.send({redirect : utils.generateUrl(req, '/user/show/' + user.id)}))
@@ -247,7 +249,8 @@ module.exports = function(app){
 				IBAN: req.body.IBAN,
 				BIC: req.body.BIC,
 				account_notification_type: req.body.account_notification_type,
-				relationship: req.body.relationship
+				relationship: req.body.relationship,
+				membership_status: req.body.membership_status
 			}, {where: { id:req.body.id }, trackOptions: utils.getTrackOptions(req.user, true) })
 			.then(() => res.send({redirect: 'reload'}))
 			.catch(error => next(error));

@@ -1,4 +1,4 @@
-/* jshint esversion: 8 */
+	/* jshint esversion: 8 */
 const moment = require('moment');
 const Op = require("sequelize").Op;
 const clonedeep = require('lodash.clonedeep');
@@ -78,6 +78,10 @@ module.exports = (sequelize, DataTypes) => {
 			allowNull: true
 		},
 		account_notification_type:{
+			type: DataTypes.STRING,
+			allowNull: true
+		},
+		membership_status: {
 			type: DataTypes.STRING,
 			allowNull: true
 		},		
@@ -344,6 +348,7 @@ module.exports = (sequelize, DataTypes) => {
 			user_iban: {id: "user_iban",  label:"IBAN", filter: 'text'},
 			user_bic: {id: "user_bic",  label: "BIC", filter: 'text'},
 			user_relationship: {id: "user_relationship",  label:"Beziehung", filter: 'list'},
+			user_membership_status: {id: "user_membership_status",  label:"Mitgliedsstatus", filter: 'list'},
 			user_street: {id: "user_street",  label: "Strasse", filter: 'text'},
 			user_zip: {id: "user_zip",  label: "PLZ", filter: 'text'},
 			user_place: {id: "user_place",  label: "Ort", filter: 'text'},
@@ -397,6 +402,7 @@ module.exports = (sequelize, DataTypes) => {
 			user_iban: { valueRaw: user.IBAN, value: user.IBAN },
 			user_bic: { valueRaw: user.BIC, value: user.BIC },
 			user_relationship: { valueRaw: user.relationship, value: user.relationship },
+			user_membership_status: { valueRaw: user.membership_status, value: user.membership_status },
 			user_street: { valueRaw: user.street, value: user.street },
 			user_zip: { valueRaw: user.zip, value: user.zip },
 			user_place: { valueRaw: user.place, value: user.place },

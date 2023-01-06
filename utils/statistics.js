@@ -44,6 +44,140 @@ var generatePieChart = function(data, callback) {
 	callback(canvas.toBuffer().toString('base64'));
 };
 
+exports.getYears = function(users) {
+	var oldestPayment = moment('3000-01-01');
+	users.forEach(user => {
+		user.contracts.forEach(contract => {
+			contract.transactions.forEach(transaction => {
+				if (oldestPayment.isAfter(transaction.transaction_date)) {
+					oldestPayment = moment(transaction.transaction_date);
+				}
+			})
+		})
+	})
+	var years = [];
+	if (!oldestPayment.isSame('1900-01-01')) {
+		for (var i = oldestPayment.year(); i<= moment().year(); i++) {
+			years.push(i);
+		}
+	}
+	return years;
+}
+
+exports.getNumbersPerYear = function() {
+	return models.user.findFetchFull(models, { })
+		.then(users => {
+			var years = exports.getYears(users);
+			var rows = [];
+			var prevRow;
+			var aggregatedInterest = 0;
+			years.forEach(year => {
+				var endOfYear = moment(year + '-12-31');
+				var endOfLastYear = moment(year + '-12-31').subtract(1, 'years');
+				var interestDate = moment(year + '-12-31').add(1, 'days');
+				if (moment().year() === year) {
+					interestDate = moment();
+				}
+				var row = {
+					year: year,
+					amountBegin: 0,
+					amountEnd: 0,
+					deposits: 0,
+					withdrawals: 0,
+					interestGained: 0,
+					notReclaimed :0,
+					interestPaid: 0,
+					newContracts: 0,
+					newContractAvgInterestRate: 0,
+					newContractAvgInterestRateWeighed: 0,
+					newContractAmount: 0, 
+					terminatedContracts: 0,
+					terminatedContractAvgInterestRate: 0,
+					terminatedContractAvgInterestWeighed: 0,
+					terminatedContractAmount: 0
+				}
+				prevRow = prevRow || row;
+				row.amountBegin = prevRow.amountEnd;
+				row.interestGained = -aggregatedInterest;
+				users.forEach(user => {
+					user.contracts.forEach(contract => {
+						contract.transactions.forEach(transaction => {
+							if (moment(transaction.transaction_date).year() === year && interestDate.isSameOrAfter(transaction.transaction_date)) {
+								if (['initial', 'deposit'].includes(transaction.type)) {
+									row.deposits += transaction.amount;
+								} else if (['withdrawal', 'termination'].includes(transaction.type)) {
+									row.withdrawals += transaction.amount;
+								} else if (['notreclaimed'].includes(transaction.type)) {
+									row.notReclaimed += transaction.amount;
+								} else if (['interestpayment'].includes(transaction.type)) {
+									row.interestPaid += transaction.amount;
+								}
+							}
+						})
+						if (contract.getDepositDate() && contract.getDepositDate().year() === year) {
+							row.newContracts ++;
+							row.newContractAvgInterestRateWeighed += contract.amount * contract.interest_rate;
+							row.newContractAmount += contract.amount;
+						} 
+						if (contract.isTerminated(endOfYear) && !contract.isTerminated(endOfLastYear)) {
+							row.terminatedContracts ++;
+							row.terminatedContractAvgInterestWeighed += contract.amount * contract.interest_rate;
+							row.terminatedContractAmount += contract.amount;
+
+							// calculated interest that was paid by termination withdrawal
+							var transactionAmount = contract.getTransactionsAmount();
+							if (transactionAmount < 0) {
+								row.interestPaid += transactionAmount;
+								row.withdrawals -= transactionAmount;
+							}
+						}
+						row.interestGained += contract.getInterestToDate(interestDate);
+					});
+										
+				})
+				row.amountEnd = row.amountBegin + row.deposits + row.withdrawals + row.interestGained + row.interestPaid + row.notReclaimed;
+				if (row.newContractAmount > 0) {
+					row.newContractAvgInterestRate = row.newContractAvgInterestRateWeighed / row.newContractAmount;
+				}
+				if (row.terminatedContractAmount > 0) {
+					row.terminatedContractAvgInterestRate = row.terminatedContractAvgInterestWeighed / row.terminatedContractAmount;
+				}
+				
+				aggregatedInterest += row.interestGained;
+				rows.push(row);
+				prevRow = row;
+			});
+			var totals = rows.reduce((a,b) => {
+				return {
+					year: 'Gesamt',
+					amountBegin: 0,
+					amountEnd: b.amountEnd,
+					deposits: a.deposits + b.deposits,
+					withdrawals: a.withdrawals + b.withdrawals,
+					interestGained: a.interestGained + b.interestGained,
+					notReclaimed :a.notReclaimed + b.notReclaimed,
+					interestPaid: a.interestPaid + b.interestPaid,
+					newContracts: a.newContracts + b.newContracts,
+					newContractAvgInterestRate: 0,
+					newContractAvgInterestRateWeighed: a.newContractAvgInterestRateWeighed + b.newContractAvgInterestRateWeighed, 
+					newContractAmount: a.newContractAmount + b.newContractAmount, 
+					terminatedContracts: a.terminatedContracts + b.terminatedContracts,
+					terminatedContractAvgInterestRate: 0,
+					terminatedContractAvgInterestWeighed: a.terminatedContractAvgInterestWeighed + b.terminatedContractAvgInterestWeighed,
+					terminatedContractAmount: a.terminatedContractAmount + b.terminatedContractAmount					
+				}
+			})
+			if (totals.newContractAmount > 0) {
+				totals.newContractAvgInterestRate = totals.newContractAvgInterestRateWeighed / totals.newContractAmount;
+			}
+			if (totals.terminatedContractAmount > 0) {
+				totals.terminatedContractAvgInterestRate = totals.terminatedContractAvgInterestWeighed / totals.terminatedContractAmount;
+			}		
+			rows.push(totals);	
+			return rows;	
+		});
+}
+
 exports.getGermanContractsByYearAndInterestRate = function(effectiveDate = undefined, interestRate = undefined, ignoreId = undefined) {
 	return models.user.findAll({
 		  	where: { country: 'DE' },

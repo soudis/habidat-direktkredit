@@ -19,9 +19,9 @@ module.exports = function(app){
 	});
 
 	router.get('/statistics/numbers', security.isLoggedInAdmin, function(req, res, next) {
-		statistics.getNumbers()
-			.then(numbers => {
-				res.render('statistics/numbers', { title: 'Zahlen, Daten, Fakten', "numbers": numbers});
+		Promise.join(statistics.getNumbers(), statistics.getNumbersPerYear(),
+			(numbers, numbersPerYear) => {
+				res.render('statistics/numbers', { title: 'Zahlen, Daten, Fakten', numbers: numbers, numbersPerYear: numbersPerYear});
 			})
 			.catch(next);
 	});

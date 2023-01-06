@@ -234,4 +234,16 @@ $(document).ready(function(){
 		updateFunctions[sliderName]();
 	});
 
+    var numberstable = $('#numberstable').DataTable({
+      	pageLength: 25,
+      	language: dataTableLanguange,
+      	order: [[ 0, 'desc' ]],
+      	responsive: {
+        	details: {
+        		type: "column"
+        	}
+      	}
+    });
+
+
 });
