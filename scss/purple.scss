@@ -1,8 +1,8 @@
-$primary-color: #1b5e20;
+$primary-color: #4a148c;
 $primary-dark: darken($primary-color, 10);
 $primary-light: lighten($primary-color, 10);
 $highlight-color: rgba(0, 100, 0, 0.3);
 $highlight-color-full: rgba(0, 100, 0, 1);
-$link-color: rgb(0, 183, 255);
+$link-color: $primary-color;
 
-@import "./_main.scss";
+@import "./main.scss";

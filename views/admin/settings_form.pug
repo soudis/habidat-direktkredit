@@ -43,6 +43,8 @@ mixin settings_form()
       - var selected = settings.project.get('theme') || 'red'
       +option('red')(selected=selected)
       +option('green')(selected=selected)
+      +option('turquoise')(selected=selected)
+      +option('purple')(selected=selected)
       +option('monochrome')(selected=selected)
     +select('interest_method')(icon='fa-percent')
       - var selected = settings.project.get('defaults.interest_method')

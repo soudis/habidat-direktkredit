@@ -146,6 +146,8 @@ const texts = {
   transaction_type_termination: "Rückzahlung",
   transaction_type_notreclaimed: "Nicht rückgefordert",
   transaction_type_interestpayment: "Zinsauszahlung",
+  turquoise: "Türkis",
+  purple: "Lila",
   type: "Typ",
   import: "importieren",
   interest_method: "Zinsberechnung",
