@@ -42,39 +42,28 @@ module.exports = function (app) {
     "/statistics/byrelation/:start/:end",
     security.isLoggedInAdmin,
     (req, res) => {
-      models.user
-        .findAll({
-          include: {
-            model: models.contract,
-            as: "contracts",
-            include: {
-              model: models.transaction,
-              as: "transactions",
-            },
-          },
-        })
-        .then(function (users) {
-          var endDate = moment(req.params.end, "DD.MM.YYYY").endOf("month");
-          var startDate = moment(req.params.start, "DD.MM.YYYY");
-          var byRelation = {};
-          var today = moment();
-          users.forEach((user) => {
-            if (!byRelation[user.relationship]) {
-              byRelation[user.relationship] = 0;
+      models.user.findFetchFull(models, {}).then(function (users) {
+        var endDate = moment(req.params.end, "DD.MM.YYYY").endOf("month");
+        var startDate = moment(req.params.start, "DD.MM.YYYY");
+        var byRelation = {};
+        var today = moment();
+        users.forEach((user) => {
+          if (!byRelation[user.relationship]) {
+            byRelation[user.relationship] = 0;
+          }
+          user.contracts.forEach((contract) => {
+            if (moment(contract.sign_date).isBetween(startDate, endDate)) {
+              byRelation[user.relationship] +=
+                contract.getAmountToDate(endDate);
             }
-            user.contracts.forEach((contract) => {
-              if (moment(contract.sign_date).isBetween(startDate, endDate)) {
-                byRelation[user.relationship] +=
-                  contract.getAmountToDate(endDate);
-              }
-            });
           });
-          Object.keys(byRelation).forEach((key) => {
-            byRelation[key] = Math.round(byRelation[key] * 100) / 100;
-          });
-          res.setHeader("Content-Type", "application/json");
-          res.send(JSON.stringify(byRelation));
         });
+        Object.keys(byRelation).forEach((key) => {
+          byRelation[key] = Math.round(byRelation[key] * 100) / 100;
+        });
+        res.setHeader("Content-Type", "application/json");
+        res.send(JSON.stringify(byRelation));
+      });
     }
   );
 
@@ -83,17 +72,8 @@ module.exports = function (app) {
     security.isLoggedInAdmin,
     (req, res, next) => {
       models.user
-        .findAll({
-          include: {
-            model: models.contract,
-            as: "contracts",
-            include: {
-              model: models.transaction,
-              as: "transactions",
-            },
-          },
-        })
-        .then(function (users) {
+        .findFetchFull(models, {})
+        .then((users) => {
           var endDate = moment(req.params.end, "DD.MM.YYYY").endOf("month");
           var startDate = moment(req.params.start, "DD.MM.YYYY");
           var sections = {};
@@ -162,46 +142,31 @@ module.exports = function (app) {
     "/statistics/bymonth/:start/:end",
     security.isLoggedInAdmin,
     (req, res) => {
-      models.user
-        .findAll({
-          include: {
-            model: models.contract,
-            as: "contracts",
-            include: {
-              model: models.transaction,
-              as: "transactions",
-            },
-          },
-        })
-        .then(function (users) {
-          var endDate = moment(req.params.end, "DD.MM.YYYY");
-          var startDate = moment(req.params.start, "DD.MM.YYYY");
-          var months = [];
-          for (
-            var i = Math.abs(endDate.diff(startDate, "months"));
-            i >= 0;
-            i--
-          ) {
-            months.push(
-              moment(endDate)
-                .subtract(1 * i, "months")
-                .endOf("month")
-            );
-          }
-          var byMonth = {};
-          months.forEach((month) => {
-            sum = 0;
-            users.forEach((user) => {
-              user.contracts.forEach((contract) => {
-                var contractAmount = contract.getAmountToDate(month);
-                sum += contractAmount;
-              });
+      models.user.findFetchFull(models, {}).then(function (users) {
+        var endDate = moment(req.params.end, "DD.MM.YYYY");
+        var startDate = moment(req.params.start, "DD.MM.YYYY");
+        var months = [];
+        for (var i = Math.abs(endDate.diff(startDate, "months")); i >= 0; i--) {
+          months.push(
+            moment(endDate)
+              .subtract(1 * i, "months")
+              .endOf("month")
+          );
+        }
+        var byMonth = {};
+        months.forEach((month) => {
+          sum = 0;
+          users.forEach((user) => {
+            user.contracts.forEach((contract) => {
+              var contractAmount = contract.getAmountToDate(month);
+              sum += contractAmount;
             });
-            byMonth[month.format("MM YYYY")] = Math.round(sum * 100) / 100;
           });
-          res.setHeader("Content-Type", "application/json");
-          res.send(JSON.stringify(byMonth));
+          byMonth[month.format("MM YYYY")] = Math.round(sum * 100) / 100;
         });
+        res.setHeader("Content-Type", "application/json");
+        res.send(JSON.stringify(byMonth));
+      });
     }
   );
 
@@ -209,80 +174,65 @@ module.exports = function (app) {
     "/statistics/transactionsbymonth/:start/:end",
     security.isLoggedInAdmin,
     (req, res) => {
-      models.user
-        .findAll({
-          include: {
-            model: models.contract,
-            as: "contracts",
-            include: {
-              model: models.transaction,
-              as: "transactions",
-            },
-          },
-        })
-        .then(function (users) {
-          var endDate = moment(req.params.end, "DD.MM.YYYY");
-          var startDate = moment(req.params.start, "DD.MM.YYYY");
-          var months = [];
-          for (
-            var i = Math.abs(endDate.diff(startDate, "months"));
-            i >= 0;
-            i--
-          ) {
-            months.push(
-              moment(endDate)
-                .subtract(1 * i, "months")
-                .endOf("month")
-            );
-          }
-          var byMonth = {
-            deposits: {},
-            withdrawals: {},
-            interest: {},
-            notReclaimed: {},
-          };
-          months.forEach((month) => {
-            var start = moment(month).startOf("month");
-            var end = month;
-            var deposits = 0,
-              withdrawals = 0,
-              interest = 0,
-              notReclaimed = 0;
-            users.forEach((user) => {
-              user.contracts.forEach((contract) => {
-                contract.transactions.forEach((transaction) => {
-                  if (
-                    start.diff(transaction.transaction_date) <= 0 &&
-                    end.diff(transaction.transaction_date) >= 0
-                  ) {
-                    if (transaction.amount > 0) {
-                      deposits += transaction.amount;
+      models.user.findFetchFull(models, {}).then(function (users) {
+        var endDate = moment(req.params.end, "DD.MM.YYYY");
+        var startDate = moment(req.params.start, "DD.MM.YYYY");
+        var months = [];
+        for (var i = Math.abs(endDate.diff(startDate, "months")); i >= 0; i--) {
+          months.push(
+            moment(endDate)
+              .subtract(1 * i, "months")
+              .endOf("month")
+          );
+        }
+        var byMonth = {
+          deposits: {},
+          withdrawals: {},
+          interest: {},
+          notReclaimed: {},
+        };
+        months.forEach((month) => {
+          var start = moment(month).startOf("month");
+          var end = month;
+          var deposits = 0,
+            withdrawals = 0,
+            interest = 0,
+            notReclaimed = 0;
+          users.forEach((user) => {
+            user.contracts.forEach((contract) => {
+              contract.transactions.forEach((transaction) => {
+                if (
+                  start.diff(transaction.transaction_date) <= 0 &&
+                  end.diff(transaction.transaction_date) >= 0
+                ) {
+                  if (transaction.amount > 0) {
+                    deposits += transaction.amount;
+                  } else {
+                    if (transaction.type === "notreclaimed") {
+                      notReclaimed += transaction.amount;
                     } else {
-                      if (transaction.type === "notreclaimed") {
-                        notReclaimed += transaction.amount;
-                      } else {
-                        withdrawals += transaction.amount;
-                      }
+                      withdrawals += transaction.amount;
                     }
                   }
-                  interest +=
-                    transaction.interestToDate(contract.interest_rate, end) -
-                    transaction.interestToDate(contract.interest_rate, start);
-                });
+                }
+                interest +=
+                  transaction.interestToDate(contract.interest_rate, end) -
+                  transaction.interestToDate(contract.interest_rate, start);
               });
             });
-            byMonth.deposits[month.format("MM YYYY")] =
-              Math.round(deposits * 100) / 100;
-            byMonth.withdrawals[month.format("MM YYYY")] =
-              Math.round(-withdrawals * 100) / 100;
-            byMonth.notReclaimed[month.format("MM YYYY")] =
-              Math.round(-notReclaimed * 100) / 100;
-            byMonth.interest[month.format("MM YYYY")] =
-              Math.round(interest * 100) / 100;
           });
-          res.setHeader("Content-Type", "application/json");
-          res.send(JSON.stringify(byMonth));
+          byMonth.deposits[month.format("MM YYYY")] =
+            Math.round(deposits * 100) / 100;
+          byMonth.withdrawals[month.format("MM YYYY")] =
+            Math.round(-withdrawals * 100) / 100;
+          byMonth.notReclaimed[month.format("MM YYYY")] =
+            Math.round(-notReclaimed * 100) / 100;
+          byMonth.interest[month.format("MM YYYY")] =
+            Math.round(interest * 100) / 100;
         });
+        res.setHeader("Content-Type", "application/json");
+        res.send(JSON.stringify(byMonth));
+      });
     }
   );
 

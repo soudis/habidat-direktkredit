@@ -87,6 +87,10 @@ exports.getNumbersPerYear = function () {
         terminatedContractAvgInterestRate: 0,
         terminatedContractAvgInterestWeighed: 0,
         terminatedContractAmount: 0,
+        runningContracts: 0,
+        runningContractAvgInterestRate: 0,
+        runningContractAvgInterestWeighed: 0,
+        runningContractAmount: 0,
       };
       prevRow = prevRow || row;
       row.amountBegin = prevRow.amountEnd;
@@ -113,7 +117,8 @@ exports.getNumbersPerYear = function () {
           });
           if (
             contract.getDepositDate() &&
-            contract.getDepositDate().year() === year
+            contract.getDepositDate().year() === year &&
+            contract.getDepositDate().isBefore(interestDate)
           ) {
             row.newContracts++;
             row.newContractAvgInterestRateWeighed +=
@@ -136,6 +141,17 @@ exports.getNumbersPerYear = function () {
               row.withdrawals -= transactionAmount;
             }
           }
+          if (
+            !contract.isTerminated(endOfYear) &&
+            contract.getDepositDate() &&
+            contract.getDepositDate().year() <= year &&
+            contract.getDepositDate().isBefore(interestDate)
+          ) {
+            row.runningContracts++;
+            row.runningContractAvgInterestWeighed +=
+              contract.amount * contract.interest_rate;
+            row.runningContractAmount += contract.amount;
+          }
           row.interestGained += contract.getInterestToDate(interestDate);
         });
       });
@@ -154,6 +170,11 @@ exports.getNumbersPerYear = function () {
         row.terminatedContractAvgInterestRate =
           row.terminatedContractAvgInterestWeighed /
           row.terminatedContractAmount;
+      }
+
+      if (row.runningContractAmount > 0) {
+        row.runningContractAvgInterestRate =
+          row.runningContractAvgInterestWeighed / row.runningContractAmount;
       }
 
       aggregatedInterest += row.interestGained;
@@ -183,6 +204,9 @@ exports.getNumbersPerYear = function () {
           b.terminatedContractAvgInterestWeighed,
         terminatedContractAmount:
           a.terminatedContractAmount + b.terminatedContractAmount,
+        runningContracts: b.runningContracts,
+        runningContractAvgInterestWeighed: b.runningContractAvgInterestWeighed,
+        runningContractAmount: b.runningContractAmount,
       };
     });
     if (totals.newContractAmount > 0) {
@@ -193,6 +217,10 @@ exports.getNumbersPerYear = function () {
       totals.terminatedContractAvgInterestRate =
         totals.terminatedContractAvgInterestWeighed /
         totals.terminatedContractAmount;
+    }
+    if (totals.runningContractAmount > 0) {
+      totals.runningContractAvgInterestRate =
+        totals.runningContractAvgInterestWeighed / totals.runningContractAmount;
     }
     rows.push(totals);
     return rows;
@@ -365,268 +393,128 @@ exports.getGermanContractsByYearAndInterestRate = function (
 };
 
 exports.getNumbers = function () {
-  var contractHelper = [];
+  var contracts = {
+    running: [],
+    cancelled: [],
+  };
 
   var numbers = {
     firstContractDate: moment(),
     total: {
-      amount: 0,
       contractAmount: 0,
-      deposits: 0,
-      withdrawals: 0,
-      notReclaimed: 0,
-      outstandingAmount: 0,
-      interestToDate: 0,
-
-      avgAmount: 0,
-      medianAmount: 0,
-
-      count: 0,
-
-      interestPaid: 0,
-      avgInterestRate: 0,
-      medianInterestRate: 0,
-
+      avgContractAmount: 0,
+      medianContractAmount: 0,
+      contracts: 0,
       users: 0,
     },
     running: {
-      amount: 0,
       contractAmount: 0,
-      deposits: 0,
-      withdrawals: 0,
-      notReclaimed: 0,
-      outstandingAmount: 0,
-      interestToDate: 0,
-      avgAmount: 0,
-      count: 0,
-      avgInterestRate: 0,
+      avgContractAmount: 0,
+      medianContractAmount: 0,
+      contracts: 0,
       users: 0,
     },
     cancelled: {
-      amount: 0,
       contractAmount: 0,
-      deposits: 0,
-      withdrawals: 0,
-      interestPaid: 0,
-      notReclaimed: 0,
-
-      avgAmount: 0,
-      count: 0,
-      avgInterestRate: 0,
+      avgContractAmount: 0,
+      medianContractAmount: 0,
+      contracts: 0,
       users: 0,
       avgDaysToRepay: 0,
       avgDaysToRepayCount: 0,
     },
-    lastMonth: {
-      amountNew: 0,
-      amountCancelled: 0,
-      countNew: 0,
-      countCancelled: 0,
-    },
-    lastYear: {
-      amountNew: 0,
-      amountCancelled: 0,
-      countNew: 0,
-      countCancelled: 0,
-    },
-    byRelationship: {},
-    charts: {},
   };
-
-  var lastMonth = moment().subtract(1, "months");
-  var lastYear = moment().subtract(1, "year");
   var now = moment();
 
-  return models.user
-    .findAll({
-      include: {
-        model: models.contract,
-        as: "contracts",
-        include: {
-          model: models.transaction,
-          as: "transactions",
-        },
-      },
-    })
-    .then(function (users) {
-      users.forEach(function (user) {
-        hasNotTerminatedContracts = false;
-
-        user.contracts.forEach(function (contract) {
-          var deposits = 0,
-            withdrawals = 0,
-            interest = 0,
-            notReclaimed = 0,
-            lastTransaction;
-
-          if (numbers.firstContractDate.isAfter(moment(contract.sign_date))) {
+  return models.user.findFetchFull(models, {}).then((users) => {
+    users.forEach((user) => {
+      var hasNotTerminatedContracts = false;
+      var hasTerminatedContracts = false;
+      user.contracts.forEach((contract) => {
+        if (
+          contract.getDepositDate() &&
+          contract.getDepositDate().isBefore(now)
+        ) {
+          if (numbers.firstContractDate.isAfter(contract.sign_date)) {
             numbers.firstContractDate = moment(contract.sign_date);
           }
-
-          contract.transactions.forEach(function (transaction) {
-            //toDate = transaction.interestToDate(contract.interest_rate, now);
-            //console.log("user: " + user.first_name + " " + user.last_name + ", now: " + now + ", transactions(date, amount):" + transaction.transaction_date + ", " + transaction.amount +" interest: " + toDate);
-            interest += transaction.interestToDate(contract.interest_rate, now);
-            // general statistics
-            if (transaction.amount > 0) {
-              deposits += transaction.amount;
-            } else {
-              withdrawals += transaction.amount;
-              if (transaction.type === "notreclaimed") {
-                notReclaimed += transaction.amount;
-              }
-            }
-
-            // last month statistics
-            if (moment(transaction.transaction_date).diff(lastMonth) > 0) {
-              if (transaction.amount > 0) {
-                numbers.lastMonth.amountNew += transaction.amount;
-                numbers.lastMonth.countNew++;
-              } else {
-                numbers.lastMonth.amountCancelled += transaction.amount;
-                numbers.lastMonth.countCancelled++;
-              }
-            }
-
-            // last year statistics
-            if (moment(transaction.transaction_date).diff(lastYear) > 0) {
-              if (transaction.amount > 0) {
-                numbers.lastYear.amountNew += transaction.amount;
-                numbers.lastYear.countNew++;
-              } else {
-                numbers.lastYear.amountCancelled += transaction.amount;
-                numbers.lastYear.countCancelled++;
-              }
-            }
-
-            lastTransaction = transaction.transaction_date;
-          });
-
-          // general statistics
-          numbers.total.amount += deposits;
-          numbers.total.avgInterestRate +=
-            contract.amount * contract.interest_rate;
-          numbers.total.count++;
-
           if (contract.isTerminated(now)) {
-            numbers.cancelled.count++;
-            numbers.cancelled.amount += deposits;
-            numbers.cancelled.avgInterestRate +=
-              contract.amount * contract.interest_rate;
-
+            hasTerminatedContracts = true;
+            numbers.cancelled.contracts++;
             numbers.cancelled.contractAmount += contract.amount;
-            numbers.cancelled.deposits += deposits;
-            numbers.cancelled.withdrawals -= withdrawals - notReclaimed;
-            numbers.cancelled.notReclaimed -= notReclaimed;
-            numbers.cancelled.interestPaid -=
-              deposits + withdrawals - notReclaimed;
+            contracts.cancelled.push(contract);
             if (
-              lastTransaction &&
+              contract.transactions.length > 0 &&
               contract.termination_date &&
-              (!contract.termination_type || contract.termination_type == "T")
+              (!contract.termination_type || contract.termination_type === "T")
             ) {
-              var daysToRepay = moment(lastTransaction).diff(
-                moment(contract.termination_date),
-                "days"
-              );
-              if (daysToRepay > 0) {
-                numbers.cancelled.avgDaysToRepay += daysToRepay;
-                numbers.cancelled.avgDaysToRepayCount++;
-              }
+              contract.sortTransactions();
+              var daysToRepay = moment(
+                contract.transactions[contract.transactions.length - 1]
+                  .transaction_date
+              ).diff(moment(contract.termination_date), "days");
+              numbers.cancelled.avgDaysToRepay +=
+                daysToRepay >= 0 ? daysToRepay : 0;
+              numbers.cancelled.avgDaysToRepayCount += daysToRepay >= 0 ? 1 : 0;
             }
-
-            numbers.total.contractAmount += contract.amount;
-            numbers.total.deposits += deposits;
-            numbers.total.withdrawals -= withdrawals - notReclaimed;
-            numbers.total.notReclaimed -= notReclaimed;
-            numbers.total.interestPaid -= deposits + withdrawals - notReclaimed;
           } else {
             hasNotTerminatedContracts = true;
-            numbers.running.count++;
-            numbers.running.amount += deposits;
-            numbers.running.avgInterestRate +=
-              contract.amount * contract.interest_rate;
-
+            numbers.running.contracts++;
             numbers.running.contractAmount += contract.amount;
-            numbers.running.deposits += deposits;
-            numbers.running.withdrawals -= withdrawals - notReclaimed;
-            numbers.running.notReclaimed -= notReclaimed;
-            numbers.running.outstandingAmount +=
-              deposits + withdrawals + interest;
-            numbers.running.interestToDate += interest;
-
-            numbers.total.contractAmount += contract.amount;
-            numbers.total.deposits += deposits;
-            numbers.total.withdrawals -= withdrawals - notReclaimed;
-            numbers.total.notReclaimed -= notReclaimed;
-            numbers.total.outstandingAmount +=
-              deposits + withdrawals + interest;
-            numbers.total.interestToDate += interest;
+            contracts.running.push(contract);
           }
-
-          if (numbers.byRelationship[user.relationhip]) {
-            numbers.byRelationship[user.relationship] += contract.amount;
-          } else {
-            numbers.byRelationship[user.relationship] = contract.amount;
-          }
-
-          contractHelper.push({
-            interestRate: contract.interest_rate,
-            amount: contract.amount,
-          });
-        });
-
-        if (hasNotTerminatedContracts) {
-          numbers.running.users++;
-        } else {
-          numbers.cancelled.users++;
         }
-        numbers.total.users++;
       });
 
-      numbers.total.avgInterestRate =
-        numbers.total.avgInterestRate / numbers.total.contractAmount;
-      numbers.running.avgInterestRate =
-        numbers.running.avgInterestRate / numbers.running.contractAmount;
-      numbers.cancelled.avgInterestRate =
-        numbers.cancelled.avgInterestRate / numbers.cancelled.contractAmount;
-
-      contractHelper.sort(function (a, b) {
-        if (a.interestRate > b.interestRate) return 1;
-        else if (b.interestRate > a.interestRate) return -1;
-        else return 0;
-      });
-
-      if (numbers.total.count > 2) {
-        numbers.total.medianInterestRate =
-          contractHelper[Math.ceil(numbers.total.count / 2)].interestRate;
-      } else {
-        numbers.total.medianInterestRate = 0;
-      }
-
-      contractHelper.sort(function (a, b) {
-        if (a.amount > b.amount) return 1;
-        else if (b.amount > a.amount) return -1;
-        else return 0;
-      });
-
-      if (numbers.total.count > 2) {
-        numbers.total.medianAmount =
-          contractHelper[Math.ceil(numbers.total.count / 2)].amount;
-      } else {
-        numbers.total.medianAmount = 0;
-      }
-
-      numbers.total.avgAmount =
-        numbers.total.contractAmount / numbers.total.count;
-      numbers.cancelled.avgAmount =
-        numbers.cancelled.contractAmount / numbers.cancelled.count;
-      numbers.running.avgAmount =
-        numbers.running.contractAmount / numbers.running.count;
-
-      numbers.cancelled.avgDaysToRepay =
-        numbers.cancelled.avgDaysToRepay /
-        numbers.cancelled.avgDaysToRepayCount;
-      return numbers;
+      numbers.running.users += hasNotTerminatedContracts ? 1 : 0;
+      numbers.cancelled.users +=
+        hasTerminatedContracts && !hasNotTerminatedContracts ? 1 : 0;
     });
+
+    numbers.running.avgContractAmount =
+      numbers.running.contractAmount / numbers.running.contracts;
+    numbers.running.avgContractAmountPerUser =
+      numbers.running.contractAmount / numbers.running.users;
+    contracts.running.sort(function (a, b) {
+      if (a.amount > b.amount) return 1;
+      else if (b.amount > a.amount) return -1;
+      else return 0;
+    });
+    numbers.running.medianContractAmount =
+      contracts.running[Math.floor(contracts.running.length / 2)].amount;
+
+    numbers.cancelled.avgContractAmount =
+      numbers.cancelled.contractAmount / numbers.cancelled.contracts;
+    numbers.cancelled.avgContractAmountPerUser =
+      numbers.cancelled.contractAmount / numbers.cancelled.users;
+    numbers.cancelled.avgDaysToRepay =
+      numbers.cancelled.avgDaysToRepay / numbers.cancelled.avgDaysToRepayCount;
+    contracts.cancelled.sort(function (a, b) {
+      if (a.amount > b.amount) return 1;
+      else if (b.amount > a.amount) return -1;
+      else return 0;
+    });
+    numbers.cancelled.medianContractAmount =
+      contracts.cancelled[Math.floor(contracts.cancelled.length / 2)].amount;
+
+    numbers.total.users = numbers.running.users + numbers.cancelled.users;
+    numbers.total.contracts =
+      numbers.running.contracts + numbers.cancelled.contracts;
+    numbers.total.contractAmount =
+      numbers.running.contractAmount + numbers.cancelled.contractAmount;
+    numbers.total.avgContractAmount =
+      numbers.total.contractAmount / numbers.total.contracts;
+    numbers.total.avgContractAmountPerUser =
+      numbers.total.contractAmount / numbers.total.users;
+    contracts.total = contracts.running.concat(contracts.cancelled);
+    contracts.total.sort(function (a, b) {
+      if (a.amount > b.amount) return 1;
+      else if (b.amount > a.amount) return -1;
+      else return 0;
+    });
+    numbers.total.medianContractAmount =
+      contracts.total[Math.floor(contracts.total.length / 2)].amount;
+
+    return numbers;
+  });
 };

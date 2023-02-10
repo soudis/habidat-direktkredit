@@ -12,28 +12,37 @@ block content
           table.table.table-striped(id="numberstable" data-auto-width="false")
             thead
               tr
-                th.control.fit.text-center(data-orderable="false")
-                th Jahr
-                th.text-right Neue Kredite
-                th.text-right Rückgezahlte Kredite
+                th.control.fit.text-center(rowspan="2" data-orderable="false")
+                th(rowspan="2") Jahr
+                th.text-center(colspan="3") Kredite
+                th.text-center(colspan="3") Zahlungen
+                th.text-center(colspan="2") Zinsen
+                th.text-right(rowspan="2") Aushaftender Betrag 
+              tr 
+                th.text-right Neu
+                th.text-right Rückgezahlt
+                th.text-right Laufend
                 th.text-right Einzahlungen
                 th.text-right Auszahlungen
                 th.text-right Nicht rückgefordert
-                th.text-right Zinsen
-                th.text-right Zinsen ausbezahlt
-                th.text-right Aushaftender Betrag 
+                th.text-right angefallen
+                th.text-right davon ausbezahlt
               tbody
                 each year, index in numbersPerYear   
                   if index < numbersPerYear.length-1
                     tr
                       td.control.fit
-                      td= year.year
+                      td= year.year 
+                        small= (index === numbersPerYear.length - 2?' 🠒 heute':'')
                       td.text-right
                         span= year.newContracts
                         small= ' (Ø ' + format.formatPercent(year.newContractAvgInterestRate) + ')'
                       td.text-right
                         span= year.terminatedContracts
                         small= ' (Ø ' + format.formatPercent(year.terminatedContractAvgInterestRate) + ')'              
+                      td.text-right
+                        span= year.runningContracts
+                        small= ' (Ø ' + format.formatPercent(year.runningContractAvgInterestRate) + ')'              
                       td.text-right= format.formatMoney(year.deposits, 2)
                       td.text-right= format.formatMoney(year.withdrawals, 2)
                       td.text-right= format.formatMoney(year.notReclaimed, 2)
@@ -51,6 +60,9 @@ block content
                   th.text-right
                     span= year.terminatedContracts
                     small= ' (Ø ' + format.formatPercent(year.terminatedContractAvgInterestRate) + ')'              
+                  th.text-right
+                    span= year.runningContracts
+                    small= ' (Ø ' + format.formatPercent(year.runningContractAvgInterestRate) + ')'              
                   th.text-right= format.formatMoney(year.deposits, 2)
                   th.text-right= format.formatMoney(year.withdrawals, 2)
                   th.text-right= format.formatMoney(year.notReclaimed, 2)
@@ -65,9 +77,9 @@ block content
             thead
               tr
                 th Kennzahl
-                th.text-right Alle Kredite
-                th.text-right Gekündigte Kredite
-                th.text-right Laufende Kredite
+                th.text-right Alle
+                th.text-right Rückgezahlt
+                th.text-right Laufend
             tbody
               tr
                 td 
@@ -77,6 +89,12 @@ block content
                 td.text-right= numbers.running.users
               tr
                 td 
+                  strong Anzahl der Kredite
+                td.text-right= numbers.total.contracts
+                td.text-right= numbers.cancelled.contracts
+                td.text-right= numbers.running.contracts
+              tr
+                td 
                   strong Vertragswert Gesamt
                 td.text-right #{format.formatMoney(numbers.total.contractAmount ,2)}
                 td.text-right #{format.formatMoney(numbers.cancelled.contractAmount ,2)}
@@ -84,21 +102,22 @@ block content
               tr
                 td 
                   strong Vertragswert Durchschnitt
-                td.text-right #{format.formatMoney(numbers.total.avgAmount ,2)}
-                td.text-right #{format.formatMoney(numbers.cancelled.avgAmount ,2)}
-                td.text-right #{format.formatMoney(numbers.running.avgAmount ,2)}
+                td.text-right #{format.formatMoney(numbers.total.avgContractAmount ,2)}
+                td.text-right #{format.formatMoney(numbers.cancelled.avgContractAmount ,2)}
+                td.text-right #{format.formatMoney(numbers.running.avgContractAmount ,2)}
               tr
                 td 
                   strong Vertragswert Median
-                td.text-right #{format.formatMoney(numbers.total.medianAmount ,2)}
-                td.text-right -
-                td.text-right -               
+                td.text-right #{format.formatMoney(numbers.total.medianContractAmount ,2)}
+                td.text-right #{format.formatMoney(numbers.cancelled.medianContractAmount ,2)}
+                td.text-right #{format.formatMoney(numbers.running.medianContractAmount ,2)}
               tr
                 td 
                   strong Rückzahlungsdauer Durchschschnitt
                 td.text-right -
                 td.text-right #{format.format(numbers.cancelled.avgDaysToRepay ,2, '# Tage')}
                 td.text-right -
+
     - var months = Math.abs(moment(numbers.firstContractDate).startOf('month').diff(moment().endOf('month'), 'months'));
     .col-md-6.col-xs-12.chart-container
       .card
@@ -112,7 +131,11 @@ block content
           canvas(id="by-relation" width="400" height="400")
     .col-md-6.col-xs-12.chart-container
       .card
-        h4.card-header Laufende Kredite nach 
+        h4.card-header 
+          span#by-region-back.d-none(data-currenturl=_url("/statistics/byregion/country"), data-currentdescription='Land')
+            a.btn.btn-light.btn-sm#by-region-backbutton #[span.fa.fa-arrow-left]
+            span  
+          span Laufende Kredite nach 
           span#by-region-level Land
           span  
           span.fa.fa-info-circle(title="Auf Region klicken um zu zoomen")
