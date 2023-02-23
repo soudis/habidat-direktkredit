@@ -1,43 +1,52 @@
-var _ = require('lodash');
-var moment = require('moment');
+var _ = require("lodash");
 
-var excludeAttributes = function(obj, attrsToExclude){
+var excludeAttributes = function (obj, attrsToExclude) {
   return _.omit(obj, attrsToExclude);
-}
+};
 
-var Tracker = function(model, sequelize, trackerOptions) {
+var Tracker = function (model, sequelize, trackerOptions) {
   if (!trackerOptions || !_.isObject(trackerOptions)) {
-    throw new Error('Option object is mandatory.');
+    throw new Error("Option object is mandatory.");
   }
 
   if (!model) {
-    throw new Error('Target model is mandatory.');
+    throw new Error("Target model is mandatory.");
   }
 
   if (!trackerOptions.userModel) {
-    throw new Error('Options must include name of the user model.');
+    throw new Error("Options must include name of the user model.");
   }
   if (!_.isString(model) && (!_.isObject(model) || !model.sequelize)) {
-    throw new Error('Target model needs to be a string or Sequelize model object.');
+    throw new Error(
+      "Target model needs to be a string or Sequelize model object."
+    );
   }
 
-  if (!_.isString(trackerOptions.userModel) && (!_.isObject(trackerOptions.userModel) || !trackerOptions.userModel.sequelize)) {
-    throw new Error('User model needs to be a string or Sequelize model object.');
+  if (
+    !_.isString(trackerOptions.userModel) &&
+    (!_.isObject(trackerOptions.userModel) ||
+      !trackerOptions.userModel.sequelize)
+  ) {
+    throw new Error(
+      "User model needs to be a string or Sequelize model object."
+    );
   }
 
   var trackerDefaultOptions = {
     persistant: true,
-    changes: ['update'],
-    allowNull: false
+    changes: ["update"],
+    allowNull: false,
   };
   trackerOptions = _.extend({}, trackerDefaultOptions, trackerOptions);
-  var trackedModel = _.isString(trackerOptions.userModel) ? sequelize.model(trackerOptions.userModel) : trackerOptions.userModel;
+  var trackedModel = _.isString(trackerOptions.userModel)
+    ? sequelize.model(trackerOptions.userModel)
+    : trackerOptions.userModel;
   var targetModel = _.isString(model) ? sequelize.model(model) : model;
   var Sequelize = sequelize.Sequelize;
-  var trackName = targetModel.name + 'Log';
+  var trackName = targetModel.name + "Log";
   var changesDataType = Sequelize.TEXT;
 
-  if (trackerOptions.encryption &&  trackerOptions.encrypt) {
+  if (trackerOptions.encryption && trackerOptions.encrypt) {
     changesDataType = Sequelize.TEXT;
   }
 
@@ -60,7 +69,7 @@ var Tracker = function(model, sequelize, trackerOptions) {
       type: Sequelize.DATE,
       allowNull: false,
       defaultValue: Sequelize.NOW,
-    }
+    },
   };
 
   var excludedAttributes = ["id", "createdAt", "updatedAt"];
@@ -68,37 +77,49 @@ var Tracker = function(model, sequelize, trackerOptions) {
   trackAttributes = _.assign({}, trackAttributes);
 
   var trackOwnOptions = {
-    timestamps: false
+    timestamps: false,
   };
   var trackOptions = _.assign({}, trackOwnOptions);
 
   var modelTrack = sequelize.define(trackName, trackAttributes, trackOptions);
 
   var modelOptions = {
-    onDelete: trackerOptions.persistant ? false : 'CASCADE'
+    onDelete: trackerOptions.persistant ? false : "CASCADE",
   };
 
-  modelTrack.belongsTo(targetModel, _.assign({
-  	as: 'target',
-    foreignKey: 'target_id'
-  }, modelOptions));
-  modelTrack.belongsTo(trackedModel, _.assign({
-  	as: 'user',
-    foreignKey: 'user_id'
-  }, modelOptions));
+  modelTrack.belongsTo(
+    targetModel,
+    _.assign(
+      {
+        as: "target",
+        foreignKey: "target_id",
+      },
+      modelOptions
+    )
+  );
+  modelTrack.belongsTo(
+    trackedModel,
+    _.assign(
+      {
+        as: "user",
+        foreignKey: "user_id",
+      },
+      modelOptions
+    )
+  );
 
-  var preSave = function(changes) {
-    if (trackerOptions.encryption &&  trackerOptions.encrypt) {
+  var preSave = function (changes) {
+    if (trackerOptions.encryption && trackerOptions.encrypt) {
       return sequelize.fn(
         trackerOptions.encryption.pg_encrypt,
         JSON.stringify(changes),
         trackerOptions.encryption.secret
-      )
+      );
     }
     return JSON.stringify(changes);
-  }
+  };
 
-  var createHook = function(obj, options) {
+  var createHook = function (obj, options) {
     if (isDoNotTrack(options)) {
       return false;
     }
@@ -107,106 +128,106 @@ var Tracker = function(model, sequelize, trackerOptions) {
 
     var values = excludeAttributes(obj.dataValues, excludedAttributes);
     var changes = [];
-    _.forOwn(values, function(value, key) {
-      	if (value !== '') {
-			changes.push({
-	        	value: value,
-	        	previousValue: '',
-	        	field: key
-	    	});
-      	}
+    _.forOwn(values, function (value, key) {
+      if (value !== "") {
+        changes.push({
+          value: value,
+          previousValue: "",
+          field: key,
+        });
+      }
     });
 
     var dataValues = {
       changes: preSave(changes),
       target_id: obj.id,
-      action: 'create',
+      action: "create",
       user_id: options.trackOptions.user_id,
-      metadata: options.trackOptions.metadata
-    }
+      metadata: options.trackOptions.metadata,
+    };
 
-    if (trackerOptions.changes.indexOf('create') < 0) {
+    if (trackerOptions.changes.indexOf("create") < 0) {
       delete dataValues.changes;
     }
 
     return modelTrack.create(dataValues, {
-      transaction: options.transaction
+      transaction: options.transaction,
     });
-  }
+  };
 
-  var createBulkHook = function(obj, options) {
+  var createBulkHook = function (obj, options) {
     if (isDoNotTrack(options)) {
       return false;
     }
     checkMandatoryHookOptions(options);
 
-    var dataValues = _.map(obj, function(o) {
+    var dataValues = _.map(obj, function (o) {
       var values = excludeAttributes(o.dataValues, excludedAttributes);
       var changes = [];
-      _.forOwn(values, function(value, key) {
-      	if (value !== '') {
-			changes.push({
-	        	value: value,
-	        	previousValue: '',
-	        	field: key
-	    	});
-      	}
+      _.forOwn(values, function (value, key) {
+        if (value !== "") {
+          changes.push({
+            value: value,
+            previousValue: "",
+            field: key,
+          });
+        }
       });
       return {
         changes: preSave(changes),
         target_id: o.id,
-        action: 'create',
+        action: "create",
         user_id: options.trackOptions.user_id,
-        metadata: options.trackOptions.metadata
+        metadata: options.trackOptions.metadata,
       };
     });
 
     // Refactor later (done: 5 August 2019)
-    if (trackerOptions.changes.indexOf('create') < 0) {
-      _.forEach(dataValues, function(value, i) {
+    if (trackerOptions.changes.indexOf("create") < 0) {
+      _.forEach(dataValues, function (value, i) {
         delete dataValues[i].changes;
       });
     }
 
     return modelTrack.bulkCreate(dataValues, {
-      transaction: options.transaction
+      transaction: options.transaction,
     });
-  }
+  };
 
-  var updateHook = function(obj, options) {
+  var updateHook = function (obj, options) {
     if (isDoNotTrack(options)) {
       return false;
     }
     checkMandatoryHookOptions(options);
     var values = excludeAttributes(obj.dataValues, excludedAttributes);
     var changes = [];
-    var hasEncryption = trackerOptions.encryption && trackerOptions.encryption.fields;
+    var hasEncryption =
+      trackerOptions.encryption && trackerOptions.encryption.fields;
     var findOptions = {};
     findOptions.where = { id: obj.id };
     if (hasEncryption) {
       var fields = trackerOptions.encryption.fields;
-      const rawAttributes = Object.keys(targetModel['rawAttributes']);
-      const attributes = rawAttributes.map(function(attr) {
+      const rawAttributes = Object.keys(targetModel["rawAttributes"]);
+      const attributes = rawAttributes.map(function (attr) {
         if (fields.indexOf(attr) > -1) {
           return [
             sequelize.fn(
               trackerOptions.encryption.pg_decrypt,
               sequelize.cast(
                 sequelize.col(`${trackerOptions.encryption.modelName}.${attr}`),
-                'bytea'
+                "bytea"
               ),
               trackerOptions.encryption.secret
             ),
-            attr
-          ]
+            attr,
+          ];
         }
         return attr;
       });
       findOptions.attributes = attributes;
     }
-    return targetModel.findOne(findOptions)
-    .then(function(data) {
-      _.forOwn(values, function(value, key) {
+    return targetModel.findOne(findOptions).then(function (data) {
+      _.forOwn(values, function (value, key) {
         var newValue = value;
         if (hasEncryption) {
           var fields = trackerOptions.encryption.fields;
@@ -215,14 +236,13 @@ var Tracker = function(model, sequelize, trackerOptions) {
           }
         }
         if (
-            (typeof data[key] === 'boolean' || !!data[key]) &&
-            !_.isEqual(data[key], newValue)
-          ) {
-
+          (typeof data[key] === "boolean" || !!data[key]) &&
+          !_.isEqual(data[key], newValue)
+        ) {
           changes.push({
             value: newValue,
             previousValue: data[key],
-            field: key
+            field: key,
           });
         }
       });
@@ -230,64 +250,67 @@ var Tracker = function(model, sequelize, trackerOptions) {
       var dataValues = {
         changes: preSave(changes),
         target_id: obj.id,
-        action: 'update',
+        action: "update",
         user_id: options.trackOptions.user_id,
-        metadata: options.trackOptions.metadata
-      }
+        metadata: options.trackOptions.metadata,
+      };
 
       return modelTrack.create(dataValues, {
-        transaction: options.transaction
+        transaction: options.transaction,
       });
     });
-  }
+  };
 
-  var updateBulkHook = function(options) {
+  var updateBulkHook = function (options) {
     if (isDoNotTrack(options)) {
       return false;
     }
     checkMandatoryHookOptions(options);
     var findOptions = {
-      where: options.where
+      where: options.where,
     };
-    var hasEncryption = trackerOptions.encryption && trackerOptions.encryption.fields;
+    var hasEncryption =
+      trackerOptions.encryption && trackerOptions.encryption.fields;
     if (hasEncryption) {
       var fields = trackerOptions.encryption.fields;
-      const rawAttributes = Object.keys(targetModel['rawAttributes']);
-      const attributes = rawAttributes.map(function(attr) {
+      const rawAttributes = Object.keys(targetModel["rawAttributes"]);
+      const attributes = rawAttributes.map(function (attr) {
         if (fields.indexOf(attr) > -1) {
           return [
             sequelize.fn(
               trackerOptions.encryption.pg_decrypt,
               sequelize.cast(
                 sequelize.col(`${trackerOptions.encryption.modelName}.${attr}`),
-                'bytea'
+                "bytea"
               ),
               trackerOptions.encryption.secret
             ),
-            attr
-          ]
+            attr,
+          ];
         }
         return attr;
       });
       findOptions.attributes = attributes;
     }
-    return targetModel.findAll(findOptions)
-    .then(function(data) {
+    return targetModel.findAll(findOptions).then(function (data) {
       if (data) {
-        var dataValues = _.map(data, function(obj) {
+        var dataValues = _.map(data, function (obj) {
           var values = excludeAttributes(obj.dataValues, excludedAttributes);
           changes = [];
-          _.forOwn(values, function(value, key) {
-          	if (options.attributes[key] instanceof Date) {
-          		value = new Date(value);
-          	}
-            var conditional = (typeof options.attributes[key] === 'boolean' || !!options.attributes[key]) &&
+          _.forOwn(values, function (value, key) {
+            if (options.attributes[key] instanceof Date) {
+              value = new Date(value);
+            }
+            var conditional =
+              (typeof options.attributes[key] === "boolean" ||
+                !!options.attributes[key]) &&
               !_.isEqual(options.attributes[key], value);
             var newValue = options.attributes[key];
             if (hasEncryption) {
               if (fields.indexOf(key) > -1 && options.attributes[key]) {
                 newValue = options.attributes[key].args[0];
-                conditional = (typeof newValue === 'boolean' || !!newValue) &&
+                conditional =
+                  (typeof newValue === "boolean" || !!newValue) &&
                   !_.isEqual(newValue, value);
               }
             }
@@ -295,99 +318,99 @@ var Tracker = function(model, sequelize, trackerOptions) {
               changes.push({
                 value: newValue,
                 previousValue: value,
-                field: key
-              })
+                field: key,
+              });
             }
           });
           return {
             changes: preSave(changes),
             target_id: obj.id,
-            action: 'update',
+            action: "update",
             user_id: options.trackOptions.user_id,
-            metadata: options.trackOptions.metadata
-          }
+            metadata: options.trackOptions.metadata,
+          };
         });
 
         return modelTrack.bulkCreate(dataValues, {
-          transaction: options.transaction
+          transaction: options.transaction,
         });
       }
     });
-  }
+  };
 
-  var deleteHook = function(obj, options) {
+  var deleteHook = function (obj, options) {
     checkMandatoryHookOptions(options);
 
     var values = excludeAttributes(obj.dataValues, excludedAttributes);
     var changes = [];
-    _.forOwn(values, function(value, key) {
+    _.forOwn(values, function (value, key) {
       changes.push({
-        value: '',
+        value: "",
         previousValue: value,
-        field: key
-      })
+        field: key,
+      });
     });
 
     var dataValues = {
       changes: preSave(changes),
       target_id: obj.id,
-      action: 'delete',
+      action: "delete",
       user_id: options.trackOptions.user_id,
-      metadata: options.trackOptions.metadata
-    }
+      metadata: options.trackOptions.metadata,
+    };
 
-    if (trackerOptions.changes.indexOf('delete') < 0) {
+    if (trackerOptions.changes.indexOf("delete") < 0) {
       delete dataValues.changes;
     }
 
     return modelTrack.create(dataValues, {
-      transaction: options.transaction
+      transaction: options.transaction,
     });
-  }
+  };
 
-  var deleteBulkHook = function(options) {
+  var deleteBulkHook = function (options) {
     checkMandatoryHookOptions(options);
 
-    return targetModel.findAll({
-      where: options.where
-    })
-    .then(function(data) {
-      if (data) {
-        var dataValues = _.map(data, function(obj) {
-          var values = excludeAttributes(obj.dataValues, excludedAttributes);
-          changes = [];
-          _.forOwn(values, function(value, key) {
-            changes.push({
-              value: '',
-              previousValue: value,
-              field: key
-            })
+    return targetModel
+      .findAll({
+        where: options.where,
+      })
+      .then(function (data) {
+        if (data) {
+          var dataValues = _.map(data, function (obj) {
+            var values = excludeAttributes(obj.dataValues, excludedAttributes);
+            changes = [];
+            _.forOwn(values, function (value, key) {
+              changes.push({
+                value: "",
+                previousValue: value,
+                field: key,
+              });
+            });
+            return {
+              changes: preSave(changes),
+              target_id: obj.id,
+              action: "delete",
+              user_id: options.trackOptions.user_id,
+              metadata: options.trackOptions.metadata,
+            };
           });
-          return {
-            changes: preSave(changes),
-            target_id: obj.id,
-            action: 'delete',
-            user_id: options.trackOptions.user_id,
-            metadata: options.trackOptions.metadata
-          }
-        });
 
-        // Refactor later (done: 5 August 2019)
-        if (trackerOptions.changes.indexOf('delete') < 0) {
-          _.forEach(dataValues, function(value, i) {
-            delete dataValues[i].changes;
+          // Refactor later (done: 5 August 2019)
+          if (trackerOptions.changes.indexOf("delete") < 0) {
+            _.forEach(dataValues, function (value, i) {
+              delete dataValues[i].changes;
+            });
+          }
+
+          return modelTrack.bulkCreate(dataValues, {
+            transaction: options.transaction,
           });
         }
+      });
+  };
 
-        return modelTrack.bulkCreate(dataValues, {
-          transaction: options.transaction
-        });
-      }
-    });
-  }
-
-
-  var findHook = function(obj, options) {
+  var findHook = function (obj, options) {
     if (!options || !options.trackOptions || !options.trackOptions.track) {
       return false;
     }
@@ -399,60 +422,66 @@ var Tracker = function(model, sequelize, trackerOptions) {
     }
 
     var objects = obj instanceof Array ? obj : [obj];
-    var dataValues = _.map(objects, function(o) {
+    var dataValues = _.map(objects, function (o) {
       return {
         target_id: o.id,
-        action: 'find',
+        action: "find",
         user_id: options.trackOptions.user_id,
-        metadata: options.trackOptions.metadata
+        metadata: options.trackOptions.metadata,
       };
-    })
+    });
 
     return modelTrack.bulkCreate(dataValues, {
-      transaction: options.transaction
+      transaction: options.transaction,
     });
-  }
+  };
 
-  var isDoNotTrack = function(options) {
+  var isDoNotTrack = function (options) {
     if (!options || !options.trackOptions) {
       // if no options given or options does not have trackOptions -> log
       return false;
     }
-    if (typeof options.trackOptions.track === 'boolean' && options.trackOptions.track === false) {
+    if (
+      typeof options.trackOptions.track === "boolean" &&
+      options.trackOptions.track === false
+    ) {
       // if track property is typeof boolean (is not undefined) and is set to false -> dont log
       return true;
     }
     return false;
-  }
+  };
 
-  var checkMandatoryHookOptions = function(options, optional) {
+  var checkMandatoryHookOptions = function (options, optional) {
     if (optional) {
       if (!options || !options.trackOptions || !options.trackOptions.track) {
         return false;
       }
     }
 
-    if (typeof trackerOptions.allowNull === 'boolean' && trackerOptions.allowNull === false) {
+    if (
+      typeof trackerOptions.allowNull === "boolean" &&
+      trackerOptions.allowNull === false
+    ) {
       if (!options || !options.trackOptions || !options.trackOptions.user_id) {
-        throw new Error('user_id is required in tracker options.');
+        throw new Error("user_id is required in tracker options.");
       }
     }
-  }
+  };
 
-  var readOnlyHook = function() {
+  var readOnlyHook = function () {
     throw new Error("This is a read-only log. You cannot modify it.");
   };
 
-  targetModel.addHook('afterFind', findHook);
-  targetModel.addHook('afterCreate', createHook);
-  targetModel.addHook('afterBulkCreate', createBulkHook);
-  targetModel.addHook('beforeUpdate', updateHook);
-  targetModel.addHook('beforeBulkUpdate', updateBulkHook);
-  targetModel.addHook('beforeDestroy', deleteHook);
-  targetModel.addHook('beforeBulkDestroy', deleteBulkHook);
+  targetModel.addHook("afterFind", findHook);
+  targetModel.addHook("afterCreate", createHook);
+  targetModel.addHook("afterBulkCreate", createBulkHook);
+  targetModel.addHook("beforeUpdate", updateHook);
+  targetModel.addHook("beforeBulkUpdate", updateBulkHook);
+  targetModel.addHook("beforeDestroy", deleteHook);
+  targetModel.addHook("beforeBulkDestroy", deleteBulkHook);
 
-  modelTrack.addHook('beforeUpdate', readOnlyHook);
-  modelTrack.addHook('beforeDestroy', readOnlyHook);
+  modelTrack.addHook("beforeUpdate", readOnlyHook);
+  modelTrack.addHook("beforeDestroy", readOnlyHook);
 
   return modelTrack;
 };

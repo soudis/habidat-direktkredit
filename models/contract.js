@@ -1,4 +1,4 @@
-/* jshint esversion: 8 */
+		/* jshint esversion: 8 */
 
 const moment = require('moment');
 const format = require('../utils/format');
@@ -193,8 +193,13 @@ module.exports = (sequelize, DataTypes) => {
 				}
 			}
 		});
-		return depositDate;
-	};
+		if (depositDate) {
+			return moment(depositDate);	
+		} else {
+			return;
+		}
+		
+	};	
 
 	contract.prototype.getTerminationType = function () {
 		return this.termination_type || settings.project.get('defaults.termination_type') || 'T';
@@ -389,6 +394,7 @@ module.exports = (sequelize, DataTypes) => {
 	    }
 	    return sum > 0 && terminated;
 	};
+
 
 	return contract;
 };

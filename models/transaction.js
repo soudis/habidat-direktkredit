@@ -84,7 +84,7 @@ module.exports = (sequelize, DataTypes) => {
 			transaction_amount: { valueRaw: transaction.amount, value: format.formatMoney(transaction.amount,2), order: transaction.amount},
 			transaction_payment_type: { valueRaw: transaction.getPaymentTypeText(), value: transaction.getPaymentTypeText() }
 		};
-	}
+	}	
 
 	transaction.prototype.getTypeText = function () {
 		switch(this.type) {

@@ -12,6 +12,7 @@ templates
 public/files
 public/images
 public/css/*.css
+public/css/*.css.map
 docker-compose.yml
 log/*
 

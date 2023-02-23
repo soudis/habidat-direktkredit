@@ -7,6 +7,7 @@ RUN \
   && rm -rf /var/lib/apt/lists/*
 
 RUN npm install pm2 -g
+RUN npm install sass -g
 
 RUN mkdir -p /habidat/node_modules && chown -R node:node /habidat
 
@@ -23,6 +24,8 @@ RUN npm install
 
 RUN mkdir -p /habidat/public/images && mkdir -p /habidat/upload && mkdir -p /habidat/log && touch /habidat/log/access.log
 COPY --chown=node:node . .
+
+RUN sass scss:public/css
 
 ENTRYPOINT ["docker-entrypoint.sh"]
 

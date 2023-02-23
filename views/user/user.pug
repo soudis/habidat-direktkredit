@@ -66,3 +66,6 @@ mixin user(user, templates_user, admin)
             tr
               td.col-md-4.h6: b Beziehung zum Projekt
               td.col-md-8.h6= user.relationship  	
+            tr
+              td.col-md-4.h6: b Mitgliedsstatus
+              td.col-md-8.h6= _t('membership_status_' + user.membership_status)

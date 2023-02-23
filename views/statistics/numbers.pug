@@ -6,123 +6,165 @@ block content
     p.lead Auswertungen für Hobby-Nummerolog*innen und Zahlennerds 
   .row
     .col-md-12
-      h4.underline Kennzahlen
+      .card
+        h4.card-header Kennzahlen nach Jahr
+        .card-body
+          table.table.table-striped(id="numberstable" data-auto-width="false")
+            thead
+              tr
+                th.control.fit.text-center(rowspan="2" data-orderable="false")
+                th(rowspan="2") Jahr
+                th.text-center(colspan="3") Kredite
+                th.text-center(colspan="3") Zahlungen
+                th.text-center(colspan="2") Zinsen
+                th.text-right(rowspan="2") Aushaftender Betrag 
+              tr 
+                th.text-right Neu
+                th.text-right Rückgezahlt
+                th.text-right Laufend
+                th.text-right Einzahlungen
+                th.text-right Auszahlungen
+                th.text-right Nicht rückgefordert
+                th.text-right angefallen
+                th.text-right davon ausbezahlt
+              tbody
+                each year, index in numbersPerYear   
+                  if index < numbersPerYear.length-1
+                    tr
+                      td.control.fit
+                      td= year.year 
+                        small= (index === numbersPerYear.length - 2?' 🠒 heute':'')
+                      td.text-right
+                        span= year.newContracts
+                        small= ' (Ø ' + format.formatPercent(year.newContractAvgInterestRate) + ')'
+                      td.text-right
+                        span= year.terminatedContracts
+                        small= ' (Ø ' + format.formatPercent(year.terminatedContractAvgInterestRate) + ')'              
+                      td.text-right
+                        span= year.runningContracts
+                        small= ' (Ø ' + format.formatPercent(year.runningContractAvgInterestRate) + ')'              
+                      td.text-right= format.formatMoney(year.deposits, 2)
+                      td.text-right= format.formatMoney(year.withdrawals, 2)
+                      td.text-right= format.formatMoney(year.notReclaimed, 2)
+                      td.text-right= format.formatMoney(year.interestGained, 2)
+                      td.text-right= format.formatMoney(year.interestPaid, 2)
+                      td.text-right= format.formatMoney(year.amountEnd, 2)                
+              tfoot
+                - var year = numbersPerYear[numbersPerYear.length-1]
+                tr
+                  td.control.fit
+                  th Gesamt
+                  th.text-right
+                    span= year.newContracts
+                    small= ' (Ø ' + format.formatPercent(year.newContractAvgInterestRate) + ')'
+                  th.text-right
+                    span= year.terminatedContracts
+                    small= ' (Ø ' + format.formatPercent(year.terminatedContractAvgInterestRate) + ')'              
+                  th.text-right
+                    span= year.runningContracts
+                    small= ' (Ø ' + format.formatPercent(year.runningContractAvgInterestRate) + ')'              
+                  th.text-right= format.formatMoney(year.deposits, 2)
+                  th.text-right= format.formatMoney(year.withdrawals, 2)
+                  th.text-right= format.formatMoney(year.notReclaimed, 2)
+                  th.text-right= format.formatMoney(year.interestGained, 2)
+                  th.text-right= format.formatMoney(year.interestPaid, 2)
+                  th.text-right= format.formatMoney(year.amountEnd, 2)    
     .col-md-12
-      table.table.table-striped
-        thead
-          tr
-            th Kennzahl
-            th.text-right Alle Kredite
-            th.text-right Gekündigte Kredite
-            th.text-right Laufende Kredite
-        tbody
-          tr
-            td 
-              strong Anzahl der Kredite
-            td.text-right= numbers.total.count
-            td.text-right= numbers.cancelled.count
-            td.text-right= numbers.running.count
-          tr
-            td 
-              strong Anzahl der Kreditgeber*innen
-            td.text-right= numbers.total.users
-            td.text-right= numbers.cancelled.users
-            td.text-right= numbers.running.users
-          tr
-            td 
-              strong Vertragswert Gesamt
-            td.text-right #{format.formatMoney(numbers.total.contractAmount ,2)}
-            td.text-right #{format.formatMoney(numbers.cancelled.contractAmount ,2)}
-            td.text-right #{format.formatMoney(numbers.running.contractAmount ,2)}
-          tr
-            td 
-              strong Vertragswert Durchschnitt
-            td.text-right #{format.formatMoney(numbers.total.avgAmount ,2)}
-            td.text-right #{format.formatMoney(numbers.cancelled.avgAmount ,2)}
-            td.text-right #{format.formatMoney(numbers.running.avgAmount ,2)}
-          tr
-            td 
-              strong Vertragswert Median
-            td.text-right #{format.formatMoney(numbers.total.medianAmount ,2)}
-            td.text-right -
-            td.text-right - 
-          tr
-            td 
-              strong Vertragszinssatz Durchschnitt
-            td.text-right #{format.formatPercent(numbers.total.avgInterestRate ,4)}
-            td.text-right #{format.formatPercent(numbers.cancelled.avgInterestRate ,4)}
-            td.text-right #{format.formatPercent(numbers.running.avgInterestRate ,4)}   
-          tr
-            td 
-              strong Einzahlungen
-            td.text-right #{format.formatMoney(numbers.total.deposits ,2)}
-            td.text-right #{format.formatMoney(numbers.cancelled.deposits ,2)}
-            td.text-right #{format.formatMoney(numbers.running.deposits ,2)}            
-          tr
-            td 
-              strong Rückzahlungen
-            td.text-right #{format.formatMoney(numbers.total.withdrawals ,2)}
-            td.text-right #{format.formatMoney(numbers.cancelled.withdrawals ,2)}
-            td.text-right #{format.formatMoney(numbers.running.withdrawals ,2)}            
-          tr
-            td 
-              strong Nicht rückgefordert
-            td.text-right #{format.formatMoney(numbers.total.notReclaimed ,2)}
-            td.text-right #{format.formatMoney(numbers.cancelled.notReclaimed ,2)}
-            td.text-right #{format.formatMoney(numbers.running.notReclaimed ,2)}            
-          tr
-            td 
-              strong Zinsen
-            td.text-right #{format.formatMoney(numbers.total.interestToDate + numbers.total.interestPaid ,2)}
-            td.text-right #{format.formatMoney(numbers.cancelled.interestPaid ,2)}
-            td.text-right #{format.formatMoney(numbers.running.interestToDate ,2)}            
-          tr
-            td 
-              strong Aushaftender Betrag
-            td.text-right #{format.formatMoney(numbers.total.outstandingAmount ,2)}
-            td.text-right #{format.formatMoney(0 ,2)}
-            td.text-right #{format.formatMoney(numbers.running.outstandingAmount ,2)}                 
-          tr
-            td 
-              strong Rückzahlungsdauer Durchschschnitt
-            td.text-right -
-            td.text-right #{format.format(numbers.cancelled.avgDaysToRepay ,2, '# Tage')}
-            td.text-right -
+      .card
+        h4.card-header Allgemeine Kennzahlen
+        .card-body
+          table.table.table-striped
+            thead
+              tr
+                th Kennzahl
+                th.text-right Alle
+                th.text-right Rückgezahlt
+                th.text-right Laufend
+            tbody
+              tr
+                td 
+                  strong Anzahl der Kreditgeber*innen
+                td.text-right= numbers.total.users
+                td.text-right= numbers.cancelled.users
+                td.text-right= numbers.running.users
+              tr
+                td 
+                  strong Anzahl der Kredite
+                td.text-right= numbers.total.contracts
+                td.text-right= numbers.cancelled.contracts
+                td.text-right= numbers.running.contracts
+              tr
+                td 
+                  strong Vertragswert Gesamt
+                td.text-right #{format.formatMoney(numbers.total.contractAmount ,2)}
+                td.text-right #{format.formatMoney(numbers.cancelled.contractAmount ,2)}
+                td.text-right #{format.formatMoney(numbers.running.contractAmount ,2)}
+              tr
+                td 
+                  strong Vertragswert Durchschnitt
+                td.text-right #{format.formatMoney(numbers.total.avgContractAmount ,2)}
+                td.text-right #{format.formatMoney(numbers.cancelled.avgContractAmount ,2)}
+                td.text-right #{format.formatMoney(numbers.running.avgContractAmount ,2)}
+              tr
+                td 
+                  strong Vertragswert Median
+                td.text-right #{format.formatMoney(numbers.total.medianContractAmount ,2)}
+                td.text-right #{format.formatMoney(numbers.cancelled.medianContractAmount ,2)}
+                td.text-right #{format.formatMoney(numbers.running.medianContractAmount ,2)}
+              tr
+                td 
+                  strong Rückzahlungsdauer Durchschschnitt
+                td.text-right -
+                td.text-right #{format.format(numbers.cancelled.avgDaysToRepay ,2, '# Tage')}
+                td.text-right -
+
     - var months = Math.abs(moment(numbers.firstContractDate).startOf('month').diff(moment().endOf('month'), 'months'));
     .col-md-6.col-xs-12.chart-container
-      h3.underline 
-        span Laufende Kredite nach Beziehung
-        span  
-        span.slider-info.h5.float-right
-      .daterange-slider
-        input(type="text" name="relationslider" id="relationslider" data-provide="slider" data-slider-handle="square" data-slider-range='true' data-start=moment(numbers.firstContractDate).startOf('month') data-slider-min=0 data-slider-max=months data-slider-value=0)
-      canvas(id="by-relation" width="400" height="400")
+      .card
+        h4.card-header
+          span Laufende Kredite nach Beziehung
+          span  
+          span.slider-info.h6.float-right
+        .card-body
+          .daterange-slider
+            input(type="text" name="relationslider" id="relationslider" data-provide="slider" data-slider-handle="square" data-slider-range='true' data-start=moment(numbers.firstContractDate).startOf('month') data-slider-min=0 data-slider-max=months data-slider-value=0)
+          canvas(id="by-relation" width="400" height="400")
     .col-md-6.col-xs-12.chart-container
-      h3.underline Laufende Kredite nach 
-        span#by-region-level Land
-        span  
-        span.fa.fa-info-circle(title="Auf Region klicken um zu zoomen")
-        span  
-        span.slider-info.h5.float-right
-      .daterange-slider
-        input(type="text" name="regionslider" id="regionslider" data-provide="slider" data-slider-handle="square" data-slider-range='true' data-start=moment(numbers.firstContractDate).startOf('month') data-slider-min=0 data-slider-max=months data-slider-value=0)
-      canvas(id="by-region" width="400" height="400")      
+      .card
+        h4.card-header 
+          span#by-region-back.d-none(data-currenturl=_url("/statistics/byregion/country"), data-currentdescription='Land')
+            a.btn.btn-light.btn-sm#by-region-backbutton #[span.fa.fa-arrow-left]
+            span  
+          span Laufende Kredite nach 
+          span#by-region-level Land
+          span  
+          span.fa.fa-info-circle(title="Auf Region klicken um zu zoomen")
+          span  
+          span.slider-info.h6.float-right
+        .card-body
+          .daterange-slider
+            input(type="text" name="regionslider" id="regionslider" data-provide="slider" data-slider-handle="square" data-slider-range='true' data-start=moment(numbers.firstContractDate).startOf('month') data-slider-min=0 data-slider-max=months data-slider-value=0)
+          canvas(id="by-region" width="400" height="400")      
     .col-md-6.col-xs-12.chart-container
-      h3.underline 
-        span Verschuldung
-        span  
-        span.slider-info.h5.float-right
-      .daterange-slider
-        input(type="text" name="debtslider" id="debtslider" data-provide="slider" data-slider-handle="square" data-slider-range='true' data-start=moment(numbers.firstContractDate).startOf('month') data-slider-min=0 data-slider-max=months data-slider-value=months-11)
-      canvas(id="by-month" width="400" height="400")  
+      .card
+        h4.card-header
+          span Verschuldung
+          span  
+          span.slider-info.h6.float-right
+        .card-body
+          .daterange-slider
+            input(type="text" name="debtslider" id="debtslider" data-provide="slider" data-slider-handle="square" data-slider-range='true' data-start=moment(numbers.firstContractDate).startOf('month') data-slider-min=0 data-slider-max=months data-slider-value=months-11)
+          canvas(id="by-month" width="400" height="400")  
     .col-md-6.col-xs-12.chart-container
-      h3.underline
-        span Transaktionen
-        span  
-        span.slider-info.h5.float-right
-      .daterange-slider
-        input(type="text" name="transactionslider" id="transactionslider" data-provide="slider" data-slider-handle="square" data-slider-range='true' data-start=moment(numbers.firstContractDate).startOf('month') data-slider-min=0 data-slider-max=months data-slider-value=months-11)
-      canvas(id="transactions-by-month" width="400" height="400")        
+      .card
+        h4.card-header
+          span Transaktionen
+          span  
+          span.slider-info.h6.float-right
+        .card-body
+          .daterange-slider
+            input(type="text" name="transactionslider" id="transactionslider" data-provide="slider" data-slider-handle="square" data-slider-range='true' data-start=moment(numbers.firstContractDate).startOf('month') data-slider-min=0 data-slider-max=months data-slider-value=months-11)
+          canvas(id="transactions-by-month" width="400" height="400")        
 
   script(type='text/javascript' src=_url('/public/slider/bootstrap-slider.min.js'))           
   script(type='text/javascript' src=_url('/public/javascripts/statistics.js'))          

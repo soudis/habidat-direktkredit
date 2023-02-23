@@ -51,6 +51,7 @@ services:
       - HABIDAT_DK_ADMIN_USERNAME=admin
       - HABIDAT_DK_ADMIN_PASSWORD=secret
       - HABIDAT_DK_DB_PASSWORD=secret
+      - HABIDAT_DK_SESSION_SECRET=secret      
       # no need to change for default setup:
       - HABIDAT_DK_DB_USER=direktkredit
       - HABIDAT_DK_DB_DATABASE=direktkredit

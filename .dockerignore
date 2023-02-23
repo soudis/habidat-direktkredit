@@ -12,6 +12,7 @@ tmp
 sessions
 templates
 docker-compose.yml
+package-lock.json
 public/files
 public/images
 public/css/*.css
