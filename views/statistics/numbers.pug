@@ -113,6 +113,12 @@ block content
                 td.text-right #{format.formatMoney(numbers.running.medianContractAmount ,2)}
               tr
                 td 
+                  strong Kreditlaufzeit Durchschnitt
+                td.text-right #{format.formatDuration(numbers.total.avgRuntime, 'years')}
+                td.text-right #{format.formatDuration(numbers.cancelled.avgRuntime, 'years')}
+                td.text-right #{format.formatDuration(numbers.running.avgRuntime, 'years')}
+              tr
+                td 
                   strong Rückzahlungsdauer Durchschschnitt
                 td.text-right -
                 td.text-right #{format.format(numbers.cancelled.avgDaysToRepay ,2, '# Tage')}
