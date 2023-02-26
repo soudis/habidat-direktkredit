@@ -30,6 +30,10 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.STRING,
         allowNull: true,
       },
+      salutation: {
+        type: DataTypes.STRING,
+        allowNull: true,
+      },
       first_name: {
         type: DataTypes.STRING,
         allowNull: true,
@@ -382,6 +386,18 @@ module.exports = (sequelize, DataTypes) => {
         filter: "text",
         displayOnly: true,
       },
+
+      user_salutation: {
+        id: "user_salutation",
+        label: "Anrede",
+        filter: "text",
+      },
+      user_is_formal: {
+        id: "user_is_formal",
+        label: "Indikator für formelle Anrede",
+        filter: "text",
+        displayOnly: true,
+      },
       user_title_prefix: {
         id: "user_title_prefix",
         label: "Titel",
@@ -492,6 +508,16 @@ module.exports = (sequelize, DataTypes) => {
       user_is_person: {
         valueRaw: !user.type && user.type === "person",
         value: !user.type && user.type === "person",
+      },
+      user_salutation: {
+        valueRaw: user.salutation || "personal",
+        value: user.salutation
+          ? intl._t("user_salutation_" + user.salutation)
+          : intl._t("user_salutation_personal"),
+      },
+      user_is_formal: {
+        valueRaw: user.type && user.saluation === "formal",
+        value: user.type && user.saluation === "formal",
       },
       user_title_prefix: {
         valueRaw: user.title_prefix,

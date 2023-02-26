@@ -1,6 +1,7 @@
 /* jshint esversion: 8 */
 
 const utils = require("../utils");
+const Op = require("sequelize").Op;
 
 module.exports = (sequelize, DataTypes) => {
   file = sequelize.define(
@@ -17,6 +18,10 @@ module.exports = (sequelize, DataTypes) => {
         allowNull: false,
       },
       description: {
+        type: DataTypes.STRING,
+        allowNull: true,
+      },
+      salutation: {
         type: DataTypes.STRING,
         allowNull: true,
       },
@@ -95,18 +100,28 @@ module.exports = (sequelize, DataTypes) => {
     }
   };
 
-  file.getContractTemplates = function () {
+  file.getContractTemplates = function (salutation = "personal") {
     return this.findAll({
       where: {
         ref_table: "template_contract",
+        [Op.or]: [
+          { salutation: { [Op.eq]: null } },
+          { salutation: "all" },
+          { salutation: salutation || "personal" },
+        ],
       },
     });
   };
 
-  file.getUserTemplates = function () {
+  file.getUserTemplates = function (salutation = "personal") {
     return this.findAll({
       where: {
         ref_table: "template_user",
+        [Op.or]: [
+          { salutation: { [Op.eq]: null } },
+          { salutation: "all" },
+          { salutation: salutation || "personal" },
+        ],
       },
     });
   };

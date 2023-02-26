@@ -34,6 +34,9 @@ mixin user(user, templates_user, admin)
             td.col-md-4.h6: b Adresse
             td.col-md-8.h6!= user.getAddress(true)
           tr
+            td.col-md-4.h6: b Anrede
+            td.col-md-8.h6= _t('user_salutation_' + user.salutation)
+          tr
             td.col-md-4.h6: b Telefonnummer
             td.col-md-8.h6= user.telno
           tr
