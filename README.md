@@ -15,29 +15,31 @@ This app is a direct loan management software for self organized housing project
 
 ## Usage
 
-Either clone repository or build Dockerfile. Create 
+Either clone repository or build Dockerfile. Create
 
-* site.json
-* config.json
-* projects.json
+- site.json
+- config.json
+- projects.json
 
-in config folder. Run app.js or run docker container. 
+in config folder. Run app.js or run docker container.
 
 ## Usage with docker-compose (recommended)
 
 1. create docker-compose.yml from docker-compose.yml.sample
 2. change environment variables in docker-compose.yml, especially:
-  * db:
-    * MYSQL_ROOT_PASSWORD
-    * MYSQL_PASSWORD
-  * web:
-    * HABIDAT_DK_PROJECT_ID
-    * HABIDAT_DK_PROJECT_NAME
-    * HABIDAT_LOGO
-    * HABIDAT_ADMIN_EMAIL
-    * HABIDAT_DK_ADMIN_USERNAME
-    * HABIDAT_DK_ADMIN_PASSWORD
-    * HABIDAT_DK_DB_PASSWORD
+
+- db:
+  - MYSQL_ROOT_PASSWORD
+  - MYSQL_PASSWORD
+- web:
+  - HABIDAT_DK_PROJECT_ID
+  - HABIDAT_DK_PROJECT_NAME
+  - HABIDAT_LOGO
+  - HABIDAT_ADMIN_EMAIL
+  - HABIDAT_DK_ADMIN_USERNAME
+  - HABIDAT_DK_ADMIN_PASSWORD
+  - HABIDAT_DK_DB_PASSWORD
+
 3. create containers with `docker-compose up -d`
 4. copy logo image to container with `docker cp /path/to/my-logo.gif "$(docker-compose ps -q web)":/habidat/public/images`
 5. access with http://localhost:8020
@@ -50,48 +52,80 @@ You can generate custom documents within the app. Go to "Administration / Vorlag
 
 ## Developing
 
-You can user dev_entrypoint.sh for development with docker. You also need to mount the source code directory from the host system to the /app directory of the container.
-
+You can user dev_entrypoint.sh for development with docker. You also need to mount the source code directory from the host system to the /habidat directory of the container.
 
 # project info
+
+```
 ENV HABIDAT_DK_PROJECT_ID project
 ENV HABIDAT_DK_PROJECT_NAME Projectname
 ENV HABIDAT_DK_LOGO logo.gif
 ENV HABIDAT_DK_EMAIL support@example.com
+```
 
 # project defaults
+
+```
 ENV HABIDAT_DK_PROJECT_DEFAULTS_INTEREST_METHOD 365_compound
 ENV HABIDAT_DK_PROJECT_DEFAULTS_TERMINATION_TYPE T
 ENV HABIDAT_DK_PROJECT_DEFAULTS_TERMINATION_PERIOD 6
 ENV HABIDAT_DK_PROJECT_DEFAULTS_TERMINATION_PERIOD_TYPE M
+```
 
 # database settings
+
+```
 ENV HABIDAT_DK_DB_URI mysql://user:pass@example.com:1234/dbname
 ENV HABIDAT_DK_DB_USER project
 ENV HABIDAT_DK_DB_PASSWORD secret
 ENV HABIDAT_DK_DB_DATABASE project
 ENV HABIDAT_DK_DB_HOST db
+```
 
 # admin authentication settings
+
+```
 ENV HABIDAT_DK_ADMIN_AUTH ldap
+```
 
 # ldap settings (optional)
+
+```
 ENV HABIDAT_DK_LDAP_HOST ldap
 ENV HABIDAT_DK_LDAP_PORT 389
 ENV HABIDAT_DK_LDAP_BINDDN cn=ldap-read,dc=example,dc=com
 ENV HABIDAT_DK_LDAP_PASSWORD secret
 ENV HABIDAT_DK_LDAP_BASE dc=example,dc=com
 ENV HABIDAT_DK_LDAP_SEARCHFILTER (cn={{username}})
+```
 
 # web server settings
+
+```
 ENV HABIDAT_DK_PORT_HTTP 80
 ENV HABIDAT_DK_HTTPS false
 ENV HABIDAT_DK_PORT_HTTPS 443
 ENV HABIDAT_DK_SSL_CERT config/certificate.pem
 ENV HABIDAT_DK_SSL_KEY config/key.pem
 ENV HABIDAT_DK_REVERSE_PROXY true
+```
 
 # for bootstrap admin account
+
+```
 ENV HABIDAT_DK_ADMIN_USER admin
 ENV HABIDAT_DK_ADMIN_EMAIL admin@example.com
 ENV HABIDAT_DK_ADMIN_PASSWORD secret
+```
+
+# for open id connect provider like keycloak or using the nextcloud as oidc provider
+
+```
+HABIDAT_DK_OIDC_ISSUER=http://keycloak:8080/realms/collectivo
+HABIDAT_DK_OIDC_CLIENT_ID=habidat
+HABIDAT_DK_OIDC_CLIENT_SECRET=secrectfromkeycloakornextcloud
+HABIDAT_DK_OIDC_CALLBACK_URL=http://direktkredit.local:8020/login-oidc-cb
+HABITAT_DK_OIDC_AUTH_URL=http://keycloak:8080/realms/collectivo/protocol/openid-connect/auth
+HABITAT_DK_OIDC_TOKEN_URL=http://keycloak:8080/realms/collectivo/protocol/openid-connect/token
+HABITAT_DK_OIDC_USERINFO_URL=http://keycloak:8080/realms/collectivo/protocol/openid-connect/userinfo
+```

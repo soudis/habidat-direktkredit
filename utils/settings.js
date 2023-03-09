@@ -86,6 +86,21 @@ const initConfig = () => {
   config.set("site.porthttps", process.env.HABIDAT_DK_PORT_HTTPS);
   config.set("site.reverseproxy", process.env.HABIDAT_DK_REVERSE_PROXY);
 
+  config.set("auth.admin.oidc.issuer", process.env.HABIDAT_DK_OIDC_ISSUER);
+  config.set("auth.admin.oidc.clientID", process.env.HABIDAT_DK_OIDC_CLIENT_ID);
+  config.set("auth.admin.oidc.clientSecret", process.env.HABIDAT_DK_OIDC_CLIENT_SECRET);
+  config.set("auth.admin.oidc.authorizationURL", process.env.HABITAT_DK_OIDC_AUTH_URL);
+  config.set("auth.admin.oidc.callbackURL", process.env.HABIDAT_DK_OIDC_CALLBACK_URL);
+  config.set("auth.admin.oidc.tokenURL", process.env.HABITAT_DK_OIDC_TOKEN_URL);
+  config.set("auth.admin.oidc.userInfoURL", process.env.HABITAT_DK_OIDC_USERINFO_URL);
+  config.set("auth.admin.oidcAdmin.issuer", process.env.HABIDAT_DK_OIDC_ISSUER);
+  config.set("auth.admin.oidcAdmin.clientID", process.env.HABIDAT_DK_OIDC_CLIENT_ID);
+  config.set("auth.admin.oidcAdmin.clientSecret", process.env.HABIDAT_DK_OIDC_CLIENT_SECRET);
+  config.set("auth.admin.oidcAdmin.authorizationURL", process.env.HABITAT_DK_OIDC_AUTH_URL);
+  config.set("auth.admin.oidcAdmin.callbackURL", `${process.env.HABIDAT_DK_OIDC_CALLBACK_URL}-admin`);
+  config.set("auth.admin.oidcAdmin.tokenURL", process.env.HABITAT_DK_OIDC_TOKEN_URL);
+  config.set("auth.admin.oidcAdmin.userInfoURL", process.env.HABITAT_DK_OIDC_USERINFO_URL);
+
   return config;
 };
 

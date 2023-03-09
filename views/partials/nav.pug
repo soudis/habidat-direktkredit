@@ -73,7 +73,11 @@ mixin logon_form(action)
       button.btn(type='submit' class='btn btn-primary btn-lg') Einloggen
     .form-group.row   
       a(href=_url("/getpassword")) Noch kein Passwort oder Passwort vergessen?
-    
+
+mixin logon_form-oidc(action)  
+  a.btn.btn-primary.mr-2(href=_url("/login-oidc")) Login via oidc
+  a.btn.btn-primary(href=_url("/login-oidc-admin")) Admin Login via oidc
+  h2.mt-4() Administrator Login
 
 mixin getpassword_form(action)        
   form.logon-form(action=action method="post")

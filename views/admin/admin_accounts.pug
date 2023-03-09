@@ -2,7 +2,7 @@ extends ../layout
 block content
   .jumbotron
     h2 Administrator*innen Accounts
-    p.lead Hier können Administrator*innen-Accounts angelegt werden. Es gibt zwei Arten von Accounts. Lokale Accounts können mit Passwort angegeben werden. Ist LDAP aktiviert, können auch LDAP Accounts angelegt werden, die sich mit dem Passwort aus dem LDAP System authentifizieren.
+    p.lead Hier können Administrator*innen-Accounts angelegt werden. Es gibt zwei Arten von Accounts. Lokale Accounts können mit Passwort angegeben werden. Ist LDAP/OIDC aktiviert, können auch LDAP Accounts angelegt werden, die sich mit dem Passwort aus dem LDAP/OIDC System authentifizieren.
   .col-md-12
     table.table.table-striped
       thead
@@ -16,7 +16,7 @@ block content
           tr
             td=account.logon_id
             td=account.email
-            td=(account.ldap?"LDAP":"Lokal")
+            td=(account.ldap?"LDAP/OIDC":"Lokal")
             td.fit.text-right
                 a.btn.btn-light.btn-sm.confirm-action(data-link=_url('/admin/delete/'+account.id) data-confirmtext='Willst du den Administrator*innen Account ' +account.logon_id + ' wirklich löschen?')
                   span.fa.fa-trash
