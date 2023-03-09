@@ -283,15 +283,15 @@ module.exports = (sequelize, DataTypes) => {
       });
   };
 
-  User.getUsers = function (models, mode, date) {
-    var activeUsers = [];
+  User.getUsers = function (models, mode, date = Date.now()) {
     return models.user.findFetchFull(models, {}).then((users) => {
-      users.forEach(function (user) {
-        if (mode == "all" || user.hasNotTerminatedContracts(date)) {
-          activeUsers.push(user);
-        }
+      return users.filter((user) => {
+        return (
+          mode == "all" ||
+          (mode === "active" && user.isActive()) ||
+          (mode === "cancelled" && user.isTerminated())
+        );
       });
-      return activeUsers;
     });
   };
 
@@ -734,11 +734,21 @@ module.exports = (sequelize, DataTypes) => {
   User.prototype.isActive = function () {
     var active;
     this.contracts.forEach(function (contract) {
-      if (!contract.isTerminated()) {
+      if (!contract.isTerminated() && contract.getDepositDate()) {
         active = true;
       }
     });
     return active;
+  };
+
+  User.prototype.isTerminated = function () {
+    var terminated = this.contracts.length > 0;
+    this.contracts.forEach(function (contract) {
+      if (!contract.isTerminated()) {
+        terminated = false;
+      }
+    });
+    return terminated;
   };
 
   User.prototype.isAdmin = function () {

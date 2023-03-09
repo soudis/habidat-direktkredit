@@ -1,10 +1,11 @@
 /* jshint esversion: 8 */
 const models = require("../models");
 const security = require("../utils/security");
+const intl = require("../utils/intl");
 const communication = require("../utils/communication");
 const router = require("express").Router();
 const moment = require("moment");
-const json2csv = require("json2csv");
+const exceljs = require("exceljs");
 
 module.exports = function (app) {
   router.post(
@@ -27,51 +28,68 @@ module.exports = function (app) {
   router.post(
     "/communication/addresses",
     security.isLoggedInAdmin,
-    function (req, res) {
-      var fieldNames = [
-        "Nachname",
-        "Vorname",
-        "Strasse",
-        "PLZ",
-        "Ort",
-        "Land",
-        "Telefonnummer",
-        "E-Mail",
-      ];
-      var fieldList = [
-        "last_name",
-        "first_name",
-        "street",
-        "zip",
-        "place",
-        "country",
-        "telno",
-        "email",
-      ];
-      models.user
-        .getUsers(models, req.body.mode, moment(req.body.to_date, "DD.MM.YYYY"))
+    function (req, res, next) {
+      return models.user
+        .getUsers(models, req.body.mode, moment())
         .then((users) => {
-          json2csv(
-            { data: users, fieldNames: fieldNames, fields: fieldList },
-            function (err, csv) {
-              if (err) {
-                res.render(error, {
-                  error: err,
-                  message: "Adressdatei konnte nicht generiert werden",
-                });
-              } else {
-                res.setHeader("Content-Length", new Buffer(csv).length);
-                res.setHeader("Content-Type", "text/csv");
-                res.setHeader(
-                  "Content-Disposition",
-                  "inline; filename=Addressliste.csv"
-                );
-                res.write(csv);
-                res.end();
-              }
-            }
+          var workbook = new exceljs.Workbook();
+          workbook.creator = "DK Plattform";
+          workbook.created = new Date();
+          var dataWorksheet = workbook.addWorksheet(
+            `Adressen (${intl._t(req.body.mode)} ${intl._t("contracts")})`
           );
-        });
+          var dataWorkSheetColumns = [];
+          const fieldLabels = [
+            "Typ",
+            "Anrede",
+            "Titel",
+            "Nachname",
+            "Vorname",
+            "Titel, nachgestellt",
+            "Strasse",
+            "PLZ",
+            "Ort",
+            "Land",
+            "Telefonnummer",
+            "E-Mail",
+          ];
+          fieldLabels.forEach((label) => {
+            dataWorkSheetColumns.push({
+              header: label,
+              //              key: column.id,
+              width: 20,
+            });
+          });
+          dataWorksheet.columns = dataWorkSheetColumns;
+          users.forEach((user) => {
+            dataWorksheet.addRow([
+              intl._t(`user_type_${user.type || "person"}`),
+              intl._t(`user_salutation_${user.salutation || "personal"}`),
+              user.title_prefix,
+              user.last_name,
+              user.first_name,
+              user.title_suffix,
+              user.street,
+              user.zip,
+              user.place,
+              user.country,
+              user.telno,
+              user.email,
+            ]);
+          });
+          res.setHeader(
+            "Content-Type",
+            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+          );
+          res.setHeader(
+            "Content-Disposition",
+            `attachment; filename=Adressen_${intl._t(req.body.mode)}_${intl._t(
+              "contracts"
+            )}_${moment().format("YYYYMMDDHHmmss")}.xlsx`
+          );
+          return workbook.xlsx.write(res).then(() => res.end());
+        })
+        .catch(next);
     }
   );
 

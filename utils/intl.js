@@ -1,15 +1,18 @@
 /* jshint esversion: 8 */
 const texts = {
+  active: "aktive",
   account_notification_type: "Erhalt Kontomitteilung",
   account_notification_type_online: "Online",
   account_notification_type_email: "E-Mail",
   account_notification_type_mail: "Post",
   administrator: "Administrator",
+  all: "alle",
   amount: "Betrag",
   BIC: "BIC",
   choose_file: "Datei auswählen..",
   country: "Land",
   description: "Beschreibung",
+  cancelled: "gekündigte",
   column_mapping: "Spaltenzuordnung",
   contract: "Kreditvertrag",
   contracts: "Kreditverträge",
