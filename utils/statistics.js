@@ -487,8 +487,10 @@ exports.getNumbers = function () {
       else if (b.amount > a.amount) return -1;
       else return 0;
     });
-    numbers.running.medianContractAmount =
-      contracts.running[Math.floor(contracts.running.length / 2)].amount;
+    if (contracts.running.length > 0) {
+      numbers.running.medianContractAmount =
+        contracts.running[Math.floor(contracts.running.length / 2)].amount;
+    }
     numbers.running.avgRuntime =
       numbers.running.avgRuntime / numbers.running.contracts;
 
@@ -503,8 +505,10 @@ exports.getNumbers = function () {
       else if (b.amount > a.amount) return -1;
       else return 0;
     });
-    numbers.cancelled.medianContractAmount =
-      contracts.cancelled[Math.floor(contracts.cancelled.length / 2)].amount;
+    if (contracts.cancelled.length > 0) {
+      numbers.cancelled.medianContractAmount =
+        contracts.cancelled[Math.floor(contracts.cancelled.length / 2)].amount;
+    }
     numbers.cancelled.avgRuntime =
       numbers.cancelled.avgRuntime / numbers.cancelled.contracts;
 
@@ -523,8 +527,10 @@ exports.getNumbers = function () {
       else if (b.amount > a.amount) return -1;
       else return 0;
     });
-    numbers.total.medianContractAmount =
-      contracts.total[Math.floor(contracts.total.length / 2)].amount;
+    if (contracts.total.length > 0) {
+      numbers.total.medianContractAmount =
+        contracts.total[Math.floor(contracts.total.length / 2)].amount;
+    }
     numbers.total.avgRuntime =
       numbers.total.avgRuntime / numbers.total.contracts;
 

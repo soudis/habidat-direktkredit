@@ -40,6 +40,7 @@ module.exports = function (app) {
           );
           var dataWorkSheetColumns = [];
           const fieldLabels = [
+            "User ID",
             "Typ",
             "Anrede",
             "Titel",
@@ -63,6 +64,7 @@ module.exports = function (app) {
           dataWorksheet.columns = dataWorkSheetColumns;
           users.forEach((user) => {
             dataWorksheet.addRow([
+              user.id,
               intl._t(`user_type_${user.type || "person"}`),
               intl._t(`user_salutation_${user.salutation || "personal"}`),
               user.title_prefix,
