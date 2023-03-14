@@ -54,26 +54,40 @@ mixin nav_header
         block
 
 mixin logon_form(action)        
-  form.logon-form(action=action method="post")
-    .form-group.row
-      label Benutzername / E-Mail Adresse
-      .input-group
-        span.input-group-prepend
-          span.input-group-text
-            span.fa.fa-user      
-        input(type="text" class="form-control" name="userid")
-    .form-group.row
-      label Passwort
-      .input-group
-        span.input-group-prepend
-          span.input-group-text
-            span.fa.fa-lock      
-        input(type="password" class="form-control" name="password")
-    .form-group.row
-      button.btn(type='submit' class='btn btn-primary btn-lg') Einloggen
-    .form-group.row   
-      a(href=_url("/getpassword")) Noch kein Passwort oder Passwort vergessen?
-    
+  if settings.config.get('auth.admin.method').includes('local') || settings.config.get('auth.admin.method').includes('ldap') || settings.config.get('auth.user.method').includes('local') || settings.config.get('auth.user.method').includes('ldap')
+    form.logon-form(action=action method="post")
+      .form-group.row
+        label Benutzername / E-Mail Adresse
+        .input-group
+          span.input-group-prepend
+            span.input-group-text
+              span.fa.fa-user      
+          input(type="text" class="form-control" name="userid")
+      .form-group.row
+        label Passwort
+        .input-group
+          span.input-group-prepend
+            span.input-group-text
+              span.fa.fa-lock      
+          input(type="password" class="form-control" name="password")
+      .form-group.row
+        button.btn(type='submit' class='btn btn-primary btn-lg') Einloggen
+      .form-group.row   
+        a(href=_url("/getpassword")) Noch kein Passwort oder Passwort vergessen?
+
+mixin oidc_logon_buttons
+  if settings.config.get('auth.admin.method').includes('oidc') || settings.config.get('auth.user.method').includes('oidc')
+    hr
+    if settings.config.get('auth.user.method').includes('oidc')
+      .form-group.row
+        .col-md-12
+          .row 
+            button.btn.btn-primary.btn-lg(href=_url("/login-oidc"))=settings.config.get('auth.user.oidc.label') || 'Einloggen via OIDC'
+    if settings.config.get('auth.admin.method').includes('oidc')
+      .form-group.row
+        .col-md-12
+          .row 
+            button.btn.btn-primary.btn-lg(href=_url("/login-oidc-admin"))=settings.config.get('auth.admin.oidc.label') || 'Einloggen via OIDC (Admin)'
 
 mixin getpassword_form(action)        
   form.logon-form(action=action method="post")

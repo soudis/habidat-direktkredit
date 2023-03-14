@@ -27,10 +27,42 @@ module.exports = function (app) {
   router.get("/login", function (req, res, next) {
     res.render("index", {
       title: "Login",
-      error: req.flash("loginMessage"),
+      error:
+        req.flash("loginMessage").length > 0
+          ? "Falscher Benutzername oder falsches Passwort"
+          : undefined,
       success: req.flash("success"),
     });
   });
+
+  /* OIDC-Login */
+  router.get("/login-oidc", passport.authenticate("openidconnect-user"));
+
+  /* OIDC-Admin-Login */
+  router.get("/login-oidc-admin", passport.authenticate("openidconnect-admin"));
+
+  /* OIDC-Callback */
+  router.get(
+    "/login-oidc-cb-admin",
+    passport.authenticate("openidconnect-admin", {
+      failureRedirect: "/login-oidc-admin",
+      failureMessage: true,
+    }),
+    function (req, res, next) {
+      res.redirect(utils.generateUrl(req, "/user/list"));
+    }
+  );
+  /* OIDC-Callback */
+  router.get(
+    "/login-oidc-cb",
+    passport.authenticate("openidconnect-user", {
+      failureRedirect: "/login",
+      failureMessage: true,
+    }),
+    function (req, res, next) {
+      res.redirect(utils.generateUrl(req, "/profile"));
+    }
+  );
 
   router.get("/getpassword", function (req, res, next) {
     res.render("getpassword", {
@@ -218,17 +250,17 @@ module.exports = function (app) {
   });
 
   /*
-	router.get('/project', function(req, res, next) {
-     	res.render('select-project', { title: 'habiDAT - Projectauswahl',projects: projects} );
-	});
+  router.get('/project', function(req, res, next) {
+        res.render('select-project', { title: 'habiDAT - Projectauswahl',projects: projects} );
+  });
 */
   /* Welcome Site */
   /*	router.get('/project/:project', function(req, res, next) {
-		req.session.project = req.params.project;
-		req.session.projectConfig = projects[req.params.project];
-		req.logout();
-     	res.redirect('/');
-	});*/
+    req.session.project = req.params.project;
+    req.session.projectConfig = projects[req.params.project];
+    req.logout();
+        res.redirect('/');
+  });*/
 
   router.get("/admin", security.isLoggedInAdmin, function (req, res) {
     res.redirect(utils.generateUrl(req, "/user/list"));
@@ -254,11 +286,17 @@ module.exports = function (app) {
     res.redirect(utils.generateUrl(req, "/"));
   });
 
-  var loginStrategies = ["local-login-admin", "local-login"];
-  if (settings.config.get("auth.admin.method") == "ldap") {
-    loginStrategies = ["ldap-login-admin", "local-login-admin", "local-login"];
-  }
-
+  var loginStrategies = [];
+  settings.config.get("auth.admin.method").forEach((strategy) => {
+    if (strategy !== "oidc") {
+      loginStrategies.push("admin-" + strategy);
+    }
+  });
+  settings.config.get("auth.user.method").forEach((strategy) => {
+    if (strategy !== "oidc") {
+      loginStrategies.push("user-" + strategy);
+    }
+  });
   router.post("/login", function (req, res, next) {
     passport.authenticate(loginStrategies, function (err, user, info) {
       if (err) {

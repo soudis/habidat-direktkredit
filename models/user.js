@@ -30,6 +30,10 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.STRING,
         allowNull: true,
       },
+      salutation: {
+        type: DataTypes.STRING,
+        allowNull: true,
+      },
       first_name: {
         type: DataTypes.STRING,
         allowNull: true,
@@ -279,15 +283,15 @@ module.exports = (sequelize, DataTypes) => {
       });
   };
 
-  User.getUsers = function (models, mode, date) {
-    var activeUsers = [];
+  User.getUsers = function (models, mode, date = Date.now()) {
     return models.user.findFetchFull(models, {}).then((users) => {
-      users.forEach(function (user) {
-        if (mode == "all" || user.hasNotTerminatedContracts(date)) {
-          activeUsers.push(user);
-        }
+      return users.filter((user) => {
+        return (
+          mode == "all" ||
+          (mode === "active" && user.isActive()) ||
+          (mode === "cancelled" && user.isTerminated())
+        );
       });
-      return activeUsers;
     });
   };
 
@@ -379,6 +383,18 @@ module.exports = (sequelize, DataTypes) => {
       user_is_person: {
         id: "user_is_person",
         label: "Indikator ob Benutzer*in eine natürliche Person ist",
+        filter: "text",
+        displayOnly: true,
+      },
+
+      user_salutation: {
+        id: "user_salutation",
+        label: "Anrede",
+        filter: "text",
+      },
+      user_is_formal: {
+        id: "user_is_formal",
+        label: "Indikator für formelle Anrede",
         filter: "text",
         displayOnly: true,
       },
@@ -492,6 +508,16 @@ module.exports = (sequelize, DataTypes) => {
       user_is_person: {
         valueRaw: !user.type && user.type === "person",
         value: !user.type && user.type === "person",
+      },
+      user_salutation: {
+        valueRaw: user.salutation || "personal",
+        value: user.salutation
+          ? intl._t("user_salutation_" + user.salutation)
+          : intl._t("user_salutation_personal"),
+      },
+      user_is_formal: {
+        valueRaw: user.type && user.saluation === "formal",
+        value: user.type && user.saluation === "formal",
       },
       user_title_prefix: {
         valueRaw: user.title_prefix,
@@ -708,11 +734,21 @@ module.exports = (sequelize, DataTypes) => {
   User.prototype.isActive = function () {
     var active;
     this.contracts.forEach(function (contract) {
-      if (!contract.isTerminated()) {
+      if (!contract.isTerminated() && contract.getDepositDate()) {
         active = true;
       }
     });
     return active;
+  };
+
+  User.prototype.isTerminated = function () {
+    var terminated = this.contracts.length > 0;
+    this.contracts.forEach(function (contract) {
+      if (!contract.isTerminated()) {
+        terminated = false;
+      }
+    });
+    return terminated;
   };
 
   User.prototype.isAdmin = function () {

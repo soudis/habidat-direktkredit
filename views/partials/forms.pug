@@ -65,7 +65,7 @@ mixin text(name, label=undefined)
     +group_input(name)(type=type||'text')&attributes(attributes)
 
 mixin select(name, label=undefined)
-  +input_group(label||_t(name))(icon=attributes.icon || 'fa-caret-down')
+  +input_group(label||_t(name))(icon=attributes.icon || 'fa-caret-down' class=attributes.groupClass help=attributes.help)
     +group_select(name)&attributes(attributes)  
       block
 

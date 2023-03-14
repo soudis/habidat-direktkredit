@@ -334,12 +334,12 @@ module.exports = function (app) {
             }
           });
           return models.file
-            .findOne({
+            .findAll({
               where: {
                 ref_table: "template_account_notification",
               },
             })
-            .then((template) => {
+            .then((templates) => {
               var archive = archiver("zip");
               res.setHeader("Content-Type", "application/zip");
               res.setHeader(
@@ -367,10 +367,20 @@ module.exports = function (app) {
                     " " +
                     req.body.year +
                     ".pdf";
-                  return utils
-                    .generateDocx(template.path, data)
-                    .then((result) => utils.convertToPdf(result))
-                    .then((file) => archive.append(file, { name: filename }));
+                  var template = templates.find(
+                    (t) =>
+                      (t.salutation || "all") === "all" ||
+                      t.salutation === (user.salutation || "personal")
+                  );
+                  console.log("template", template);
+                  if (template) {
+                    return utils
+                      .generateDocx(template.path, data)
+                      .then((result) => utils.convertToPdf(result))
+                      .then((file) => archive.append(file, { name: filename }));
+                  } else {
+                    return;
+                  }
                 },
                 { concurrency: 1 }
               )

@@ -90,12 +90,20 @@ module.exports = function (app) {
           var filename = "Kontomitteilung " + user.id + " " + req.body.year;
 
           return models.file
-            .findOne({
+            .findAll({
               where: {
                 ref_table: "template_account_notification",
               },
             })
-            .then((template) => {
+            .then((templates) => {
+              var template = templates.find(
+                (t) =>
+                  (t.salutation || "all") === "all" ||
+                  t.salutation === (user.salutation || "personal")
+              );
+              if (!template) {
+                throw "Vorlage nicht gefunden";
+              }
               return utils
                 .generateDocx(template.path, data)
                 .then((result) => utils.convertToPdf(result))

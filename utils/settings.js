@@ -59,23 +59,110 @@ const initConfig = () => {
   config.set("database.password", process.env.HABIDAT_DK_DB_PASSWORD);
   config.set("database.database", process.env.HABIDAT_DK_DB_DATABASE);
 
-  config.set("auth.admin.method", process.env.HABIDAT_DK_ADMIN_AUTH);
-  config.set("auth.admin.ldap.server.url", process.env.HABIDAT_DK_LDAP_URI);
+  config.set(
+    "auth.admin.method",
+    process.env.HABIDAT_DK_AUTH_ADMIN_METHOD?.split(",")
+  );
+  // Admin authentication (LDAP)
+  config.set(
+    "auth.admin.ldap.server.url",
+    process.env.HABIDAT_DK_AUTH_ADMIN_LDAP_URI
+  );
+  config.set(
+    "auth.admin.ldap.server.host",
+    process.env.HABIDAT_DK_AUTH_ADMIN_LDAP_HOST
+  );
+  config.set(
+    "auth.admin.ldap.server.port",
+    process.env.HABIDAT_DK_AUTH_ADMIN_LDAP_PORT
+  );
   config.set(
     "auth.admin.ldap.server.bindDN",
-    process.env.HABIDAT_DK_LDAP_BINDDN
+    process.env.HABIDAT_DK_AUTH_ADMIN_LDAP_BINDDN
   );
   config.set(
     "auth.admin.ldap.server.bindCredentials",
-    process.env.HABIDAT_DK_LDAP_PASSWORD
+    process.env.HABIDAT_DK_AUTH_ADMIN_LDAP_PASSWORD
   );
   config.set(
     "auth.admin.ldap.server.searchBase",
-    process.env.HABIDAT_DK_LDAP_BASE
+    process.env.HABIDAT_DK_AUTH_ADMIN_LDAP_BASE
   );
   config.set(
     "auth.admin.ldap.server.searchFilter",
-    process.env.HABIDAT_DK_LDAP_SEARCHFILTER
+    process.env.HABIDAT_DK_AUTH_ADMIN_LDAP_SEARCHFILTER
+  );
+  // Admin authentication (OIDC)
+  config.set(
+    "auth.admin.oidc.label",
+    process.env.HABIDAT_DK_AUTH_ADMIN_OIDC_LABEL
+  );
+  config.set(
+    "auth.admin.oidc.issuer",
+    process.env.HABIDAT_DK_AUTH_ADMIN_OIDC_ISSUER
+  );
+  config.set(
+    "auth.admin.oidc.clientID",
+    process.env.HABIDAT_DK_AUTH_ADMIN_OIDC_CLIENT_ID
+  );
+  config.set(
+    "auth.admin.oidc.clientSecret",
+    process.env.HABIDAT_DK_AUTH_ADMIN_OIDC_CLIENT_SECRET
+  );
+  config.set(
+    "auth.admin.oidc.authorizationURL",
+    process.env.HABIDAT_DK_AUTH_ADMIN_OIDC_AUTH_URL
+  );
+  config.set(
+    "auth.admin.oidc.callbackURL",
+    process.env.HABIDAT_DK_AUTH_ADMIN_OIDC_CALLBACK_URL
+  );
+  config.set(
+    "auth.admin.oidc.tokenURL",
+    process.env.HABIDAT_DK_AUTH_ADMIN_OIDC_TOKEN_URL
+  );
+  config.set(
+    "auth.admin.oidc.userInfoURL",
+    process.env.HABIDAT_DK_AUTH_ADMIN_OIDC_USERINFO_URL
+  );
+
+  // User authentication
+  config.set(
+    "auth.user.method",
+    process.env.HABIDAT_DK_AUTH_USER_METHOD?.split(",")
+  );
+  // User authentication (OIDC)
+  config.set(
+    "auth.user.oidc.label",
+    process.env.HABIDAT_DK_AUTH_USER_OIDC_LABEL
+  );
+  config.set(
+    "auth.user.oidc.issuer",
+    process.env.HABIDAT_DK_AUTH_USER_OIDC_ISSUER
+  );
+  config.set(
+    "auth.user.oidc.clientID",
+    process.env.HABIDAT_DK_AUTH_USER_OIDC_CLIENT_ID
+  );
+  config.set(
+    "auth.user.oidc.clientSecret",
+    process.env.HABIDAT_DK_AUTH_USER_OIDC_CLIENT_SECRET
+  );
+  config.set(
+    "auth.user.oidc.authorizationURL",
+    process.env.HABIDAT_DK_AUTH_USER_OIDC_AUTH_URL
+  );
+  config.set(
+    "auth.user.oidc.callbackURL",
+    process.env.HABIDAT_DK_AUTH_USER_OIDC_CALLBACK_URL
+  );
+  config.set(
+    "auth.user.oidc.tokenURL",
+    process.env.HABIDAT_DK_AUTH_USER_OIDC_TOKEN_URL
+  );
+  config.set(
+    "auth.user.oidc.userInfoURL",
+    process.env.HABIDAT_DK_AUTH_USER_OIDC_USERINFO_URL
   );
 
   config.set("debug", process.env.HABIDAT_DK_DEBUG || false);

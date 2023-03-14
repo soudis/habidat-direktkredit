@@ -406,6 +406,7 @@ exports.getNumbers = function () {
       medianContractAmount: 0,
       contracts: 0,
       users: 0,
+      avgRuntime: 0,
     },
     running: {
       contractAmount: 0,
@@ -413,6 +414,7 @@ exports.getNumbers = function () {
       medianContractAmount: 0,
       contracts: 0,
       users: 0,
+      avgRuntime: 0,
     },
     cancelled: {
       contractAmount: 0,
@@ -422,6 +424,7 @@ exports.getNumbers = function () {
       users: 0,
       avgDaysToRepay: 0,
       avgDaysToRepayCount: 0,
+      avgRuntime: 0,
     },
   };
   var now = moment();
@@ -435,6 +438,7 @@ exports.getNumbers = function () {
           contract.getDepositDate() &&
           contract.getDepositDate().isBefore(now)
         ) {
+          contract.sortTransactions();
           if (numbers.firstContractDate.isAfter(contract.sign_date)) {
             numbers.firstContractDate = moment(contract.sign_date);
           }
@@ -442,13 +446,13 @@ exports.getNumbers = function () {
             hasTerminatedContracts = true;
             numbers.cancelled.contracts++;
             numbers.cancelled.contractAmount += contract.amount;
+            numbers.cancelled.avgRuntime += contract.getRuntime();
             contracts.cancelled.push(contract);
             if (
               contract.transactions.length > 0 &&
               contract.termination_date &&
               (!contract.termination_type || contract.termination_type === "T")
             ) {
-              contract.sortTransactions();
               var daysToRepay = moment(
                 contract.transactions[contract.transactions.length - 1]
                   .transaction_date
@@ -461,6 +465,7 @@ exports.getNumbers = function () {
             hasNotTerminatedContracts = true;
             numbers.running.contracts++;
             numbers.running.contractAmount += contract.amount;
+            numbers.running.avgRuntime += contract.getRuntime();
             contracts.running.push(contract);
           }
         }
@@ -470,6 +475,8 @@ exports.getNumbers = function () {
       numbers.cancelled.users +=
         hasTerminatedContracts && !hasNotTerminatedContracts ? 1 : 0;
     });
+    numbers.total.avgRuntime =
+      numbers.cancelled.avgRuntime + numbers.running.avgRuntime;
 
     numbers.running.avgContractAmount =
       numbers.running.contractAmount / numbers.running.contracts;
@@ -480,8 +487,12 @@ exports.getNumbers = function () {
       else if (b.amount > a.amount) return -1;
       else return 0;
     });
-    numbers.running.medianContractAmount =
-      contracts.running[Math.floor(contracts.running.length / 2)].amount;
+    if (contracts.running.length > 0) {
+      numbers.running.medianContractAmount =
+        contracts.running[Math.floor(contracts.running.length / 2)].amount;
+    }
+    numbers.running.avgRuntime =
+      numbers.running.avgRuntime / numbers.running.contracts;
 
     numbers.cancelled.avgContractAmount =
       numbers.cancelled.contractAmount / numbers.cancelled.contracts;
@@ -494,8 +505,12 @@ exports.getNumbers = function () {
       else if (b.amount > a.amount) return -1;
       else return 0;
     });
-    numbers.cancelled.medianContractAmount =
-      contracts.cancelled[Math.floor(contracts.cancelled.length / 2)].amount;
+    if (contracts.cancelled.length > 0) {
+      numbers.cancelled.medianContractAmount =
+        contracts.cancelled[Math.floor(contracts.cancelled.length / 2)].amount;
+    }
+    numbers.cancelled.avgRuntime =
+      numbers.cancelled.avgRuntime / numbers.cancelled.contracts;
 
     numbers.total.users = numbers.running.users + numbers.cancelled.users;
     numbers.total.contracts =
@@ -512,8 +527,12 @@ exports.getNumbers = function () {
       else if (b.amount > a.amount) return -1;
       else return 0;
     });
-    numbers.total.medianContractAmount =
-      contracts.total[Math.floor(contracts.total.length / 2)].amount;
+    if (contracts.total.length > 0) {
+      numbers.total.medianContractAmount =
+        contracts.total[Math.floor(contracts.total.length / 2)].amount;
+    }
+    numbers.total.avgRuntime =
+      numbers.total.avgRuntime / numbers.total.contracts;
 
     return numbers;
   });
