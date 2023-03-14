@@ -10,7 +10,7 @@
 		"admin": {
 			"method": "ldap",
 			"ldap": {
-				"server":  {
+				"server": {
 					"url": "ldap://example.com:389",
 					"bindDN": "cn=read,dc=example,dc=org",
 					"bindCredentials": "secret",
@@ -19,11 +19,29 @@
 				},
 				"passReqToCallback": true,
 				"usernameField": "userid"
+			},
+			"oidc": {
+				"issuer": "https://server.example.com",
+				"authorizationURL": "https://server.example.com/authorize",
+				"tokenURL": "https://server.example.com/token",
+				"userInfoURL": "https://server.example.com/userinfo",
+				"clientID": "exampleclient",
+				"clientSecret": "examplesecret",
+				"callbackURL": "https://client.example.org/c"
+			},
+			"oidcAdmin": {
+				"issuer": "https://server.example.com",
+				"authorizationURL": "https://server.example.com/authorize",
+				"tokenURL": "https://server.example.com/token",
+				"userInfoURL": "https://server.example.com/userinfo",
+				"clientID": "exampleclient",
+				"clientSecret": "examplesecret",
+				"callbackURL": "https://client.example.org/c-admin"
 			}
 		},
 		"user": "local"
 	},
-	"site":	{
+	"site": {
 		"http": "true",
 		"https": "$HABIDAT_DK_HTTPS",
 		"sslcert": "$HABIDAT_DK_SSL_CERT",

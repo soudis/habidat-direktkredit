@@ -47,6 +47,7 @@
     "passport": "~0.6.0",
     "passport-ldapauth": "^3.0.1",
     "passport-local": "~1.0.0",
+    "passport-openidconnect": "^0.1.1",
     "path": "~0.12.7",
     "pizzip": "^3.1.1",
     "pug": "^3.0.2",

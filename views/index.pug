@@ -14,4 +14,6 @@ block content
       | bei uns!
   
   .col-md-5.col-xs-12.col-sm-6.col-lg-4
+    if (settings.config.get('auth.admin.method') === "oidc" )
+    +logon_form-oidc(_url("/login-oidc"))
     +logon_form(_url("/login"))
