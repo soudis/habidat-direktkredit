@@ -1,53 +1,57 @@
 {
-	"database": {
-		"host": "example.com",
-		"dialect": "mysql",
-		"username": "user",
-		"password": "pass",
-		"database": "dbname"
-	},
-	"auth": {
-		"admin": {
-			"method": "ldap",
-			"ldap": {
-				"server": {
-					"url": "ldap://example.com:389",
-					"bindDN": "cn=read,dc=example,dc=org",
-					"bindCredentials": "secret",
-					"searchBase": "uo=users,dc=example,dc=org",
-					"searchFilter": "(cn={{username}})"
-				},
-				"passReqToCallback": true,
-				"usernameField": "userid"
-			},
-			"oidc": {
-				"issuer": "https://server.example.com",
-				"authorizationURL": "https://server.example.com/authorize",
-				"tokenURL": "https://server.example.com/token",
-				"userInfoURL": "https://server.example.com/userinfo",
-				"clientID": "exampleclient",
-				"clientSecret": "examplesecret",
-				"callbackURL": "https://client.example.org/c"
-			},
-			"oidcAdmin": {
-				"issuer": "https://server.example.com",
-				"authorizationURL": "https://server.example.com/authorize",
-				"tokenURL": "https://server.example.com/token",
-				"userInfoURL": "https://server.example.com/userinfo",
-				"clientID": "exampleclient",
-				"clientSecret": "examplesecret",
-				"callbackURL": "https://client.example.org/c-admin"
-			}
-		},
-		"user": "local"
-	},
-	"site": {
-		"http": "true",
-		"https": "$HABIDAT_DK_HTTPS",
-		"sslcert": "$HABIDAT_DK_SSL_CERT",
-		"sslkey": "$HABIDAT_DK_SSL_KEY",
-		"porthttps": "$HABIDAT_DK_PORT_HTTPS",
-		"porthttp": "$HABIDAT_DK_PORT_HTTP",
-		"reverseproxy": "false"
-	}
+  "database": {
+    "host": "example.com",
+    "dialect": "mysql",
+    "username": "user",
+    "password": "pass",
+    "database": "dbname"
+  },
+  "auth": {
+    "admin": {
+      "method": ["local"],
+      "ldap": {
+        "server": {
+          "url": "ldap://example.com:389",
+          "bindDN": "cn=read,dc=example,dc=org",
+          "bindCredentials": "secret",
+          "searchBase": "uo=users,dc=example,dc=org",
+          "searchFilter": "(cn={{username}})"
+        },
+        "passReqToCallback": true,
+        "usernameField": "userid"
+      },
+      "oidc": {
+        "label": "Keycloak (Admin)",
+        "issuer": "https://server.example.com",
+        "authorizationURL": "https://server.example.com/authorize",
+        "tokenURL": "https://server.example.com/token",
+        "userInfoURL": "https://server.example.com/userinfo",
+        "clientID": "exampleclient",
+        "clientSecret": "examplesecret",
+        "callbackURL": "https://client.example.org/c"
+      }
+    },
+    "user": {
+      "method": ["local"],
+      "oidc": {
+        "label": "Keycloak",
+        "issuer": "https://server.example.com",
+        "authorizationURL": "https://server.example.com/authorize",
+        "tokenURL": "https://server.example.com/token",
+        "userInfoURL": "https://server.example.com/userinfo",
+        "clientID": "exampleclient",
+        "clientSecret": "examplesecret",
+        "callbackURL": "https://client.example.org/c"
+      }
+    }
+  },
+  "site": {
+    "http": "true",
+    "https": "$HABIDAT_DK_HTTPS",
+    "sslcert": "$HABIDAT_DK_SSL_CERT",
+    "sslkey": "$HABIDAT_DK_SSL_KEY",
+    "porthttps": "$HABIDAT_DK_PORT_HTTPS",
+    "porthttp": "$HABIDAT_DK_PORT_HTTP",
+    "reverseproxy": "false"
+  }
 }
