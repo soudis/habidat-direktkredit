@@ -10,8 +10,8 @@ const set = function (path, value, overwrite = true, overwriteNull = false) {
     var prev;
     path.split(".").forEach((part) => {
       if (prev) {
-        // create parent object if not exists
-        if (!parent[prev]) {
+        // create parent object if not exists or overwrite if the type is not an object
+        if (!parent[prev] || typeof parent[prev] !== "object") {
           parent[prev] = {};
         }
         parent = parent[prev];
