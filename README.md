@@ -119,14 +119,27 @@ ENV HABIDAT_DK_ADMIN_EMAIL admin@example.com
 ENV HABIDAT_DK_ADMIN_PASSWORD secret
 ```
 
-# for open id connect provider like keycloak or using the nextcloud as oidc provider
+# oidc settings (optional)
 
 ```
-HABIDAT_DK_OIDC_ISSUER=http://keycloak:8080/realms/collectivo
-HABIDAT_DK_OIDC_CLIENT_ID=habidat
-HABIDAT_DK_OIDC_CLIENT_SECRET=secrectfromkeycloakornextcloud
-HABIDAT_DK_OIDC_CALLBACK_URL=http://direktkredit.local:8020/login-oidc-cb
-HABITAT_DK_OIDC_AUTH_URL=http://keycloak:8080/realms/collectivo/protocol/openid-connect/auth
-HABITAT_DK_OIDC_TOKEN_URL=http://keycloak:8080/realms/collectivo/protocol/openid-connect/token
-HABITAT_DK_OIDC_USERINFO_URL=http://keycloak:8080/realms/collectivo/protocol/openid-connect/userinfo
+#only if admin auth method includes oidc
+HABIDAT_DK_AUTH_ADMIN_OIDC_LABEL=Keycloak (Admin)
+HABIDAT_DK_AUTH_ADMIN_OIDC_ISSUER=http://keycloak:8080/realms/collectivo
+HABIDAT_DK_AUTH_ADMIN_OIDC_CLIENT_ID=habidat
+HABIDAT_DK_AUTH_ADMIN_OIDC_CLIENT_SECRET=hF2EGOwy7QTI5G9SNGFTejsC9j8G5X34
+HABIDAT_DK_AUTH_ADMIN_OIDC_CALLBACK_URL=http://direktkredit.local:8020/login-oidc-cb
+HABIDAT_DK_AUTH_ADMIN_OIDC_AUTH_URL=http://keycloak:8080/realms/collectivo/protocol/openid-connect/auth
+HABIDAT_DK_AUTH_ADMIN_OIDC_TOKEN_URL=http://keycloak:8080/realms/collectivo/protocol/openid-connect/token
+HABIDAT_DK_AUTH_ADMIN_OIDC_USERINFO_URL=http://keycloak:8080/realms/collectivo/protocol/openid-connect/userinfo
+#list of user auth methods (local or oidc)
+HABIDAT_DK_AUTH_USER_METHOD=local,oidc
+#only if user auth method includes OIDC:
+HABIDAT_DK_AUTH_USER_OIDC_LABEL=Keycloak
+HABIDAT_DK_AUTH_USER_OIDC_ISSUER=http://keycloak:8080/realms/collectivo
+HABIDAT_DK_AUTH_USER_OIDC_CLIENT_ID=habidat
+HABIDAT_DK_AUTH_USER_OIDC_CLIENT_SECRET=hF2EGOwy7QTI5G9SNGFTejsC9j8G5X34
+HABIDAT_DK_AUTH_USER_OIDC_CALLBACK_URL=http://direktkredit.local:8020/login-oidc-cb
+HABIDAT_DK_AUTH_USER_OIDC_AUTH_URL=http://keycloak:8080/realms/collectivo/protocol/openid-connect/auth
+HABIDAT_DK_AUTH_USER_OIDC_TOKEN_URL=http://keycloak:8080/realms/collectivo/protocol/openid-connect/token
+HABIDAT_DK_AUTH_USER_OIDC_USERINFO_URL=http://keycloak:8080/realms/collectivo/protocol/openid-connect/userinfo
 ```
