@@ -82,12 +82,12 @@ mixin oidc_logon_buttons
       .form-group.row
         .col-md-12
           .row 
-            button.btn.btn-primary.btn-lg(href=_url("/login-oidc"))=settings.config.get('auth.user.oidc.label') || 'Einloggen via OIDC'
+            a.btn.btn-primary.btn-lg(href=_url("/login-oidc"))=settings.config.get('auth.user.oidc.label') || 'Einloggen via OIDC'
     if settings.config.get('auth.admin.method').includes('oidc')
       .form-group.row
         .col-md-12
           .row 
-            button.btn.btn-primary.btn-lg(href=_url("/login-oidc-admin"))=settings.config.get('auth.admin.oidc.label') || 'Einloggen via OIDC (Admin)'
+            a.btn.btn-primary.btn-lg(href=_url("/login-oidc-admin"))=settings.config.get('auth.admin.oidc.label') || 'Einloggen via OIDC (Admin)'
 
 mixin getpassword_form(action)        
   form.logon-form(action=action method="post")
