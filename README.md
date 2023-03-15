@@ -75,7 +75,8 @@ ENV HABIDAT_DK_PROJECT_DEFAULTS_TERMINATION_PERIOD_TYPE M
 # database settings
 
 ```
-ENV HABIDAT_DK_DB_URI mysql://user:pass@example.com:1234/dbname
+# database uri (optional)
+#ENV HABIDAT_DK_DB_URI mysql://user:pass@example.com:1234/dbname
 ENV HABIDAT_DK_DB_USER project
 ENV HABIDAT_DK_DB_PASSWORD secret
 ENV HABIDAT_DK_DB_DATABASE project
