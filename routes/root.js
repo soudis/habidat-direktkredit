@@ -36,16 +36,16 @@ module.exports = function (app) {
   });
 
   /* OIDC-Login */
-  router.get("/login-oidc", passport.authenticate("openidconnect-user"));
+  router.get("/login-oidc", passport.authenticate("user-oidc"));
 
   /* OIDC-Admin-Login */
-  router.get("/login-oidc-admin", passport.authenticate("openidconnect-admin"));
+  router.get("/login-oidc-admin", passport.authenticate("admin-oidc"));
 
   /* OIDC-Callback */
   router.get(
     "/login-oidc-cb-admin",
-    passport.authenticate("openidconnect-admin", {
-      failureRedirect: "/login-oidc-admin",
+    passport.authenticate("admin-oidc", {
+      failureRedirect: "/login",
       failureMessage: true,
     }),
     function (req, res, next) {
@@ -55,7 +55,7 @@ module.exports = function (app) {
   /* OIDC-Callback */
   router.get(
     "/login-oidc-cb",
-    passport.authenticate("openidconnect-user", {
+    passport.authenticate("user-oidc", {
       failureRedirect: "/login",
       failureMessage: true,
     }),
