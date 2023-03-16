@@ -11,7 +11,7 @@ const set = function (path, value, overwrite = true, overwriteNull = false) {
     path.split(".").forEach((part) => {
       if (prev) {
         // create parent object if not exists
-        if (!parent[prev]) {
+        if (!parent[prev] || typeof parent[prev] !== "object") {
           parent[prev] = {};
         }
         parent = parent[prev];
