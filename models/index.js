@@ -6,8 +6,8 @@ const Sequelize = require("sequelize");
 const settings = require("../utils/settings");
 const Umzug = require("umzug");
 const tracker = require("../utils/tracker");
-const crypto = require("crypto");
 const config = require("../config/config.json");
+const bcrypt = require("bcrypt");
 
 var createdb = function () {
   // defining database connection
@@ -95,12 +95,14 @@ var createdb = function () {
       ) {
         return db.admin.count().then((count) => {
           if (count === 0) {
+            var salt = bcrypt.genSaltSync(10);
+            var passwordHashed = bcrypt.hashSync(process.env.HABIDAT_DK_ADMIN_PASSWORD, salt);
             return db.admin
               .create(
                 {
                   email: process.env.HABIDAT_DK_ADMIN_EMAIL,
                   logon_id: process.env.HABIDAT_DK_ADMIN_USERNAME,
-                  passwordHashed: crypto.randomBytes(16).toString("hex"),
+                  passwordHashed: passwordHashed,
                   ldap: false,
                 },
                 { trackOptions: { track: false, user_id: -1 } }

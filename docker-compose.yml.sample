@@ -25,6 +25,10 @@ services:
       # no need to change for default setup:
       - MYSQL_DATABASE=direktkredit
       - MYSQL_USER=direktkredit
+      healthcheck:
+        test: ["CMD", "mysqladmin" ,"ping", "-h", "localhost"]
+        timeout: 20s
+        retries: 10
     logging:
       options:
         max-size: 50m      
@@ -57,6 +61,8 @@ services:
       - HABIDAT_DK_DB_DATABASE=direktkredit
       - HABIDAT_DK_DB_HOST=db
       - HABIDAT_DK_PORT_HTTP=80
+      # or use db uri
+      #- HABIDAT_DK_DB_URI=mysql://direktkredit:secret@db/direktkredit
       # list of admin auth methods (local, ldap or oidc)  
       - HABIDAT_DK_AUTH_ADMIN_METHOD=local,ldap                                  
       # only if admin auth method includes LDAP:
@@ -93,7 +99,8 @@ services:
       - HABIDAT_DK_SSL_CERT=config/certificate.pem
       - HABIDAT_DK_SSL_KEY=config/key.pem      
     depends_on:
-      - db
+      db:
+        condition: service_healthy
     links:
       - db
     ports:
