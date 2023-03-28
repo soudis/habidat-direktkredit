@@ -150,39 +150,44 @@ module.exports = function (passport) {
             .then(function (dbUser) {
               // if no user is found, return the message
               if (!dbUser) {
+                console.log('OIDC-User not found, creating new user', user.username);
                 models.user
                   .create(
                     {
                       logon_id: user.username,
                       email: user.username,
-                      firstName: user.given_name,
-                      lastName: user.family_name,
+                      first_name: user.name.givenName,
+                      last_name: user.name.familyName,
                       lastLogin: moment(),
-                      passwordHashed: crypto.randomBytes(16).toString("hex"),
+                      passwordHashed: crypto.randomBytes(16).toString('hex'),
                       loginCount: 1,
                     },
-                    { trackOptions: utils.getTrackOptions(user, false) }
+                    { trackOptions: utils.getTrackOptions(user, false) },
                   )
                   .then(function (createdUser) {
                     done(null, createdUser);
                   });
+              } else {
+                dbUser.lastLogin = moment();
+                dbUser.loginCount = (dbUser.loginCount || 0) + 1;
+                dbUser
+                  .update(
+                    {
+                      lastLogin: dbUser.lastLogin,
+                      loginCount: dbUser.loginCount,
+                    },
+                    {
+                      where: { id: dbUser.id },
+                      trackOptions: utils.getTrackOptions(dbUser, false),
+                    },
+                  )
+                  .then(() => {
+                    done(null, dbUser);
+                  });
               }
-              dbUser.lastLogin = moment();
-              dbUser.loginCount = (dbUser.loginCount || 0) + 1;
-              dbUser
-                .update(
-                  {
-                    lastLogin: dbUser.lastLogin,
-                    loginCount: dbUser.loginCount,
-                  },
-                  {
-                    where: { id: dbUser.id },
-                    trackOptions: utils.getTrackOptions(dbUser, false),
-                  }
-                )
-                .then(() => {
-                  done(null, dbUser);
-                });
+            })
+            .catch((err) => {
+              console.log(err);
             });
         }
       )
