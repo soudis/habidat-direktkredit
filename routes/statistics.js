@@ -171,6 +171,66 @@ module.exports = function (app) {
   );
 
   router.get(
+    "/statistics/amounts/:status",
+    security.isLoggedInAdmin,
+    (req, res) => {
+      models.user.findFetchFull(models, {}).then(function (users) {
+        var amounts = {};
+        users.forEach((user) => {
+          user.contracts.forEach((contract) => {
+            if (
+              req.params.status === "all" ||
+              contract.getStatusValue() === req.params.status
+            ) {
+              var contractAmountRounded =
+                Math.ceil(contract.amount / 1000) * 1000;
+
+              amounts[contractAmountRounded] =
+                (amounts[contractAmountRounded] || 0) + 1;
+            }
+          });
+        });
+        var amountsFormatted = {};
+        Object.keys(amounts).forEach((key) => {
+          amountsFormatted[format.formatMoney(parseInt(key), 0)] = amounts[key];
+        });
+        res.setHeader("Content-Type", "application/json");
+        res.send(JSON.stringify({ amounts: amountsFormatted }));
+      });
+    }
+  );
+
+  router.get(
+    "/statistics/amountdistribution/:status",
+    security.isLoggedInAdmin,
+    (req, res) => {
+      models.user.findFetchFull(models, {}).then(function (users) {
+        var amounts = {};
+        users.forEach((user) => {
+          user.contracts.forEach((contract) => {
+            if (
+              req.params.status === "all" ||
+              contract.getStatusValue() === req.params.status
+            ) {
+              var contractAmountRounded =
+                Math.ceil(contract.amount / 1000) * 1000;
+
+              amounts[contractAmountRounded] =
+                (amounts[contractAmountRounded] || 0) + contract.amount;
+            }
+          });
+        });
+        var amountsFormatted = {};
+        Object.keys(amounts).forEach((key) => {
+          amountsFormatted[format.formatMoney(parseInt(key), 0)] = amounts[key];
+        });
+        res.setHeader("Content-Type", "application/json");
+        res.send(JSON.stringify({ amounts: amountsFormatted }));
+      });
+    }
+  );
+
+  router.get(
     "/statistics/transactionsbymonth/:start/:end",
     security.isLoggedInAdmin,
     (req, res) => {

@@ -396,7 +396,10 @@ exports.getNumbers = function () {
   var contracts = {
     running: [],
     cancelled: [],
+    notDeposited: [],
   };
+
+  var userTotals = [];
 
   var numbers = {
     firstContractDate: moment(),
@@ -407,6 +410,8 @@ exports.getNumbers = function () {
       contracts: 0,
       users: 0,
       avgRuntime: 0,
+      avgContractAmountPerUser: 0,
+      medianContractAmountPerUser: 0,
     },
     running: {
       contractAmount: 0,
@@ -426,6 +431,13 @@ exports.getNumbers = function () {
       avgDaysToRepayCount: 0,
       avgRuntime: 0,
     },
+    notDeposited: {
+      contractAmount: 0,
+      avgContractAmount: 0,
+      medianContractAmount: 0,
+      contracts: 0,
+      users: 0,
+    },
   };
   var now = moment();
 
@@ -433,11 +445,15 @@ exports.getNumbers = function () {
     users.forEach((user) => {
       var hasNotTerminatedContracts = false;
       var hasTerminatedContracts = false;
+      var hasDeposits = false;
+      var userTotal = 0;
       user.contracts.forEach((contract) => {
+        userTotal += contract.amount;
         if (
           contract.getDepositDate() &&
           contract.getDepositDate().isBefore(now)
         ) {
+          hasDeposits = true;
           contract.sortTransactions();
           if (numbers.firstContractDate.isAfter(contract.sign_date)) {
             numbers.firstContractDate = moment(contract.sign_date);
@@ -468,20 +484,28 @@ exports.getNumbers = function () {
             numbers.running.avgRuntime += contract.getRuntime();
             contracts.running.push(contract);
           }
+        } else {
+          // no deposits yet
+          numbers.notDeposited.contracts++;
+          numbers.notDeposited.contractAmount += contract.amount;
+          contracts.notDeposited.push(contract);
         }
       });
 
       numbers.running.users += hasNotTerminatedContracts ? 1 : 0;
       numbers.cancelled.users +=
         hasTerminatedContracts && !hasNotTerminatedContracts ? 1 : 0;
+
+      if (userTotal > 0) {
+        userTotals.push(userTotal);
+        numbers.notDeposited.users += hasDeposits ? 0 : 1;
+      }
     });
     numbers.total.avgRuntime =
       numbers.cancelled.avgRuntime + numbers.running.avgRuntime;
 
     numbers.running.avgContractAmount =
       numbers.running.contractAmount / numbers.running.contracts;
-    numbers.running.avgContractAmountPerUser =
-      numbers.running.contractAmount / numbers.running.users;
     contracts.running.sort(function (a, b) {
       if (a.amount > b.amount) return 1;
       else if (b.amount > a.amount) return -1;
@@ -496,8 +520,6 @@ exports.getNumbers = function () {
 
     numbers.cancelled.avgContractAmount =
       numbers.cancelled.contractAmount / numbers.cancelled.contracts;
-    numbers.cancelled.avgContractAmountPerUser =
-      numbers.cancelled.contractAmount / numbers.cancelled.users;
     numbers.cancelled.avgDaysToRepay =
       numbers.cancelled.avgDaysToRepay / numbers.cancelled.avgDaysToRepayCount;
     contracts.cancelled.sort(function (a, b) {
@@ -512,16 +534,37 @@ exports.getNumbers = function () {
     numbers.cancelled.avgRuntime =
       numbers.cancelled.avgRuntime / numbers.cancelled.contracts;
 
-    numbers.total.users = numbers.running.users + numbers.cancelled.users;
+    numbers.notDeposited.avgContractAmount =
+      numbers.notDeposited.contractAmount / numbers.notDeposited.contracts;
+    contracts.notDeposited.sort(function (a, b) {
+      if (a.amount > b.amount) return 1;
+      else if (b.amount > a.amount) return -1;
+      else return 0;
+    });
+    if (contracts.notDeposited.length > 0) {
+      numbers.notDeposited.medianContractAmount =
+        contracts.notDeposited[
+          Math.floor(contracts.notDeposited.length / 2)
+        ].amount;
+    }
+
+    numbers.total.users =
+      numbers.running.users +
+      numbers.cancelled.users +
+      numbers.notDeposited.users;
     numbers.total.contracts =
-      numbers.running.contracts + numbers.cancelled.contracts;
+      numbers.running.contracts +
+      numbers.cancelled.contracts +
+      numbers.notDeposited.contracts;
     numbers.total.contractAmount =
-      numbers.running.contractAmount + numbers.cancelled.contractAmount;
+      numbers.running.contractAmount +
+      numbers.cancelled.contractAmount +
+      numbers.notDeposited.contractAmount;
     numbers.total.avgContractAmount =
       numbers.total.contractAmount / numbers.total.contracts;
-    numbers.total.avgContractAmountPerUser =
-      numbers.total.contractAmount / numbers.total.users;
-    contracts.total = contracts.running.concat(contracts.cancelled);
+    contracts.total = contracts.running.concat(
+      contracts.cancelled.concat(contracts.notDeposited)
+    );
     contracts.total.sort(function (a, b) {
       if (a.amount > b.amount) return 1;
       else if (b.amount > a.amount) return -1;
@@ -532,7 +575,21 @@ exports.getNumbers = function () {
         contracts.total[Math.floor(contracts.total.length / 2)].amount;
     }
     numbers.total.avgRuntime =
-      numbers.total.avgRuntime / numbers.total.contracts;
+      numbers.total.avgRuntime /
+      (numbers.running.contracts + numbers.cancelled.contracts);
+
+    if (userTotals.length > 0)
+      numbers.total.avgContractAmountPerUser =
+        userTotals.reduce((a, b) => a + b, 0) / userTotals.length;
+
+    userTotals.sort(function (a, b) {
+      if (a.amount > b.amount) return 1;
+      else if (b.amount > a.amount) return -1;
+      else return 0;
+    });
+    if (userTotals.length > 0)
+      numbers.total.medianContractAmountPerUser =
+        userTotals[Math.floor(userTotals.length / 2)];
 
     return numbers;
   });

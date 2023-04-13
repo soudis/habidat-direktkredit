@@ -68,7 +68,7 @@ mixin settings_form()
         +option('Y', _t('termination_period_type_Y'))(selected=selected)
     +select('country')(value=settings.project.get('defaults.country') icon="fa-globe-africa")
       +country_select_options(settings.project.get('defaults.country'))        
-    +tags('relationships')(value=settings.project.get('defaults.relationships'))
+    +tags('relationships', undefined, settings.project.get('defaults.relationships'))
     +text('usersuffix', _t('project_usersuffix'))(icon='fa-user' value=settings.project.get('usersuffix') help="Kann Feldnamen enthalten, z.B. {user_last_name}" required)
     +submit_button()
 

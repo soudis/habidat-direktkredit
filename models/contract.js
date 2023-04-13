@@ -502,6 +502,19 @@ module.exports = (sequelize, DataTypes) => {
       : "Laufend";
   };
 
+  contract.prototype.getStatusValue = function () {
+    var now = moment();
+    if (this.getDepositDate() && this.getDepositDate().isBefore(now)) {
+      if (this.isTerminated(now)) {
+        return "cancelled";
+      } else {
+        return "running";
+      }
+    } else {
+      return "notDeposited";
+    }
+  };
+
   contract.prototype.getStatusText = function () {
     switch (this.status) {
       case "unknown":
