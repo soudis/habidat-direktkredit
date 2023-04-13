@@ -242,9 +242,20 @@ module.exports = function (app) {
     security.isLoggedInAdmin,
     function (req, res, next) {
       Promise.resolve()
-        .then(() =>
-          utils.render(req, res, "admin/settings", {}, "Einstellungen")
-        )
+        .then(email.testEmailSettings)
+        .catch((error) => {
+          return error;
+        })
+        .then((emailError) => {
+          console.log(emailError);
+          utils.render(
+            req,
+            res,
+            "admin/settings",
+            { emailError: emailError },
+            "Einstellungen"
+          );
+        })
         .catch((error) => next(error));
     }
   );
@@ -272,9 +283,27 @@ module.exports = function (app) {
           },
         })
         .then(function (templates) {
+          const accountNotficationsComplete =
+            templates.find(
+              (t) =>
+                t.ref_table === "template_account_notification" &&
+                t.salutation === "all"
+            ) ||
+            (templates.find(
+              (t) =>
+                t.ref_table === "template_account_notification" &&
+                t.salutation === "personal"
+            ) &&
+              templates.find(
+                (t) =>
+                  t.ref_table === "template_account_notification" &&
+                  t.salutation === "formal"
+              ));
+
           res.render("admin/templates", {
             title: "Vorlagen",
-            templates: templates,
+            templates,
+            accountNotficationsComplete,
           });
         });
     }

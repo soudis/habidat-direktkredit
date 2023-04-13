@@ -3,35 +3,47 @@ const settings = require("../utils/settings");
 const utils = require("./");
 
 const models = require("../models");
+const { create } = require("lodash");
 
 const fromAddress = (req) => {
   return settings.project.get("email") || "no-reply@" + req.headers.host;
 };
 
+const createTransporter = () => {
+  var transporter;
+  if (settings.project.get("smtp.host")) {
+    var options = settings.project.get("smtp");
+    transporter = nodemailer.createTransport(options);
+  } else if (
+    process.env.HABIDAT_DK_SENDGRID_USER &&
+    process.env.HABIDAT_DK_SENDGRID_PASSWORD
+  ) {
+    transporter = nodemailer.createTransport({
+      service: "SendGrid",
+      auth: {
+        user: process.env.HABIDAT_DK_SENDGRID_USER,
+        pass: process.env.HABIDAT_DK_SENDGRID_PASSWORD,
+      },
+    });
+  } else {
+    throw "Keine E-Maileinstellungen hinterlegt (weder SMTP noch Sendgrid)";
+  }
+  return transporter;
+};
+
+exports.testEmailSettings = () => {
+  return Promise.resolve().then(() => {
+    return createTransporter().verify();
+  });
+};
+
 const sendMail = (from, recipient, subject, body) => {
   return Promise.resolve()
     .then(() => {
-      if (!recipient || recipient === "") {
+      if (!from || from === "") {
         throw "Keine Kontakt E-Mailadresse in den Einstellungen hinterlegt";
       }
-      var transporter;
-      if (settings.project.get("smtp.host")) {
-        var options = settings.project.get("smtp");
-        transporter = nodemailer.createTransport(options);
-      } else if (
-        process.env.HABIDAT_DK_SENDGRID_USER &&
-        process.env.HABIDAT_DK_SENDGRID_PASSWORD
-      ) {
-        transporter = nodemailer.createTransport({
-          service: "SendGrid",
-          auth: {
-            user: process.env.HABIDAT_DK_SENDGRID_USER,
-            pass: process.env.HABIDAT_DK_SENDGRID_PASSWORD,
-          },
-        });
-      } else {
-        throw "Keine E-Maileinstellungen hinterlegt (weder SMTP noch Sendgrid)";
-      }
+      var transporter = createTransporter();
       const mailOptions = {
         to: recipient,
         from: from,
