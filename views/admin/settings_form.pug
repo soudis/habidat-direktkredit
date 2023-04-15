@@ -50,6 +50,10 @@ mixin settings_form()
       - var selected = settings.project.get('defaults.interest_method')
       each method in ['365_compound', '30E360_compound', '360_compound', 'ACT_compound', '365_nocompound', '30E360_nocompound', '360_nocompound', 'ACT_nocompound']
         +option(method, _t('interest_method_' + method))(selected=selected)
+    +select('interest_methods_alternative')(icon='fa-percent' multiple addClass="multi-select"  help="Hinweis: Es wird empfohlen keine alternativen Zinsberechnungsmethoden zu verwenden und bei einer Standardmethode zu bleiben.")
+      - var selected = settings.project.get('defaults.interest_methods_alternative')
+      each method in ['365_compound', '30E360_compound', '360_compound', 'ACT_compound', '365_nocompound', '30E360_nocompound', '360_nocompound', 'ACT_nocompound']
+        +option(method, _t('interest_method_' + method), selected)
     +select('interest_payment_type')(icon='fa-reply')
       - var selected = settings.project.get('defaults.interest_payment_type')
       +option('end', _t('interest_payment_type_end'))(selected=selected)
@@ -210,6 +214,8 @@ mixin settings_form()
     $('.new-tag-input').on('change', function(e) {
       addTag($(this).val().trim(), $(this));
     })    
+
+    $('.multi-select').selectpicker();
 
     $('.new-tag-input').on('keydown', function (e) {
       if(event.key === 'Enter') {

@@ -32,7 +32,14 @@ mixin contract(contract, templates_contract, admin)
               td= format.formatMoney(contract.amount)
             tr
               td: b Zinssatz
-              td= format.formatPercent(contract.interest_rate,2)                        
+              td= format.formatPercent(contract.interest_rate,2)  
+            if contract.interest_method 
+              tr
+                td: b Alternative Zinsberechnung
+                td 
+                  span= _t('interest_method_' + contract.interest_method)
+                  span  
+                  span.fa.fa-info-circle(title=_t('interest_method_hint_' + contract.interest_method))                                                   
             tr
               td: b= _t('interest_payment_type')
               td= _t('interest_payment_type_' + (contract.interest_payment_type || settings.project.get('defaults.interest_payment_type')))

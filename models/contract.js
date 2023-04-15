@@ -57,6 +57,10 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.DECIMAL(10, 3),
         allowNull: true,
       },
+      interest_method: {
+        type: DataTypes.STRING,
+        allowNull: true,
+      },
       status: {
         type: DataTypes.STRING,
         allowNull: true,
@@ -119,6 +123,11 @@ module.exports = (sequelize, DataTypes) => {
         label: "Zinssatz",
         class: "text-right",
         filter: "number",
+      },
+      contract_interest_method: {
+        id: "contract_interest_method",
+        label: "Alternative Zinsberechnung",
+        filter: "text",
       },
       contract_deposit: {
         id: "contract_deposit",
@@ -268,6 +277,10 @@ module.exports = (sequelize, DataTypes) => {
         valueRaw: contract.interest_rate,
         value: format.formatPercent(contract.interest_rate, 2),
         order: contract.interest_rate,
+      },
+      contract_interest_method: {
+        valueRaw: contract.interest_method,
+        value: _t("interest_method_" + contract.interest_method),
       },
       contract_deposit: {
         valueRaw: contract.getDepositAmount(),
@@ -569,7 +582,11 @@ module.exports = (sequelize, DataTypes) => {
       ) {
         sum +=
           transaction.amount +
-          transaction.interestToDate(contract.interest_rate, date);
+          transaction.interestToDate(
+            contract.interest_rate,
+            contract.interest_method,
+            date
+          );
       }
     });
     if (sum > 0) {
@@ -584,7 +601,11 @@ module.exports = (sequelize, DataTypes) => {
     var contract = this;
     this.transactions.forEach(function (transaction) {
       if (moment(date).diff(transaction.transaction_date) >= 0) {
-        sum += transaction.interestToDate(contract.interest_rate, date);
+        sum += transaction.interestToDate(
+          contract.interest_rate,
+          contract.interest_method,
+          date
+        );
       }
     });
     if (sum > 0) {
@@ -601,8 +622,16 @@ module.exports = (sequelize, DataTypes) => {
     var year_end = moment(year + "-01-01").add(1, "years");
     this.transactions.forEach(function (transaction) {
       if (year_end.diff(transaction.transaction_date) > 0) {
-        sum += transaction.interestToDate(contract.interest_rate, year_end);
-        sum -= transaction.interestToDate(contract.interest_rate, year_begin);
+        sum += transaction.interestToDate(
+          contract.interest_rate,
+          contract.interest_method,
+          year_end
+        );
+        sum -= transaction.interestToDate(
+          contract.interest_rate,
+          contract.interest_method,
+          year_begin
+        );
       }
     });
     if (sum > 0) {

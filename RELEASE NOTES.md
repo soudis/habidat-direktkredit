@@ -1,12 +1,17 @@
 # Release Notes
 
+## Version 1.2.0
+
+- Feature: interest method per contract
+- Feature: warning messages when changing crucial info on contracts with payments
+
 ## Version 1.1.1
 
-- new statstics (not paid loads)
-- new charts (loan amounts and loan amount distribution)
-- bugfix with special chars in relationships settings
+- Feature: new statstics (not paid loads)
+- Feature: new charts (loan amounts and loan amount distribution)
+- Bugfix: Special chars in relationships settings
 
 ## Version 1.1.0
 
-- new Open ID Connect Feature
-- bugfixes
+- Feature: Open ID Connect authentication
+- Bugfix: various small fixes

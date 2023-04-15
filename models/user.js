@@ -866,11 +866,13 @@ module.exports = (sequelize, DataTypes) => {
             sums.begin.amount += transaction.amount;
             sums.begin.interest += transaction.interestToDate(
               contract.interest_rate,
+              contract.interest_method,
               moment(firstDay)
             );
             sums.end.amount += transaction.amount;
             sums.end.interest += transaction.interestToDate(
               contract.interest_rate,
+              contract.interest_method,
               moment(firstDayNextYear)
             );
           } else if (
@@ -897,6 +899,7 @@ module.exports = (sequelize, DataTypes) => {
             sums.current.amount += transaction.amount;
             sums.end.interest += transaction.interestToDate(
               contract.interest_rate,
+              contract.interest_method,
               moment(firstDayNextYear)
             );
           }

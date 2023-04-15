@@ -155,7 +155,8 @@ const texts = {
   purple: "Lila",
   type: "Typ",
   import: "importieren",
-  interest_method: "Zinsberechnung",
+  interest_method: "Zinsberechnung (Standard)",
+  interest_methods_alternative: "Alternative Zinsberechnung",
   interest_method_365_compound: "ACT/365 mit Zinseszins",
   interest_method_hint_365_compound:
     "Bei ACT/365 (englische Methode) werden die Zinstage eines Jahres kalendergenau berechnet, allerdings hat das Basis-Zinsjahr immer 365 Zinstage, unabhängig von einem möglichen Schaltjahr.",
@@ -180,6 +181,7 @@ const texts = {
   interest_method_ACT_nocompound: "ACT/ACT ohne Zinseszins",
   interest_method_hint_ACT_nocompound:
     "Bei ACT/ACT (Effektivzinsmethode) werden die Zinstage eines Jahres kalendergenau berechnet, auch das Basis-Zinsjahr hat je nach Jahr 365 oder 366 (Schaltjahr) Zinstage.",
+  interest_method_null: "-",
   salutation: "Anrede",
   user_id: "Kontonummer",
   user_type: "Benutzer*innentyp",

@@ -31,7 +31,7 @@ mixin group_input(name)
   input.form-control(name=name)&attributes(attributes)(id=attributes.id||name type=attributes.type||'text')
 
 mixin group_select(name)        
-  select.form-control(id=attributes.id||name name=name required=attributes.required)
+  select.form-control(id=attributes.id||name name=name required=attributes.required multiple=attributes.multiple class=attributes.addClass data-none-selected-text="-")
     block  
 
 mixin file(name, label=undefined)
@@ -110,8 +110,8 @@ mixin radio(name, label=undefined)
     input.custom-control-input(id=name+'_'+attributes.value type="radio" name=name checked=attributes.default&&!attributes.selected||attributes.selected&&attributes.selected==attributes.value?"checked":undefined)&attributes(attributes)
     label.custom-control-label.radio-label(for=name+'_'+attributes.value)= label||_t(name)
 
-mixin option(value, label=undefined) 
-  option(selected=attributes.selected && attributes.selected==value value=value)=label||_t(value)
+mixin option(value, label=undefined, selectedArray=undefined) 
+  option(selected=attributes.selected && attributes.selected==value || selectedArray && selectedArray.includes(value) value=value)=label||_t(value)
 
 mixin output(name, label=undefined)
   .form-group(class=attributes.class)

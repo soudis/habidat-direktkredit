@@ -276,8 +276,16 @@ module.exports = function (app) {
                   }
                 }
                 interest +=
-                  transaction.interestToDate(contract.interest_rate, end) -
-                  transaction.interestToDate(contract.interest_rate, start);
+                  transaction.interestToDate(
+                    contract.interest_rate,
+                    contract.interest_method,
+                    end
+                  ) -
+                  transaction.interestToDate(
+                    contract.interest_rate,
+                    contract.interest_method,
+                    start
+                  );
               });
             });
           });
