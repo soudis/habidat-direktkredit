@@ -63,6 +63,10 @@ exports.convertToPdf = function (stream) {
   });
 };
 
+exports.toArray = function (data) {
+  return Array.isArray(data) ? data : [data];
+};
+
 exports.generateTransactionList = function (transactionList) {
   return Promise.resolve().then(() => {
     var workbook = new exceljs.Workbook();

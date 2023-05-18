@@ -177,7 +177,7 @@ module.exports = function (app) {
           setSetting("defaults.interest_method", req.body.interest_method);
           setSetting(
             "defaults.interest_methods_alternative",
-            req.body.interest_methods_alternative
+            utils.toArray(req.body.interest_methods_alternative)
           );
           setSetting(
             "defaults.interest_payment_type",
