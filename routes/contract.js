@@ -55,10 +55,11 @@ module.exports = function (app) {
         .findByIdFetchFull(models, req.params.contract_id)
         .then((contract) =>
           res.json({
-            amountToDate: contract.getAmountToDate(
-              moment(req.params.date, "DD.MM.YYYY"),
+            amountToDate: contract.calculateToDate(
+              moment(req.params.date, "YYYY-MM-DD"),
+              undefined,
               req.params.transaction_id
-            ),
+            ).end,
           })
         )
         .catch((error) => res.status(500).json({ error: error }));
@@ -402,13 +403,13 @@ module.exports = function (app) {
           if (
             !req.body.ignore_warning &&
             contract.amount != parseFloat(req.body.amount) &&
-            contract.amount < contract.getDepositAmount()
+            contract.amount < contract.calculateToDate().deposits
           ) {
             throw new utils.Warning(
               `Der geänderte Vertragswert (${format.formatMoney(
                 parseFloat(req.body.amount)
               )}) ist kleiner als die Einzahlungen (${format.formatMoney(
-                contract.getDepositAmount()
+                contract.contract.calculateToDate().deposits
               )})`
             );
           }

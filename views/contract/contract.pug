@@ -1,6 +1,7 @@
 include ../transaction/transaction
 
-mixin contract(contract, templates_contract, admin)
+mixin contract(contract, templates_contract, admin) 
+  - const totals = contract.calculateToDate()
   .col-md-12(id="contract_" + contract.id)
     .card
       .card-header
@@ -71,23 +72,29 @@ mixin contract(contract, templates_contract, admin)
                 td= moment(contract.getPaybackDate()).format('DD.MM.YYYY')              
             tr.divider
               td: b Einzahlungen
-              td= format.formatMoney(contract.getDepositAmount())
+              td= format.formatMoney(totals.deposits)
             tr
-              td: b Auszahlungen
-              td= format.formatMoney(contract.getWithdrawalAmount())
+              td: b Rückzahlungen
+              td= format.formatMoney(totals.withdrawals)
+            tr
+              td: b Zinsauszahlungen
+              td= format.formatMoney(totals.interestPaid)
+            tr
+              td: b Nicht rückgefordert
+              td= format.formatMoney(totals.notReclaimed)
             tr
               td: b Zinsen bis heute
-              td= format.formatMoney(contract.getInterestToDate())
+              td= format.formatMoney(totals.interest)              
             tr.divider
               if admin
                 td: b Aushaftender Betrag
-                td= format.formatMoney(contract.getAmountToDate( moment()))    
+                td= format.formatMoney(totals.end)    
               else 
                 td.h6: b Kontostand
-                if contract.getAmountToDate(moment()) > 0
-                  td.h6.text-success: b= format.formatMoney(contract.getAmountToDate( moment()))    
+                if totals.end > 0
+                  td.h6.text-success: b= format.formatMoney(totals.end)    
                 else
-                  td.h6: b= format.formatMoney(contract.getAmountToDate( moment()))    
+                  td.h6: b= format.formatMoney(totals.end)    
               
             if ((admin || contract.notes_public) && contract.notes && contract.notes.trim() !== '')      
               tr.divider
@@ -142,6 +149,7 @@ mixin contracts(user, templates_contract, admin)
               +contract(contract, templates_contract, admin)  
 
 mixin contracts_summary(user, admin)
+  - const totals = user.calculateToDate()
   .card
     h4.card-header 
       span Kontostand 
@@ -158,23 +166,29 @@ mixin contracts_summary(user, admin)
           tbody
             tr
               td.label: b Vertragswert:
-              td= format.formatMoney(user.getContractAmount())
+              td= format.formatMoney(totals.amount)
             tr
               td: b Einzahlungen
-              td= format.formatMoney(user.getDepositAmount())
+              td= format.formatMoney(totals.deposits)
             tr
-              td: b Auszahlungen
-              td= format.formatMoney(user.getWithdrawalAmount())
+              td: b Rückzahlungen
+              td= format.formatMoney(totals.withdrawals)
+            tr
+              td: b Zinsauszahlungen
+              td= format.formatMoney(totals.interestPaid)
+            tr
+              td: b Nicht rückgefordert
+              td= format.formatMoney(totals.notReclaimed)              
             tr
               td: b Zinsen bis heute
-              td= format.formatMoney(user.getInterestToDate())
+              td= format.formatMoney(totals.interest)
             tr
               if admin
                 td: b Aushaftender Betrag
-                td= format.formatMoney(user.getAmountToDate( moment()))    
+                td= format.formatMoney(totals.end)    
               else 
                 td.h6: b Kontostand
-                if user.getAmountToDate(moment()) > 0
-                  td.h6.text-success: b= format.formatMoney(user.getAmountToDate( moment()))    
+                if totals.end > 0
+                  td.h6.text-success: b= format.formatMoney(totals.end)    
                 else
-                  td.h6: b= format.formatMoney(user.getAmountToDate( moment()))    
+                  td.h6: b= format.formatMoney(totals.end)    

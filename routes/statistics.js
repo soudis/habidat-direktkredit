@@ -54,7 +54,7 @@ module.exports = function (app) {
           user.contracts.forEach((contract) => {
             if (moment(contract.sign_date).isBetween(startDate, endDate)) {
               byRelation[user.relationship] +=
-                contract.getAmountToDate(endDate);
+                contract.calculateToDate(endDate).end;
             }
           });
         });
@@ -117,7 +117,7 @@ module.exports = function (app) {
             }
             user.contracts.forEach((contract) => {
               if (moment(contract.sign_date).isBetween(startDate, endDate)) {
-                var amount = contract.getAmountToDate(endDate);
+                var amount = contract.calculateToDate(endDate).end;
                 if (!skip) {
                   sections[key] += amount;
                 }
@@ -158,7 +158,7 @@ module.exports = function (app) {
           sum = 0;
           users.forEach((user) => {
             user.contracts.forEach((contract) => {
-              var contractAmount = contract.getAmountToDate(month);
+              var contractAmount = contract.calculateToDate(month).end;
               sum += contractAmount;
             });
           });
@@ -256,10 +256,13 @@ module.exports = function (app) {
           var end = month;
           var deposits = 0,
             withdrawals = 0,
-            interest = 0,
-            notReclaimed = 0;
+            notReclaimed = 0,
+            interest = 0;
           users.forEach((user) => {
             user.contracts.forEach((contract) => {
+              interest +=
+                contract.calculateToDate(end).interest -
+                contract.calculateToDate(start).interest;
               contract.transactions.forEach((transaction) => {
                 if (
                   start.diff(transaction.transaction_date) <= 0 &&
@@ -275,17 +278,6 @@ module.exports = function (app) {
                     }
                   }
                 }
-                interest +=
-                  transaction.interestToDate(
-                    contract.interest_rate,
-                    contract.interest_method,
-                    end
-                  ) -
-                  transaction.interestToDate(
-                    contract.interest_rate,
-                    contract.interest_method,
-                    start
-                  );
               });
             });
           });
@@ -323,11 +315,17 @@ module.exports = function (app) {
             if (a.date.diff(b.date) > 0) return 1;
             else if (b.date.diff(a.date) > 0) return -1;
             else {
-              var comp = new String(a.last_name).localeCompare(b.last_name);
-              if (comp === 0) {
-                return new String(a.first_name).localeCompare(b.first_name);
+              if (a.order > b.order) {
+                return 1;
+              } else if (b.order > a.order) {
+                return -1;
               } else {
-                return comp;
+                var comp = new String(a.last_name).localeCompare(b.last_name);
+                if (comp === 0) {
+                  return new String(a.first_name).localeCompare(b.first_name);
+                } else {
+                  return comp;
+                }
               }
             }
           });

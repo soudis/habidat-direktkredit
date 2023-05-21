@@ -191,6 +191,7 @@ module.exports = (sequelize, DataTypes) => {
     }
   };
 
+  // TODO delete this function (old interest calculation)
   transaction.prototype.interestToDate = function (
     rate,
     contractMethod,
@@ -253,6 +254,7 @@ module.exports = (sequelize, DataTypes) => {
         } else {
           interestDays = endOfYear.diff(fromDate, "days");
         }
+
         amountWithInterest +=
           (((amountWithInterest * rate) / 100) * interestDays) /
           getBaseDays(fromDate);

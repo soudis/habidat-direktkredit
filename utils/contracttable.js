@@ -56,7 +56,10 @@ exports.contractTableRow = function (
       contractRow.contract_interest_method,
       contractRow.contract_deposit,
       contractRow.contract_withdrawal,
+      contractRow.contract_interest_paid,
+      contractRow.contract_not_reclaimed,
       contractRow.contract_amount_to_date,
+      contractRow.contract_interest_to_date_old,
       contractRow.contract_interest_to_date,
       contractRow.contract_interest_of_year,
       contractRow.contract_interest_payment_type,
@@ -65,7 +68,6 @@ exports.contractTableRow = function (
       contractRow.contract_payback_date,
       contractRow.contract_status,
       contractRow.contract_deposit_date,
-      contractRow.contract_deposit_amount,
     ];
   } else {
     return [
@@ -86,6 +88,8 @@ exports.contractTableRow = function (
       userRow.user_account_notification_type,
       userRow.user_relationship,
       userRow.user_membership_status,
+      false,
+      false,
       false,
       false,
       false,
@@ -138,7 +142,10 @@ exports.getContractTableColumns = (pInterestYear = undefined) => {
     contractColumns.contract_interest_method,
     contractColumns.contract_deposit,
     contractColumns.contract_withdrawal,
+    contractColumns.contract_interest_paid,
+    contractColumns.contract_not_reclaimed,
     contractColumns.contract_amount_to_date,
+    contractColumns.contract_interest_to_date_old,
     contractColumns.contract_interest_to_date,
     contractColumns.contract_interest_of_year,
     contractColumns.contract_interest_payment_type,
@@ -147,7 +154,6 @@ exports.getContractTableColumns = (pInterestYear = undefined) => {
     contractColumns.contract_payback_date,
     contractColumns.contract_status,
     contractColumns.contract_deposit_date,
-    contractColumns.contract_deposit_amount,
   ];
 };
 
