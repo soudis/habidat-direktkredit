@@ -838,6 +838,7 @@ module.exports = (sequelize, DataTypes) => {
     var user = this;
     var firstDay = moment(year + " +00:00", "YYYY Z");
     var firstDayNextYear = moment(year + " +00:00", "YYYY Z").add(1, "years");
+    var lastDay = moment(year + " +00:00", "YYYY Z").endOf("year");
     this.contracts.forEach(function (contract) {
       const years = contract.calculatePerYear(firstDayNextYear);
       if (years.length > 1 && !contract.isTerminated(firstDay)) {
@@ -848,32 +849,36 @@ module.exports = (sequelize, DataTypes) => {
                 .transaction_date
             : undefined;
         // begin balance
-        transactionList.push({
-          id: user.id,
-          last_name: user.last_name,
-          first_name: user.first_name,
-          contract_id: contract.id,
-          interest_rate: contract.interest_rate,
-          date: firstDay,
-          type: "Kontostand Jahresbeginn",
-          amount: currentYear.begin,
-          interest: 0, // TODO: Interest accumulated until beginning of year?
-          interest_payment_type: contract.getInterestPaymentType(),
-          order: 0,
-        });
-        transactionList.push({
-          id: user.id,
-          last_name: user.last_name,
-          first_name: user.first_name,
-          contract_id: contract.id,
-          interest_rate: contract.interest_rate,
-          date: moment(firstDay).endOf("year"),
-          type: "Kontostand Jahresende",
-          amount: currentYear.end,
-          interest: currentYear.interest, // TODO: Interest accumulated until beginning of year?
-          interest_payment_type: contract.getInterestPaymentType(),
-          order: 4,
-        });
+        if (currentYear.begin > 0) {
+          transactionList.push({
+            id: user.id,
+            last_name: user.last_name,
+            first_name: user.first_name,
+            contract_id: contract.id,
+            interest_rate: contract.interest_rate,
+            date: firstDay,
+            type: "Kontostand Jahresbeginn",
+            amount: currentYear.begin,
+            interest: 0, // TODO: Interest accumulated until beginning of year?
+            interest_payment_type: contract.getInterestPaymentType(),
+            order: 0,
+          });
+        }
+        if (!contract.isTerminated(lastDay)) {
+          transactionList.push({
+            id: user.id,
+            last_name: user.last_name,
+            first_name: user.first_name,
+            contract_id: contract.id,
+            interest_rate: contract.interest_rate,
+            date: moment(lastDay),
+            type: "Kontostand Jahresende",
+            amount: currentYear.end,
+            interest: currentYear.interest, // TODO: Interest accumulated until beginning of year?
+            interest_payment_type: contract.getInterestPaymentType(),
+            order: 4,
+          });
+        }
         transactionList.push({
           id: user.id,
           last_name: user.last_name,
@@ -881,11 +886,16 @@ module.exports = (sequelize, DataTypes) => {
           contract_id: contract.id,
           interest_rate: contract.interest_rate,
           date:
-            contract.isTerminated(firstDayNextYear) && lastTransaction
+            contract.isTerminated(lastDay) && lastTransaction
               ? moment(lastTransaction)
-              : moment(firstDayNextYear).subtract(1, "days"),
+              : moment(lastDay),
           type: "Zinsertrag " + year,
-          amount: currentYear.interest,
+          amount:
+            Math.round(
+              (currentYear.interest -
+                (contract.isTerminated(lastDay) ? currentYear.end : 0)) *
+                100
+            ) / 100,
           interest: "",
           interest_payment_type: contract.getInterestPaymentType(),
           order: 2,
