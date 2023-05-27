@@ -52,6 +52,7 @@ exports.calculateInterestDaily = function (
       // days in last month
       interestDays += Math.min(moment(toDate).date(), 30);
       interestDays -= lastYear ? 1 : 0;
+      interestDays -= !lastYear && !firstYear ? 1 : 0;
     }
   } else {
     interestDays = toDate.diff(fromDate, "days");
