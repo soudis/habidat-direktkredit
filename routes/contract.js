@@ -383,7 +383,8 @@ module.exports = function (app) {
             !req.body.ignore_warning
           ) {
             const checkField = (field, value, label) => {
-              if (contract[field] !== value)
+              console.log(field, contract[field], value);
+              if ((contract[field] || "") !== (value || ""))
                 throw new utils.Warning(
                   `Dieser Vertrag hat bereits Zahlungen aus den Vorjahren, ${label} zu ändern, ändert im Nachhinein die berechneten Zinsen`
                 );
