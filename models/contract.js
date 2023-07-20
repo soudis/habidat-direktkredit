@@ -41,6 +41,7 @@ module.exports = (sequelize, DataTypes) => {
       termination_date: {
         type: DataTypes.DATEONLY,
         allowNull: true,
+        displayOnly: true,
       },
       termination_period: {
         type: DataTypes.DECIMAL,
@@ -215,6 +216,7 @@ module.exports = (sequelize, DataTypes) => {
         class: "text-center",
         priority: "2",
         filter: "list",
+        displayOnly: true,
       },
       contract_has_interest: {
         id: "contract_has_interest",
@@ -229,6 +231,13 @@ module.exports = (sequelize, DataTypes) => {
         label: "Einzahlungsdatum",
         class: "text-right",
         filter: "date",
+      },
+      contract_deposit_amount: {
+        id: "contract_deposit_amount",
+        label: "Einzahlungsbetrag (Import)",
+        class: "text-right",
+        filter: "number",
+        importOnly: true,
       },
       contract_notes: {
         id: "contract_notes",
@@ -378,6 +387,11 @@ module.exports = (sequelize, DataTypes) => {
         valueRaw: depositDate ? depositDate : "",
         value: depositDate ? moment(depositDate).format("DD.MM.YYYY") : "",
         order: depositDate ? moment(depositDate).format("YYYY/MM/DD") : "",
+      },
+      contract_deposit_amount: {
+        valueRaw: 0,
+        value: 0,
+        order: 0,
       },
       contract_notes: { valueRaw: contract.notes, value: contract.notes },
       contract_user_id: { valueRaw: contract.user_id, value: contract.user_id },

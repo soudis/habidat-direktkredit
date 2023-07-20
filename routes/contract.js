@@ -83,8 +83,6 @@ module.exports = function (app) {
             if (userId === undefined || userId === null || userId === "") {
               throw "Kontonummer fehlt oder ist nicht zugeordnet";
             }
-            console.log("userid", userId);
-            console.log("user", user);
             if (!user || !user.id) {
               throw "Kein Konto mit Kontonummer " + userId + " gefunden";
             }
