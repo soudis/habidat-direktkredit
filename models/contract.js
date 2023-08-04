@@ -795,5 +795,33 @@ module.exports = (sequelize, DataTypes) => {
     return sum > 0 && terminated;
   };
 
+  contract.prototype.deepDelete = function () {
+    return Promise.all(
+      this.transactions.map((transaction) =>
+        transaction.destroy({
+          trackOptions: utils.getTrackOptions(transaction, false),
+        })
+      )
+    ).then(this.destroy({ trackOptions: utils.getTrackOptions(this, false) }));
+  };
+
+  contract.findFetchFull = function (models, whereClause) {
+    return models.contract.findAll({
+      where: whereClause,
+      include: {
+        model: models.transaction,
+        as: "transactions",
+      },
+    });
+  };
+
+  contract.deepDelete = function (models, whereClause) {
+    return contract
+      .findFetchFull(models, whereClause)
+      .then((contracts) =>
+        Promise.all(contracts.map((contract) => contract.deepDelete()))
+      );
+  };
+
   return contract;
 };

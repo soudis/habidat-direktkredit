@@ -225,6 +225,18 @@ module.exports = (sequelize, DataTypes) => {
     });
   };
 
+  User.prototype.deepDelete = function () {
+    return Promise.all(
+      this.contracts.map((contract) => contract.deepDelete())
+    ).then(this.destroy({ trackOptions: utils.getTrackOptions(this, false) }));
+  };
+
+  User.deepDelete = function (models, whereClause) {
+    return User.findFetchFull(models, whereClause).then((users) =>
+      Promise.all(users.map((user) => user.deepDelete()))
+    );
+  };
+
   User.findFetchFull = function (
     models,
     whereClause,

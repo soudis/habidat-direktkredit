@@ -503,20 +503,12 @@ module.exports = function (app) {
     function (req, res, next) {
       var ids = JSON.parse(req.body.ids);
       models.contract
-        .destroy({
-          where: { id: ids },
-          trackOptions: utils.getTrackOptions(req.user, true),
-        })
+        .deepDelete(models, { id: ids })
         .then(function (deleted) {
-          if (deleted > 0) {
-            res.json({ deletedRows: deleted });
-          } else {
-            res.json({
-              error: "Kreditverträge konnten nicht gelöscht werden:" + error,
-            });
-          }
+          res.json({});
         })
         .catch(function (error) {
+          console.log(error);
           res.json({
             error: "Kreditverträge konnten nicht gelöscht werden: " + error,
           });
