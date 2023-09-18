@@ -1,0 +1,235 @@
+{
+  "user_id": 3,
+  "user_type": "Person",
+  "user_is_person": false,
+  "user_salutation": "Persönlich",
+  "user_is_formal": false,
+  "user_title_prefix": "",
+  "user_first_name": "Resi",
+  "user_last_name": "Stanz",
+  "user_title_suffix": "",
+  "user_name": "STANZ Resi",
+  "user_address": "Straße 1\nDE-12345 Ort",
+  "user_address_oneline": "Straße 1</br>DE-12345 Ort",
+  "user_telno": "1234512345",
+  "user_email": "email@example.com",
+  "user_iban": "DE12 1234 1234 1234 1234 12",
+  "user_bic": "BIC1234",
+  "user_relationship": "Unbekannt",
+  "user_membership_status": "Nicht definiert",
+  "user_street": "Straße 1",
+  "user_zip": "12345",
+  "user_place": "Ort",
+  "user_country": "DE",
+  "user_logon_id": "310000_direktkredit",
+  "user_account_notification_type": "Online",
+  "current_date": "25.06.2023",
+  "year": "2022",
+  "user_transactions_year": [
+    {
+      "contract_id": 3,
+      "contract_interest_rate": "2,00 %",
+      "contract_interest_payment_type": "Jährlich",
+      "contract_first_line": true,
+      "transaction_date": "01.01.2022",
+      "transaction_amount": "5.000,28 €",
+      "transaction_type": "Kontostand Jahresbeginn"
+    },
+    {
+      "contract_id": 3,
+      "contract_interest_rate": "2,00 %",
+      "contract_interest_payment_type": "Jährlich",
+      "contract_first_line": false,
+      "transaction_date": "31.12.2022",
+      "transaction_amount": "100,00 €",
+      "transaction_type": "Zinsertrag 2022"
+    },
+    {
+      "contract_id": 3,
+      "contract_interest_rate": "2,00 %",
+      "contract_interest_payment_type": "Jährlich",
+      "contract_first_line": false,
+      "transaction_date": "31.12.2022",
+      "transaction_amount": "-100,00 €",
+      "transaction_type": "Zinsauszahlung"
+    },
+    {
+      "contract_id": 3,
+      "contract_interest_rate": "2,00 %",
+      "contract_interest_payment_type": "Jährlich",
+      "contract_first_line": false,
+      "transaction_date": "31.12.2022",
+      "transaction_amount": "5.000,28 €",
+      "transaction_type": "Kontostand Jahresende"
+    },
+    {
+      "contract_id": 13,
+      "contract_interest_rate": "1,90 %",
+      "contract_interest_payment_type": "Jährlich",
+      "contract_first_line": true,
+      "transaction_date": "01.01.2022",
+      "transaction_amount": "4.031,45 €",
+      "transaction_type": "Kontostand Jahresbeginn"
+    },
+    {
+      "contract_id": 13,
+      "contract_interest_rate": "1,90 %",
+      "contract_interest_payment_type": "Jährlich",
+      "contract_first_line": false,
+      "transaction_date": "31.12.2022",
+      "transaction_amount": "76,60 €",
+      "transaction_type": "Zinsertrag 2022"
+    },
+    {
+      "contract_id": 13,
+      "contract_interest_rate": "1,90 %",
+      "contract_interest_payment_type": "Jährlich",
+      "contract_first_line": false,
+      "transaction_date": "31.12.2022",
+      "transaction_amount": "-76,59 €",
+      "transaction_type": "Zinsauszahlung"
+    },
+    {
+      "contract_id": 13,
+      "contract_interest_rate": "1,90 %",
+      "contract_interest_payment_type": "Jährlich",
+      "contract_first_line": false,
+      "transaction_date": "31.12.2022",
+      "transaction_amount": "4.031,46 €",
+      "transaction_type": "Kontostand Jahresende"
+    },
+    {
+      "contract_id": 19,
+      "contract_interest_rate": "1,90 %",
+      "contract_interest_payment_type": "Jährlich",
+      "contract_first_line": true,
+      "transaction_date": "01.01.2022",
+      "transaction_amount": "1.500,16 €",
+      "transaction_type": "Kontostand Jahresbeginn"
+    },
+    {
+      "contract_id": 19,
+      "contract_interest_rate": "1,90 %",
+      "contract_interest_payment_type": "Jährlich",
+      "contract_first_line": false,
+      "transaction_date": "31.12.2022",
+      "transaction_amount": "28,50 €",
+      "transaction_type": "Zinsertrag 2022"
+    },
+    {
+      "contract_id": 19,
+      "contract_interest_rate": "1,90 %",
+      "contract_interest_payment_type": "Jährlich",
+      "contract_first_line": false,
+      "transaction_date": "31.12.2022",
+      "transaction_amount": "-28,50 €",
+      "transaction_type": "Zinsauszahlung"
+    },
+    {
+      "contract_id": 19,
+      "contract_interest_rate": "1,90 %",
+      "contract_interest_payment_type": "Jährlich",
+      "contract_first_line": false,
+      "transaction_date": "31.12.2022",
+      "transaction_amount": "1.500,16 €",
+      "transaction_type": "Kontostand Jahresende"
+    },
+    {
+      "contract_id": 24,
+      "contract_interest_rate": "1,90 %",
+      "contract_interest_payment_type": "Jährlich",
+      "contract_first_line": true,
+      "transaction_date": "01.01.2022",
+      "transaction_amount": "2.000,00 €",
+      "transaction_type": "Kontostand Jahresbeginn"
+    },
+    {
+      "contract_id": 24,
+      "contract_interest_rate": "1,90 %",
+      "contract_interest_payment_type": "Jährlich",
+      "contract_first_line": false,
+      "transaction_date": "31.12.2022",
+      "transaction_amount": "38,00 €",
+      "transaction_type": "Zinsertrag 2022"
+    },
+    {
+      "contract_id": 24,
+      "contract_interest_rate": "1,90 %",
+      "contract_interest_payment_type": "Jährlich",
+      "contract_first_line": false,
+      "transaction_date": "31.12.2022",
+      "transaction_amount": "-38,00 €",
+      "transaction_type": "Zinsauszahlung"
+    },
+    {
+      "contract_id": 24,
+      "contract_interest_rate": "1,90 %",
+      "contract_interest_payment_type": "Jährlich",
+      "contract_first_line": false,
+      "transaction_date": "31.12.2022",
+      "transaction_amount": "2.000,00 €",
+      "transaction_type": "Kontostand Jahresende"
+    },
+    {
+      "contract_id": 50,
+      "contract_interest_rate": "2,00 %",
+      "contract_interest_payment_type": "Ende der Laufzeit",
+      "contract_first_line": true,
+      "transaction_date": "01.01.2022",
+      "transaction_amount": "8.214,22 €",
+      "transaction_type": "Kontostand Jahresbeginn"
+    },
+    {
+      "contract_id": 50,
+      "contract_interest_rate": "2,00 %",
+      "contract_interest_payment_type": "Ende der Laufzeit",
+      "contract_first_line": false,
+      "transaction_date": "31.12.2022",
+      "transaction_amount": "160,00 €",
+      "transaction_type": "Zinsertrag 2022"
+    },
+    {
+      "contract_id": 50,
+      "contract_interest_rate": "2,00 %",
+      "contract_interest_payment_type": "Ende der Laufzeit",
+      "contract_first_line": false,
+      "transaction_date": "31.12.2022",
+      "transaction_amount": "8.374,22 €",
+      "transaction_type": "Kontostand Jahresende"
+    },
+    {
+      "contract_id": 145,
+      "contract_interest_rate": "1,50 %",
+      "contract_interest_payment_type": "Ende der Laufzeit",
+      "contract_first_line": true,
+      "transaction_date": "01.12.2022",
+      "transaction_amount": "3.000,00 €",
+      "transaction_type": "Einzahlung"
+    },
+    {
+      "contract_id": 145,
+      "contract_interest_rate": "1,50 %",
+      "contract_interest_payment_type": "Ende der Laufzeit",
+      "contract_first_line": false,
+      "transaction_date": "31.12.2022",
+      "transaction_amount": "3,75 €",
+      "transaction_type": "Zinsertrag 2022"
+    },
+    {
+      "contract_id": 145,
+      "contract_interest_rate": "1,50 %",
+      "contract_interest_payment_type": "Ende der Laufzeit",
+      "contract_first_line": false,
+      "transaction_date": "31.12.2022",
+      "transaction_amount": "3.003,75 €",
+      "transaction_type": "Kontostand Jahresende"
+    }
+  ],
+  "interest_total": "406,85 €",
+  "interest_total_paid": "243,09 €",
+  "amount_total_end": "23.909,87 €",
+  "amount_total_begin": "20.746,11 €",
+  "project_name": "Hausprojekt",
+  "project_iban": "DE12 1234 1234 1234 1234 12",
+  "project_bic": "BIC"
+}

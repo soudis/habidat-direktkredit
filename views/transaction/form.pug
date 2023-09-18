@@ -9,7 +9,7 @@ mixin transaction_form( action, updateAction, updateTag, contract, transaction)
     +select('type', _t('transaction_type'))(id='transaction_type' icon='fa-exchange-alt')
       each type in ['initial', 'deposit', 'withdrawal', 'interestpayment', 'termination', 'notreclaimed']
         +option(type, _t('transaction_type_'+type))(selected = _iv(transaction, 'type'))
-    +money('amount')(id='transaction_amount' step='0.01' value=_iv(transaction, 'amount') contract-amount=contract.amount transactions-amount=contract.getTransactionsAmount()-(transaction ? transaction.amount : 0) amount-to-date=contract.getAmountToDate(transaction?moment(transaction.transaction_date):moment() , transaction.id) required)
+    +money('amount')(id='transaction_amount' step='0.01' value=_iv(transaction, 'amount') contract-amount=contract.amount transactions-amount=contract.getTransactionsAmount()-(transaction ? transaction.amount : 0) amount-to-date=contract.calculateToDate(transaction?moment(transaction.transaction_date):moment() , undefined, transaction.id).end required)
     +select('payment_type')(icon='fa-money-bill')
       each type in ['bank', 'cash', 'other']
         +option(type, _t('payment_type_'+type))(selected = _iv(transaction, 'payment_type'))      

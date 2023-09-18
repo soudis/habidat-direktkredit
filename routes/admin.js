@@ -176,6 +176,10 @@ module.exports = function (app) {
           setSetting("theme");
           setSetting("defaults.interest_method", req.body.interest_method);
           setSetting(
+            "defaults.interest_methods_alternative",
+            utils.toArray(req.body.interest_methods_alternative)
+          );
+          setSetting(
             "defaults.interest_payment_type",
             req.body.interest_payment_type
           );
@@ -242,9 +246,20 @@ module.exports = function (app) {
     security.isLoggedInAdmin,
     function (req, res, next) {
       Promise.resolve()
-        .then(() =>
-          utils.render(req, res, "admin/settings", {}, "Einstellungen")
-        )
+        .then(email.testEmailSettings)
+        .catch((error) => {
+          return error;
+        })
+        .then((emailError) => {
+          console.log(emailError);
+          utils.render(
+            req,
+            res,
+            "admin/settings",
+            { emailError: emailError },
+            "Einstellungen"
+          );
+        })
         .catch((error) => next(error));
     }
   );
@@ -272,9 +287,27 @@ module.exports = function (app) {
           },
         })
         .then(function (templates) {
+          const accountNotficationsComplete =
+            templates.find(
+              (t) =>
+                t.ref_table === "template_account_notification" &&
+                t.salutation === "all"
+            ) ||
+            (templates.find(
+              (t) =>
+                t.ref_table === "template_account_notification" &&
+                t.salutation === "personal"
+            ) &&
+              templates.find(
+                (t) =>
+                  t.ref_table === "template_account_notification" &&
+                  t.salutation === "formal"
+              ));
+
           res.render("admin/templates", {
             title: "Vorlagen",
-            templates: templates,
+            templates,
+            accountNotficationsComplete,
           });
         });
     }

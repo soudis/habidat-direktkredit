@@ -25,7 +25,7 @@ services:
       # no need to change for default setup:
       - MYSQL_DATABASE=direktkredit
       - MYSQL_USER=direktkredit
-      healthcheck:
+    healthcheck:
         test: ["CMD", "mysqladmin" ,"ping", "-h", "localhost"]
         timeout: 20s
         retries: 10
@@ -97,7 +97,9 @@ services:
       - HABIDAT_DK_HTTPS=false
       - HABIDAT_DK_PORT_HTTPS=443
       - HABIDAT_DK_SSL_CERT=config/certificate.pem
-      - HABIDAT_DK_SSL_KEY=config/key.pem      
+      - HABIDAT_DK_SSL_KEY=config/key.pem
+      # change for debugging
+      - HABIDAT_DK_DEBUG=false
     depends_on:
       db:
         condition: service_healthy

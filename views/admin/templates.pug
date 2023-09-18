@@ -49,6 +49,10 @@ block content
           span buchhaltung.docx
       hr
       +template_table(templates, 'template_account_notification', 'Kontomitteilung')
+      if !accountNotficationsComplete
+        .alert.alert-warning 
+          strong Warnung 
+          span Bitte erstelle Vorlagen für die Kontomitteilung (für alle Anreden oder getrennt für persönliche und förmliche Anrede)
   .card
     h5.card-header 
       span Vorlagen für Direktkreditgeber*in

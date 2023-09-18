@@ -33,7 +33,8 @@ module.exports = function (app) {
               (!contract.interest_payment_type &&
                 settings.project.get("defaults.interest_payment_type") ===
                   "yearly")) &&
-            contract.getInterestOfYear(req.params.year) > 0
+            contract.calculateToDate(moment().add(1, "year"), req.params.year)
+              .interestOfYear > 0
           );
         })
         .then((users) => {
@@ -61,7 +62,7 @@ module.exports = function (app) {
                       req,
                       res,
                       users,
-                      undefined,
+                      moment().endOf("year").add(1, "day"),
                       req.params.year
                     )
                     .setColumnsVisible(columnsVisible),
@@ -95,8 +96,12 @@ module.exports = function (app) {
           users.forEach((user) => {
             user.contracts.forEach((contract) => {
               interests +=
-                Math.round(contract.getInterestOfYear(req.params.year) * 100) /
-                100;
+                Math.round(
+                  contract.calculateToDate(
+                    moment().add(1, "year"),
+                    req.params.year
+                  ).interestOfYear * 100
+                ) / 100;
             });
           });
           res.render("process/startinterestpayment", {
@@ -125,8 +130,12 @@ module.exports = function (app) {
               var transaction = {
                 transaction_date: moment(req.body.year).endOf("year"),
                 amount:
-                  -Math.round(contract.getInterestOfYear(req.body.year) * 100) /
-                  100,
+                  -Math.round(
+                    contract.calculateToDate(
+                      moment().add(1, "year"),
+                      req.body.year
+                    ).interestOfYear * 100
+                  ) / 100,
                 type: "interestpayment",
                 contract_id: contract.id,
                 payment_type: "bank",

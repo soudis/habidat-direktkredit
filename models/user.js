@@ -7,6 +7,7 @@ const crypto = require("crypto");
 const utils = require("../utils");
 const format = require("../utils/format");
 const intl = require("../utils/intl");
+const { first } = require("lodash");
 
 module.exports = (sequelize, DataTypes) => {
   var User = sequelize.define(
@@ -222,6 +223,18 @@ module.exports = (sequelize, DataTypes) => {
         ],
       ],
     });
+  };
+
+  User.prototype.deepDelete = function () {
+    return Promise.all(
+      this.contracts.map((contract) => contract.deepDelete())
+    ).then(this.destroy({ trackOptions: utils.getTrackOptions(this, false) }));
+  };
+
+  User.deepDelete = function (models, whereClause) {
+    return User.findFetchFull(models, whereClause).then((users) =>
+      Promise.all(users.map((user) => user.deepDelete()))
+    );
   };
 
   User.findFetchFull = function (
@@ -691,44 +704,37 @@ module.exports = (sequelize, DataTypes) => {
     return notTerminated;
   };
 
-  User.prototype.getAmountToDate = function (date, currentTransactionId) {
-    var sum = 0;
+  User.prototype.calculateToDate = function (
+    toDate = undefined,
+    interestYear = undefined,
+    currentTransactionId = undefined
+  ) {
+    const totals = {
+      amount: 0,
+      end: 0,
+      withdrawals: 0,
+      deposits: 0,
+      notReclaimed: 0,
+      interestPaid: 0,
+      interest: 0,
+      interestOfYear: 0,
+    };
     this.contracts.forEach((contract) => {
-      sum += contract.getAmountToDate(date, currentTransactionId);
+      const contractTotals = contract.calculateToDate(
+        toDate,
+        interestYear,
+        currentTransactionId
+      );
+      totals.amount += contract.amount;
+      totals.end += contractTotals.end;
+      totals.withdrawals += contractTotals.withdrawals;
+      totals.deposits += contractTotals.deposits;
+      totals.notReclaimed += contractTotals.notReclaimed;
+      totals.interestPaid += contractTotals.interestPaid;
+      totals.interest += contractTotals.interest;
+      totals.interestOfYear += contractTotals.interestOfYear;
     });
-    return sum;
-  };
-
-  User.prototype.getDepositAmount = function () {
-    var sum = 0;
-    this.contracts.forEach((contract) => {
-      sum += contract.getDepositAmount();
-    });
-    return sum;
-  };
-
-  User.prototype.getWithdrawalAmount = function () {
-    var sum = 0;
-    this.contracts.forEach((contract) => {
-      sum += contract.getWithdrawalAmount();
-    });
-    return sum;
-  };
-
-  User.prototype.getInterestToDate = function (date) {
-    var sum = 0;
-    this.contracts.forEach((contract) => {
-      sum += contract.getInterestToDate(date);
-    });
-    return sum;
-  };
-
-  User.prototype.getContractAmount = function (date) {
-    var sum = 0;
-    this.contracts.forEach((contract) => {
-      sum += contract.amount;
-    });
-    return sum;
+    return totals;
   };
 
   User.prototype.isActive = function () {
@@ -844,98 +850,19 @@ module.exports = (sequelize, DataTypes) => {
     var user = this;
     var firstDay = moment(year + " +00:00", "YYYY Z");
     var firstDayNextYear = moment(year + " +00:00", "YYYY Z").add(1, "years");
+    var lastDay = moment(year + " +00:00", "YYYY Z").endOf("year");
     this.contracts.forEach(function (contract) {
-      var sums = {
-        begin: {
-          amount: 0,
-          interest: 0,
-        },
-        end: {
-          amount: 0,
-          interest: 0,
-        },
-        current: {
-          amount: 0,
-        },
-        transactions: 0,
-      };
-      var lastTransaction;
-      if (contract.isTerminated(firstDay) === false) {
-        contract.transactions.forEach(function (transaction) {
-          if (firstDay.diff(transaction.transaction_date) >= 0) {
-            sums.begin.amount += transaction.amount;
-            sums.begin.interest += transaction.interestToDate(
-              contract.interest_rate,
-              moment(firstDay)
-            );
-            sums.end.amount += transaction.amount;
-            sums.end.interest += transaction.interestToDate(
-              contract.interest_rate,
-              moment(firstDayNextYear)
-            );
-          } else if (
-            firstDay.diff(transaction.transaction_date) < 0 &&
-            firstDayNextYear.diff(transaction.transaction_date) >= 0
-          ) {
-            var trans = {
-              id: user.id,
-              last_name: user.last_name,
-              first_name: user.first_name,
-              contract_id: contract.id,
-              interest_rate: contract.interest_rate,
-              date: moment(transaction.transaction_date),
-              type: transaction.getTypeText(),
-              amount: transaction.amount,
-              interest: "",
-              interest_payment_type: contract.getInterestPaymentType(),
-              order: 1,
-            };
-            transactionList.push(trans);
-            sums.transactions++;
-            lastTransaction = transaction.transaction_date;
-            sums.end.amount += transaction.amount;
-            sums.current.amount += transaction.amount;
-            sums.end.interest += transaction.interestToDate(
-              contract.interest_rate,
-              moment(firstDayNextYear)
-            );
-          }
-        });
-        sums.interest =
-          Math.round((sums.end.interest - sums.begin.interest) * 100) / 100;
-        sums.begin.interest = Math.round(sums.begin.interest * 100) / 100;
-        sums.end.interest = Math.round(sums.end.interest * 100) / 100;
-        if (contract.isTerminated(firstDayNextYear)) {
-          sums.end.interest = -sums.end.amount;
-          sums.interest =
-            Math.round((-sums.end.amount - sums.begin.interest) * 100) / 100;
-          sums.end.amount = 0;
-        }
-        if (
-          !contract.isTerminated(firstDayNextYear) &&
-          (sums.end.amount > 0 || sums.end.interest > 0)
-        ) {
-          var endBalance = {
-            id: user.id,
-            last_name: user.last_name,
-            first_name: user.first_name,
-            contract_id: contract.id,
-            interest_rate: contract.interest_rate,
-            date: moment(firstDay).endOf("year"),
-            type: "Kontostand Jahresende",
-            amount:
-              Math.round((sums.begin.amount + sums.begin.interest) * 100) /
-                100 +
-              sums.interest +
-              sums.current.amount,
-            interest: sums.end.interest,
-            interest_payment_type: contract.getInterestPaymentType(),
-            order: 1,
-          };
-          transactionList.push(endBalance);
-        }
-        if (sums.begin.amount > 0 || sums.begin.interest > 0) {
-          var beginBalance = {
+      const years = contract.calculatePerYear(firstDayNextYear);
+      if (years.length > 1 && !contract.isTerminated(firstDay)) {
+        const currentYear = years[years.length - 2];
+        const lastTransaction =
+          contract.transactions && contract.transactions.length > 0
+            ? contract.transactions[contract.transactions.length - 1]
+                .transaction_date
+            : undefined;
+        // begin balance
+        if (currentYear.begin > 0) {
+          transactionList.push({
             id: user.id,
             last_name: user.last_name,
             first_name: user.first_name,
@@ -943,33 +870,63 @@ module.exports = (sequelize, DataTypes) => {
             interest_rate: contract.interest_rate,
             date: firstDay,
             type: "Kontostand Jahresbeginn",
-            amount:
-              Math.round((sums.begin.amount + sums.begin.interest) * 100) / 100,
-            interest: sums.begin.interest,
+            amount: currentYear.begin,
+            interest: 0, // TODO: Interest accumulated until beginning of year?
             interest_payment_type: contract.getInterestPaymentType(),
-            order: 1,
-          };
-          transactionList.push(beginBalance);
+            order: 0,
+          });
         }
-        if (contract.transactions.length > 0) {
-          var interest = {
+        if (!contract.isTerminated(lastDay)) {
+          transactionList.push({
             id: user.id,
             last_name: user.last_name,
             first_name: user.first_name,
             contract_id: contract.id,
             interest_rate: contract.interest_rate,
-            date:
-              contract.isTerminated(firstDayNextYear) && lastTransaction
-                ? moment(lastTransaction)
-                : moment(firstDayNextYear).subtract(1, "days"),
-            type: "Zinsertrag " + year,
-            amount: sums.interest,
+            date: moment(lastDay),
+            type: "Kontostand Jahresende",
+            amount: currentYear.end,
+            interest: currentYear.interest, // TODO: Interest accumulated until beginning of year?
+            interest_payment_type: contract.getInterestPaymentType(),
+            order: 4,
+          });
+        }
+        transactionList.push({
+          id: user.id,
+          last_name: user.last_name,
+          first_name: user.first_name,
+          contract_id: contract.id,
+          interest_rate: contract.interest_rate,
+          date:
+            contract.isTerminated(lastDay) && lastTransaction
+              ? moment(lastTransaction)
+              : moment(lastDay),
+          type: "Zinsertrag " + year,
+          amount:
+            Math.round(
+              (currentYear.interest -
+                (contract.isTerminated(lastDay) ? currentYear.end : 0)) *
+                100
+            ) / 100,
+          interest: "",
+          interest_payment_type: contract.getInterestPaymentType(),
+          order: 2,
+        });
+        contract.getTransactionsOfYear(year).forEach((transaction) => {
+          transactionList.push({
+            id: user.id,
+            last_name: user.last_name,
+            first_name: user.first_name,
+            contract_id: contract.id,
+            interest_rate: contract.interest_rate,
+            date: moment(transaction.transaction_date),
+            type: transaction.getTypeText(),
+            amount: transaction.amount,
             interest: "",
             interest_payment_type: contract.getInterestPaymentType(),
-            order: 0,
-          };
-          transactionList.push(interest);
-        }
+            order: transaction.type === "interestpayment" ? 3 : 1,
+          });
+        });
       }
     });
     return transactionList;

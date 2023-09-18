@@ -41,6 +41,8 @@ exports.generateDocx = function (templateFile, data) {
     data.project_iban = settings.project.get("project_iban");
     data.project_bic = settings.project.get("project_bic");
 
+    console.log(JSON.stringify(data, null, 2));
+
     var path = templateFile;
     var file = fs.readFileSync(path, "binary");
     var doc = new DocxGen();
@@ -61,6 +63,10 @@ exports.convertToPdf = function (stream) {
       resolve(result);
     });
   });
+};
+
+exports.toArray = function (data) {
+  return Array.isArray(data) ? data : [data];
 };
 
 exports.generateTransactionList = function (transactionList) {

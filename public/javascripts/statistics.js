@@ -149,6 +149,130 @@ $(document).ready(function () {
     });
   };
 
+  var amountsChart;
+  var updateAmounts = function (status) {
+    $.ajax({
+      type: "get",
+      dataType: "json",
+      url: _url("/statistics/amounts/" + status),
+      complete: function (result) {
+        var data = JSON.parse(result.responseText);
+        var min = Math.min.apply(Math, data.amounts);
+        var max = Math.max.apply(Math, data.amounts);
+        var ctx = $("#amounts").get(0).getContext("2d");
+        if (amountsChart) {
+          amountsChart.destroy();
+        }
+        amountsChart = new Chart(ctx, {
+          type: "bar",
+          data: {
+            datasets: [
+              {
+                data: Object.values(data.amounts),
+                backgroundColor: dynamicColors(),
+                label: "Kredite",
+              },
+            ],
+            labels: Object.keys(data.amounts),
+          },
+          options: {
+            responsive: true,
+            title: {
+              display: false,
+              text: "Kredite pro Kredithöhe (aufgerundet auf 1.000€)",
+            },
+            scales: {
+              xAxes: [
+                {
+                  display: true,
+                  scaleLabel: {
+                    display: true,
+                    labelString: "Kredithöhe",
+                  },
+                },
+              ],
+              yAxes: [
+                {
+                  display: true,
+                  ticks: {
+                    suggestedMin: 0,
+                    suggestedMax: max * 1.05,
+                  },
+                  scaleLabel: {
+                    display: true,
+                    labelString: "Kredite",
+                  },
+                },
+              ],
+            },
+          },
+        });
+      },
+    });
+  };
+
+  var amountDistributionChart;
+  var updateAmountDistribution = function (status) {
+    $.ajax({
+      type: "get",
+      dataType: "json",
+      url: _url("/statistics/amountdistribution/" + status),
+      complete: function (result) {
+        var data = JSON.parse(result.responseText);
+        var min = Math.min.apply(Math, data.amounts);
+        var max = Math.max.apply(Math, data.amounts);
+        var ctx = $("#amountdistribution").get(0).getContext("2d");
+        if (amountDistributionChart) {
+          amountDistributionChart.destroy();
+        }
+        amountDistributionChart = new Chart(ctx, {
+          type: "bar",
+          data: {
+            datasets: [
+              {
+                data: Object.values(data.amounts),
+                backgroundColor: dynamicColors(),
+                label: "Kreditsumme",
+              },
+            ],
+            labels: Object.keys(data.amounts),
+          },
+          options: {
+            responsive: true,
+            title: {
+              display: false,
+              text: "Kreditesumme pro Kredithöhe",
+            },
+            scales: {
+              xAxes: [
+                {
+                  display: true,
+                  scaleLabel: {
+                    display: true,
+                    labelString: "Kredithöhe",
+                  },
+                },
+              ],
+              yAxes: [
+                {
+                  display: true,
+                  ticks: {
+                    suggestedMin: 0,
+                    suggestedMax: max * 1.05,
+                  },
+                  scaleLabel: {
+                    display: true,
+                    labelString: "Kreditsumme",
+                  },
+                },
+              ],
+            },
+          },
+        });
+      },
+    });
+  };
+
   var byMonthChart;
   var updateDeptByMonth = function () {
     var range = getSliderDateRange("debtslider");
@@ -337,6 +461,16 @@ $(document).ready(function () {
     updateSliderInfo(slider.data("slider").getValue());
     updateFunctions[sliderName]();
   });
+
+  $("#amountselect").on("change", function () {
+    updateAmounts($(this).val());
+  });
+  updateAmounts("all");
+
+  $("#amountdistributionselect").on("change", function () {
+    updateAmountDistribution($(this).val());
+  });
+  updateAmountDistribution("all");
 
   var numberstable = $("#numberstable").DataTable({
     pageLength: 25,

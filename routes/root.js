@@ -318,5 +318,13 @@ module.exports = function (app) {
     })(req, res, next);
   });
 
+  if (settings.config.get("debug")) {
+    router.get("/test", function (req, res, next) {
+      models.user.findFetchFull(models, { id: 62 }).then((users) => {
+        res.json(users[0].getTransactionList(2022));
+      });
+    });
+  }
+
   app.use("/", router);
 };

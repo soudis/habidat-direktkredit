@@ -1,4 +1,6 @@
 extends ../layout
+include ../partials/forms
+
 
 block content
   .jumbotron
@@ -80,6 +82,7 @@ block content
                 th.text-right Alle
                 th.text-right Rückgezahlt
                 th.text-right Laufend
+                th.text-right Nicht eingezahlt
             tbody
               tr
                 td 
@@ -87,41 +90,62 @@ block content
                 td.text-right= numbers.total.users
                 td.text-right= numbers.cancelled.users
                 td.text-right= numbers.running.users
+                td.text-right= numbers.notDeposited.users
               tr
                 td 
                   strong Anzahl der Kredite
                 td.text-right= numbers.total.contracts
                 td.text-right= numbers.cancelled.contracts
                 td.text-right= numbers.running.contracts
+                td.text-right= numbers.notDeposited.contracts
               tr
                 td 
                   strong Vertragswert Gesamt
                 td.text-right #{format.formatMoney(numbers.total.contractAmount ,2)}
                 td.text-right #{format.formatMoney(numbers.cancelled.contractAmount ,2)}
                 td.text-right #{format.formatMoney(numbers.running.contractAmount ,2)}
+                td.text-right #{format.formatMoney(numbers.notDeposited.contractAmount ,2)}
               tr
                 td 
                   strong Vertragswert Durchschnitt
                 td.text-right #{format.formatMoney(numbers.total.avgContractAmount ,2)}
                 td.text-right #{format.formatMoney(numbers.cancelled.avgContractAmount ,2)}
                 td.text-right #{format.formatMoney(numbers.running.avgContractAmount ,2)}
+                td.text-right #{format.formatMoney(numbers.notDeposited.avgContractAmount ,2)}
               tr
                 td 
                   strong Vertragswert Median
                 td.text-right #{format.formatMoney(numbers.total.medianContractAmount ,2)}
                 td.text-right #{format.formatMoney(numbers.cancelled.medianContractAmount ,2)}
                 td.text-right #{format.formatMoney(numbers.running.medianContractAmount ,2)}
+                td.text-right #{format.formatMoney(numbers.notDeposited.medianContractAmount ,2)}
+              tr
+                td 
+                  strong Vertragswert Durchschnitt (pro Kreditgeber*in)
+                td.text-right #{format.formatMoney(numbers.total.avgContractAmountPerUser ,2)}
+                td.text-right -
+                td.text-right -
+                td.text-right -
+              tr
+                td 
+                  strong Vertragswert Median (pro Kreditgeber*in)
+                td.text-right #{format.formatMoney(numbers.total.medianContractAmountPerUser ,2)}
+                td.text-right -
+                td.text-right -
+                td.text-right -
               tr
                 td 
                   strong Kreditlaufzeit Durchschnitt
                 td.text-right #{format.formatDuration(numbers.total.avgRuntime, 'years')}
                 td.text-right #{format.formatDuration(numbers.cancelled.avgRuntime, 'years')}
                 td.text-right #{format.formatDuration(numbers.running.avgRuntime, 'years')}
+                td.text-right -
               tr
                 td 
                   strong Rückzahlungsdauer Durchschschnitt
                 td.text-right -
                 td.text-right #{format.format(numbers.cancelled.avgDaysToRepay ,2, '# Tage')}
+                td.text-right -
                 td.text-right -
 
     - var months = Math.abs(moment(numbers.firstContractDate).startOf('month').diff(moment().endOf('month'), 'months'));
@@ -170,7 +194,33 @@ block content
         .card-body
           .daterange-slider
             input(type="text" name="transactionslider" id="transactionslider" data-provide="slider" data-slider-handle="square" data-slider-range='true' data-start=moment(numbers.firstContractDate).startOf('month') data-slider-min=0 data-slider-max=months data-slider-value=months-11)
-          canvas(id="transactions-by-month" width="400" height="400")        
+          canvas(id="transactions-by-month" width="400" height="400")   
+    .col-md-6.col-xs-12.chart-container
+      .card
+        h4.card-header
+          span Kredithöhen (Anzahl Kredite)
+          span  
+          span.slider-info.h6.float-right
+            select(name="amountselect" id="amountselect")
+              option(value="all") Alle
+              option(value="cancelled") Rückgezahlt
+              option(value="running") Laufend
+              option(value="notDeposited") Nicht eingezahlt
+        .card-body
+          canvas(id="amounts" width="400" height="400")  
+    .col-md-6.col-xs-12.chart-container
+      .card
+        h4.card-header
+          span Kredithöhen (Summe Kredite)
+          span  
+          span.slider-info.h6.float-right
+            select(name="amountdistributionselect" id="amountdistributionselect")
+              option(value="all") Alle
+              option(value="cancelled") Rückgezahlt
+              option(value="running") Laufend
+              option(value="notDeposited") Nicht eingezahlt
+        .card-body
+          canvas(id="amountdistribution" width="400" height="400")                          
 
   script(type='text/javascript' src=_url('/public/slider/bootstrap-slider.min.js'))           
   script(type='text/javascript' src=_url('/public/javascripts/statistics.js'))          

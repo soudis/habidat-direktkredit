@@ -1,7 +1,7 @@
 {
-  "name": "habidat",
+  "name": "habidat-direktkredit",
   "version": "1.4.0",
-  "private": true,
+  "private": false,
   "scripts": {
     "start": "node ./bin/www"
   },
@@ -15,7 +15,7 @@
     "bootstrap": "^4.4.1",
     "bootstrap-datepicker": "^1.9.0",
     "bootstrap-multiselect": "^1.1.0",
-    "bootstrap-select": "^1.13.17",
+    "bootstrap-select": "^1.13.18",
     "bootstrap-slider": "^10.6.2",
     "canvas": "^2.8.0",
     "chart.js": "^2.9.4",
