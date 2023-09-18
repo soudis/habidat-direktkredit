@@ -57,6 +57,10 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.DECIMAL(10, 3),
         allowNull: true,
       },
+      interest_rate_type: {
+        type: DataTypes.STRING,
+        allowNull: true,
+      },
       status: {
         type: DataTypes.STRING,
         allowNull: true,
@@ -209,6 +213,11 @@ module.exports = (sequelize, DataTypes) => {
         label: "Vertragsnotizen",
         filter: "text",
       },
+      contract_interest_rate_type: {  
+        id: "contract_interest_rate_type",
+        label: "Zinsart",
+        filter: "text",
+      },
       contract_user_id: {
         id: "contract_user_id",
         label: "Kontonummer",
@@ -268,6 +277,11 @@ module.exports = (sequelize, DataTypes) => {
         valueRaw: contract.interest_rate,
         value: format.formatPercent(contract.interest_rate, 2),
         order: contract.interest_rate,
+      },
+      contract_interest_rate_type:{
+        valueRaw: contract.interest_rate_type,
+        value: contract.interest_rate_type,
+        order: contract.interest_rate_type,
       },
       contract_deposit: {
         valueRaw: contract.getDepositAmount(),
@@ -430,6 +444,14 @@ module.exports = (sequelize, DataTypes) => {
       this.interest_payment_type ||
       settings.project.get("defaults.interest_payment_type") ||
       "end"
+    );
+  };
+
+  contract.prototype.getInterestRateType = function () {
+    return (
+      this.interest_rate_type ||
+      settings.project.get("defaults.interest_rate_type") ||
+      "money"
     );
   };
 

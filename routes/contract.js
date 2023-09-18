@@ -92,6 +92,7 @@ module.exports = function(app){
 							termination_period_type: termination_period_type,
 							amount: getValue('contract_amount', req.body.amount),
 							interest_rate: getValue('contract_interest_rate', req.body.interest_rate),
+							interest_rate_type: getValue('contract_interest_rate_type', req.body.interest_rate_type),
 							user_id: userId,
 							status: req.body.status,
 							notes: getValue('contract_notes', req.body.notes),
@@ -194,6 +195,7 @@ module.exports = function(app){
 					termination_period_type: termination_period_type,
 					amount: req.body.amount,
 					interest_rate: req.body.interest_rate,
+					interest_rate_type: req.body.interest_rate_type,
 					user_id: req.body.user_id,
 					status: req.body.status,
 					notes: req.body.notes,
@@ -250,6 +252,7 @@ module.exports = function(app){
 					termination_period_type: termination_period_type,
 					amount: parseFloat(req.body.amount),
 					interest_rate: parseFloat(req.body.interest_rate),
+					interest_rate_type: req.body.interest_rate_type,
 					status: req.body.status,
 					notes: req.body.notes,
 					notes_public: req.body.notes_public?true:false

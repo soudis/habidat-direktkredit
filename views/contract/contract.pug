@@ -72,16 +72,18 @@ mixin contract(contract, templates_contract, admin)
               td: b Zinsen bis heute
               td= format.formatMoney(contract.getInterestToDate())
             tr.divider
+              td: b= _t('interest_rate_type')
+              td= _t('interest_rate_type_' + (contract.interest_rate_type || settings.project.get('defaults.interest_rate_type')))
+            tr.divider
               if admin
                 td: b Aushaftender Betrag
-                td= format.formatMoney(contract.getAmountToDate( moment()))    
+                td= format.formatMoney(contract.getAmountToDate( moment())) 
               else 
                 td.h6: b Kontostand
                 if contract.getAmountToDate(moment()) > 0
                   td.h6.text-success: b= format.formatMoney(contract.getAmountToDate( moment()))    
                 else
-                  td.h6: b= format.formatMoney(contract.getAmountToDate( moment()))    
-              
+                  td.h6: b= format.formatMoney(contract.getAmountToDate( moment()))   
             if ((admin || contract.notes_public) && contract.notes && contract.notes.trim() !== '')      
               tr.divider
                 td

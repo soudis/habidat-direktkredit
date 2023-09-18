@@ -18,13 +18,18 @@ mixin contract_form(action, updateAction, updateTag, editContract, updateForm = 
     - var termination_period = editContract?editContract.getTerminationPeriod():settings.project.get('defaults.termination_period');
     - var termination_period_type = editContract?editContract.getTerminationPeriodType():settings.project.get('defaults.termination_period_type');
     - var interest_payment_type = editContract?editContract.getInterestPaymentType():settings.project.get('defaults.interest_payment_type');
+    - var interest_rate_type = editContract?editContract.getInterestRateType():settings.project.get('defaults.interest_rate_type');
     +is_import('contract_sign_date', 'sign_date'): +date('sign_date')(value=_iv(editContract, 'sign_date') required)
     +is_import('contract_amount', 'amount'): +money('amount')(value=_iv(editContract, 'amount') required)
     +is_import('contract_interest_rate', 'interest_rate'): +percent('interest_rate')(min="0" max="10" value=_iv(editContract, 'interest_rate') required)
     +is_import('contract_interest_payment_type', 'interest_payment_type')
       +select('interest_payment_type')(icon='fa-reply')
         +option('end', _t('interest_payment_type_end'))(selected=interest_payment_type)
-        +option('yearly', _t('interest_payment_type_yearly'))(selected=interest_payment_type)    
+        +option('yearly', _t('interest_payment_type_yearly'))(selected=interest_payment_type)
+    +is_import('contract_interest_rate_type', 'interest_rate_type')
+      +select('interest_rate_type')(icon='fa-hand-holding-dollar')
+        +option('money', _t('interest_rate_type_money'))(selected=interest_rate_type)
+        +option('coupon', _t('interest_rate_type_coupon'))(selected=interest_rate_type)  
     +select('termination_type')(icon='fa-sign-out-alt' required)
       each type in ['T', 'P', 'D']
         +option(type, _t('termination_type_'+type))(selected=termination_type)
