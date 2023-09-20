@@ -92,7 +92,9 @@ services:
       - HABIDAT_DK_AUTH_USER_OIDC_CALLBACK_URL=http://direktkredit.local:8020/login-oidc-cb
       - HABIDAT_DK_AUTH_USER_OIDC_AUTH_URL=http://keycloak:8080/realms/collectivo/protocol/openid-connect/auth
       - HABIDAT_DK_AUTH_USER_OIDC_TOKEN_URL=http://keycloak:8080/realms/collectivo/protocol/openid-connect/token
-      - HABIDAT_DK_AUTH_USER_OIDC_USERINFO_URL=http://keycloak:8080/realms/collectivo/protocol/openid-connect/userinfo      
+      - HABIDAT_DK_AUTH_USER_OIDC_USERINFO_URL=http://keycloak:8080/realms/collectivo/protocol/openid-connect/userinfo
+      # Interest rate type can be money,coupon or disabled
+      - HABIDAT_DK_INTEREST_RATE_TYPE=disabled  
       # change if you need https:
       - HABIDAT_DK_HTTPS=false
       - HABIDAT_DK_PORT_HTTPS=443

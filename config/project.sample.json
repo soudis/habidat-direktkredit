@@ -7,7 +7,7 @@
     "interest_method": "360_compound",
     "interest_methods_alternative": [],
     "interest_payment_type": "end",
-    "interest_rate_type": "money",
+    "interest_rate_type": "disabled",
     "termination_type": "T",
     "termination_period": "6",
     "termination_period_type": "M",
