@@ -44,6 +44,9 @@ services:
     environment:
       - HABIDAT_DK_DB_HOST=db
       - HABIDAT_DK_PORT_HTTP=80
+    depends_on:
+      db:
+        condition: service_healthy
     links:
       - db
     ports:
