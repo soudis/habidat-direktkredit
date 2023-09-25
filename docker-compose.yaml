@@ -1,0 +1,54 @@
+version: '2'
+
+volumes:
+  db:
+  files:
+  upload:
+  images:    
+
+services:
+
+  # Database
+  #
+  # mysql instances
+  #
+  db:
+    image: mariadb
+    restart: always
+    volumes:
+      - db:/var/lib/mysql
+    env_file:
+      - .env
+    healthcheck:
+        test: ["CMD", "mysqladmin" ,"ping", "-h", "localhost"]
+        timeout: 20s
+        retries: 10
+    logging:
+      options:
+        max-size: 50m      
+
+  # Web app
+  #
+  # NodeJS Web App
+  #
+  web:
+    image: habidat-direktkredite
+    build:
+      dockerfile: Dockerfile
+    restart: always
+    volumes:
+      - files:/habidat/public/files
+      - images:/habidat/public/images
+      - upload:/habidat/upload
+    env_file:
+      - .env
+    environment:
+      - HABIDAT_DK_DB_HOST=db
+      - HABIDAT_DK_PORT_HTTP=80
+    links:
+      - db
+    ports:
+      - 8000:80
+    logging:
+      options:
+        max-size: 50m    

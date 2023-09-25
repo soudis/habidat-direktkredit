@@ -1,7 +1,7 @@
 {
-  "projectname": "My Project",
-  "logo": "/public/logo.png",
-  "url": "https://example.com",
+  "projectname": "M$HABIDAT_DK_PROJECT_NAME",
+  "logo": "$HABIDAT_DK_PROJECT_LOGO",
+  "url": "$HABIDAT_DK_PROJECT_URL",
   "usersuffix": "direktkredit",
   "defaults": {
     "interest_method": "360_compound",
