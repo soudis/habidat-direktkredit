@@ -1,47 +1,47 @@
 {
   "database": {
-    "host": "example.com",
+    "host": "$HABIDAT_DK_DB_HOST",
     "dialect": "mysql",
-    "username": "user",
-    "password": "pass",
-    "database": "dbname"
+    "username": "$MARIADB_USER",
+    "password": "$MARIADB_PASSWORD",
+    "database": "$MARIADB_DATABASE"
   },
   "auth": {
     "admin": {
-      "method": ["local"],
+      "method": ["$HABIDAT_DK_AUTH_ADMIN_METHOD"],
       "ldap": {
         "server": {
-          "url": "ldap://example.com:389",
-          "bindDN": "cn=read,dc=example,dc=org",
-          "bindCredentials": "secret",
-          "searchBase": "uo=users,dc=example,dc=org",
-          "searchFilter": "(cn={{username}})"
+          "url": "$HABIDAT_DK_AUTH_ADMIN_LDAP_URI",
+          "bindDN": "$HABIDAT_DK_AUTH_ADMIN_LDAP_BINDDN",
+          "bindCredentials": "$HABIDAT_DK_AUTH_ADMIN_LDAP_PASSWORD",
+          "searchBase": "$HABIDAT_DK_AUTH_ADMIN_LDAP_BASE",
+          "searchFilter": "$HABIDAT_DK_AUTH_ADMIN_LDAP_SEARCHFILTER"
         },
         "passReqToCallback": true,
         "usernameField": "userid"
       },
       "oidc": {
-        "label": "Keycloak (Admin)",
-        "issuer": "https://server.example.com",
-        "authorizationURL": "https://server.example.com/authorize",
-        "tokenURL": "https://server.example.com/token",
-        "userInfoURL": "https://server.example.com/userinfo",
-        "clientID": "exampleclient",
-        "clientSecret": "examplesecret",
-        "callbackURL": "https://client.example.org/c"
+        "label": "$HABIDAT_DK_AUTH_ADMIN_OIDC_LABEL",
+        "issuer": "$HABIDAT_DK_AUTH_ADMIN_OIDC_ISSUER",
+        "authorizationURL": "$HABIDAT_DK_AUTH_ADMIN_OIDC_AUTH_URL",
+        "tokenURL": "$HABIDAT_DK_AUTH_ADMIN_OIDC_TOKEN_URL",
+        "userInfoURL": "$HABIDAT_DK_AUTH_ADMIN_OIDC_USERINFO_URL",
+        "clientID": "$HABIDAT_DK_AUTH_ADMIN_OIDC_CLIENT_ID",
+        "clientSecret": "$HABIDAT_DK_AUTH_ADMIN_OIDC_CLIENT_SECRET",
+        "callbackURL": "$HABIDAT_DK_AUTH_ADMIN_OIDC_CALLBACK_URL"
       }
     },
     "user": {
-      "method": ["local"],
+      "method": ["$HABIDAT_DK_AUTH_USER_METHOD"],
       "oidc": {
-        "label": "Keycloak",
-        "issuer": "https://server.example.com",
-        "authorizationURL": "https://server.example.com/authorize",
-        "tokenURL": "https://server.example.com/token",
-        "userInfoURL": "https://server.example.com/userinfo",
-        "clientID": "exampleclient",
-        "clientSecret": "examplesecret",
-        "callbackURL": "https://client.example.org/c"
+        "label": "$HABIDAT_DK_AUTH_USER_OIDC_LABEL",
+        "issuer": "$HABIDAT_DK_AUTH_USER_OIDC_ISSUER",
+        "authorizationURL": "$HABIDAT_DK_AUTH_USER_OIDC_AUTH_URL",
+        "tokenURL": "$HABIDAT_DK_AUTH_USER_OIDC_TOKEN_URL",
+        "userInfoURL": "$HABIDAT_DK_AUTH_USER_OIDC_USERINFO_URL",
+        "clientID": "$HABIDAT_DK_AUTH_USER_OIDC_CLIENT_ID",
+        "clientSecret": "$HABIDAT_DK_AUTH_USER_OIDC_CLIENT_SECRET",
+        "callbackURL": "$HABIDAT_DK_AUTH_USER_OIDC_CALLBACK_URL"
       }
     }
   },
