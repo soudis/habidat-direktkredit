@@ -10,7 +10,7 @@ services:
 
   # Database
   #
-  # mysql instances
+  # mariadb instances
   #
   db:
     image: mariadb:11.1
@@ -20,12 +20,12 @@ services:
     env_file:
       - .env
     healthcheck:
-        test: ["CMD", "mysqladmin" ,"ping", "-h", "localhost"]
-        timeout: 20s
-        retries: 10
+        test: ["CMD", "healthcheck.sh" ,"--su-mysql", "--connect", "--innodb_initialized"]
+        timeout: 3s
+        retries: 3
     logging:
       options:
-        max-size: 50m      
+        max-size: 50m
 
   # Web app
   #
