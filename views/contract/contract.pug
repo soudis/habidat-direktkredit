@@ -84,7 +84,11 @@ mixin contract(contract, templates_contract, admin)
               td= format.formatMoney(totals.notReclaimed)
             tr
               td: b Zinsen bis heute
-              td= format.formatMoney(totals.interest)              
+              td= format.formatMoney(totals.interest)
+            if contract.interest_rate_type !== 'disabled'                
+              tr.divider
+                td: b= _t('interest_rate_type')
+                td= _t('interest_rate_type_' + (contract.interest_rate_type || settings.project.get('defaults.interest_rate_type')))
             tr.divider
               if admin
                 td: b Aushaftender Betrag
