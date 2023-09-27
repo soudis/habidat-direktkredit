@@ -252,7 +252,7 @@ const initProject = () => {
     this.set(
       "defaults.interest_rate_type",
       process.env.HABIDAT_DK_INTEREST_RATE_TYPE,
-      "disabled"
+      false
     );
   };
 
