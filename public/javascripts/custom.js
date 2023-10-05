@@ -124,7 +124,7 @@ $(document).ready(function () {
       ),
       function (data) {
         $("#transaction_amount").attr("amount-to-date", data.amountToDate);
-        $("transaction_type").change();
+        $("#transaction_type").change();
       },
       "json"
     );
