@@ -248,7 +248,7 @@ module.exports = (sequelize, DataTypes) => {
         label: "Vertragsnotizen",
         filter: "text",
       },
-      contract_interest_rate_type: {  
+      contract_interest_rate_type: {
         id: "contract_interest_rate_type",
         label: "Zinsart",
         filter: "text",
@@ -725,6 +725,7 @@ module.exports = (sequelize, DataTypes) => {
         var interestBaseAmount = currentYear.interestBaseAmount;
         // calculate interest for new transactions of year
         var interest = 0;
+        let terminationDate = undefined;
         this.getTransactionsOfYear(year).forEach((transaction) => {
           if (
             toDate.isSameOrAfter(transaction.transaction_date) &&
@@ -733,13 +734,18 @@ module.exports = (sequelize, DataTypes) => {
             amount += transaction.amount;
             if (method.compound || transaction.type !== "interestpayment") {
               interestBaseAmount += transaction.amount;
-              interest += interestUtils.calculateInterestDaily(
-                moment(transaction.transaction_date),
-                year === lastYear ? toDate : undefined,
-                transaction.amount,
-                this.interest_rate,
-                this.interest_method
-              );
+              if (amount <= 1) {
+                terminationDate = moment(transaction.transaction_date);
+                interestBaseAmount = 0;
+              } else {
+                interest += interestUtils.calculateInterestDaily(
+                  moment(transaction.transaction_date),
+                  year === lastYear ? toDate : undefined,
+                  transaction.amount,
+                  this.interest_rate,
+                  this.interest_method
+                );
+              }
             }
             switch (transaction.type) {
               case "withdrawal":
@@ -761,10 +767,10 @@ module.exports = (sequelize, DataTypes) => {
         });
 
         // calculate interest for existing balance
-        if (year === lastYear) {
+        if (year === lastYear || terminationDate) {
           interest += interestUtils.calculateInterestDaily(
             undefined,
-            toDate,
+            terminationDate || toDate,
             currentYear.interestBaseAmount,
             this.interest_rate,
             this.interest_method
@@ -774,7 +780,8 @@ module.exports = (sequelize, DataTypes) => {
             (currentYear.interestBaseAmount * this.interest_rate) / 100;
         }
         currentYear.interest = Math.round(interest * 100) / 100;
-        currentYear.end = amount + currentYear.interest;
+        currentYear.end =
+          Math.round((amount + currentYear.interest) * 100) / 100;
         if (year !== lastYear) {
           years.push({
             year: year + 1,
