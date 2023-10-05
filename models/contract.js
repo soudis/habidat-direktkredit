@@ -305,9 +305,9 @@ module.exports = (sequelize, DataTypes) => {
         value: format.formatPercent(contract.interest_rate, 2),
         order: contract.interest_rate,
       },
-      contract_interest_rate_type: {
-        valueRaw: contract.interest_rate_type,
-        value: contract.interest_rate_type,
+      contract_interest_rate_type:{
+        valueRaw: contract.getInterestRateType(),
+        value: contract.getInterestRateType(),
         order: contract.interest_rate_type,
       },
       contract_interest_method: {
@@ -495,11 +495,18 @@ module.exports = (sequelize, DataTypes) => {
   };
 
   contract.prototype.getInterestRateType = function () {
-    return (
+    const rateType = (
       this.interest_rate_type ||
       settings.project.get("defaults.interest_rate_type") ||
       "money"
     );
+    if (rateType === "coupon") {
+      return "Einkaufsgutschein";
+    } else if (rateType === "money") {
+      return "Geld";
+    }
+    return rateType;
+
   };
 
   contract.getTerminationTypeFullString = function (
