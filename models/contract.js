@@ -191,6 +191,13 @@ module.exports = (sequelize, DataTypes) => {
         filter: "number",
         displayOnly: true,
       },
+      contract_interest_payment_of_year: {
+        id: "contract_interest_payment_of_year",
+        label: "Zinsauszahlung " + interestYear,
+        class: "text-right",
+        filter: "number",
+        displayOnly: true,
+      },
       contract_interest_payment_type: {
         id: "contract_interest_payment_type",
         label: "Zinsauszahlung",
@@ -287,6 +294,8 @@ module.exports = (sequelize, DataTypes) => {
     var interestToDateOld =
       Math.round(contract.getInterestToDate(moment(effectiveDate)) * 100) / 100;
     var totals = contract.calculateToDate(moment(effectiveDate), interestYear);
+    const interestPaymentsOfYear =
+      contract.getInterestPaymentsOfYear(interestYear);
     var depositDate = contract.getDepositDate();
     return {
       contract_sign_date: {
@@ -305,7 +314,7 @@ module.exports = (sequelize, DataTypes) => {
         value: format.formatPercent(contract.interest_rate, 2),
         order: contract.interest_rate,
       },
-      contract_interest_rate_type:{
+      contract_interest_rate_type: {
         valueRaw: contract.getInterestRateType(),
         value: contract.getInterestRateType(),
         order: contract.interest_rate_type,
@@ -355,6 +364,11 @@ module.exports = (sequelize, DataTypes) => {
       contract_interest_of_year: {
         valueRaw: totals.interestOfYear,
         value: format.formatMoney(totals.interestOfYear),
+        order: totals.interestOfYear,
+      },
+      contract_interest_payment_of_year: {
+        valueRaw: interestPaymentsOfYear,
+        value: format.formatMoney(interestPaymentsOfYear),
         order: totals.interestOfYear,
       },
       contract_interest_payment_type: {
@@ -412,17 +426,19 @@ module.exports = (sequelize, DataTypes) => {
     };
   };
 
-  contract.prototype.isTerminated = function (date) {
+  contract.prototype.isTerminated = function (toDate) {
     // check if all money was paid back until given date
-    var count = 0;
-    var toDate = date;
-    this.transactions.forEach(function (transaction) {
-      if (moment(toDate).diff(transaction.transaction_date) >= 0) {
-        count++;
-      }
-    });
-    var sum = this.calculateToDate(date, undefined).end;
-    return count > 1 && sum < 1.0; // check if < 1 to account for rounding issues with older methods of interest calculation
+    if (this.transactions.length <= 1) {
+      return undefined;
+    } else {
+      this.sortTransactions();
+      const lastTransaction = this.transactions[this.transactions.length - 1];
+      return (lastTransaction.type === "termination" ||
+        lastTransaction.type === "notreclaimed") &&
+        moment(lastTransaction.transaction_date).isSameOrBefore(toDate)
+        ? lastTransaction.transaction_date
+        : undefined;
+    }
   };
 
   // get first deposit (initial) transaction date
@@ -495,18 +511,16 @@ module.exports = (sequelize, DataTypes) => {
   };
 
   contract.prototype.getInterestRateType = function () {
-    const rateType = (
+    const rateType =
       this.interest_rate_type ||
       settings.project.get("defaults.interest_rate_type") ||
-      "money"
-    );
+      "money";
     if (rateType === "coupon") {
       return "Einkaufsgutschein";
     } else if (rateType === "money") {
       return "Geld";
     }
     return rateType;
-
   };
 
   contract.getTerminationTypeFullString = function (
@@ -697,7 +711,16 @@ module.exports = (sequelize, DataTypes) => {
     toDateParameter = undefined,
     currentTransactionId = undefined
   ) {
-    const toDate = moment(toDateParameter);
+    let toDate = moment(toDateParameter);
+    const terminationDate = this.isTerminated(toDate);
+    // if contract is terminated and the current transaction ID is not the termination transaction only calculate until termination date
+    if (
+      terminationDate &&
+      this.transactions[this.transactions.length - 1].id !==
+        currentTransactionId
+    ) {
+      toDate = moment(terminationDate);
+    }
     const method = interestUtils.splitMethod(this.interest_method);
     if (this.transactions.length === 0) {
       return [];
@@ -793,6 +816,15 @@ module.exports = (sequelize, DataTypes) => {
             interestBaseAmount:
               interestBaseAmount + (method.compound ? currentYear.interest : 0),
           });
+        } else if (
+          terminationDate &&
+          this.transactions[this.transactions.length - 1].id !==
+            currentTransactionId &&
+          currentYear.end !== 0
+        ) {
+          // if contract is terminated and there are small rounding numbers from the past correct interest to adjust to a zero end value
+          currentYear.interest -= currentYear.end;
+          currentYear.end = 0;
         }
       }
       return years;
@@ -804,6 +836,19 @@ module.exports = (sequelize, DataTypes) => {
     var contract = this;
     this.transactions.forEach(function (transaction) {
       sum += transaction.amount;
+    });
+    return sum;
+  };
+
+  contract.prototype.getInterestPaymentsOfYear = function (year) {
+    let sum = 0;
+    this.transactions.forEach((transaction) => {
+      if (
+        transaction.type === "interestpayment" &&
+        moment(transaction.transaction_date).year() == (year || moment().year())
+      ) {
+        sum += transaction.amount;
+      }
     });
     return sum;
   };

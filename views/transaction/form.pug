@@ -3,9 +3,9 @@ include ../partials/forms
 mixin transaction_form( action, updateAction, updateTag, contract, transaction)
   +form(action)(updateTag=updateTag updateAction=updateAction)
     if transaction
-      +hidden('id', transaction.id)(id='transaction_id')
+      +hidden('id', transaction.id)(id='transaction_id')      
     +hidden('contract_id', contract.id)(id='transaction_contract_id')
-    +date('transaction_date')(value=_iv(transaction, 'transaction_date') required)
+    +date('transaction_date')(value=_iv(transaction, 'transaction_date', moment().format('YYYY-MM-DD')) required)
     +select('type', _t('transaction_type'))(id='transaction_type' icon='fa-exchange-alt')
       each type in ['initial', 'deposit', 'withdrawal', 'interestpayment', 'termination', 'notreclaimed']
         +option(type, _t('transaction_type_'+type))(selected = _iv(transaction, 'type'))

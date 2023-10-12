@@ -244,11 +244,11 @@ try {
   app.use(passport.initialize());
   app.use(passport.session()); // persistent login sessions
 
-  const _iv = (object, key) => {
+  const _iv = (object, key, defaultValue = undefined) => {
     if (object) {
       return object[key];
     } else {
-      return undefined;
+      return defaultValue;
     }
   };
 

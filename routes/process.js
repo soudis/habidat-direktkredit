@@ -19,6 +19,7 @@ module.exports = function (app) {
     "contract_amount",
     "contract_amount_to_date",
     "contract_interest_of_year",
+    "contract_interest_payment_of_year",
     "contract_interest_payment_type",
   ];
 
@@ -26,6 +27,11 @@ module.exports = function (app) {
     "/process/interestpayment/:year",
     security.isLoggedInAdmin,
     function (req, res, next) {
+      const endOfYear = moment().set("year", req.params.year).endOf("year");
+      const startOfNextYear = moment()
+        .set("year", req.params.year)
+        .add(1, "year")
+        .startOf("year");
       models.user
         .findFetchFull(models, {}, (user, contract) => {
           return (
@@ -33,7 +39,8 @@ module.exports = function (app) {
               (!contract.interest_payment_type &&
                 settings.project.get("defaults.interest_payment_type") ===
                   "yearly")) &&
-            contract.calculateToDate(moment().add(1, "year"), req.params.year)
+            !contract.isTerminated(endOfYear) &&
+            contract.calculateToDate(startOfNextYear, req.params.year)
               .interestOfYear > 0
           );
         })
@@ -85,6 +92,10 @@ module.exports = function (app) {
       ) {
         next(new Error("Keine Verträge ausgewählt"));
       }
+      const startOfNextYear = moment()
+        .set("year", req.params.year)
+        .add(1, "year")
+        .startOf("year");
       models.user
         .findFetchFull(models, {}, (user, contract) => {
           return req.params.contracts
@@ -97,10 +108,8 @@ module.exports = function (app) {
             user.contracts.forEach((contract) => {
               interests +=
                 Math.round(
-                  contract.calculateToDate(
-                    moment().add(1, "year"),
-                    req.params.year
-                  ).interestOfYear * 100
+                  contract.calculateToDate(startOfNextYear, req.params.year)
+                    .interestOfYear * 100
                 ) / 100;
             });
           });
