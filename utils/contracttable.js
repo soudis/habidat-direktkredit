@@ -107,6 +107,7 @@ exports.contractTableRow = function (
       false,
       false,
       false,
+      false,
     ];
   }
 };
