@@ -100,7 +100,7 @@ exports.getNumbersPerYear = function () {
       };
       prevRow = prevRow || row;
       row.amountBegin = prevRow.amountEnd;
-      row.interestGained = -aggregatedInterest;
+      //row.interestGained = -aggregatedInterest;
       users.forEach((user) => {
         user.contracts.forEach((contract) => {
           const yearTotals = contract.totals.find(
@@ -111,6 +111,7 @@ exports.getNumbersPerYear = function () {
             row.withdrawals += yearTotals.withdrawals;
             row.interestPaid += yearTotals.interestPaid;
             row.notReclaimed += yearTotals.notReclaimed;
+            row.interestGained += yearTotals.interest;
             if (
               contract.getDepositDate() &&
               contract.getDepositDate().year() === year
@@ -142,8 +143,6 @@ exports.getNumbersPerYear = function () {
                 yearTotals.end * contract.interest_rate;
               row.runningContractAmount += yearTotals.end;
             }
-            row.interestGained +=
-              contract.calculateToDate(interestDate).interest;
           }
         });
       });
