@@ -333,7 +333,7 @@ module.exports = function (app) {
           return transactionList;
         })
         .then((transactionList) =>
-          utils.generateTransactionList(transactionList)
+          utils.generateTransactionList(transactionList, req.body.year)
         )
         .then((workbook) => {
           res.setHeader(

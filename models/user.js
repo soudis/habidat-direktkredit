@@ -868,8 +868,11 @@ module.exports = (sequelize, DataTypes) => {
     var lastDay = moment(year + " +00:00", "YYYY Z").endOf("year");
     this.contracts.forEach(function (contract) {
       const years = contract.calculatePerYear(firstDayNextYear);
-      if (years.length > 1 && !contract.isTerminated(firstDay)) {
-        const currentYear = years[years.length - 2];
+      if (
+        years.length > 1 &&
+        !contract.isTerminated(firstDay.subtract(1, "days"))
+      ) {
+        const currentYear = years.find((y) => y.year == year);
         const lastTransaction =
           contract.transactions && contract.transactions.length > 0
             ? contract.transactions[contract.transactions.length - 1]
@@ -917,12 +920,7 @@ module.exports = (sequelize, DataTypes) => {
               ? moment(lastTransaction)
               : moment(lastDay),
           type: "Zinsertrag " + year,
-          amount:
-            Math.round(
-              (currentYear.interest -
-                (contract.isTerminated(lastDay) ? currentYear.end : 0)) *
-                100
-            ) / 100,
+          amount: currentYear.interest,
           interest: "",
           interest_payment_type: contract.getInterestPaymentType(),
           order: 2,

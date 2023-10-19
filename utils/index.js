@@ -69,11 +69,43 @@ exports.toArray = function (data) {
   return Array.isArray(data) ? data : [data];
 };
 
-exports.generateTransactionList = function (transactionList) {
+exports.generateTransactionList = function (transactionList, year) {
   return Promise.resolve().then(() => {
     var workbook = new exceljs.Workbook();
     workbook.creator = "DK Plattform";
     workbook.created = new Date();
+
+    var sumsWorksheet = workbook.addWorksheet("Summen");
+    sumsWorksheet.columns = [
+      { header: "Vorgang", key: "type", width: 25 },
+      {
+        header: "Summe",
+        key: "sum",
+        width: 25,
+      },
+    ];
+    [
+      "Kontostand Jahresbeginn",
+      "Einzahlung",
+      "Zusatzzahlung",
+      `Zinsertrag ${year}`,
+      "Zinsauszahlung",
+      "Teilauszahlung",
+      "Rückzahlung",
+      "Nicht rückgefordert",
+      "Kontostand Jahresende",
+    ].forEach((type) =>
+      sumsWorksheet.addRow([
+        type,
+        Math.round(
+          transactionList.reduce(
+            (sum, current) =>
+              current.type === type ? sum + current.amount : sum,
+            0
+          ) * 100
+        ) / 100,
+      ])
+    );
 
     var dataWorksheet = workbook.addWorksheet("Jahresliste");
 
@@ -105,7 +137,7 @@ exports.generateTransactionList = function (transactionList) {
       dataWorkSheetColumns.push({
         header: fieldNames[index],
         key: column,
-        width: 20,
+        width: 25,
       });
     });
     dataWorksheet.columns = dataWorkSheetColumns;
