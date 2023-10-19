@@ -116,6 +116,15 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.DATE,
         allowNull: true,
       },
+      notes: {
+        type: DataTypes.TEXT,
+        allowNull: true,
+      },
+      notes_public: {
+        type: DataTypes.BOOLEAN,
+        allowNull: true,
+        defaultValue: false,
+      },
     },
     {
       tableName: "user",
@@ -479,6 +488,11 @@ module.exports = (sequelize, DataTypes) => {
         label: "Kontomitteilung",
         filter: "list",
       },
+      user_notes: {
+        id: "user_notes",
+        label: "Notizen Kreditgeber*in",
+        filter: "text",
+      },
     };
   };
 
@@ -579,6 +593,7 @@ module.exports = (sequelize, DataTypes) => {
             (user.account_notification_type || "online")
         ),
       },
+      user_notes: { valueRaw: user.notes, value: user.notes },
     };
   };
 

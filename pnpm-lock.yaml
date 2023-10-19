@@ -55,6 +55,9 @@ dependencies:
   datatables.net-bs4:
     specifier: ^1.13.6
     version: 1.13.6
+  datatables.net-responsive:
+    specifier: ^2.5.0
+    version: 2.5.0
   datatables.net-responsive-bs4:
     specifier: ^2.5.0
     version: 2.5.0

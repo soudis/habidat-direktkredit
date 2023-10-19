@@ -127,8 +127,8 @@ exports.getNumbersPerYear = function () {
             ) {
               row.terminatedContracts++;
               row.terminatedContractAvgInterestWeighed +=
-                yearTotals.end * contract.interest_rate;
-              row.terminatedContractAmount += yearTotals.end;
+                yearTotals.begin * contract.interest_rate;
+              row.terminatedContractAmount += yearTotals.begin;
 
               // calculated interest that was paid by termination withdrawal
               var transactionAmount = contract.getTransactionsAmount();

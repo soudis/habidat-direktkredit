@@ -322,6 +322,8 @@ module.exports = function (app) {
                   "user_membership_status",
                   req.body.membership_status
                 ),
+                notes: getValue("contract_notes", req.body.notes),
+                notes_public: req.body.notes_public ? true : false,
               },
               {
                 trackOptions: utils.getTrackOptions(req.user, true),
@@ -408,6 +410,8 @@ module.exports = function (app) {
               password: password,
               relationship: req.body.relationship,
               membership_status: req.body.membership_status,
+              notes: req.body.notes,
+              notes_public: req.body.notes_public ? true : false,
             },
             { trackOptions: utils.getTrackOptions(req.user, true) }
           );
@@ -451,6 +455,8 @@ module.exports = function (app) {
             account_notification_type: req.body.account_notification_type,
             relationship: req.body.relationship,
             membership_status: req.body.membership_status,
+            notes: req.body.notes,
+            notes_public: req.body.notes_public ? true : false,
           },
           {
             where: { id: req.body.id },

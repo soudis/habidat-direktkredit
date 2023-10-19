@@ -72,3 +72,19 @@ mixin user(user, templates_user, admin)
             tr
               td.col-md-4.h6: b Mitgliedsstatus
               td.col-md-8.h6= _t('membership_status_' + user.membership_status)
+          if ((admin || user.notes_public) && user.notes && user.notes.trim() !== '')      
+            tr.divider
+              td
+                b 
+                  | Notizen
+                  if admin
+                    | &nbsp;
+                    small
+                      if user.notes_public
+                        i.fa.fa-eye
+                      else
+                        i.fa.fa-eye-slash
+              td
+                blockquote.note
+                  each line in user.notes.split("\r") 
+                    p=line              

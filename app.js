@@ -3,19 +3,15 @@ try {
   var express = require("express");
   var router = express.Router();
   var path = require("path");
-  var favicon = require("serve-favicon");
   var logger = require("morgan");
   var cookieParser = require("cookie-parser");
   var bodyParser = require("body-parser");
   var passport = require("passport");
   var flash = require("connect-flash");
-  var Sequelize = require("sequelize");
   var https = require("https");
   var http = require("http");
   var fs = require("fs");
-  var multer = require("multer");
   var mkdirp = require("mkdirp");
-  var numeral = require("numeral");
   const urlUtil = require("url");
   const intl = require("./utils/intl");
   const utils = require("./utils");
@@ -63,6 +59,15 @@ try {
     express.static(path.join(__dirname, "node_modules/datatables.net/js"), {
       maxAge: oneDay,
     })
+  );
+  router.use(
+    "/public/datatables",
+    express.static(
+      path.join(__dirname, "node_modules/datatables.net-responsive/js"),
+      {
+        maxAge: oneDay,
+      }
+    )
   );
   router.use(
     "/public/bootstrap",
