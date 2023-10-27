@@ -89,8 +89,8 @@ $(document).ready(function () {
     var contractAmount = parseFloat(
       $("#transaction_amount").attr("contract-amount")
     );
-    if (!$(this).attr("value")) {
-      $(this).attr("value", $(this).val());
+    if (!$(this).data("intialvalue")) {
+      $(this).data("intialvalue", $(this).val());
     }
     $("#transaction_amount").attr("readonly", false);
     if ($(this).val() == "termination" || $(this).val() == "notreclaimed") {
@@ -101,16 +101,12 @@ $(document).ready(function () {
       );
       $("#transaction_amount").attr("readonly", true);
       if (
-        $("#transaction_amount").attr("value") === undefined ||
-        $(this).attr("value") !== $(this).val()
+        $("#transaction_amount").data("intialvalue") === undefined ||
+        $(this).data("intialvalue") !== $(this).val()
       ) {
-        $("#transaction_amount").val(
-          (-amountToDate).toString().replace(".", getSeparator())
-        );
+        $("#transaction_amount").val(-amountToDate);
       } else {
-        $("#transaction_amount").val(
-          $("#transaction_amount").attr("value").replace(".", getSeparator())
-        );
+        $("#transaction_amount").val($("#transaction_amount").attr("value"));
       }
     } else if ($(this).val() == "initial" || $(this).val() == "deposit") {
       $("#transaction_amount").attr("min", "0.01");
