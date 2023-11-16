@@ -33,7 +33,7 @@ mixin contract(contract, templates_contract, admin)
               td= format.formatMoney(contract.amount)
             tr
               td: b Zinssatz
-              td= format.formatPercent(contract.interest_rate,2)  
+              td= format.formatPercent(contract.interest_rate,3)  
             if contract.interest_method 
               tr
                 td: b Alternative Zinsberechnung

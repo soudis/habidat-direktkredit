@@ -311,7 +311,7 @@ module.exports = (sequelize, DataTypes) => {
       },
       contract_interest_rate: {
         valueRaw: contract.interest_rate,
-        value: format.formatPercent(contract.interest_rate, 2),
+        value: format.formatPercent(contract.interest_rate, 3),
         order: contract.interest_rate,
       },
       contract_interest_rate_type: {

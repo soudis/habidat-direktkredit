@@ -58,7 +58,7 @@ mixin number(name, label=undefined)
 
 mixin percent(name, label=undefined)
   +input_group(label||_t(name))(icon=attributes.icon || 'fa-percent')
-    +group_input(name)(type='number' step="0.01")&attributes(attributes)  
+    +group_input(name)(type='number' step="0.001")&attributes(attributes)  
 
 mixin text(name, label=undefined)
   +input_group(label||_t(name))(icon=attributes.icon class=attributes.groupClass help=attributes.help)
