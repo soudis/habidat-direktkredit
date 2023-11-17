@@ -1,5 +1,6 @@
 const settings = require("./settings");
 const moment = require("moment");
+const Decimal = require("decimal.js");
 
 exports.splitMethod = function (method) {
   var methodString =
@@ -57,8 +58,9 @@ exports.calculateInterestDaily = function (
   } else {
     interestDays = toDate.diff(fromDate, "days");
   }
-  return (
-    (((amount * rate) / 100) * interestDays) /
-    exports.getBaseDays(method, toDate)
-  );
+  return new Decimal(amount)
+    .times(rate)
+    .dividedBy(100)
+    .times(interestDays)
+    .dividedBy(exports.getBaseDays(method, toDate));
 };

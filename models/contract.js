@@ -7,6 +7,7 @@ const _t = require("../utils/intl")._t;
 const intl = require("../utils/intl");
 const utils = require("../utils");
 const interestUtils = require("../utils/interest");
+const Decimal = require("decimal.js");
 
 module.exports = (sequelize, DataTypes) => {
   contract = sequelize.define(
@@ -734,56 +735,66 @@ module.exports = (sequelize, DataTypes) => {
       var years = [
         {
           year: firstYear,
-          begin: 0,
-          withdrawals: 0,
-          deposits: 0,
-          notReclaimed: 0,
-          interestPaid: 0,
-          interestBaseAmount: 0, // to calculate with no compound methods
+          begin: new Decimal(0),
+          withdrawals: new Decimal(0),
+          deposits: new Decimal(0),
+          notReclaimed: new Decimal(0),
+          interestPaid: new Decimal(0),
+          interestBaseAmount: new Decimal(0), // to calculate with no compound methods
         },
       ];
       for (let year = firstYear; year <= lastYear; year++) {
         const currentYear = years[years.length - 1];
-        var amount = currentYear.begin;
+        var amount = new Decimal(currentYear.begin);
         var interestBaseAmount = currentYear.interestBaseAmount;
         // calculate interest for new transactions of year
-        var interest = 0;
+        var interest = new Decimal(0);
         let terminationDate = undefined;
         this.getTransactionsOfYear(year).forEach((transaction) => {
           if (
             toDate.isSameOrAfter(transaction.transaction_date) &&
             currentTransactionId != transaction.id
           ) {
-            amount += transaction.amount;
+            amount = amount.plus(transaction.amount);
             if (method.compound || transaction.type !== "interestpayment") {
-              interestBaseAmount += transaction.amount;
+              interestBaseAmount = interestBaseAmount.plus(transaction.amount);
               if (amount <= 1) {
                 terminationDate = moment(transaction.transaction_date);
-                interestBaseAmount = 0;
+                interestBaseAmount = new Decimal(0);
               } else {
-                interest += interestUtils.calculateInterestDaily(
-                  moment(transaction.transaction_date),
-                  year === lastYear ? toDate : undefined,
-                  transaction.amount,
-                  this.interest_rate,
-                  this.interest_method
+                interest = interest.plus(
+                  interestUtils.calculateInterestDaily(
+                    moment(transaction.transaction_date),
+                    year === lastYear ? toDate : undefined,
+                    transaction.amount,
+                    this.interest_rate,
+                    this.interest_method
+                  )
                 );
               }
             }
             switch (transaction.type) {
               case "withdrawal":
               case "termination":
-                currentYear.withdrawals += transaction.amount;
+                currentYear.withdrawals = currentYear.withdrawals.plus(
+                  transaction.amount
+                );
                 break;
               case "initial":
               case "deposit":
-                currentYear.deposits += transaction.amount;
+                currentYear.deposits = currentYear.deposits.plus(
+                  transaction.amount
+                );
                 break;
               case "notreclaimed":
-                currentYear.notReclaimed += transaction.amount;
+                currentYear.notReclaimed = currentYear.notReclaimed.plus(
+                  transaction.amount
+                );
                 break;
               case "interestpayment":
-                currentYear.interestPaid += transaction.amount;
+                currentYear.interestPaid = currentYear.interestPaid.plus(
+                  transaction.amount
+                );
                 break;
             }
           }
@@ -791,30 +802,37 @@ module.exports = (sequelize, DataTypes) => {
 
         // calculate interest for existing balance
         if (year === lastYear || terminationDate) {
-          interest += interestUtils.calculateInterestDaily(
-            undefined,
-            terminationDate || toDate,
-            currentYear.interestBaseAmount,
-            this.interest_rate,
-            this.interest_method
+          interest = interest.plus(
+            interestUtils.calculateInterestDaily(
+              undefined,
+              terminationDate || toDate,
+              currentYear.interestBaseAmount,
+              this.interest_rate,
+              this.interest_method
+            )
           );
         } else {
-          interest +=
-            (currentYear.interestBaseAmount * this.interest_rate) / 100;
+          interest = interest.plus(
+            currentYear.interestBaseAmount
+              .times(this.interest_rate)
+              .dividedBy(100)
+          );
         }
-        currentYear.interest = Math.round(interest * 100) / 100;
-        currentYear.end =
-          Math.round((amount + currentYear.interest) * 100) / 100;
+        currentYear.interest = new Decimal(interest.toFixed(2));
+        currentYear.end = new Decimal(
+          amount.plus(currentYear.interest).toFixed(2)
+        );
         if (year !== lastYear) {
           years.push({
             year: year + 1,
-            begin: currentYear.end,
-            withdrawals: 0,
-            deposits: 0,
-            notReclaimed: 0,
-            interestPaid: 0,
-            interestBaseAmount:
-              interestBaseAmount + (method.compound ? currentYear.interest : 0),
+            begin: new Decimal(currentYear.end),
+            withdrawals: new Decimal(0),
+            deposits: new Decimal(0),
+            notReclaimed: new Decimal(0),
+            interestPaid: new Decimal(0),
+            interestBaseAmount: interestBaseAmount.plus(
+              method.compound ? currentYear.interest : 0
+            ),
           });
         } else if (
           terminationDate &&
@@ -823,11 +841,21 @@ module.exports = (sequelize, DataTypes) => {
           currentYear.end !== 0
         ) {
           // if contract is terminated and there are small rounding numbers from the past correct interest to adjust to a zero end value
-          currentYear.interest -= currentYear.end;
-          currentYear.end = 0;
+          currentYear.interest = currentYear.interest.minus(currentYear.end);
+          currentYear.end = new Decimal(0);
         }
       }
-      return years;
+      return years.map((year) => ({
+        year: year.year,
+        begin: year.begin.toNumber(),
+        end: year.end.toNumber(),
+        withdrawals: year.withdrawals.toNumber(),
+        deposits: year.deposits.toNumber(),
+        notReclaimed: year.notReclaimed.toNumber(),
+        interestPaid: year.interestPaid.toNumber(),
+        interestBaseAmount: year.interestBaseAmount.toNumber(),
+        interest: year.interest.toNumber(),
+      }));
     }
   };
 
