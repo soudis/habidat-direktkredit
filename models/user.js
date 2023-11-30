@@ -800,6 +800,7 @@ module.exports = (sequelize, DataTypes) => {
 
     data.current_date = moment().format("DD.MM.YYYY");
     data.year = year;
+    data[`is${data.year}`] = true;
 
     var transactionList = this.getTransactionList(year);
 
@@ -839,6 +840,7 @@ module.exports = (sequelize, DataTypes) => {
       data.user_transactions_year.push({
         contract_id: transaction.contract_id,
         contract_interest_rate: format.formatPercent(transaction.interest_rate),
+        contract_amount: format.formatMoney(transaction.contract_amount),
         contract_interest_payment_type: intl._t(
           "interest_payment_type_" + transaction.interest_payment_type
         ),
@@ -885,6 +887,7 @@ module.exports = (sequelize, DataTypes) => {
             last_name: user.last_name,
             first_name: user.first_name,
             contract_id: contract.id,
+            contract_amount: contract.amount,
             interest_rate: contract.interest_rate,
             date: firstDay,
             type: "Kontostand Jahresbeginn",
@@ -900,6 +903,7 @@ module.exports = (sequelize, DataTypes) => {
             last_name: user.last_name,
             first_name: user.first_name,
             contract_id: contract.id,
+            contract_amount: contract.amount,
             interest_rate: contract.interest_rate,
             date: moment(lastDay),
             type: "Kontostand Jahresende",
@@ -932,6 +936,7 @@ module.exports = (sequelize, DataTypes) => {
             last_name: user.last_name,
             first_name: user.first_name,
             contract_id: contract.id,
+            contract_amount: contract.amount,
             interest_rate: contract.interest_rate,
             date: moment(transaction.transaction_date),
             type: transaction.getTypeText(),
