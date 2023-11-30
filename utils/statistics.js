@@ -49,7 +49,7 @@ exports.getYears = function (users) {
     });
   });
   var years = [];
-  if (!oldestPayment.isSame("1900-01-01")) {
+  if (!oldestPayment.isSame("3000-01-01")) {
     for (var i = oldestPayment.year(); i <= moment().year(); i++) {
       years.push(i);
     }
@@ -172,48 +172,52 @@ exports.getNumbersPerYear = function () {
       rows.push(row);
       prevRow = row;
     });
-    var totals = rows.reduce((a, b) => {
-      return {
-        year: "Gesamt",
-        amountBegin: 0,
-        amountEnd: b.amountEnd,
-        deposits: a.deposits + b.deposits,
-        withdrawals: a.withdrawals + b.withdrawals,
-        interestGained: a.interestGained + b.interestGained,
-        notReclaimed: a.notReclaimed + b.notReclaimed,
-        interestPaid: a.interestPaid + b.interestPaid,
-        newContracts: a.newContracts + b.newContracts,
-        newContractAvgInterestRate: 0,
-        newContractAvgInterestRateWeighed:
-          a.newContractAvgInterestRateWeighed +
-          b.newContractAvgInterestRateWeighed,
-        newContractAmount: a.newContractAmount + b.newContractAmount,
-        terminatedContracts: a.terminatedContracts + b.terminatedContracts,
-        terminatedContractAvgInterestRate: 0,
-        terminatedContractAvgInterestWeighed:
-          a.terminatedContractAvgInterestWeighed +
-          b.terminatedContractAvgInterestWeighed,
-        terminatedContractAmount:
-          a.terminatedContractAmount + b.terminatedContractAmount,
-        runningContracts: b.runningContracts,
-        runningContractAvgInterestWeighed: b.runningContractAvgInterestWeighed,
-        runningContractAmount: b.runningContractAmount,
-      };
-    });
-    if (totals.newContractAmount > 0) {
-      totals.newContractAvgInterestRate =
-        totals.newContractAvgInterestRateWeighed / totals.newContractAmount;
+    if (rows.length > 0) {
+      var totals = rows.reduce((a, b) => {
+        return {
+          year: "Gesamt",
+          amountBegin: 0,
+          amountEnd: b.amountEnd,
+          deposits: a.deposits + b.deposits,
+          withdrawals: a.withdrawals + b.withdrawals,
+          interestGained: a.interestGained + b.interestGained,
+          notReclaimed: a.notReclaimed + b.notReclaimed,
+          interestPaid: a.interestPaid + b.interestPaid,
+          newContracts: a.newContracts + b.newContracts,
+          newContractAvgInterestRate: 0,
+          newContractAvgInterestRateWeighed:
+            a.newContractAvgInterestRateWeighed +
+            b.newContractAvgInterestRateWeighed,
+          newContractAmount: a.newContractAmount + b.newContractAmount,
+          terminatedContracts: a.terminatedContracts + b.terminatedContracts,
+          terminatedContractAvgInterestRate: 0,
+          terminatedContractAvgInterestWeighed:
+            a.terminatedContractAvgInterestWeighed +
+            b.terminatedContractAvgInterestWeighed,
+          terminatedContractAmount:
+            a.terminatedContractAmount + b.terminatedContractAmount,
+          runningContracts: b.runningContracts,
+          runningContractAvgInterestWeighed:
+            b.runningContractAvgInterestWeighed,
+          runningContractAmount: b.runningContractAmount,
+        };
+      });
+      if (totals.newContractAmount > 0) {
+        totals.newContractAvgInterestRate =
+          totals.newContractAvgInterestRateWeighed / totals.newContractAmount;
+      }
+      if (totals.terminatedContractAmount > 0) {
+        totals.terminatedContractAvgInterestRate =
+          totals.terminatedContractAvgInterestWeighed /
+          totals.terminatedContractAmount;
+      }
+      if (totals.runningContractAmount > 0) {
+        totals.runningContractAvgInterestRate =
+          totals.runningContractAvgInterestWeighed /
+          totals.runningContractAmount;
+      }
+      rows.push(totals);
     }
-    if (totals.terminatedContractAmount > 0) {
-      totals.terminatedContractAvgInterestRate =
-        totals.terminatedContractAvgInterestWeighed /
-        totals.terminatedContractAmount;
-    }
-    if (totals.runningContractAmount > 0) {
-      totals.runningContractAvgInterestRate =
-        totals.runningContractAvgInterestWeighed / totals.runningContractAmount;
-    }
-    rows.push(totals);
     return rows;
   });
 };

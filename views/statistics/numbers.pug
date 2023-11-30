@@ -29,48 +29,52 @@ block content
                 th.text-right Nicht rückgefordert
                 th.text-right angefallen
                 th.text-right davon ausbezahlt
-              tbody
-                each year, index in numbersPerYear   
-                  if index < numbersPerYear.length-1
-                    tr
-                      td.control.fit
-                      td= year.year 
-                        small= (index === numbersPerYear.length - 2?' 🠒 heute':'')
-                      td.text-right
-                        span= year.newContracts
-                        small= ' (Ø ' + format.formatPercent(year.newContractAvgInterestRate) + ')'
-                      td.text-right
-                        span= year.terminatedContracts
-                        small= ' (Ø ' + format.formatPercent(year.terminatedContractAvgInterestRate) + ')'              
-                      td.text-right
-                        span= year.runningContracts
-                        small= ' (Ø ' + format.formatPercent(year.runningContractAvgInterestRate) + ')'              
-                      td.text-right= format.formatMoney(year.deposits, 2)
-                      td.text-right= format.formatMoney(year.withdrawals, 2)
-                      td.text-right= format.formatMoney(year.notReclaimed, 2)
-                      td.text-right= format.formatMoney(year.interestGained, 2)
-                      td.text-right= format.formatMoney(year.interestPaid, 2)
-                      td.text-right= format.formatMoney(year.amountEnd, 2)                
-              tfoot
-                - var year = numbersPerYear[numbersPerYear.length-1]
-                tr
-                  td.control.fit
-                  th Gesamt
-                  th.text-right
-                    span= year.newContracts
-                    small= ' (Ø ' + format.formatPercent(year.newContractAvgInterestRate) + ')'
-                  th.text-right
-                    span= year.terminatedContracts
-                    small= ' (Ø ' + format.formatPercent(year.terminatedContractAvgInterestRate) + ')'              
-                  th.text-right
-                    span= year.runningContracts
-                    small= ' (Ø ' + format.formatPercent(year.runningContractAvgInterestRate) + ')'              
-                  th.text-right= format.formatMoney(year.deposits, 2)
-                  th.text-right= format.formatMoney(year.withdrawals, 2)
-                  th.text-right= format.formatMoney(year.notReclaimed, 2)
-                  th.text-right= format.formatMoney(year.interestGained, 2)
-                  th.text-right= format.formatMoney(year.interestPaid, 2)
-                  th.text-right= format.formatMoney(year.amountEnd, 2)    
+              if numbersPerYear.length > 0
+                tbody
+                  each year, index in numbersPerYear   
+                    if index < numbersPerYear.length-1
+                      tr
+                        td.control.fit
+                        td= year.year 
+                          small= (index === numbersPerYear.length - 2?' 🠒 heute':'')
+                        td.text-right
+                          span= year.newContracts
+                          small= ' (Ø ' + format.formatPercent(year.newContractAvgInterestRate) + ')'
+                        td.text-right
+                          span= year.terminatedContracts
+                          small= ' (Ø ' + format.formatPercent(year.terminatedContractAvgInterestRate) + ')'              
+                        td.text-right
+                          span= year.runningContracts
+                          small= ' (Ø ' + format.formatPercent(year.runningContractAvgInterestRate) + ')'              
+                        td.text-right= format.formatMoney(year.deposits, 2)
+                        td.text-right= format.formatMoney(year.withdrawals, 2)
+                        td.text-right= format.formatMoney(year.notReclaimed, 2)
+                        td.text-right= format.formatMoney(year.interestGained, 2)
+                        td.text-right= format.formatMoney(year.interestPaid, 2)
+                        td.text-right= format.formatMoney(year.amountEnd, 2)                
+                tfoot
+                  - var year = numbersPerYear[numbersPerYear.length-1]
+                  tr
+                    td.control.fit
+                    th Gesamt
+                    th.text-right
+                      span= year.newContracts
+                      small= ' (Ø ' + format.formatPercent(year.newContractAvgInterestRate) + ')'
+                    th.text-right
+                      span= year.terminatedContracts
+                      small= ' (Ø ' + format.formatPercent(year.terminatedContractAvgInterestRate) + ')'              
+                    th.text-right
+                      span= year.runningContracts
+                      small= ' (Ø ' + format.formatPercent(year.runningContractAvgInterestRate) + ')'              
+                    th.text-right= format.formatMoney(year.deposits, 2)
+                    th.text-right= format.formatMoney(year.withdrawals, 2)
+                    th.text-right= format.formatMoney(year.notReclaimed, 2)
+                    th.text-right= format.formatMoney(year.interestGained, 2)
+                    th.text-right= format.formatMoney(year.interestPaid, 2)
+                    th.text-right= format.formatMoney(year.amountEnd, 2)   
+              else 
+                tbody 
+                  td(colspan=8) Keine Zahlungen gefunden
     .col-md-12
       .card
         h4.card-header Allgemeine Kennzahlen
