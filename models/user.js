@@ -870,7 +870,7 @@ module.exports = (sequelize, DataTypes) => {
       const years = contract.calculatePerYear(firstDayNextYear);
       if (
         years.length > 1 &&
-        !contract.isTerminated(firstDay.subtract(1, "days"))
+        !contract.isTerminated(moment(firstDay).subtract(1, "days"))
       ) {
         const currentYear = years.find((y) => y.year == year);
         const lastTransaction =
@@ -914,6 +914,7 @@ module.exports = (sequelize, DataTypes) => {
           last_name: user.last_name,
           first_name: user.first_name,
           contract_id: contract.id,
+          contract_amount: contract.amount,
           interest_rate: contract.interest_rate,
           date:
             contract.isTerminated(lastDay) && lastTransaction

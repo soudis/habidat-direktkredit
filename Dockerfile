@@ -2,7 +2,7 @@ FROM node:lts
 
 RUN \
   apt-get update \
-  && apt-get -y install gettext-base unoconv build-essential pkg-config libcairo2-dev libpango1.0-dev librsvg2-dev libpixman-1-dev libgif-dev\
+  && apt-get -y install gettext-base unoconv build-essential pkg-config libcairo2-dev libpango1.0-dev librsvg2-dev libpixman-1-dev libgif-dev fonts-crosextra-carlito fonts-crosextra-caladea \
   && apt-get clean \
   && rm -rf /var/lib/apt/lists/*
 
