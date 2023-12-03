@@ -53,6 +53,7 @@ module.exports = function (app) {
             "Land",
             "Telefonnummer",
             "E-Mail",
+            "Notizen",
           ];
           fieldLabels.forEach((label) => {
             dataWorkSheetColumns.push({
@@ -77,6 +78,7 @@ module.exports = function (app) {
               user.country,
               user.telno,
               user.email,
+              user.notes,
             ]);
           });
           res.setHeader(
