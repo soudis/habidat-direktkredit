@@ -511,6 +511,14 @@ module.exports = (sequelize, DataTypes) => {
     );
   };
 
+  contract.prototype.getInterestRateTypeValue = function () {
+    const rateType =
+      this.interest_rate_type ||
+      settings.project.get("defaults.interest_rate_type") ||
+      "money";
+    return rateType;
+  };
+  
   contract.prototype.getInterestRateType = function () {
     const rateType =
       this.interest_rate_type ||
