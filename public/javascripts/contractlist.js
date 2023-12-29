@@ -112,6 +112,7 @@ $(document).ready(function () {
     onChange: function (option, checked, select) {
       table.column($(option).val() + ":name").visible(checked);
       toggleFilters(true);
+      storeViewInQuery();
     },
   });
   $(".datatable-buttons")
@@ -149,8 +150,15 @@ $(document).ready(function () {
     .removeClass("col-md-7")
     .addClass("col-sm-7");
 
+  let queryParams = new URLSearchParams(window.location.search);
+  let view = queryParams.get("view");
+  if (view) {
+    restoreView(JSON.parse(view));
+  }
+
   $(document).on("click", ".toggle-filters", function () {
     toggleFilters(false);
+    storeViewInQuery();
   });
 
   $(document).on("keyup change", ".text-filter", function () {
@@ -158,6 +166,7 @@ $(document).ready(function () {
     if (table.column(name + ":name").search() !== this.value) {
       table.column(name + ":name").search(this.value);
       updateCustomFilters();
+      storeViewInQuery();
     }
   });
 
@@ -168,6 +177,7 @@ $(document).ready(function () {
         .column(name + ":name")
         .search(this.value !== "Alle" ? this.value : "");
       updateCustomFilters();
+      storeViewInQuery();
     }
   });
 
@@ -182,6 +192,7 @@ $(document).ready(function () {
     // This will show: "Ordering on column 1 (asc)", for example
     if (!orderTriggerDisabled) {
       updateCustomFilters();
+      storeViewInQuery();
     }
   });
 
@@ -261,18 +272,22 @@ $(document).ready(function () {
 
   $(document).on("change keyup", "#datatable_filter input", function () {
     updateCustomFilters();
+    storeViewInQuery();
   });
 
   $(document).on("keyup change", ".date-filter", function () {
     updateCustomFilters();
+    storeViewInQuery();
   });
 
   $(document).on("change", ".date-filter-operator", function () {
     $(this).parent().next().change();
+    storeViewInQuery();
   });
 
   $(document).on("keyup change", ".number-filter", function () {
     updateCustomFilters();
+    storeViewInQuery();
   });
 
   $(document).on("change", ".number-filter-operator", function () {
@@ -333,6 +348,12 @@ $(document).ready(function () {
       }
     });
     return view;
+  }
+
+  function storeViewInQuery() {
+    const url = new URL(location);
+    url.searchParams.set("view", JSON.stringify(getCurrentView()));
+    history.pushState({}, "", url);
   }
 
   function setColumnsSelected(columnsSelected) {
