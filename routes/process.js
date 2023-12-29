@@ -157,7 +157,10 @@ module.exports = function (app) {
             });
           });
           return Promise.all(create).then(() => {
-            res.send({ message: create.length + " Zahlungen angelegt." });
+            res.send({
+              message: create.length + " Zahlungen angelegt.",
+              redirect: "reload",
+            });
           });
         })
         .catch((error) => next(error));
