@@ -103,7 +103,10 @@ exports.sendTransactionEmail = function (
           "Dein Direktkredit für " +
           settings.project.get("projectname") +
           " ist angekommen!";
-      } else if (transaction.type === "notreclaimed") {
+      } else if (
+        transaction.type === "notreclaimed" ||
+        transaction.type === "notreclaimedpartial"
+      ) {
         subject =
           "Dein Kreditnachlass bei " +
           settings.project.get("projectname") +

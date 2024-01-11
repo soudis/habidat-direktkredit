@@ -271,7 +271,10 @@ module.exports = function (app) {
                   if (transaction.amount > 0) {
                     deposits += transaction.amount;
                   } else {
-                    if (transaction.type === "notreclaimed") {
+                    if (
+                      transaction.type === "notreclaimed" ||
+                      transaction.type === "notreclaimedpartial"
+                    ) {
                       notReclaimed += transaction.amount;
                     } else {
                       withdrawals += transaction.amount;

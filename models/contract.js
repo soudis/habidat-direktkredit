@@ -518,7 +518,7 @@ module.exports = (sequelize, DataTypes) => {
       "money";
     return rateType;
   };
-  
+
   contract.prototype.getInterestRateType = function () {
     const rateType =
       this.interest_rate_type ||
@@ -654,6 +654,10 @@ module.exports = (sequelize, DataTypes) => {
     this.transactions.sort(function (a, b) {
       if (a.transaction_date > b.transaction_date) return 1;
       else if (b.transaction_date > a.transaction_date) return -1;
+      else if (a.type === "termination") return 1;
+      else if (b.type === "termination") return -1;
+      else if (a.type === "initial") return -1;
+      else if (b.type === "initial") return 1;
       else return 0;
     });
   };
@@ -795,6 +799,7 @@ module.exports = (sequelize, DataTypes) => {
                 );
                 break;
               case "notreclaimed":
+              case "notreclaimedpartial":
                 currentYear.notReclaimed = currentYear.notReclaimed.plus(
                   transaction.amount
                 );

@@ -42,6 +42,7 @@ module.exports = (sequelize, DataTypes) => {
               this.type === "withdrawal" ||
               this.type === "termination" ||
               this.type === "notreclaimed" ||
+              this.type === "notreclaimedpartial" ||
               this.type === "interestpayment"
             ) {
               if (value >= 0) {
@@ -144,6 +145,8 @@ module.exports = (sequelize, DataTypes) => {
         return "Rückzahlung";
       case "notreclaimed":
         return "Nicht rückgefordert";
+      case "notreclaimedpartial":
+        return "Teilerlass";
       case "interestpayment":
         return "Zinsauszahlung";
     }

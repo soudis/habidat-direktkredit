@@ -151,6 +151,7 @@ const texts = {
   transaction_type_initial: "Einzahlung",
   transaction_type_deposit: "Zusatzzahlung",
   transaction_type_withdrawal: "Teilauszahlung",
+  transaction_type_notreclaimedpartial: "Teilerlass",
   transaction_type_termination: "Rückzahlung",
   transaction_type_notreclaimed: "Nicht rückgefordert",
   transaction_type_interestpayment: "Zinsauszahlung",
