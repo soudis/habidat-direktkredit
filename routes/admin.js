@@ -265,6 +265,33 @@ module.exports = function (app) {
   );
 
   router.get(
+    "/admin/test_email_settings",
+    security.isLoggedInAdmin,
+    function (req, res, next) {
+      Promise.resolve()
+        .then(email.testEmailSettings)
+        .catch((error) => {
+          return error;
+        })
+        .then((emailError) => {
+          if (emailError !== true) {
+            utils.render(req, res, "partials/error", {
+              error: {
+                message: `Kein E-Mailversand möglich, bitte überprüfe die <a href="${utils.generateUrl(
+                  req,
+                  "/admin/settings"
+                )}">SMTP Einstellungen</a>: ${emailError}`,
+              },
+            });
+          } else {
+            res.end();
+          }
+        })
+        .catch((error) => next(error));
+    }
+  );
+
+  router.get(
     "/admin/edit_settings",
     security.isLoggedInAdmin,
     function (req, res, next) {

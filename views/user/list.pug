@@ -3,3 +3,17 @@ include ../partials/contractlist
 
 block content
   +contractlist(contracts)(fnExport=true fnImport=true fnViews=true fnFilter=true fnColumns=true fnAdd=true)
+  script.
+    $(document).ready(function(){
+       $.ajax({
+      url: _url("/admin/test_email_settings"),
+      type: "GET",
+      success: function (response) {
+        $("#root-container").prepend(response);
+      },
+      error: function (xhr, status, error) {
+        var data = JSON.parse(xhr.responseText);
+        errorAlert(data.error);
+      },
+    });      
+    })
