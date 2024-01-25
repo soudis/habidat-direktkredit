@@ -14,7 +14,7 @@ mixin contract(contract, templates_contract, admin)
               a.btn.btn-light.btn-sm.confirm-action(data-remove-tag='contract_'+contract.id data-link=_url('/contract/delete/'+contract.id) data-confirmtext='Willst du den Direktkredit vom ' + moment(contract.sign_date).format('DD.MM.YYYY') + ' wirklich löschen?')                  
                 span.fa.fa-trash
               if templates_contract && templates_contract.length > 0
-                a.btn.btn-light.btn-sm.dropdown-toggle(id='contractTemplateButton' type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false") 
+                a.btn.btn-light.btn-sm.dropdown-toggle(id='contractTemplateButton' type="button" title="Dokument generieren (nach Vorlagen für Kredite)" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false") 
                   span.fa.fa-file                          
                 .dropdown-menu.dropdown-menu-right( aria-labelledby="contractTemplateButton")
                   each template in templates_contract
