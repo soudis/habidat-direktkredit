@@ -86,11 +86,14 @@ block content
                           td.col-md-4.h6.squeeze-left Alternative Zinsberechnung:
                           td.col-md-8.h6
                             each interestMethod, index in settings.project.get('defaults.interest_methods_alternative')
-                              if index > 0
-                                span , 
-                              span= _t('interest_method_' + interestMethod)
-                              span  
-                              span.fa.fa-info-circle(title=_t('interest_method_hint_' + interestMethod))
+                              if interestMethod
+                                if index > 0
+                                  span , 
+                                span= _t('interest_method_' + interestMethod)
+                                span  
+                                span.fa.fa-info-circle(title=_t('interest_method_hint_' + interestMethod))
+                              else 
+                                span -
                       tr
                         td.col-md-4.h6.squeeze-left=_t('interest_payment_type')+':'
                         td.col-md-8.h6= _t('interest_payment_type_' + settings.project.get('defaults.interest_payment_type'))
