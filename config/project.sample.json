@@ -4,7 +4,7 @@
   "url": "https://example.com",
   "usersuffix": "direktkredit",
   "defaults": {
-    "interest_method": "360_compound",
+    "interest_method": "30E360_compound",
     "interest_methods_alternative": [],
     "interest_payment_type": "end",
     "interest_rate_type": "disabled",

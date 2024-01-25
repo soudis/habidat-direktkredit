@@ -166,7 +166,7 @@ const texts = {
     "Bei ACT/365 (englische Methode) werden die Zinstage eines Jahres kalendergenau berechnet, allerdings hat das Basis-Zinsjahr immer 365 Zinstage, unabhängig von einem möglichen Schaltjahr.",
   interest_method_30E360_compound: "30E/360 mit Zinseszins",
   interest_method_hint_30E360_compound:
-    "Bei 30E/365 (deutsche / kaufmännische Methode) werden alle Monate mit 30 Tagen gerechnet, das Basis-Zinsjahr hat immer 360 Zinstage. Beispiel: Eine Anlage vom 28. Februar 2015 bis 10. April 2015 ergibt 3 + 30 + 9 = 42 Zinstage",
+    "Die 30E/365 (deutsche / kaufmännische Methode) ist die bei Banken in Deutschland übliche Berechnungsmethode, hier werden alle Monate mit 30 Tagen gerechnet, das Basis-Zinsjahr hat immer 360 Zinstage. Beispiel: Eine Anlage vom 28. Februar 2015 bis 10. April 2015 ergibt 3 + 30 + 9 = 42 Zinstage",
   interest_method_360_compound: "ACT/360 mit Zinseszins",
   interest_method_hint_360_compound:
     "Bei ACT/360 (Eurozins- / französische methode) werden die Zinstage eines Jahres kalendergenau berechnet, allerdings hat das Basis-Zinsjahr immer 360 Zinstage.",
