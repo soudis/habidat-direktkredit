@@ -70,6 +70,7 @@ exports.contractTableRow = function (
       contractRow.contract_payback_date,
       contractRow.contract_status,
       contractRow.contract_deposit_date,
+      contractRow.contract_last_transaction_date,
     ];
   } else {
     return [
@@ -90,6 +91,7 @@ exports.contractTableRow = function (
       userRow.user_account_notification_type,
       userRow.user_relationship,
       userRow.user_membership_status,
+      false,
       false,
       false,
       false,
@@ -160,6 +162,7 @@ exports.getContractTableColumns = (pInterestYear = undefined) => {
     contractColumns.contract_payback_date,
     contractColumns.contract_status,
     contractColumns.contract_deposit_date,
+    contractColumns.contract_last_transaction_date,
   ];
 };
 

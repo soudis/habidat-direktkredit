@@ -244,6 +244,12 @@ module.exports = (sequelize, DataTypes) => {
         class: "text-right",
         filter: "date",
       },
+      contract_last_transaction_date: {
+        id: "contract_last_transaction_date",
+        label: "Datum letzte Zahlung",
+        class: "text-right",
+        filter: "date",
+      },
       contract_deposit_amount: {
         id: "contract_deposit_amount",
         label: "Einzahlungsbetrag (Import)",
@@ -297,7 +303,8 @@ module.exports = (sequelize, DataTypes) => {
     var totals = contract.calculateToDate(moment(effectiveDate), interestYear);
     const interestPaymentsOfYear =
       contract.getInterestPaymentsOfYear(interestYear);
-    var depositDate = contract.getDepositDate();
+    const depositDate = contract.getDepositDate();
+    const lastTransactionDate = contract.getLastTransactionDate();
     return {
       contract_sign_date: {
         valueRaw: contract.sign_date,
@@ -417,6 +424,15 @@ module.exports = (sequelize, DataTypes) => {
         value: depositDate ? moment(depositDate).format("DD.MM.YYYY") : "",
         order: depositDate ? moment(depositDate).format("YYYY/MM/DD") : "",
       },
+      contract_last_transaction_date: {
+        valueRaw: lastTransactionDate ? lastTransactionDate : "",
+        value: lastTransactionDate
+          ? moment(lastTransactionDate).format("DD.MM.YYYY")
+          : "",
+        order: lastTransactionDate
+          ? moment(lastTransactionDate).format("YYYY/MM/DD")
+          : "",
+      },
       contract_deposit_amount: {
         valueRaw: 0,
         value: 0,
@@ -463,19 +479,9 @@ module.exports = (sequelize, DataTypes) => {
     }
   };
 
-  contract.prototype.getRuntime = function (date) {
-    // note transactions need to be sorted
-    if (this.isTerminated(date) && this.transactions.length > 0) {
-      return Math.abs(
-        this.getDepositDate().diff(
-          moment(
-            this.transactions[this.transactions.length - 1].transaction_date
-          ),
-          "days"
-        )
-      );
-    } else {
-      return Math.abs(this.getDepositDate().diff(date, "days"));
+  contract.prototype.getLastTransactionDate = function () {
+    if (this.transactions.length) {
+      return this.transactions[this.transactions.length - 1].transaction_date;
     }
   };
 
