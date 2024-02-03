@@ -479,6 +479,22 @@ module.exports = (sequelize, DataTypes) => {
     }
   };
 
+  contract.prototype.getRuntime = function (date) {
+    // note transactions need to be sorted
+    if (this.isTerminated(date) && this.transactions.length > 0) {
+      return Math.abs(
+        this.getDepositDate().diff(
+          moment(
+            this.transactions[this.transactions.length - 1].transaction_date
+          ),
+          "days"
+        )
+      );
+    } else {
+      return Math.abs(this.getDepositDate().diff(date, "days"));
+    }
+  };
+
   contract.prototype.getLastTransactionDate = function () {
     if (this.transactions.length) {
       return this.transactions[this.transactions.length - 1].transaction_date;
