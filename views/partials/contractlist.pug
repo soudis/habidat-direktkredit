@@ -75,10 +75,9 @@ mixin contractlist(contracts)
             for year in attributes.years
               option(value=year selected=year===attributes.year?'selected':undefined)=year
 
-    table.table.table-striped(id="datatable" data-auto-width="false" data-interest-year=attributes.year class=attributes.fnSelectable?"selectable":"")
+    table.table.table-striped(id="datatable" data-auto-width="true" width="100%" data-interest-year=attributes.year class=attributes.fnSelectable?"selectable":"")
       thead
         tr
-          th.control.fit.text-center(data-orderable="false")
           if attributes.fnSelectable
             th.fit.selector(data-orderable="false")
               span.not-selected.fa.fa-square
@@ -90,7 +89,6 @@ mixin contractlist(contracts)
       tbody
         each row in contracts.data
           tr
-            td.control.fit
             if attributes.fnSelectable
               td.selector.fit.selectable
                 span.not-selected.fa.fa-square

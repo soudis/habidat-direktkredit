@@ -179,6 +179,27 @@ try {
     )
   );
   router.use(
+    "/public/datatables",
+    express.static(
+      path.join(__dirname, "node_modules/datatables.net-fixedcolumns/js"),
+      { maxAge: oneDay }
+    )
+  );
+  router.use(
+    "/public/datatables",
+    express.static(
+      path.join(__dirname, "node_modules/datatables.net-fixedcolumns-bs4/js"),
+      { maxAge: oneDay }
+    )
+  );
+  router.use(
+    "/public/datatables",
+    express.static(
+      path.join(__dirname, "node_modules/datatables.net-fixedcolumns-bs4/css"),
+      { maxAge: oneDay }
+    )
+  );
+  router.use(
     "/public/slider",
     express.static(path.join(__dirname, "node_modules/bootstrap-slider/dist"), {
       maxAge: oneDay,

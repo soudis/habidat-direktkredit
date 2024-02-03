@@ -42,6 +42,10 @@ tr td.slim {
   width: 1%;
 }
 
+.dataTables_scrollBody td {
+  white-space: nowrap;
+}
+
 h3.underline {
   border-bottom: 1px solid #aaa;
 }

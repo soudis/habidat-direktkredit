@@ -8,10 +8,10 @@ $(document).ready(function () {
     pageLength: 25,
     language: dataTableLanguange,
     order: [[orderBy, "desc"]],
-    responsive: {
-      details: {
-        type: "column",
-      },
+    scrollX: true,
+    fixedColumns: {
+      left: $("#datatable").hasClass("selectable") ? 1 : 0,
+      right: 1,
     },
     initComplete: function (settings, json) {},
   });
@@ -154,6 +154,9 @@ $(document).ready(function () {
   let view = queryParams.get("view");
   if (view) {
     restoreView(JSON.parse(view));
+  } else {
+    setColumnsSelected($("#column_select").val());
+    reDrawTable();
   }
 
   $(document).on("click", ".toggle-filters", function () {

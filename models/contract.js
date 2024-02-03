@@ -201,7 +201,7 @@ module.exports = (sequelize, DataTypes) => {
       },
       contract_interest_payment_type: {
         id: "contract_interest_payment_type",
-        label: "Zinsauszahlung",
+        label: "Zinsauszahlungsart",
         class: "text-right",
         filter: "number",
       },

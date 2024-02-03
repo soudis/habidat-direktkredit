@@ -1,5 +1,9 @@
 lockfileVersion: '6.0'
 
+settings:
+  autoInstallPeers: true
+  excludeLinksFromLockfile: false
+
 dependencies:
   '@fortawesome/fontawesome-free':
     specifier: ^6.4.2
@@ -55,6 +59,12 @@ dependencies:
   datatables.net-bs4:
     specifier: ^1.13.6
     version: 1.13.6
+  datatables.net-fixedcolumns:
+    specifier: ^4.3.0
+    version: 4.3.0
+  datatables.net-fixedcolumns-bs4:
+    specifier: ^4.3.0
+    version: 4.3.0
   datatables.net-responsive:
     specifier: ^2.5.0
     version: 2.5.0
@@ -836,6 +846,21 @@ packages:
 
   /datatables.net-bs4@1.13.6:
     resolution: {integrity: sha512-+ZYDvpvCf0L0qSXPGKbb17arFPNqnjkyrvAEamR9SGQaGK7PprVaNTLmRfP0Xq2dBxVYr+Y+OD/q63zaDo0cSA==}
+    dependencies:
+      datatables.net: 1.13.6
+      jquery: 3.7.1
+    dev: false
+
+  /datatables.net-fixedcolumns-bs4@4.3.0:
+    resolution: {integrity: sha512-iQqN0+/qekGRP/zFxTNSYxnc1Sj65ps+rWRQIRSQLbCt6tndXkjCp1pwT17QmsEELJjnZwArZqxq2zdKTEaHIQ==}
+    dependencies:
+      datatables.net-bs4: 1.13.6
+      datatables.net-fixedcolumns: 4.3.0
+      jquery: 3.7.1
+    dev: false
+
+  /datatables.net-fixedcolumns@4.3.0:
+    resolution: {integrity: sha512-H2otCswJDHufI4A8k7HUDj25HCB3a44KFnBlYEwYFWdrJayLcYB3I79kBjS8rSCu4rFEp0I9nVLKvWgKlZZgCQ==}
     dependencies:
       datatables.net: 1.13.6
       jquery: 3.7.1

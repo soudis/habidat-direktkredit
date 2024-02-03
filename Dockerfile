@@ -1,4 +1,4 @@
-FROM node:lts
+FROM node:19
 
 RUN \
   apt-get update \
