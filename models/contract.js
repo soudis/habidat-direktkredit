@@ -293,6 +293,17 @@ module.exports = (sequelize, DataTypes) => {
     });
   };
 
+  contract.prototype.getFlags = function () {
+    let flags = {};
+    if (this.interest_rate_type)
+      flags[`contract_interest_rate_type_is_${this.interest_rate_type}`] = true;
+    if (this.getInterestPaymentType())
+      flags[
+        `contract_interest_payment_type_is_${this.getInterestPaymentType()}`
+      ] = true;
+    return flags;
+  };
+
   contract.prototype.getRow = function (
     effectiveDate = undefined,
     interestYear = undefined

@@ -58,7 +58,7 @@ const texts = {
   interest_rate_type: "Zinsart",
   interest_rate_type_money: "Geld",
   interest_rate_type_coupon: "Einkaufsgutschein",
-  interest_payment_type: "Zinsauszahlung",
+  interest_payment_type: "Zinsauszahlungsart",
   interest_payment_type_end: "Ende der Laufzeit",
   interest_payment_type_yearly: "Jährlich",
   last_name: "Nachname",

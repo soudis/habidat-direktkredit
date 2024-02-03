@@ -29,33 +29,37 @@ block content
         td project_bic
         td Projekt BIC      
       tr
-        td Buchhaltungsbestätigung
+        td Kontomitteilung
         td year
         td Jahr
       tr
-        td Buchhaltungsbestätigung
+        td Kontomitteilung
         td is&lt;Jahr&gt;
         td Indiktator ob ein bestimmtes Jahr ist, z.B.: is2022        
       tr
-        td Buchhaltungsbestätigung
+        td Kontomitteilung
         td interest_total
         td Summe Jahreszinsen
       tr
-        td Buchhaltungsbestätigung
+        td Kontomitteilung
         td amount_total_begin
         td Summe Kontostand Jahresbeginn        
       tr
-        td Buchhaltungsbestätigung
+        td Kontomitteilung
         td amount_total_end
         td Summe Kontostand Jahresende        
       tr
-        td Buchhaltungsbestätigung
+        td Kontomitteilung
         td interest_total_paid
         td Summe ausgezahlte Zinsen des Jahres        
       tr
-        td Buchhaltungsbestätigung
+        td Kontomitteilung
+        td user_contracts
+        td Verträge (Liste, siehe Ebene "Vertrag")
+      tr
+        td Kontomitteilung
         td user_transactions_year
-        td Zahlungen und Zinsbuchungen des Jahres (Liste)      
+        td Zahlungen und Zinsbuchungen des Jahres (Liste aller Kredite, siehe Ebene "Zahlungen und Zinsbuchungen des Jahres")      
       tr
         td Zahlungen und Zinsbuchungen des Jahres
         td contract_id
@@ -91,6 +95,18 @@ block content
           td=column.label
       tr
         td Kreditgeber*in
+        td user_type_is_&lt;Typ&gt;
+        td Indikator ob Kreditgeber*in von Typ "person" oder "organisation" ist (nur Kontomitteilung)
+      tr
+        td Kreditgeber*in
+        td user_interest_payment_type_is_&lt;Zinsauszahlungsart&gt;
+        td Indikator ob Kreditgeber*in Kredite mit Zinsauszahlungsart "yearly" oder "end" besitzt (nur Kontomitteilung)
+      tr
+        td Kreditgeber*in
+        td user_interest_rate_type_is_&lt;Zinsart&gt;
+        td Indikator ob Kreditgeber*in Kredite mit Zinsart "money" oder "coupon" besitzt (nur Kontomitteilung)
+      tr
+        td Kreditgeber*in
         td user_contracts
         td Verträge (Liste)
       each column in contractColumns
@@ -100,8 +116,20 @@ block content
           td=column.label
       tr
         td Vertrag
+        td contract_interest_payment_type_is_&lt;Zinsauszahlungsart&gt;
+        td Indikator ob der Kredit die Zinsauszahlungsart "yearly" oder "end" hat (nur Kontomitteilung)
+      tr
+        td Vertrag
+        td contract_interest_rate_type_is_&lt;Zinsart&gt;
+        td Indikator ob der Kredit die Zinsart "money" oder "coupon" hat (nur Kontomitteilung)                
+      tr
+        td Vertrag
+        td contract_transactions_year
+        td Zahlungen und Zinsbuchungen des Jahres (nur bei Kontomitteilung, Liste pro Kredit, siehe Ebene "Zahlungen und Zinsbuchungen des Jahres")             
+      tr
+        td Vertrag
         td contract_transactions
-        td Zahlungen (Liste)
+        td Zahlungen (Liste, siehe Ebene "Zahlung")
       each column in transactionColumns
         tr
           td Zahlung

@@ -522,6 +522,12 @@ module.exports = (sequelize, DataTypes) => {
     }
   };
 
+  User.prototype.getFlags = function () {
+    let flags = {};
+    if (this.type) flags[`user_type_is_${this.type}`] = true;
+    return flags;
+  };
+
   User.prototype.getRow = function () {
     var user = this;
     return {
@@ -533,8 +539,8 @@ module.exports = (sequelize, DataTypes) => {
           : intl._t("user_type_person"),
       },
       user_is_person: {
-        valueRaw: !user.type && user.type === "person",
-        value: !user.type && user.type === "person",
+        valueRaw: user.type && user.type === "person",
+        value: user.type && user.type === "person",
       },
       user_salutation: {
         valueRaw: user.salutation || "personal",
@@ -776,55 +782,16 @@ module.exports = (sequelize, DataTypes) => {
     return false;
   };
 
-  User.prototype.getAccountNotificationData = function (year) {
-    data = this.getRow();
-    data.user_contracts = this.contracts.map((contract) => {
-      var data = contract.getRow();
-      Object.keys(data).forEach((key) => {
-        data[key] = data[key].value;
-      });
-      data.contract_transactions = contract.transactions.map((transaction) => {
-        var data = transaction.getRow();
-        Object.keys(data).forEach((key) => {
-          data[key] = data[key].value;
-        });
-      });
-      data.current_date = moment().format("DD.MM.YYYY");
-    });
-
-    Object.keys(data).forEach((key) => {
-      data[key] = data[key].value;
-    });
-
-    data.user_address = data.user_address.replace("</br>", "\n");
-
-    data.current_date = moment().format("DD.MM.YYYY");
-    data.year = year;
-    data[`is${data.year}`] = true;
-
-    var transactionList = this.getTransactionList(year);
-
-    transactionList.sort(function (a, b) {
-      if (a.contract_id > b.contract_id) return 1;
-      else if (b.contract_id > a.contract_id) return -1;
-      else {
-        if (a.date.isAfter(b.date, "day")) return 1;
-        else if (b.date.isAfter(a.date, "day")) return -1;
-        else {
-          if (a.order > b.order) return 1;
-          else if (a.order < b.order) return -1;
-          else return 0;
-        }
-      }
-    });
-    data.user_transactions_year = [];
+  function generateTransactionList(transactions, name) {
+    let data = {};
+    data[name] = [];
 
     var interestTotal = 0,
       interestTotalPaid = 0,
       amountTotalEnd = 0,
       amountTotalBegin = 0,
       lastTransaction;
-    transactionList.forEach(function (transaction) {
+    transactions.forEach(function (transaction) {
       if (transaction.type.startsWith("Zinsertrag")) {
         interestTotal = interestTotal + transaction.amount;
       }
@@ -837,7 +804,7 @@ module.exports = (sequelize, DataTypes) => {
       if (transaction.type.startsWith("Kontostand Jahresbeginn")) {
         amountTotalBegin += transaction.amount;
       }
-      data.user_transactions_year.push({
+      data[name].push({
         contract_id: transaction.contract_id,
         contract_interest_rate: format.formatPercent(transaction.interest_rate),
         contract_amount: format.formatMoney(transaction.contract_amount),
@@ -859,6 +826,79 @@ module.exports = (sequelize, DataTypes) => {
     data.interest_total_paid = format.formatMoney(interestTotalPaid);
     data.amount_total_end = format.formatMoney(amountTotalEnd);
     data.amount_total_begin = format.formatMoney(amountTotalBegin);
+    return data;
+  }
+
+  User.prototype.getAccountNotificationData = function (year) {
+    var transactionList = this.getTransactionList(year);
+
+    transactionList.sort(function (a, b) {
+      if (a.contract_id > b.contract_id) return 1;
+      else if (b.contract_id > a.contract_id) return -1;
+      else {
+        if (a.date.isAfter(b.date, "day")) return 1;
+        else if (b.date.isAfter(a.date, "day")) return -1;
+        else {
+          if (a.order > b.order) return 1;
+          else if (a.order < b.order) return -1;
+          else return 0;
+        }
+      }
+    });
+
+    let data = {
+      ...this.getFlags(),
+      ...generateTransactionList(transactionList, "user_transactions_year"),
+    };
+
+    let userFields = this.getRow();
+    Object.keys(userFields).forEach(
+      (field) => (data[field] = userFields[field].value)
+    );
+
+    data.user_address = data.user_address.replace("</br>", "\n");
+    data.current_date = moment().format("DD.MM.YYYY");
+    data.year = year;
+    data[`is${data.year}`] = true;
+    data[`is_year_${data.year}`] = true;
+
+    data.user_contracts = this.contracts.map((contract) => {
+      let contractData = {};
+      const contractFields = contract.getRow();
+      Object.keys(contractFields).forEach(
+        (field) => (contractData[field] = contractFields[field].value)
+      );
+
+      contractData.contract_transactions = contract.transactions.map(
+        (transaction) => {
+          let transactionData = {};
+          const transactionFields = transaction.getRow();
+          Object.keys(transactionFields).forEach(
+            (field) => (transactionData[field] = transactionFields[field].value)
+          );
+          return transactionData;
+        }
+      );
+      contractData.current_date = moment().format("DD.MM.YYYY");
+      contractData.contract_transactions_year = [];
+
+      const flags = contract.getFlags();
+
+      // also set flags on user level
+      Object.keys(flags).forEach((flag) => {
+        data[flag.replace("contract", "user")] = flags[flag];
+      });
+
+      return {
+        ...contractData,
+        ...flags,
+        ...generateTransactionList(
+          transactionList.filter((row) => row.contract_id === contract.id),
+          "contract_transactions_year"
+        ),
+      };
+    });
+    console.log(data);
     return data;
   };
 
