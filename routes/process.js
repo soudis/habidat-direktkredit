@@ -27,6 +27,7 @@ module.exports = function (app) {
     "/process/interestpayment/:year",
     security.isLoggedInAdmin,
     function (req, res, next) {
+      const now = moment();
       const endOfYear = moment().set("year", req.params.year).endOf("year");
       const startOfNextYear = moment()
         .set("year", req.params.year)
@@ -39,7 +40,7 @@ module.exports = function (app) {
               (!contract.interest_payment_type &&
                 settings.project.get("defaults.interest_payment_type") ===
                   "yearly")) &&
-            !contract.isTerminated(endOfYear) &&
+            !contract.isTerminated(now) &&
             contract.calculateToDate(startOfNextYear, req.params.year)
               .interestOfYear > 0
           );
