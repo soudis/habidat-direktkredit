@@ -48,7 +48,7 @@ module.exports = function (app) {
                   " - Konto " +
                   user.id +
                   " (" +
-                  user.getFullName() +
+                  user.getFullName().replace("/", "-") +
                   ').docx"'
               );
               res.write(result, "binary");
@@ -116,7 +116,7 @@ module.exports = function (app) {
                         " - Konto " +
                         user.id +
                         " (" +
-                        user.getFullName() +
+                        user.getFullName().replace("/", "-") +
                         ") - Vertrag " +
                         contract.id +
                         '.docx"'

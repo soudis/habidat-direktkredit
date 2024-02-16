@@ -432,7 +432,7 @@ module.exports = function (app) {
                   data = user.getAccountNotificationData(req.body.year);
                   var filename =
                     "Kontomitteilung " +
-                    user.getFullNameNoTitle() +
+                    user.getFullNameNoTitle().replace("/", "-") +
                     " " +
                     req.body.year +
                     ".pdf";
