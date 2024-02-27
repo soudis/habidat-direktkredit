@@ -15,9 +15,9 @@ mixin transaction(contract, transaction, admin)
     if admin
       td.text-right
         if transaction.amount < 0 && !transaction.type.includes('notreclaimed')
-          a.btn.btn-light.btn-sm.sepa-qr(data-id=transaction.id)
+          a.btn.btn-light.btn-sm.sepa-qr(data-id=transaction.id title="QR Code für Überweisung")
             span.fa.fa-qrcode
-        a.btn.btn-light.btn-sm.sidebar-action(href=_url('/transaction/edit/'+transaction.id))
+        a.btn.btn-light.btn-sm.sidebar-action(href=_url('/transaction/edit/'+transaction.id) title="Zahlung bearbeiten")
           span.fa.fa-edit
-        a.btn.btn-light.btn-sm.confirm-action(data-update-tag="contract_"+contract.id data-link=_url('/transaction/delete/'+transaction.id), data-confirmtext='Willst du die ' +transaction.getTypeText()+' von ' + sprintf('%.2f', transaction.amount) +  ' EUR vom ' + moment(transaction.transaction_date).format('DD.MM.YYYY') + ' wirklich löschen?')   
+        a.btn.btn-light.btn-sm.confirm-action(title="Zahlung löschen" data-update-tag="contract_"+contract.id data-link=_url('/transaction/delete/'+transaction.id), data-confirmtext='Willst du die ' +transaction.getTypeText()+' von ' + sprintf('%.2f', transaction.amount) +  ' EUR vom ' + moment(transaction.transaction_date).format('DD.MM.YYYY') + ' wirklich löschen?')   
           span.fa.fa-trash

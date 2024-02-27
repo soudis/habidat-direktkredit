@@ -1,6 +1,6 @@
 /* jshint esversion: 8 */
-import express from "express";
 try {
+  var express = require("express");
   var router = express.Router();
   var path = require("path");
   var logger = require("morgan");

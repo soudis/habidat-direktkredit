@@ -87,14 +87,12 @@ module.exports = function (app) {
             });
         })
         .then((contract) => {
-          return models.file
-            .getContractTemplates()
-            .then((templates) =>
-              utils.render(req, res, "contract/show", {
-                templates_contract: templates,
-                contract: contract,
-              })
-            );
+          return models.file.getContractTemplates().then((templates) =>
+            utils.render(req, res, "contract/show", {
+              templates_contract: templates,
+              contract: contract,
+            })
+          );
         })
         .catch((error) => next(error));
     }
@@ -122,14 +120,12 @@ module.exports = function (app) {
           models.contract.findByIdFetchFull(models, req.body.contract_id)
         )
         .then((contract) => {
-          return models.file
-            .getContractTemplates()
-            .then((templates) =>
-              utils.render(req, res, "contract/show", {
-                templates_contract: templates,
-                contract: contract,
-              })
-            );
+          return models.file.getContractTemplates().then((templates) =>
+            utils.render(req, res, "contract/show", {
+              templates_contract: templates,
+              contract: contract,
+            })
+          );
         })
         .catch((error) => next(error));
     }
@@ -148,14 +144,12 @@ module.exports = function (app) {
               models.contract.findByIdFetchFull(models, transaction.contract_id)
             )
             .then((contract) => {
-              return models.file
-                .getContractTemplates()
-                .then((templates) =>
-                  utils.render(req, res, "contract/show", {
-                    templates_contract: templates,
-                    contract: contract,
-                  })
-                );
+              return models.file.getContractTemplates().then((templates) =>
+                utils.render(req, res, "contract/show", {
+                  templates_contract: templates,
+                  contract: contract,
+                })
+              );
             });
         })
         .catch((error) => next(error));
@@ -175,13 +169,13 @@ module.exports = function (app) {
               return models.user.findByPk(contract.user_id).then((user) => {
                 res.setHeader("Content-Type", "image/svg+xml");
                 res.send(
-                  qr.generateSepaQrCode(
-                    user.getFullName(),
-                    user.iban,
-                    user.bic,
-                    -transaction.amount,
-                    `Direktkredit ${transaction.getTypeText()}`
-                  )
+                  qr.giroCode({
+                    name: user.getFullName(),
+                    iban: user.IBAN,
+                    bic: user.BIC || "XXXXXXXXXXX",
+                    amount: -transaction.amount,
+                    reason: `Direktkredit ${transaction.getTypeText()}`,
+                  })
                 );
                 res.end();
               });

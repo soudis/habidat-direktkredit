@@ -213,11 +213,11 @@ $(document).ready(function () {
   $(document).on("click", ".sepa-qr", function () {
     let transactionId = $(this).data("id");
     let qrCode = $(
-      `<img src="${_url(
+      `<div class="col-md-12 qr-code-container"><img src="${_url(
         "/transaction/qr/" + transactionId
-      )}" alt="SEPA EPC QR code" />`
+      )}" alt="SEPA EPC QR code" /><div class="col-md-12">Scanne den QR Code mit deiner Banking-App für das Erstellen der Überweisung</div></div>`
     );
-    bootbox.confirm(qrCode);
+    bootbox.alert({ message: qrCode });
   });
 
   $(document).on("click", "td.details-control", function () {

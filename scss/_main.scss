@@ -573,6 +573,14 @@ label.radio-label {
   margin-bottom: 0.7rem;
 }
 
+.qr-code-container {
+  padding: 8px;
+  display: flex;
+  gap: 16px;
+  flex-direction: column;
+  align-items: center;
+}
+
 @media (min-width: 1600px) {
   .col-xxl {
     flex-basis: 0;
