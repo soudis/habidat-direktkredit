@@ -75,7 +75,11 @@ html
               span  Unterlagen für Kreditgeber*innen     
           +nav_item(_url("/admin/auditlog/30d"))
             span.fa.fa-history
-            span  Logbuch              
+            span  Logbuch     
+          if settings.config.get('faqUrl') && settings.config.get('faqUrl') !== ''
+            +nav_item(settings.config.get('faqUrl'), undefined, '_blank')
+              span.fa.fa-info-circle
+              span  Hilfe / FAQ                        
         else if currentUser
           +nav_item(_url("/profile"))
             span.fa.fa-info

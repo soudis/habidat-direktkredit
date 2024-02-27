@@ -41,8 +41,8 @@ mixin nav(name, id, logo, style)
                   span  Anmelden                 
 
  
-mixin nav_item(href, active)
-    li.nav-item(class=active): a.nav-link( href=href )
+mixin nav_item(href, active, target='_self')
+    li.nav-item(class=active): a.nav-link( href=href target=target )
         block
 
 

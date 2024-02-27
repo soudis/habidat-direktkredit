@@ -173,6 +173,8 @@ const initConfig = () => {
   config.set("site.porthttps", process.env.HABIDAT_DK_PORT_HTTPS);
   config.set("site.reverseproxy", process.env.HABIDAT_DK_REVERSE_PROXY);
 
+  config.set("faqUrl", process.env.HABIDAT_DK_FAQ_URL);
+
   return config;
 };
 

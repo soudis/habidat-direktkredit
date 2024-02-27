@@ -5,6 +5,9 @@ settings:
   excludeLinksFromLockfile: false
 
 dependencies:
+  '@dipser/epc-qr-code.js':
+    specifier: ^1.0.3
+    version: 1.0.3
   '@fortawesome/fontawesome-free':
     specifier: ^6.4.2
     version: 6.4.2
@@ -195,6 +198,10 @@ packages:
       '@babel/helper-string-parser': 7.22.5
       '@babel/helper-validator-identifier': 7.22.20
       to-fast-properties: 2.0.0
+    dev: false
+
+  /@dipser/epc-qr-code.js@1.0.3:
+    resolution: {integrity: sha512-1+jc9sfsgg45M+8lxW19ogKFEAwTPafPwcw5xdKprHoOTNbVwEcilxrAMZ5h+yGBSoOusnXC+3SGCNvXsoTM2Q==}
     dev: false
 
   /@fast-csv/format@4.3.5:

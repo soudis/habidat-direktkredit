@@ -210,6 +210,16 @@ $(document).ready(function () {
     .removeClass("col-md-7")
     .addClass("col-sm-7");
 
+  $(document).on("click", ".sepa-qr", function () {
+    let transactionId = $(this).data("id");
+    let qrCode = $(
+      `<img src="${_url(
+        "/transaction/qr/" + transactionId
+      )}" alt="SEPA EPC QR code" />`
+    );
+    bootbox.confirm(qrCode);
+  });
+
   $(document).on("click", "td.details-control", function () {
     var tr = $(this).parent();
     var icon = $(this).children("span");

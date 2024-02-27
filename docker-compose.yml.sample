@@ -102,6 +102,8 @@ services:
       - HABIDAT_DK_SSL_KEY=config/key.pem
       # change for debugging
       - HABIDAT_DK_DEBUG=false
+      # Link to faq site for admins
+      - HABIDAT_DK_FAQ_URL=https://faq.direktkreditverwaltung.de
     depends_on:
       db:
         condition: service_healthy
