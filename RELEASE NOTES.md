@@ -1,5 +1,10 @@
 # Release Notes
 
+## Version 1.6.3
+
+- Feature: QR Codes for withdrawal transactions
+- Feature: Link to FAQ site in menu
+
 ## Version 1.2.0
 
 - Feature: interest method per contract
