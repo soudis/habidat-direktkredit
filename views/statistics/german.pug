@@ -75,5 +75,5 @@ block content
       $(location).attr('href', _url('/statistics/german/' + effectiveDate + '/' + interestRate));
     } ); 
     $(document).on( 'click', '.reset-date', function () {
-      $(location).attr('href', _url('/statistics/german/all/all'));
+      $(location).attr('href', _url(`/statistics/german/${moment().format('YYYY-MM-DD')}/all`));
     } );       

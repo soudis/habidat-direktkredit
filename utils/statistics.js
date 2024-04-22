@@ -336,14 +336,6 @@ exports.getGermanContractsByYearAndInterestRate = function (
           }
         });
 
-        result.forEach((entry) => {
-          console.log(
-            entry.id,
-            entry.startDate.format("DD.MM.YYYY"),
-            entry.endDate.format("DD.MM.YYYY")
-          );
-        });
-
         // merge time ranges with same result
         var currentEntry;
         var resultMerged = [];

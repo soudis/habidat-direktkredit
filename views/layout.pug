@@ -54,7 +54,7 @@ html
            +dd_item(_url("/user/list/cancelled"))
              span.fa.fa-comment-dollar
              span  Anstehende Rückzahlungen
-           +dd_item(_url("/statistics/german/all/all"))
+           +dd_item(_url(`/statistics/german/${moment().format('YYYY-MM-DD')}/all`))
              span.fa.fa-balance-scale
              span  Direktkredite aus Deutschland
            +dd_item(_url("/process/interestpayment/" + moment().subtract(1,'years').year()))
