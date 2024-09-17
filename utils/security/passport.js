@@ -99,10 +99,10 @@ module.exports = function (passport) {
             }
 
             // if the user is found but the password is wrong
-            // if (user.password && user.password !== password || !user.password && !user.comparePassword(password)) {
-            // 	logAuthFailed(req,userid);
-            // 	return done(null, false, req.flash('loginMessage', 'Falsches Passwort')); // create the loginMessage and save it to session as flashdata
-            // }
+            if (user.password && user.password !== password || !user.password && !user.comparePassword(password)) {
+            	logAuthFailed(req,userid);
+            	return done(null, false, req.flash('loginMessage', 'Falsches Passwort')); // create the loginMessage and save it to session as flashdata
+            }
             user.lastLogin = moment();
             user.loginCount = (user.loginCount || 0) + 1;
             models.user
