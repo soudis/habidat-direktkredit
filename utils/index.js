@@ -196,11 +196,13 @@ exports.processImportFile = function (
       var dbColumns = models[importTarget].getColumns();
       var promises = [];
       worksheet.eachRow((row, rowIndex) => {
-        var getValue = function (columnName, bodyValue = undefined) {
+        var getValue = function (columnName, bodyValue = undefined, parseInt = false) {
           if (importMappings[columnName] !== undefined) {
             var cell = row.getCell(importMappings[columnName] + 1);
             var value = cell.value;
-            if (cell.type === exceljs.ValueType.Number) {
+            if (value?.formula && value?.result) {
+              value = value.result;
+            } else if (cell.type === exceljs.ValueType.Number) {
               if (cell.numFmt && cell.numFmt.includes("%")) {
                 // Detect Percent Values
                 value = cell.value * 100;
