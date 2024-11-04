@@ -910,8 +910,9 @@ module.exports = (sequelize, DataTypes) => {
     var lastDay = moment(year + " +00:00", "YYYY Z").endOf("year");
     this.contracts.forEach(function (contract) {
       const years = contract.calculatePerYear(firstDayNextYear);
+      const currentYear = years.find((y) => y.year == year);
       if (
-        years.length >= 1 &&
+        currentYear &&
         !contract.isTerminated(moment(firstDay).subtract(1, "days"))
       ) {
         const currentYear = years.find((y) => y.year == year);

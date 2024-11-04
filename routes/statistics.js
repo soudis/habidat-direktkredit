@@ -349,7 +349,7 @@ module.exports = function (app) {
           );
           return workbook.xlsx.write(res).then(() => res.end());
         })
-        .catch((error) => next);
+        .catch((error) => next(error));
     }
   );
 
