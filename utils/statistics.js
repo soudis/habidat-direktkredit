@@ -131,11 +131,12 @@ exports.getNumbersPerYear = function () {
               row.terminatedContractAmount += yearTotals.begin;
 
               // calculated interest that was paid by termination withdrawal
-              var transactionAmount = contract.getTransactionsAmount();
+              // NOTE: disabled, because it led to confusion as everywhere else termination withdrawals are fully counted as withdrawals not interest payments
+              /* var transactionAmount = contract.getTransactionsAmount();
               if (transactionAmount < 0) {
                 row.interestPaid += transactionAmount;
                 row.withdrawals -= transactionAmount;
-              }
+              } */
             }
             if (!contract.isTerminated(endOfYear)) {
               row.runningContracts++;
