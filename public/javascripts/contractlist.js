@@ -1,3 +1,10 @@
+function debugMsg(msg, params) {
+  if (window.location.hostname.endsWith('localhost')) {
+    console.log(`DEBUG: ${msg}`, params);
+  }
+}
+
+
 /* jshint esversion: 8 */
 $(document).ready(function () {
   var orderBy = 1;
@@ -16,7 +23,9 @@ $(document).ready(function () {
     initComplete: function (settings, json) {},
   });
 
+  // toggle column filters
   function toggleFilters(update = false) {
+    debugMsg('toggleFilters', update);
     if (
       ($("#datatable thead tr:eq(1)").length && !update) ||
       (!$("#datatable thead tr:eq(1)").length && update)
@@ -102,6 +111,7 @@ $(document).ready(function () {
     }
   }
 
+  // select visible columns multiselect 
   $("#column_select").multiselect({
     buttonClass: "btn btn-light",
     enableHTML: true,
@@ -115,6 +125,8 @@ $(document).ready(function () {
       storeViewInQuery();
     },
   });
+
+  // several layout adjustments
   $(".datatable-buttons")
     .children()
     .each(function (index) {
@@ -164,26 +176,8 @@ $(document).ready(function () {
     storeViewInQuery();
   });
 
-  $(document).on("keyup change", ".text-filter", function () {
-    var name = $(this).data("name");
-    if (table.column(name + ":name").search() !== this.value) {
-      table.column(name + ":name").search(this.value);
-      updateCustomFilters();
-      storeViewInQuery();
-    }
-  });
 
-  $(document).on("change", ".list-filter", function () {
-    var name = $(this).data("name");
-    if (table.column(name + ":name").search() !== this.value) {
-      table
-        .column(name + ":name")
-        .search(this.value !== "Alle" ? this.value : "");
-      updateCustomFilters();
-      storeViewInQuery();
-    }
-  });
-
+  // remove custom filters
   function popCustomFilters(count) {
     for (var i = 0; i < count; i++) {
       $.fn.dataTable.ext.search.pop();
@@ -200,12 +194,14 @@ $(document).ready(function () {
   });
 
   function reDrawTable() {
+    debugMsg('reDrawTable')
     orderTriggerDisabled = true;
     table.draw();
     orderTriggerDisabled = false;
   }
 
   function updateCustomFilters(pop = true) {
+    debugMsg('updateCustomFilters', pop);
     var customFilterCount = 0;
     $("#datatable thead tr:eq(1) th:visible").each(function (i) {
       var filterType = $(this).data("filter");
@@ -273,13 +269,36 @@ $(document).ready(function () {
     return customFilterCount;
   }
 
+
+  // on change ein text column filter
+  $(document).on("keyup change", ".text-filter", function () {
+    var name = $(this).data("name");
+    if (table.column(name + ":name").search() !== this.value) {
+      table.column(name + ":name").search(this.value);
+      updateCustomFilters(true);
+      storeViewInQuery();
+    }
+  });
+
+  // on change in select column filters
+  $(document).on("change", ".list-filter", function () {
+    var name = $(this).data("name");
+    if (table.column(name + ":name").search() !== this.value) {
+      table
+        .column(name + ":name")
+        .search(this.value !== "Alle" ? this.value : "");
+      updateCustomFilters(true);
+      storeViewInQuery();
+    }
+  });
+
   $(document).on("change keyup", "#datatable_filter input", function () {
-    updateCustomFilters();
+    updateCustomFilters(true);
     storeViewInQuery();
   });
 
   $(document).on("keyup change", ".date-filter", function () {
-    updateCustomFilters();
+    updateCustomFilters(true);
     storeViewInQuery();
   });
 
@@ -289,7 +308,7 @@ $(document).ready(function () {
   });
 
   $(document).on("keyup change", ".number-filter", function () {
-    updateCustomFilters();
+    updateCustomFilters(true);
     storeViewInQuery();
   });
 
@@ -298,6 +317,7 @@ $(document).ready(function () {
   });
 
   function getCurrentView() {
+    debugMsg('getCurrentView')
     var view = {
       columnsSelected: $("#column_select").val(),
       tableSearch: table.search(),
@@ -354,6 +374,7 @@ $(document).ready(function () {
   }
 
   function storeViewInQuery() {
+    debugMsg('storeViewInQuery')
     const url = new URL(location);
     url.searchParams.set("view", JSON.stringify(getCurrentView()));
     history.pushState({}, "", url);
@@ -373,6 +394,7 @@ $(document).ready(function () {
   }
 
   function restoreView(view) {
+    debugMsg(restoreView, view)
     table.search("").columns().search("");
 
     if (view.tableSearch) {
@@ -436,6 +458,7 @@ $(document).ready(function () {
   }
 
   function saveView(view, id = undefined) {
+    debugMsg('saveView', view, id)
     $.ajax({
       url: _url("/user/saveview" + (id !== undefined ? "/" + id : "")),
       type: "POST",
@@ -651,6 +674,7 @@ $(document).ready(function () {
   });
 
   var updateSelected = function () {
+    debugMsg('updateSelected')
     var contracts = [];
     $.each(table.rows(".selected").data(), function () {
       contracts.push(this[table.column("contract_id:name").index()].display);
