@@ -97,6 +97,10 @@ mixin submit_button(label=_t('save'))
   .text-right
     button.submit-button.btn.btn-primary(type='submit' class=attributes.class)=label
 
+mixin submit_button_left(label=_t('save'))
+  div
+    button.submit-button.btn.btn-primary(type='submit' class=attributes.class)=label    
+
 mixin checkbox(name, label=undefined)
   .form-group
     .form-check

@@ -116,6 +116,7 @@ module.exports = function (app) {
           });
           res.render("process/startinterestpayment", {
             contracts: req.params.contracts.split(","),
+            userCount: users.length,
             year: req.params.year,
             interests: interests,
           });
@@ -315,6 +316,7 @@ module.exports = function (app) {
         .catch((error) => next(error));
     }
   );
+
 
   app.use("/", router);
 };

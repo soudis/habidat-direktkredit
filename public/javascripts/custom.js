@@ -214,7 +214,7 @@ $(document).ready(function () {
     let transactionId = $(this).data("id");
     let qrCode = $(
       `<div class="col-md-12 qr-code-container"><img src="${_url(
-        "/transaction/qr/" + transactionId
+        "/transaction/qr/?ids=" + transactionId
       )}" alt="SEPA EPC QR code" /><div class="col-md-12">Scanne den QR Code mit deiner Banking-App für das Erstellen der Überweisung</div></div>`
     );
     bootbox.alert({ message: qrCode });

@@ -11,6 +11,8 @@ const multer = require("multer");
 const Promise = require("bluebird");
 const contracttable = require("../utils/contracttable");
 const settings = require("../utils/settings");
+const qr = require("../utils/qr");
+
 
 module.exports = function (app) {
   /* Add contract */
@@ -517,6 +519,47 @@ module.exports = function (app) {
         });
     }
   );
+
+  router.get(
+    "/contract/qr",
+    security.isLoggedInAdmin,
+    function (req, res, next) {
+      const ids = req.query.ids.split(",");
+      const amount = parseFloat(req.query.amount);
+      const type = req.query.type;
+      models.contract
+        .findAll({
+          where: { id: ids },
+          include: {model: models.user, as: "user"},
+        })
+        .then((contracts) => {
+          if (!amount) {
+            throw("No amount specified");
+          }
+          if (contracts.length === 0) {
+            throw("No contracts found");
+          }
+          if (contracts.some((contract) => contract.user.id !== contracts[0].user.id)) {
+            throw("All contracts must belong to the same user");
+          }
+          const contract = contracts[0];
+          const user = contract.user;
+          res.setHeader("Content-Type", "image/svg+xml");
+          res.send(
+            qr.giroCode({
+              name: user.getFullName(),
+              iban: user.IBAN,
+              bic: "",
+              amount,
+              reason: `${type} Direktkredit${contract.length===1?"":"e"}, Vertragsnummern ${ids.join(', ')}, Kontonummer: ${user.id}`,
+            })
+          );
+          res.end();
+        })
+        .catch((error) => next(error));
+    }
+  );
+
 
   app.use("/", router);
 };

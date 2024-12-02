@@ -1,9 +1,17 @@
 include ../partials/forms
 
 +form('/process/startinterestpayment')
-  +output('year', "Zinsjahr")(value=year)
-  +hidden('year', year)
-  +output('contract_length', "Verträge")(value=contracts.length)
-  +hidden('contracts', contracts.join(','))
-  +output('sum', "Summe Zinsauszahlungen")(value=format.formatMoney(interests))
-  +submit_button('Eintragen')
+  .row
+    .col-md-6
+      +output('year', "Zinsjahr")(value=year)
+      +hidden('year', year)
+      +output('contract_length', "Verträge")(value=contracts.length)
+      +hidden('contracts', contracts.join(','))
+      +output('sum', "Summe Zinsauszahlungen")(value=format.formatMoney(interests))
+    if userCount === 1
+      .col-md-6 
+        .col-md-12.qr-code-container-small
+          img(src=_url("/contract/qr/?ids=" + contracts.join(',') + "&type=Zinsauszahlung%20" + year + "&amount=" + interests))
+          div Scanne den QR Code mit deiner Banking-App für das Erstellen der Überweisung
+    .col-md-12
+      +submit_button_left('Eintragen')

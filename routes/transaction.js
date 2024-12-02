@@ -8,6 +8,28 @@ const multer = require("multer");
 const email = require("../utils/email");
 const qr = require("../utils/qr");
 
+const umlautMap = {
+  "\u00dc": "UE",
+  "\u00c4": "AE",
+  "\u00d6": "OE",
+  "\u00fc": "ue",
+  "\u00e4": "ae",
+  "\u00f6": "oe",
+  "\u00df": "ss",
+};
+
+var replaceUmlaute = function (str) {
+  return str
+    .replace(/[\u00dc|\u00c4|\u00d6][a-z]/g, (a) => {
+      const big = umlautMap[a.slice(0, 1)];
+      return big.charAt(0) + big.charAt(1).toLowerCase() + a.slice(1);
+    })
+    .replace(
+      new RegExp("[" + Object.keys(umlautMap).join("|") + "]", "g"),
+      (a) => umlautMap[a]
+    );
+};
+
 module.exports = function (app) {
   /* GET home page. */
   router.get(
@@ -157,33 +179,41 @@ module.exports = function (app) {
   );
 
   router.get(
-    "/transaction/qr/:id",
+    "/transaction/qr",
     security.isLoggedInAdmin,
     function (req, res, next) {
+      const ids = req.query.ids.split(",");
       models.transaction
-        .findByPk(req.params.id)
-        .then((transaction) => {
-          return models.contract
-            .findByPk(transaction.contract_id)
-            .then((contract) => {
-              return models.user.findByPk(contract.user_id).then((user) => {
-                res.setHeader("Content-Type", "image/svg+xml");
-                res.send(
-                  qr.giroCode({
-                    name: user.getFullName(),
-                    iban: user.IBAN,
-                    bic: user.BIC || "XXXXXXXXXXX",
-                    amount: -transaction.amount,
-                    reason: `Direktkredit ${transaction.getTypeText()}`,
-                  })
-                );
-                res.end();
-              });
-            });
+        .findAll({
+          where: { id: ids },
+          include: {model: models.contract, as: "contract", include: {model: models.user, as: "user"}},
+        })
+        .then((transactions) => {
+          if (transactions.length === 0) {
+            throw("No transactions found");
+          }
+          if (transactions.some((transaction) => transaction.contract.user.id !== transactions[0].contract.user.id)) {
+            throw("All transactions must belong to the same user");
+          }
+          const contract = transactions[0].contract;
+          const user = contract.user;
+          res.setHeader("Content-Type", "image/svg+xml");
+          res.send(
+            qr.giroCode({
+              name: user.getFullName(),
+              iban: user.IBAN,
+              bic: "",
+              amount: Math.abs(transactions.reduce(
+                (sum, transaction) => sum + transaction.amount,
+                0
+              )).toString(),
+              reason: transactions.length === 1 ? `${replaceUmlaute(transactions[0].getTypeText())} Direktkredit, Vertragsnummer ${contract.id}, Kontonummer ${user.id}` : `${replaceUmlaute(transactions[0].getTypeText())} ${transactions.length} Direktkredite`,
+            })
+          );
+          res.end();
         })
         .catch((error) => next(error));
     }
   );
-
   app.use("/", router);
 };
