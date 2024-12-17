@@ -1,0 +1,79 @@
+include partials/nav
+
+doctype html
+html
+  head
+    title= settings.project.get('projectname') + ' Kreditplattform - ' + title
+    // link(rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.2/css/bootstrap.min.css")
+    //link(rel="stylesheet" href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.min.css")
+    link(rel="shortcut icon" type="image/png" href=_url("/public/favicon.png"))
+    link(rel="stylesheet" href=_url("/public/datatables/dataTables.bootstrap4.min.css"))
+    link(rel="stylesheet" href=_url("/public/datatables/responsive.bootstrap4.min.css"))
+    link(rel="stylesheet" href=_url("/public/datatables/fixedColumns.bootstrap4.min.css"))
+
+    link(rel="stylesheet" href=_url("/public/css/" + (settings.project.get('theme')||red) + ".css"))
+    link(rel="stylesheet" href=_url("/public/datepicker/bootstrap-datepicker3.min.css"))
+    link(rel="stylesheet" href=_url("/public/multiselect/bootstrap-multiselect.min.css"))
+    link(rel="stylesheet" href=_url("/public/chart.js/Chart.min.css"))
+    //link(rel="stylesheet" href="/public/css/dataTables.bootstrap.min.css")
+    script(type='text/javascript' src=_url('/public/jquery/jquery.min.js'))
+    //script(type='text/javascript' src='/public/popper/popper.min.js')
+    script(type='text/javascript' src=_url('/public/bootstrap/bootstrap.bundle.min.js'))
+    script(type='text/javascript' src=_url('/public/datatables/jquery.dataTables.min.js'))
+    script(type='text/javascript' src=_url('/public/multiselect/bootstrap-multiselect.min.js'))
+    script(type='text/javascript' src=_url('/public/datatables/dataTables.bootstrap4.min.js'))
+    script(type='text/javascript' src=_url('/public/datatables/dataTables.responsive.min.js'))
+    script(type='text/javascript' src=_url('/public/datatables/dataTables.fixedColumns.min.js'))
+    script(type='text/javascript' src=_url('/public/datatables/responsive.bootstrap4.min.js'))
+    script(type='text/javascript' src=_url('/public/datatables/fixedColumns.bootstrap4.min.js'))
+    script(type='text/javascript' src=_url('/public/moment/moment.min.js'))
+    script(type='text/javascript' src=_url('/public/moment/locale/de.js'))
+    script(type='text/javascript' src=_url('/public/datepicker/bootstrap-datepicker.min.js'))
+    script(type='text/javascript' src=_url('/public/select/bootstrap-select.min.js'))
+    
+    script(type='text/javascript' src=_url('/public/javascripts/locale/de.js'))
+    script(type='text/javascript' src=_url('/public/bootbox/bootbox.min.js'))
+    script(type='text/javascript' src=_url('/public/chart.js/Chart.min.js'))
+    script(type='text/javascript' src=_url('/public/javascripts/custom.js'))
+    script(type='text/javascript' src=_url('/public/javascripts/actions.js'))
+    
+  body(data-projectid=settings.project.get('projectid'))
+    #body-container     
+      .col-xl-12.col-lg-12.mx-auto(id="root-container" style="min-height: calc(100vh - 120px)")              
+          if error && error.length > 0
+            include partials/error
+
+          if success && success.length > 0
+            include partials/success       
+
+          block content
+
+    .col-xl-12.col-lg-12.mx-auto(id="footer")     
+      footer.d-flex.flex-wrap.justify-content-between.align-items-center.py-3.mt-4.border-top
+        p.col-md-4.mb-0.text-muted
+          img(src=_url('https://mirrors.creativecommons.org/presskit/icons/cc.svg?ref=chooser-v1') alt='Creative Commons icons CC' height='22px')
+          img(src=_url('https://mirrors.creativecommons.org/presskit/icons/by.svg?ref=chooser-v1') alt='Creative Commons icons BY' height='22px')
+          span  Creative Commons 
+          a(href="https://creativecommons.org/licenses/by/4.0/deed.de") BY-SA 4.0
+          span  Lizenz
+        ul.nav.col-md-4.justify-content-end
+          li.nav-item
+            a.nav-link(href=_url('/imprint')) Impressum & Datenschutz
+          li.nav-item
+            a.nav-link(href=_url('https://github.com/soudis/habidat-direktkredit/') target="_blank") 
+              img(src=_url("/public/github.png") height="22px") 
+              span  github
+
+        
+    if currentUser && currentUser.isAdmin()
+
+      #sidebar.col-md-12.col-sm-12.col-lg-10.col-xl-8.col-xxl-5
+        #sidebar-content
+        .sidebar-closer
+          a.btn.btn-light.btn-sm
+            span.fa.fa-times
+
+      #sidebar-opener.d-none
+        a
+          span.fa.fa-caret-left
+        

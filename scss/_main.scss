@@ -139,24 +139,25 @@ button.multiselect {
 
 #root-container {
   margin-top: 20px;
+  min-height: calc(100vh - 180px);
 }
 
 @media (min-width: 1500px) {
-  #root-container {
+  #root-container, #footer {
     flex: 0 0 83.33333%;
     max-width: 83.33333%;
   }
 }
 
 @media (min-width: 2000px) {
-  #root-container {
+  #root-container, #footer {
     flex: 0 0 73.33333%;
     max-width: 73.33333%;
   }
 }
 
 @media (min-width: 3000px) {
-  #root-container {
+  #root-container, #footer {
     flex: 0 0 63.33333%;
     max-width: 63.33333%;
   }

@@ -18,6 +18,12 @@ module.exports = function (app) {
     });
   });
 
+  
+  router.get('/imprint', function(req, res) {
+		res.render('imprint');
+	});
+
+
   /* Welcome Site */
   router.get("/", security.isLoggedInAdmin, function (req, res, next) {
     res.redirect(utils.generateUrl(req, "/user/list"));

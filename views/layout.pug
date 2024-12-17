@@ -97,6 +97,22 @@ html
 
           block content
 
+    footer.d-flex.flex-wrap.justify-content-between.align-items-center.py-3.mt-4.border-top
+      p.col-md-4.mb-0.text-muted
+        img(src=_url('https://mirrors.creativecommons.org/presskit/icons/cc.svg?ref=chooser-v1') alt='Creative Commons icons CC' height='22px')
+        img(src=_url('https://mirrors.creativecommons.org/presskit/icons/by.svg?ref=chooser-v1') alt='Creative Commons icons BY' height='22px')
+        span  Creative Commons 
+        a(href="https://creativecommons.org/licenses/by/4.0/deed.de") BY-SA 4.0
+        span  Lizenz
+      ul.nav.col-md-4.justify-content-end
+        li.nav-item
+          a.nav-link(href=_url('/imprint')) Impressum & Datenschutz
+        li.nav-item
+          a.nav-link(href=_url('https://github.com/soudis/habidat-direktkredit/') target="_blank") 
+            img(src=_url("/public/github.png") height="22px") 
+            span  github
+
+        
     if currentUser && currentUser.isAdmin()
 
       #sidebar.col-md-12.col-sm-12.col-lg-10.col-xl-8.col-xxl-5
