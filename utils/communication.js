@@ -9,7 +9,11 @@ exports.getEmails = function (mode) {
       if (
         user.email &&
         validator.isEmail(user.email) &&
-        (mode === "all" || user.isActive())
+        (
+          mode == "all" ||
+          (mode === "active" && user.isActive()) ||
+          (mode === "cancelled" && user.isTerminated())
+        )
       ) {
         usersString += user.email + ",";
       }

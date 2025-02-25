@@ -22,7 +22,7 @@ mixin group(title, files, type)
           each file in files
             tr(id="file_"+file.id)
               td.col-md-6
-                a(href='/file/get/' + file.id).btn.btn-sm.btn-light
+                a(href=_url('/file/get/' + file.id)).btn.btn-sm.btn-light
                   span.fa.fa-download
                   span  
                   span= file.filename                
