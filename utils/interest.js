@@ -56,7 +56,7 @@ exports.calculateInterestDaily = function (
       interestDays -= !lastYear && !firstYear ? 1 : 0;
     }
   } else {
-    interestDays = toDate.diff(fromDate, "days");
+    interestDays = Math.max(toDate.diff(fromDate, "days"), 0);
   }
   return new Decimal(amount)
     .times(rate)

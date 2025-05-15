@@ -473,7 +473,7 @@ module.exports = (sequelize, DataTypes) => {
   contract.prototype.getDepositDate = function () {
     var depositDate;
     this.transactions.forEach(function (transaction) {
-      if (transaction.type === "initial") {
+      if (transaction.type === "initial" || transaction.type === 'deposit') {
         if (depositDate) {
           if (moment(depositDate).isAfter(transaction.transaction_date)) {
             depositDate = transaction.transaction_date;
@@ -887,7 +887,7 @@ module.exports = (sequelize, DataTypes) => {
           currentYear.end !== 0
         ) {
           // if contract is terminated and there are small rounding numbers from the past correct interest to adjust to a zero end value
-          currentYear.interest = currentYear.interest.minus(currentYear.end);
+          currentYear.interest = currentYear.interest.minus(currentYear.end);        
           currentYear.end = new Decimal(0);
         }
       }
