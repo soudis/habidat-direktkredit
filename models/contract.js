@@ -887,8 +887,11 @@ module.exports = (sequelize, DataTypes) => {
           currentYear.end !== 0
         ) {
           // if contract is terminated and there are small rounding numbers from the past correct interest to adjust to a zero end value
-          currentYear.interest = currentYear.interest.minus(currentYear.end);        
-          currentYear.end = new Decimal(0);
+          // only do that if the interest of the year does not get negative
+          if (currentYear.interest.minus(currentYear.end).gt(0)) {
+            currentYear.interest = currentYear.interest.minus(currentYear.end);        
+            currentYear.end = new Decimal(0);
+          }
         }
       }
       return years.map((year) => ({
