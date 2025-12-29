@@ -124,7 +124,7 @@ mixin contract(contract, templates_contract, admin)
                 .row
                   .h6.section-title.col-md-10
                     b Zahlungen
-                  if admin && !contract.isTerminated(Date.now())
+                  if admin && (!contract.isTerminated(Date.now()) || totals.end > 0)
                     .col-md-2.text-right.section-actions
                       a.btn.btn-light.btn-sm.sidebar-action(href=_url('/transaction/add/'+contract.id))
                         span.fa.fa-plus
