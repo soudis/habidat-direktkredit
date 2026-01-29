@@ -13,7 +13,6 @@ const contracttable = require("../utils/contracttable");
 const settings = require("../utils/settings");
 const qr = require("../utils/qr");
 
-
 module.exports = function (app) {
   /* Add contract */
   router.get(
@@ -24,7 +23,7 @@ module.exports = function (app) {
         .findByIdFetchFull(models, req.params.id)
         .then((user) => utils.render(req, res, "contract/add", { user: user }))
         .catch((error) => next(error));
-    }
+    },
   );
 
   /* Edit contract */
@@ -41,11 +40,11 @@ module.exports = function (app) {
               utils.render(req, res, "contract/edit", {
                 user: user,
                 editContract: contract,
-              })
+              }),
             );
         })
         .catch((error) => next(error));
-    }
+    },
   );
 
   /* Edit contract */
@@ -60,12 +59,12 @@ module.exports = function (app) {
             amountToDate: contract.calculateToDate(
               moment(req.params.date, "YYYY-MM-DD"),
               undefined,
-              req.params.transaction_id
+              req.params.transaction_id,
             ).end,
-          })
+          }),
         )
         .catch((error) => res.status(500).json({ error: error }));
-    }
+    },
   );
 
   router.post(
@@ -78,7 +77,7 @@ module.exports = function (app) {
           models.user.findByPk(getValue("contract_user_id")),
           models.contract.validateOrGenerateId(
             getValue("contract_id", req.body.id),
-            rowIndex - 1
+            rowIndex - 1,
           ),
           (user, contractId) => {
             var userId = getValue("contract_user_id");
@@ -99,7 +98,7 @@ module.exports = function (app) {
             if (req.body.termination_type == "T") {
               termination_date = !!getValue(
                 "contract_termination_date",
-                req.body.termination_date_T
+                req.body.termination_date_T,
               )
                 ? moment(req.body.termination_date_T)
                 : null;
@@ -121,7 +120,7 @@ module.exports = function (app) {
 
             var interest_payment_type = getValue(
               "contract_interest_payment_type",
-              req.body.interest_payment_type
+              req.body.interest_payment_type,
             );
             ["end", "yearly"].forEach((type) => {
               if (
@@ -135,7 +134,7 @@ module.exports = function (app) {
 
             var interest_method = getValue(
               "contract_interest_method",
-              req.body.interest_method
+              req.body.interest_method,
             );
             if (
               interest_method &&
@@ -152,7 +151,7 @@ module.exports = function (app) {
                 {
                   id: contractId,
                   sign_date: moment(
-                    getValue("contract_sign_date", req.body.sign_date)
+                    getValue("contract_sign_date", req.body.sign_date),
                   ),
                   interest_payment_type: interest_payment_type,
                   termination_date: termination_date,
@@ -162,7 +161,7 @@ module.exports = function (app) {
                   amount: getValue("contract_amount", req.body.amount),
                   interest_rate: getValue(
                     "contract_interest_rate",
-                    req.body.interest_rate
+                    req.body.interest_rate,
                   ),
                   interest_method: interest_method,
                   user_id: userId,
@@ -170,7 +169,7 @@ module.exports = function (app) {
                   notes: getValue("contract_notes", req.body.notes),
                   notes_public: req.body.notes_public ? true : false,
                 },
-                { trackOptions: utils.getTrackOptions(req.user, true) }
+                { trackOptions: utils.getTrackOptions(req.user, true) },
               )
               .then((contract) => {
                 if (depositAmount > 0) {
@@ -192,7 +191,7 @@ module.exports = function (app) {
                   return contract;
                 }
               });
-          }
+          },
         );
       };
 
@@ -201,7 +200,7 @@ module.exports = function (app) {
           req.body.import_file_id,
           "contract",
           JSON.parse(req.body.import_mappings),
-          validateAndCreate
+          validateAndCreate,
         )
         .then((result) => {
           var errors = result.filter((entry) => {
@@ -235,7 +234,7 @@ module.exports = function (app) {
             });
         })
         .catch((error) => next(error));
-    }
+    },
   );
 
   router.post(
@@ -250,7 +249,7 @@ module.exports = function (app) {
               return statistics
                 .getGermanContractsByYearAndInterestRate(
                   req.body.sign_date,
-                  req.body.interest_rate
+                  req.body.interest_rate,
                 )
                 .then((result) => {
                   if (
@@ -260,7 +259,7 @@ module.exports = function (app) {
                     throw new utils.Warning(
                       "In diesem Zeitraum sind für diesen Zinssatz bereits Kredite aus Deutschland in der Höhe von " +
                         format.formatMoney(result[0].totalAmount) +
-                        " angelegt (siehe Auswertungen / Kredite aus Deutschland)"
+                        " angelegt (siehe Auswertungen / Kredite aus Deutschland)",
                     );
                   }
                 });
@@ -316,32 +315,32 @@ module.exports = function (app) {
               termination_period_type: termination_period_type,
               amount: req.body.amount,
               interest_rate: req.body.interest_rate,
-							interest_rate_type: req.body.interest_rate_type,
+              interest_rate_type: req.body.interest_rate_type,
               interest_method: req.body.interest_method,
               user_id: req.body.user_id,
               status: req.body.status,
               notes: req.body.notes,
               notes_public: req.body.notes_public ? true : false,
             },
-            { trackOptions: utils.getTrackOptions(req.user, true) }
+            { trackOptions: utils.getTrackOptions(req.user, true) },
           );
         })
         .then((contract) =>
           models.contract.findOne({
             where: { id: contract.id },
             include: [{ model: models.transaction, as: "transactions" }],
-          })
+          }),
         )
         .then((contract) => {
           return models.file.getContractTemplates().then((templates) =>
             utils.render(req, res, "contract/show", {
               templates_contract: templates,
               contract: contract,
-            })
+            }),
           );
         })
         .catch((error) => next(error));
-    }
+    },
   );
 
   router.post(
@@ -357,7 +356,7 @@ module.exports = function (app) {
                 .getGermanContractsByYearAndInterestRate(
                   req.body.sign_date,
                   req.body.interest_rate,
-                  req.body.id
+                  req.body.id,
                 )
                 .then((result) => {
                   if (
@@ -367,7 +366,7 @@ module.exports = function (app) {
                     throw new utils.Warning(
                       "In diesem Zeitraum sind für diesen Zinssatz bereits Kredite aus Deutschland in der Höhe von " +
                         format.formatMoney(result[0].totalAmount) +
-                        " angelegt (siehe Auswertungen / Kredite aus Deutschland)"
+                        " angelegt (siehe Auswertungen / Kredite aus Deutschland)",
                     );
                   }
                 });
@@ -387,32 +386,32 @@ module.exports = function (app) {
               console.log(field, contract[field], value);
               if ((contract[field] || "") !== (value || ""))
                 throw new utils.Warning(
-                  `Dieser Vertrag hat bereits Zahlungen aus den Vorjahren, ${label} zu ändern, ändert im Nachhinein die berechneten Zinsen`
+                  `Dieser Vertrag hat bereits Zahlungen aus den Vorjahren, ${label} zu ändern, ändert im Nachhinein die berechneten Zinsen`,
                 );
             };
             checkField(
               "interest_rate",
               parseFloat(req.body.interest_rate),
-              "den Zinssatz"
+              "den Zinssatz",
             );
             checkField(
               "interest_method",
               req.body.interest_method,
-              "die Zinsberechnungsmethode"
+              "die Zinsberechnungsmethode",
             );
           }
 
           if (
             !req.body.ignore_warning &&
             contract.amount != parseFloat(req.body.amount) &&
-            contract.amount < contract.calculateToDate().deposits
+            parseFloat(req.body.amount) < contract.calculateToDate().deposits
           ) {
             throw new utils.Warning(
               `Der geänderte Vertragswert (${format.formatMoney(
-                parseFloat(req.body.amount)
+                parseFloat(req.body.amount),
               )}) ist kleiner als die Einzahlungen (${format.formatMoney(
-                contract.contract.calculateToDate().deposits
-              )})`
+                contract.calculateToDate().deposits,
+              )})`,
             );
           }
 
@@ -458,7 +457,7 @@ module.exports = function (app) {
             {
               where: { id: req.body.id },
               trackOptions: utils.getTrackOptions(req.user, true),
-            }
+            },
           );
         })
 
@@ -468,11 +467,11 @@ module.exports = function (app) {
             utils.render(req, res, "contract/show", {
               templates_contract: templates,
               contract: contract,
-            })
+            }),
           );
         })
         .catch((error) => next(error));
-    }
+    },
   );
 
   router.get(
@@ -497,7 +496,7 @@ module.exports = function (app) {
         .catch((error) => {
           res.status(500).json({ error: error });
         });
-    }
+    },
   );
 
   router.post(
@@ -517,7 +516,7 @@ module.exports = function (app) {
             error: "Kreditverträge konnten nicht gelöscht werden: " + error,
           });
         });
-    }
+    },
   );
 
   router.get(
@@ -530,17 +529,21 @@ module.exports = function (app) {
       models.contract
         .findAll({
           where: { id: ids },
-          include: {model: models.user, as: "user"},
+          include: { model: models.user, as: "user" },
         })
         .then((contracts) => {
           if (!amount) {
-            throw("No amount specified");
+            throw "No amount specified";
           }
           if (contracts.length === 0) {
-            throw("No contracts found");
+            throw "No contracts found";
           }
-          if (contracts.some((contract) => contract.user.id !== contracts[0].user.id)) {
-            throw("All contracts must belong to the same user");
+          if (
+            contracts.some(
+              (contract) => contract.user.id !== contracts[0].user.id,
+            )
+          ) {
+            throw "All contracts must belong to the same user";
           }
           const contract = contracts[0];
           const user = contract.user;
@@ -551,15 +554,14 @@ module.exports = function (app) {
               iban: user.IBAN,
               bic: "",
               amount,
-              reason: `${type} Direktkredit${contract.length===1?"":"e"}, Vertragsnummern ${ids.join(', ')}, Kontonummer: ${user.id}`,
-            })
+              reason: `${type} Direktkredit${contract.length === 1 ? "" : "e"}, Vertragsnummern ${ids.join(", ")}, Kontonummer: ${user.id}`,
+            }),
           );
           res.end();
         })
         .catch((error) => next(error));
-    }
+    },
   );
-
 
   app.use("/", router);
 };

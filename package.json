@@ -61,5 +61,10 @@
     "sprintf-js": "^1.1.3",
     "umzug": "^2.3.0",
     "validator": "^13.11.0"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "bcrypt"
+    ]
   }
 }
