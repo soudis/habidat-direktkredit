@@ -1,6 +1,9 @@
 h1=settings.project.get('projectname')
   |  Direktkreditplattform
-h3 Eine Zahlung für deinen Direktkredit wurde vermerkt: 
+h3 
+  span Eine Zahlung für deinen Direktkredit (Kreditnummer: #
+  span= contract.id
+  span ) wurde vermerkt: 
   table(style="margin-top:20px; margin-bottom:20px")
     thead
       tr
@@ -19,8 +22,12 @@ h3 Eine Zahlung für deinen Direktkredit wurde vermerkt:
         td(style="text-align:right; padding-left: 10px; padding-right: 10px; padding-top:20px;")
           h4= format.formatMoney(parseFloat(transaction.amount))
 h3 
-  span Dein neuer Gesamtkontostand beträgt somit 
-  span: b(style="color:rgb(30, 126, 52);")=format.formatMoney(user.calculateToDate().end)
+  span Dein neuer Gesamtkontostand für dein Konto (Kontonummer: #
+  span= user.id
+  span ) beträgt somit zum Stichtag 
+  span= moment(transaction.transaction_date).format('DD.MM.YYYY')
+  span &nbsp;
+  span: b(style="color:rgb(30, 126, 52);")=format.formatMoney(user.calculateToDate(transaction.transaction_date).end)
 h3 Du kannst deine Daten jederzeit unter 
   a(style="color: #00b7ff; font-style:none; text-decoration:none;" href=siteurl)
     b= siteurl
