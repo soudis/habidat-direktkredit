@@ -26,7 +26,7 @@ h3
   span= user.id
   span ) beträgt somit zum Stichtag 
   span= moment(transaction.transaction_date).format('DD.MM.YYYY')
-  span &nbsp;
+  span :&nbsp;
   span: b(style="color:rgb(30, 126, 52);")=format.formatMoney(user.calculateToDate(transaction.transaction_date).end)
 h3 Du kannst deine Daten jederzeit unter 
   a(style="color: #00b7ff; font-style:none; text-decoration:none;" href=siteurl)
