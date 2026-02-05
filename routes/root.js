@@ -1,4 +1,6 @@
 /* jshint esversion: 8 */
+const path = require("path");
+const fs = require("fs");
 const security = require("../utils/security");
 const passport = require("passport");
 const router = require("express").Router();
@@ -7,6 +9,7 @@ const models = require("../models");
 const utils = require("../utils");
 const email = require("../utils/email");
 const bcrypt = require("bcrypt");
+const archiver = require("archiver");
 
 module.exports = function (app) {
   router.get("/projectconfig", function (req, res, next) {
@@ -18,11 +21,9 @@ module.exports = function (app) {
     });
   });
 
-  
-  router.get('/imprint', function(req, res) {
-		res.render('imprint');
-	});
-
+  router.get("/imprint", function (req, res) {
+    res.render("imprint");
+  });
 
   /* Welcome Site */
   router.get("/", security.isLoggedInAdmin, function (req, res, next) {
@@ -56,7 +57,7 @@ module.exports = function (app) {
     }),
     function (req, res, next) {
       res.redirect(utils.generateUrl(req, "/user/list"));
-    }
+    },
   );
   /* OIDC-Callback */
   router.get(
@@ -67,7 +68,7 @@ module.exports = function (app) {
     }),
     function (req, res, next) {
       res.redirect(utils.generateUrl(req, "/profile"));
-    }
+    },
   );
 
   router.get("/getpassword", function (req, res, next) {
@@ -87,7 +88,7 @@ module.exports = function (app) {
         title: "Passwort ändern",
         error: req.flash("error"),
       });
-    }
+    },
   );
 
   router.get(
@@ -100,7 +101,7 @@ module.exports = function (app) {
         title: "Passwort ändern",
         error: req.flash("error"),
       });
-    }
+    },
   );
 
   router.get("/getpassword/:token", function (req, res, next) {
@@ -147,7 +148,7 @@ module.exports = function (app) {
               {
                 where: { id: req.user.id },
                 trackOptions: utils.getTrackOptions(req.user, true),
-              }
+              },
             );
           } else {
             return models.user.update(
@@ -160,7 +161,7 @@ module.exports = function (app) {
               {
                 where: { id: req.user.id },
                 trackOptions: utils.getTrackOptions(req.user, true),
-              }
+              },
             );
           }
         })
@@ -193,7 +194,7 @@ module.exports = function (app) {
               {
                 where: { passwordResetToken: req.body.token },
                 trackOptions: utils.getTrackOptions(req.user, true),
-              }
+              },
             );
           } else {
             return models.user.update(
@@ -206,14 +207,14 @@ module.exports = function (app) {
               {
                 where: { passwordResetToken: req.body.token },
                 trackOptions: utils.getTrackOptions(req.user, true),
-              }
+              },
             );
           }
         })
         .then(() => {
           req.flash(
             "success",
-            "Dein Passwort wurde gesetzt, logge dich jetzt ein"
+            "Dein Passwort wurde gesetzt, logge dich jetzt ein",
           );
           res.redirect(utils.generateUrl(req, "/"));
         });
@@ -245,7 +246,7 @@ module.exports = function (app) {
       .then(() => {
         req.flash(
           "success",
-          "Falls dein Account gefunden wurde, hast du ein E-Mail mit einem Link bekommen. Bitte sieh auch in deinem Spam-Ordner nach."
+          "Falls dein Account gefunden wurde, hast du ein E-Mail mit einem Link bekommen. Bitte sieh auch in deinem Spam-Ordner nach.",
         );
         res.redirect(utils.generateUrl(req, "/"));
       })
@@ -322,6 +323,60 @@ module.exports = function (app) {
         }
       });
     })(req, res, next);
+  });
+
+  router.get("/migrate", function (req, res, next) {
+    var token =
+      req.query.token ||
+      req.get("X-Migration-Token") ||
+      (req.get("Authorization") || "").replace(/^Bearer\s+/i, "");
+    var expectedToken = process.env.MIGRATION_TOKEN;
+
+    if (!expectedToken || token !== expectedToken) {
+      res.status(401).json({ error: "Unauthorized" });
+      return;
+    }
+
+    var uploadDir = path.join(__dirname, "..", "upload");
+
+    Promise.all([
+      models.user.findAll({ raw: true }),
+      models.contract.findAll({ raw: true }),
+      models.transaction.findAll({ raw: true }),
+      models.admin.findAll({ raw: true }),
+      models.file.findAll({ raw: true }),
+    ])
+      .then(function (results) {
+        var dump = {
+          user: results[0],
+          contract: results[1],
+          transaction: results[2],
+          admin: results[3],
+          file: results[4],
+        };
+        var archive = archiver("zip", { zlib: { level: 9 } });
+        res.setHeader("Content-Type", "application/zip");
+        res.setHeader(
+          "Content-Disposition",
+          'attachment; filename="habidat-migration-' +
+            new Date().toISOString().slice(0, 10) +
+            '.zip"',
+        );
+        archive.on("error", function (err) {
+          next(err);
+        });
+        archive.pipe(res);
+        archive.append(JSON.stringify(dump, null, 2), {
+          name: "database.json",
+        });
+        if (fs.existsSync(uploadDir)) {
+          archive.directory(uploadDir, "upload");
+        }
+        archive.finalize();
+      })
+      .catch(function (err) {
+        next(err);
+      });
   });
 
   if (settings.config.get("debug")) {
