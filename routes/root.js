@@ -369,6 +369,12 @@ module.exports = function (app) {
         archive.append(JSON.stringify(dump, null, 2), {
           name: "database.json",
         });
+        archive.append(
+          JSON.stringify(settings.config.get("project"), null, 2),
+          {
+            name: "project.json",
+          },
+        );
         if (fs.existsSync(uploadDir)) {
           archive.directory(uploadDir, "upload");
         }
