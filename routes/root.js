@@ -127,98 +127,95 @@ module.exports = function (app) {
   });
 
   router.post("/setpassword", security.isLoggedIn, function (req, res, next) {
+    var setpasswordUrl = req.user.isAdmin()
+      ? "/setpassword/admin"
+      : "/setpassword/user";
+
     if (!req.body.password || req.body.password === "") {
       req.flash("error", "Passwort darf nicht leer sein!");
-      res.redirect(utils.generateUrl(req, "/setpassword/" + req.body.usertype));
-    } else if (req.body.password !== req.body.passwordRepeat) {
-      req.flash("error", "Passwörter müssen übereinstimmen");
-      res.redirect(utils.generateUrl(req, "/setpassword/" + req.body.usertype));
-    } else {
-      Promise.resolve()
-        .then(() => {
-          var salt = bcrypt.genSaltSync(10);
-          var passwordHashed = bcrypt.hashSync(req.body.password, salt);
-          if (req.body.usertype === "admin") {
-            return models.admin.update(
-              {
-                passwordHashed: passwordHashed,
-                passwordResetToken: null,
-                passwordResetExpires: null,
-              },
-              {
-                where: { id: req.user.id },
-                trackOptions: utils.getTrackOptions(req.user, true),
-              },
-            );
-          } else {
-            return models.user.update(
-              {
-                passwordHashed: passwordHashed,
-                password: null,
-                passwordResetToken: null,
-                passwordResetExpires: null,
-              },
-              {
-                where: { id: req.user.id },
-                trackOptions: utils.getTrackOptions(req.user, true),
-              },
-            );
-          }
-        })
-        .then(() => {
-          req.flash("success", "Dein Passwort wurde geändert");
-          res.redirect(utils.generateUrl(req, "/"));
-        });
+      res.redirect(utils.generateUrl(req, setpasswordUrl));
+      return;
     }
+    if (req.body.password !== req.body.passwordRepeat) {
+      req.flash("error", "Passwörter müssen übereinstimmen");
+      res.redirect(utils.generateUrl(req, setpasswordUrl));
+      return;
+    }
+
+    Promise.resolve()
+      .then(function () {
+        var salt = bcrypt.genSaltSync(10);
+        req.user.passwordHashed = bcrypt.hashSync(req.body.password, salt);
+        req.user.passwordResetToken = null;
+        req.user.passwordResetExpires = null;
+        if (!req.user.isAdmin()) {
+          req.user.password = null;
+        }
+        return req.user.save({
+          trackOptions: utils.getTrackOptions(req.user, true),
+        });
+      })
+      .then(function () {
+        req.flash("success", "Dein Passwort wurde geändert");
+        res.redirect(utils.generateUrl(req, "/"));
+      })
+      .catch(function (error) {
+        next(error);
+      });
   });
 
   router.post("/setpasswordbytoken", function (req, res, next) {
-    if (!req.body.password || req.body.password === "") {
-      req.flash("error", "Passwort darf nicht leer sein!");
-      res.redirect(utils.generateUrl(req, "/getpassword/" + req.body.token));
-    } else if (req.body.password !== req.body.passwordRepeat) {
-      req.flash("error", "Passwörter müssen übereinstimmen");
-      res.redirect(utils.generateUrl(req, "/getpassword/" + req.body.token));
-    } else {
-      Promise.resolve()
-        .then(() => {
-          var salt = bcrypt.genSaltSync(10);
-          var passwordHashed = bcrypt.hashSync(req.body.password, salt);
-          if (req.body.usertype === "admin") {
-            return models.admin.update(
-              {
-                passwordHashed: passwordHashed,
-                passwordResetToken: null,
-                passwordResetExpires: null,
-              },
-              {
-                where: { passwordResetToken: req.body.token },
-                trackOptions: utils.getTrackOptions(req.user, true),
-              },
-            );
-          } else {
-            return models.user.update(
-              {
-                passwordHashed: passwordHashed,
-                password: null,
-                passwordResetToken: null,
-                passwordResetExpires: null,
-              },
-              {
-                where: { passwordResetToken: req.body.token },
-                trackOptions: utils.getTrackOptions(req.user, true),
-              },
-            );
-          }
-        })
-        .then(() => {
-          req.flash(
-            "success",
-            "Dein Passwort wurde gesetzt, logge dich jetzt ein",
-          );
-          res.redirect(utils.generateUrl(req, "/"));
-        });
+    var token = req.body.token;
+
+    var redirectWithError = function (message) {
+      req.flash("error", message);
+      if (token && typeof token === "string") {
+        res.redirect(utils.generateUrl(req, "/getpassword/" + token));
+      } else {
+        res.redirect(utils.generateUrl(req, "/getpassword"));
+      }
+    };
+
+    if (!token || typeof token !== "string" || token.trim() === "") {
+      redirectWithError("Der Link ist ungültig, bitte versuche es noch einmal");
+      return;
     }
+    if (!req.body.password || req.body.password === "") {
+      redirectWithError("Passwort darf nicht leer sein!");
+      return;
+    }
+    if (req.body.password !== req.body.passwordRepeat) {
+      redirectWithError("Passwörter müssen übereinstimmen");
+      return;
+    }
+
+    models.admin
+      .findByToken(token)
+      .catch(function () {
+        return models.user.findByToken(token);
+      })
+      .then(function (account) {
+        var salt = bcrypt.genSaltSync(10);
+        account.passwordHashed = bcrypt.hashSync(req.body.password, salt);
+        account.passwordResetToken = null;
+        account.passwordResetExpires = null;
+        if (!account.isAdmin()) {
+          account.password = null;
+        }
+        return account.save({
+          trackOptions: utils.getTrackOptions(req.user, true),
+        });
+      })
+      .then(function () {
+        req.flash(
+          "success",
+          "Dein Passwort wurde gesetzt, logge dich jetzt ein",
+        );
+        res.redirect(utils.generateUrl(req, "/"));
+      })
+      .catch(function (error) {
+        redirectWithError(error);
+      });
   });
 
   router.post("/getpassword", function (req, res, next) {
