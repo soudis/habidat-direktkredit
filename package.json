@@ -19,7 +19,7 @@
     "bootstrap-multiselect": "^1.1.0",
     "bootstrap-select": "^1.13.18",
     "bootstrap-slider": "^10.6.2",
-    "canvas": "^2.11.2",
+    "canvas": "^3.2.3",
     "chart.js": "^2.9.4",
     "connect-flash": "~0.1.1",
     "cookie-parser": "^1.4.6",
