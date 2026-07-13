@@ -4,6 +4,7 @@ doctype html
 html
   head
     title= settings.project.get('projectname') + ' Kreditplattform - ' + title
+    meta(name="csrf-token" content=csrfToken)
     // link(rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.2/css/bootstrap.min.css")
     //link(rel="stylesheet" href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.min.css")
     link(rel="shortcut icon" type="image/png" href=_url("/public/favicon.png"))
@@ -17,6 +18,26 @@ html
     link(rel="stylesheet" href=_url("/public/chart.js/Chart.min.css"))
     //link(rel="stylesheet" href="/public/css/dataTables.bootstrap.min.css")
     script(type='text/javascript' src=_url('/public/jquery/jquery.min.js'))
+    script.
+      (function () {
+        var meta = document.querySelector('meta[name="csrf-token"]');
+        var token = meta ? meta.getAttribute('content') : '';
+        if (window.jQuery) {
+          jQuery.ajaxSetup({ headers: { 'X-CSRF-Token': token } });
+        }
+        document.addEventListener('DOMContentLoaded', function () {
+          var forms = document.querySelectorAll('form');
+          for (var i = 0; i < forms.length; i++) {
+            if (!forms[i].querySelector('input[name="_csrf"]')) {
+              var input = document.createElement('input');
+              input.type = 'hidden';
+              input.name = '_csrf';
+              input.value = token;
+              forms[i].appendChild(input);
+            }
+          }
+        });
+      })();
     //script(type='text/javascript' src='/public/popper/popper.min.js')
     script(type='text/javascript' src=_url('/public/bootstrap/bootstrap.bundle.min.js'))
     script(type='text/javascript' src=_url('/public/datatables/jquery.dataTables.min.js'))
