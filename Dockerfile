@@ -6,7 +6,7 @@ RUN \
   && apt-get clean \
   && rm -rf /var/lib/apt/lists/*
 
-RUN npm install pm2 sass pnpm@10 -g
+RUN npm install pm2@7.0.3 sass@1.101.0 pnpm@10 -g
 
 RUN mkdir -p /habidat/node_modules && chown -R node:node /habidat
 
