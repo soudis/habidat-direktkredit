@@ -8,6 +8,7 @@ try {
   var bodyParser = require("body-parser");
   var passport = require("passport");
   var flash = require("connect-flash");
+  var helmet = require("helmet");
   var https = require("https");
   var http = require("http");
   var fs = require("fs");
@@ -235,6 +236,10 @@ try {
   if (settings.config.get("site.reverseproxy") === "true") {
     app.enable("trust proxy");
   }
+
+  // security headers; CSP is left disabled for now because the app relies on
+  // inline scripts/styles that a default policy would block
+  app.use(helmet({ contentSecurityPolicy: false }));
 
   // setup the logger
   app.use(logger("common"));

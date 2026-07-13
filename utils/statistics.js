@@ -27,8 +27,8 @@ var generatePieChart = function (data, callback) {
     index++;
   }
 
-  var Canvas = require("canvas"),
-    canvas = new Canvas(800, 800),
+  var { createCanvas } = require("canvas"),
+    canvas = createCanvas(800, 800),
     ctx = canvas.getContext("2d"),
     Chart = require("nchart"),
     fs = require("fs");

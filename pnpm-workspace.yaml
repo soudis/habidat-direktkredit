@@ -1,0 +1,26 @@
+# pnpm 10 no longer reads the `pnpm` field from package.json; overrides and
+# build-script allowlists live here instead.
+onlyBuiltDependencies:
+  - bcrypt
+  - canvas
+overrides:
+  'sequelize@<6.19.1': '>=6.19.1'
+  'sequelize@<6.28.1': '>=6.28.1'
+  'sequelize@<6.29.0': '>=6.29.0'
+  'nodemailer@<7.0.7': '>=7.0.7'
+  'tar@<7.5.7': '>=7.5.7'
+  'semver@>=7.0.0 <7.5.2': '>=7.5.2'
+  'nodemailer@<=7.0.10': '>=7.0.11'
+  'tar@<=7.5.2': '>=7.5.3'
+  'tar@<7.5.8': '>=7.5.8'
+  'bootstrap-multiselect@<2.0.0': '>=2.0.0'
+  'tar@<=7.5.9': '>=7.5.10'
+  'tar@<=7.5.10': '>=7.5.11'
+  'tar@<=7.5.3': '>=7.5.4'
+  'nodemailer@<8.0.4': '>=8.0.4'
+  'nodemailer@<=8.0.4': '>=8.0.5'
+  'uuid@<11.1.1': '>=11.1.1'
+  'tar@<=7.5.15': '>=7.5.16'
+  'nodemailer@<=8.0.8': '>=8.0.9'
+  'nodemailer@<=8.0.7': '>=8.0.8'
+  'nodemailer@<=9.0.0': '>=9.0.1'
