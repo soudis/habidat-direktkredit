@@ -48,7 +48,10 @@ var createdb = function () {
       return file.indexOf(".") !== -1 && file !== "index.js";
     })
     .forEach(function (file) {
-      var model = sequelize.import(path.join(__dirname, file));
+      var model = require(path.join(__dirname, file))(
+        sequelize,
+        Sequelize.DataTypes
+      );
       db[model.name] = model;
       // create table if not exist
       /*      db[model.name].sync()

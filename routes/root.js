@@ -10,6 +10,18 @@ const utils = require("../utils");
 const email = require("../utils/email");
 const bcrypt = require("bcrypt");
 const archiver = require("archiver");
+const { rateLimit } = require("express-rate-limit");
+
+// throttle authentication attempts to slow brute-force / credential stuffing
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  limit: 10, // max attempts per window per IP
+  standardHeaders: "draft-7",
+  legacyHeaders: false,
+  // the app enables a permissive "trust proxy" behind a reverse proxy; skip
+  // express-rate-limit's proxy validation so it never aborts a request
+  validate: { trustProxy: false },
+});
 
 module.exports = function (app) {
   router.get("/projectconfig", function (req, res, next) {
@@ -164,7 +176,7 @@ module.exports = function (app) {
       });
   });
 
-  router.post("/setpasswordbytoken", function (req, res, next) {
+  router.post("/setpasswordbytoken", authLimiter, function (req, res, next) {
     var token = req.body.token;
 
     var redirectWithError = function (message) {
@@ -301,7 +313,7 @@ module.exports = function (app) {
       loginStrategies.push("user-" + strategy);
     }
   });
-  router.post("/login", function (req, res, next) {
+  router.post("/login", authLimiter, function (req, res, next) {
     passport.authenticate(loginStrategies, function (err, user, info) {
       if (err) {
         return next(err);
