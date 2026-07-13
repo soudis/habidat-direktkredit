@@ -11,6 +11,7 @@ try {
   var https = require("https");
   var http = require("http");
   var fs = require("fs");
+  var crypto = require("crypto");
   var mkdirp = require("mkdirp");
   const urlUtil = require("url");
   const intl = require("./utils/intl");
@@ -269,6 +270,48 @@ try {
   });
   app.use(passport.initialize());
   app.use(passport.session()); // persistent login sessions
+
+  // CSRF protection: a synchronizer token kept in the session, checked on unsafe
+  // methods via the X-CSRF-Token header (AJAX) or a _csrf form field. Pre-auth
+  // routes are exempt (they run before a stable session / are token-protected).
+  var csrfExemptPaths = new Set([
+    "/login",
+    "/getpassword",
+    "/setpasswordbytoken",
+  ]);
+  var csrfSafeEqual = function (a, b) {
+    if (typeof a !== "string" || typeof b !== "string" || a.length !== b.length) {
+      return false;
+    }
+    return crypto.timingSafeEqual(Buffer.from(a), Buffer.from(b));
+  };
+  app.use(function (req, res, next) {
+    if (!req.session.csrfToken) {
+      req.session.csrfToken = crypto.randomBytes(32).toString("hex");
+    }
+    res.locals.csrfToken = req.session.csrfToken;
+    if (
+      req.method === "GET" ||
+      req.method === "HEAD" ||
+      req.method === "OPTIONS"
+    ) {
+      return next();
+    }
+    var pathname = req.path;
+    if (projectId && pathname.startsWith("/" + projectId + "/")) {
+      pathname = pathname.substring(("/" + projectId).length);
+    } else if (projectId && pathname === "/" + projectId) {
+      pathname = "/";
+    }
+    if (csrfExemptPaths.has(pathname)) {
+      return next();
+    }
+    var token = req.headers["x-csrf-token"] || (req.body && req.body._csrf);
+    if (csrfSafeEqual(token, req.session.csrfToken)) {
+      return next();
+    }
+    return res.status(403).send("Invalid CSRF token");
+  });
 
   const _iv = (object, key, defaultValue = undefined) => {
     if (object) {
