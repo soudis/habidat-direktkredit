@@ -258,11 +258,16 @@ try {
       sessionHandlers[key] = session({
         secret: process.env.HABIDAT_DK_SESSION_SECRET,
         store: new FileStore(),
-        resave: true,
+        resave: false,
         cookie: {
           path: key,
+          httpOnly: true,
+          sameSite: "lax",
+          // set the Secure flag automatically when the request is HTTPS
+          // (respects "trust proxy" behind a TLS-terminating reverse proxy)
+          secure: "auto",
         },
-        saveUninitialized: true,
+        saveUninitialized: false,
       });
     }
     sessionHandlers[key](req, res, next);
