@@ -2,6 +2,7 @@
 
 const utils = require("../utils");
 const Op = require("sequelize").Op;
+const { escape } = require("lodash");
 
 module.exports = (sequelize, DataTypes) => {
   file = sequelize.define(
@@ -66,13 +67,13 @@ module.exports = (sequelize, DataTypes) => {
         req,
         `/user/show/${this.user.id}#show_file_${this.id}`
       );
-      return `<a href="${url}">${this.filename}</a>`;
+      return `<a href="${url}">${escape(this.filename)}</a>`;
     } else if (this.ref_table.startsWith("template_")) {
       var url = utils.generateUrl(req, `/admin/templates#show_file_${this.id}`);
-      return `<a href="${url}">${this.filename}</a>`;
+      return `<a href="${url}">${escape(this.filename)}</a>`;
     } else if (this.ref_table.startsWith("infopack")) {
       var url = utils.generateUrl(req, `/admin/infopack#show_file_${this.id}`);
-      return `<a href="${url}">${this.filename}</a>`;
+      return `<a href="${url}">${escape(this.filename)}</a>`;
     } else {
       return this.filename;
     }

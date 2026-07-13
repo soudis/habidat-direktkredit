@@ -97,7 +97,7 @@ mixin contractlist(contracts)
               if cell === false
                 td.selectable(title=_t('no_contract') data-order='' class=contracts.columns[cellIndex].class?contracts.columns[cellIndex].class:"") -
               else
-                td.selectable(data-order=(cell.order?cell.order:cell.value) class=cell.class + (contracts.columns[cellIndex].class?" "+contracts.columns[cellIndex].class:""))!=cell.value
+                td.selectable(data-order=(cell.order?cell.order:cell.value) class=cell.class + (contracts.columns[cellIndex].class?" "+contracts.columns[cellIndex].class:""))=cell.value
             td.fit.text-right
               if row[15] === false
                 a.btn.btn-light.btn-sm(href=_url('/user/show/'+row[1].value)) #[span.fa.fa-search-plus]  

@@ -7,7 +7,7 @@ const crypto = require("crypto");
 const utils = require("../utils");
 const format = require("../utils/format");
 const intl = require("../utils/intl");
-const { first } = require("lodash");
+const { first, escape } = require("lodash");
 
 module.exports = (sequelize, DataTypes) => {
   var User = sequelize.define(
@@ -569,11 +569,11 @@ module.exports = (sequelize, DataTypes) => {
       },
       user_address: {
         valueRaw: user.getAddress(true),
-        value: user.getAddress(true),
+        value: user.getAddress(false),
       },
       user_address_oneline: {
         valueRaw: user.getAddress(false),
-        value: user.getAddress(true),
+        value: user.getAddress(false),
       },
       user_telno: { valueRaw: user.telno, value: user.telno },
       user_email: { valueRaw: user.email, value: user.email },
@@ -691,7 +691,7 @@ module.exports = (sequelize, DataTypes) => {
 
   User.prototype.getLink = function (req) {
     var url = utils.generateUrl(req, `/user/show/${this.id}`);
-    return `<a href="${url}">${this.getFullName()}</a>`;
+    return `<a href="${url}">${escape(this.getFullName())}</a>`;
   };
 
   User.prototype.getDescriptor = function (req, models) {
