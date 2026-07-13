@@ -1,4 +1,4 @@
-FROM node:19
+FROM node:24
 
 RUN \
   apt-get update \
@@ -6,13 +6,13 @@ RUN \
   && apt-get clean \
   && rm -rf /var/lib/apt/lists/*
 
-RUN npm install pm2 sass pnpm -g
+RUN npm install pm2@7.0.3 sass@1.101.0 pnpm@10 -g
 
 RUN mkdir -p /habidat/node_modules && chown -R node:node /habidat
 
 WORKDIR /habidat
 
-COPY package*.json ./
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 
 COPY docker-entrypoint.sh /usr/local/bin/
 RUN chmod +x /usr/local/bin/docker-entrypoint.sh

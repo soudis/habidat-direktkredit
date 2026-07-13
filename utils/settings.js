@@ -55,7 +55,7 @@ const initConfig = () => {
   config.set("database.uri", process.env.HABIDAT_DK_DB_URI);
   config.set("database.host", process.env.HABIDAT_DK_DB_HOST);
   config.set("database.dialect", process.env.HABIDAT_DK_DB_DIALECT);
-  config.set("database.user", process.env.HABIDAT_DK_DB_USER);
+  config.set("database.username", process.env.HABIDAT_DK_DB_USER);
   config.set("database.password", process.env.HABIDAT_DK_DB_PASSWORD);
   config.set("database.database", process.env.HABIDAT_DK_DB_DATABASE);
 

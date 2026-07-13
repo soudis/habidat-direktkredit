@@ -14,7 +14,7 @@ services:
   # mysql instances
   #
   db:
-    image: mariadb
+    image: mariadb:12.3
     restart: always
     volumes:
       - db:/var/lib/mysql
@@ -26,7 +26,9 @@ services:
       - MYSQL_DATABASE=direktkredit
       - MYSQL_USER=direktkredit
     healthcheck:
-        test: ["CMD", "mysqladmin" ,"ping", "-h", "localhost"]
+        # newer MariaDB images dropped the `mysqladmin` name; use the image's
+        # bundled healthcheck script instead
+        test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
         timeout: 20s
         retries: 10
     logging:
